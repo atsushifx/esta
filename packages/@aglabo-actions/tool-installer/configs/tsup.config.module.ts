@@ -1,19 +1,10 @@
-// @(#) : tsup config for textlint plugin development
+// src: ./configs/tsup.config.module.ts
+// @(#) : tsup config for tool setup action (ESM)
 //
-// @version   1.0.0
-// @since     2025-04-12
-// @author    Furukawa, Atsushi <atsushifx@gmail.com>
-// @license   MIT
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
-// @description<<
-//
-// Configuration for tsup bundler using shared base config:
-// - Outputs CommonJS + ESM modules
-// - Generates declaration files (.d.ts)
-// - Cleans output directory before build
-// - Excludes config and test files from bundling
-//
-// <<
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
 // system config
 import { defineConfig } from 'tsup';
