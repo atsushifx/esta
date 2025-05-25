@@ -17,11 +17,7 @@ export default defineConfig({
   clean: true,
   format: ['esm'],
   entry: [
-    'src/**/*',
-    // exclude tests
-    '!src/**/*.test.ts',
-    '!src/**/*.spec.ts',
-    '!src/tests/**',
+    'src/index.ts',
   ],
   tsconfig: './tsconfig.json',
   outDir: 'module', // for ESM
