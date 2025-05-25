@@ -14,15 +14,6 @@ import { baseConfig } from '../../../../shared/configs/tsup.config.base';
 
 export default defineConfig({
   ...baseConfig,
-  clean: true,
-  format: ['cjs', 'esm'],
-  entry: [
-    'src/index.ts',
-  ],
-  dts: {
-    entry: 'src/index.ts',
-    resolve: true,
-  },
   tsconfig: './tsconfig.json',
   outDir: 'lib', // for CJS
 });

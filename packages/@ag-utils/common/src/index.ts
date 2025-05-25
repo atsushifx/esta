@@ -7,15 +7,13 @@
 // https://opensource.org/licenses/MIT
 
 // import
-import * as agUtilsGetPlatform from '@ag-utils/get-platform';
+import * as _agUtilsGetPlatform from '@ag-utils/get-platform';
+const agUtils = _agUtilsGetPlatform;
 
 // --- export
 // named export
 export * from '@ag-utils/get-platform'; // Individual exports (named exports)
 
-// set namespace
-export const agUtils = {
-  ...agUtilsGetPlatform,
-};
-
+// namespace / default export
+export { agUtils };
 export default agUtils; // Default export as namespace

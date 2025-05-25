@@ -19,14 +19,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export const baseConfig: Options = {
   format: ['esm'],
   target: 'es2022',
-  dts: false,
-  sourcemap: false,
   clean: true,
+  dts: true,
+  sourcemap: true,
   minify: false,
-  splitting: false,
+  splitting: true,
   shims: false,
-  // outDir: 'dist',  // それぞれのsub repositoryで設定
-
-  // ⬇ Sub-repo will define this
-  entry: [],
+  outDir: './lib',
+  // overwrite it if sub-packages is necessary
+  entry: [
+    'src/index.ts',
+    '!src/**/*.test.ts',
+    '!src/**/*.spec.ts',
+    '!src/tests/**',
+  ],
 };

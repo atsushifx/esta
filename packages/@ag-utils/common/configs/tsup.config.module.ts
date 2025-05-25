@@ -14,11 +14,8 @@ import { baseConfig } from '../../../../shared/configs/tsup.config.base';
 
 export default defineConfig({
   ...baseConfig,
-  clean: true,
+  // sub-packages definition
   format: ['esm'],
-  entry: [
-    'src/index.ts',
-  ],
   tsconfig: './tsconfig.json',
   outDir: 'module', // for ESM
 });
