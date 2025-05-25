@@ -1,4 +1,4 @@
-// src: ./helper/tool-config/__tests__/findConfigFile.spec.ts
+// src: ./helper/configs/__tests__/findConfigFile.spec.ts
 // @(#) : 設定ファイル探索ユーティリティ（prefix/extension 固定版）
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -7,19 +7,27 @@
 // https://opensource.org/licenses/MIT
 
 // libs
-import * as fs from 'fs';
+
 import * as path from 'path';
 
 // vitest
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
+// test unit
+import { ConfigType } from '@/shared/types';
+
+import { findConfigFile } from '../findConfigFile';
+
+// --- types
+import type { PathLike } from 'fs';
+
 // mock
 let expectedConfigFile: string;
 vi.mock('fs', async () => {
-  const realFs = await vi.importActual<typeof import('fs')>('fs');
+  const realFs = await vi.importActual('fs');
   return {
     ...realFs,
-    existsSync: (p: fs.PathLike) => {
+    existsSync: (p: PathLike) => {
       return String(p) === expectedConfigFile;
     },
   };
@@ -32,12 +40,7 @@ vi.mock('os', () => ({
   platform: () => 'win32',
 }));
 
-// types
-import { ConfigType } from '@/shared/types';
-
-// test unit
-import { findConfigFile } from '../findConfigFile';
-
+// --- test setup
 let ORIGINAL_ENV: NodeJS.ProcessEnv;
 beforeAll(() => {
   ORIGINAL_ENV = process.env;

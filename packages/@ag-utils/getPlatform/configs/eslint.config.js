@@ -1,5 +1,5 @@
-// src: ./configs/eslint.config.js
-// @(#) : ESLint flat config for TypeScript
+// src: configs/eslint.config.js
+// @(#) : ESLint flat config for TypeScript workspace
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -22,6 +22,7 @@ export default [
       'lib/**',
       'module/**',
       'node_modules/**',
+      '.cache/**',
     ],
   },
 

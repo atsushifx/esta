@@ -1,0 +1,28 @@
+// @(#) : cspell settings for ths workspa
+/**
+ *
+ * @version  1.0.0
+ * @author   Furukawa, Atsushi <https://github.com/atsushifx>
+ * @since    2025-02-27
+ * @license  MIT
+ *
+ * @description<<
+ *
+ * this files is cspell (Code Specll Checkr) settings for this workspace.
+ *
+ *<<
+ */
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/packages/cspell-types/cspell.schema.json",
+  "version": "0.2",
+  "import": [
+    "${env:XDG_CONFIG_HOME}/vscode/cspell.config.json",
+    "../../../../.vscode/cspell.json"
+  ],
+  "language": "en",
+  "caseSensitive": true,
+  "dictionaries": [
+    "user-dic",
+    "project-dic"
+  ]
+}

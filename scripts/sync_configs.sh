@@ -121,7 +121,7 @@ main() {
 
 
   if [[ "$config_type" == "all" ]]; then
-    local config_types=( "lefthook" "secretlint" "package")
+    local config_types=( "secretlint" "package")
     for type in "${config_types[@]}"; do
       echo "🔧 [$type]"
       sync_config_type "$type" "$target_dir" || exit 1

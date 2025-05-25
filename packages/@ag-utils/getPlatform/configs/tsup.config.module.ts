@@ -1,5 +1,5 @@
-// src: ./configs/tsup.config.module.ts
-// @(#) : tsup config for tool setup action (ESM)
+// src: configs/tsup.config.module.ts
+// @(#) : tsup config for esm module
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //

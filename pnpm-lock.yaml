@@ -57,6 +57,8 @@ importers:
         specifier: ^3.1.4
         version: 3.1.4(@types/node@22.15.21)(tsx@4.19.4)(yaml@2.8.0)
 
+  packages/@ag-utils/getPlatform: {}
+
   packages/@aglabo-actions/tool-installer:
     dependencies:
       '@actions/core':
@@ -68,6 +70,9 @@ importers:
       '@actions/tool-cache':
         specifier: ^2.0.2
         version: 2.0.2
+      '@ag-utils/get-platform':
+        specifier: workspace:*
+        version: link:../../@ag-utils/getPlatform
       '@shared':
         specifier: workspace:*
         version: link:../../../shared/common

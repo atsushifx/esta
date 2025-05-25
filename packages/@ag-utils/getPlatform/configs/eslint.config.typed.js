@@ -1,12 +1,11 @@
-// src: ./configs/eslint.config.typed.js
-// @(#) : ESLint flat config for check types
+// src: configs/eslint.config.typed.js
+// @(#) : eslint float config for type check
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// libs
 import path from 'path';
 
 // import form common base config
@@ -18,6 +17,7 @@ export default [
       'lib/**',
       'module/**',
       'node_modules/**',
+      '.cache/**',
     ],
   },
   ...baseConfig,

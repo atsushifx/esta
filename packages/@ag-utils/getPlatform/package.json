@@ -1,8 +1,8 @@
 {
-  "name": "@aglabo-actions/tool-installer",
+  "name": "@ag-utils/get-platform",
   "private": true,
-  "version": "0.1.0",
-  "description": "Universal tool installer framework for GitHub Actions (eget-based).",
+  "version": "0.0.0",
+  "description": "Cross-platform Node.js utility to detect runtime platform.",
   "author": "atsushifx <https://github.com/atsushifx>",
   "license": "MIT",
   "type": "module",
@@ -45,12 +45,6 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@actions/io": "^1.1.3",
-    "@actions/tool-cache": "^2.0.2",
-    "@shared": "workspace:*",
-    "@ag-utils/get-platform": "workspace:*",
-    "comment-json": "^4.2.5"
   },
   "devDependencies": {
   }

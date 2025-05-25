@@ -43,6 +43,7 @@
     "check:spells": "pnpm exec cspell --config .vscode/cspell.json",
     "lint": "echo 'skip where project root'",
     "lint:types": "echo 'skip where project root'",
+    "lint:all": "echo 'skip where project root'",
     "lint:fix": "echo 'skip where project root'",
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*"
   }

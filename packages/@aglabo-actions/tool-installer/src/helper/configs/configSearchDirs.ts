@@ -9,10 +9,11 @@
 // --- libs
 import * as os from 'os';
 
+// --- internal libs
+import { getDelimiter } from '@ag-utils/get-platform';
+
 // --- types
 import { ConfigType } from '@/shared/types';
-// --- modules
-import { getDelimiter } from '@/utils/getPlatform';
 
 // functions
 export const configSearchDirs = (appConfig: string, configType: ConfigType): string[] => {
