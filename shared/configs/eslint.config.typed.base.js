@@ -6,18 +6,24 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// import form common base config
-import baseConfig from './eslint.config.base.js';
-// rules
-
+// --- plugins
 import tseslint from '@typescript-eslint/eslint-plugin';
+
+// --- base configs
+import baseConfig from './eslint.config.base.js';
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
+  // --- 共通のbaseConfigを先頭に展開
   ...baseConfig,
 
+  // --- rules for TypeScript type check (override)
   {
-    files: ['src/**/*.ts', 'tests/**/*.ts', 'types/**.*.ts'],
+    files: [
+      'src/**/*.ts',
+      'tests/**/*.ts',
+      'types/**/*.ts',
+    ],
     plugins: {
       '@typescript-eslint': tseslint,
     },

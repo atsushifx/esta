@@ -6,15 +6,25 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// libs
-
 // import form common base config
 import baseConfig from '../../../../shared/configs/eslint.config.base.js';
+
+// libs
 
 // settings
 export default [
   ...baseConfig,
-
   // source codes
-  {},
+  {
+    files: [
+      'src/**/*.ts',
+    ],
+    settings: {
+      'import/resolver': {
+        typescript: {
+          project: './tsconfig.json',
+        },
+      },
+    },
+  },
 ];
