@@ -1,11 +1,13 @@
-// src: ./utils/__tests__/searchDirs.spec.ts
+// src: ./helper/configs/__tests__/configSearchDirs.spec.ts
 // @(#) : 設定ファイル検索用ディレクトリリストのユニットテスト
-
+//
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// --- libs
+import { getDelimiter } from '@ag-utils/get-platform';
 // vitest
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -17,7 +19,6 @@ vi.mock('os', () => ({
 
 // libs
 import { ConfigType } from '@/shared/types';
-import { getDelimiter } from '@/utils/getPlatform';
 
 // test unit
 import { configSearchDirs } from '../configSearchDirs';

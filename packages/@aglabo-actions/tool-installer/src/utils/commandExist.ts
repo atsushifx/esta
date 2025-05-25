@@ -11,7 +11,7 @@
 // main
 import { spawn } from 'child_process';
 
-import { getPlatform } from '@/utils/getPlatform';
+import { getPlatform } from '@ag-utils/get-platform';
 
 const existWhenWindows = (command: string): Promise<boolean> =>
   new Promise((resolve) => {
