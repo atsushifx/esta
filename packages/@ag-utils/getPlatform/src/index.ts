@@ -9,12 +9,13 @@
 // import all
 import * as agUtilsObj from './getPlatform';
 
-// 値オブジェクトから型を設定
+// -- Namespaced export object ---
 type _agUtilsType = typeof agUtilsObj & {
   PlatformType: typeof agUtilsObj.PlatformType;
 };
 const agUtils = agUtilsObj as _agUtilsType;
 
-// export
-export { agUtils };
+// --- export
+export * from './getPlatform'; // named export
+export { agUtils }; //            namespace export
 export default agUtils;
