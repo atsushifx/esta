@@ -7,9 +7,16 @@
 // https://opensource.org/licenses/MIT
 
 // libs
+import path from 'path';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 // import form common base config
 import baseConfig from '../../../../shared/configs/eslint.config.base.js';
+
+// set __dirname for ESM
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const rootDir = path.resolve(__dirname, '../');
 
 // settings
 export default [
@@ -19,12 +26,19 @@ export default [
   {
     files: [
       'src/**/*.ts',
+      'tests/**/*.ts',
     ],
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: rootDir,
+        project: path.resolve(rootDir, './tsconfig.json'),
+      },
+    },
     settings: {
       'import/resolver': {
         typescript: {
-          project: './tsconfig.json',
-          tsconfigRootDir: __dirname,
+          tsconfigRootDir: rootDir,
+          project: path.resolve(rootDir, './tsconfig.json'),
         },
       },
     },

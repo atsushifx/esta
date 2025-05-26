@@ -11,7 +11,7 @@ import * as os from 'os';
 import process from 'process';
 
 // --- internal libs
-import { getDelimiter } from '@ag-utils/get-platform';
+import { getDelimiter } from '@ag-utils/common';
 
 // --- types
 import { ConfigType } from '@/shared/types';

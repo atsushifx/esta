@@ -21,13 +21,11 @@
   ],
   "compilerOptions": {
     // directories
-    "outDir": "lib",
+    // "outDir": "lib",
     "rootDir": "./",
-    // ✅ エイリアス設定（←追加！）
+    // aliases
     "baseUrl": "./",
     // "paths": {},      // 外部パッケージ用にリザーブ
-    // aliases
-    // "paths": {},
     // types
     // cache
     "tsBuildInfoFile": ".cache/tsbuildinfo"

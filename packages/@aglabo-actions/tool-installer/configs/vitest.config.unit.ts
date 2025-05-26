@@ -6,12 +6,14 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// libs for base directory
+// libs : Note path resolver
 import path from 'path';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-// base directory
+
+// Monorepo root directory
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const MonorepoRoot = path.resolve(__dirname, '../../../../');
 
 // system config
 import { mergeConfig } from 'vitest/config';
@@ -31,6 +33,7 @@ export default mergeConfig(baseConfig, {
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '../src'),
+      '@shared': path.resolve(MonorepoRoot, 'shared/common'),
     },
   },
 });

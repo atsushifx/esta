@@ -13,7 +13,7 @@ import { join } from 'path';
 import path from 'path';
 import { promisify } from 'util';
 
-import { getPlatform } from '@ag-utils/get-platform';
+import { getPlatform } from '@ag-utils/common';
 // constants
 import { AgActions_DEFAULT_TEMP_DIR, AgDir_WINGET_INSTALL_DIR } from '@shared/constants';
 
