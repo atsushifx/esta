@@ -23,10 +23,10 @@
     "outDir": "lib",
     "rootDir": ".",
     // alias
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
       "@/*": [
-        "./src/*"
+        "*"
       ]
     },
     // types
