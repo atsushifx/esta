@@ -16,8 +16,8 @@ const config: UserConfig = {
   ...baseConfig,
   rules: {
     ...baseConfig.rules,
-    // 必要ならここでプロジェクト固有ルールを追加・上書き
-    // 'header-max-length': [2, 'always', 72], など
+    // write rules if necessary
+    // 'header-max-length': [2, 'always', 72], etc
   },
 };
 

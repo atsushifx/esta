@@ -1,5 +1,5 @@
-// src: ./configs/tsup.config.ts
-// @(#) : tsup config for tool setup action
+// src: configs/tsup.config.ts
+// @(#) : tsup config for CommonJS module
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -14,19 +14,10 @@ import { baseConfig } from '../../../../shared/configs/tsup.config.base';
 
 export default defineConfig({
   ...baseConfig,
-  clean: true,
+
+  // sub packages definition
   format: ['cjs', 'esm'],
-  entry: [
-    'src/**/*',
-    // exclude tests
-    '!src/**/*.test.ts',
-    '!src/**/*.spec.ts',
-    '!src/tests/**',
-  ],
-  dts: {
-    entry: 'src/index.ts',
-    resolve: true,
-  },
-  tsconfig: './tsconfig.json',
   outDir: 'lib', // for CJS
+  // tsconfig
+  tsconfig: './tsconfig.json',
 });

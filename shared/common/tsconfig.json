@@ -1,23 +1,37 @@
-// src: /shared/tsconfig.json
-// @(#) : 型、定数要設定
+// src: ./tsconfig.json
+// @(#) : typescript compile settings
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 {
-  "extends": "../configs/tsconfig.base.json",
+  "extends": "../../shared/configs/tsconfig.base.json",
   "include": [
-    "."
+    "index.ts",
+    "constants/**/*.ts",
+    "types/**/*.ts"
   ],
   "exclude": [
     ".git",
-    "node_modules",
     "lib",
-    "configs"
+    "module",
+    "node_modules",
+    ".cache"
   ],
   "compilerOptions": {
+    // directories
     "outDir": "lib",
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
+    "rootDir": "./",
+    // ✅ エイリアス設定（←追加！）
+    "baseUrl": "./",
+    // "paths": {},      // 外部パッケージ用にリザーブ
+    // aliases
+    // "paths": {},
+    // types
+    // cache
     "tsBuildInfoFile": ".cache/tsbuildinfo"
   }
+  // references
+  // "references": []
 }

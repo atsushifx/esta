@@ -1,5 +1,5 @@
-// src: ./configs/tsup.config.module.ts
-// @(#) : tsup config for tool setup action (ESM)
+// src: configs/tsup.config.module.ts
+// @(#) : tsup config for esm module
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -12,17 +12,13 @@ import { defineConfig } from 'tsup';
 // user config
 import { baseConfig } from '../../../../shared/configs/tsup.config.base';
 
+// configs
 export default defineConfig({
   ...baseConfig,
-  clean: true,
+
+  // sub-packages definition
   format: ['esm'],
-  entry: [
-    'src/**/*',
-    // exclude tests
-    '!src/**/*.test.ts',
-    '!src/**/*.spec.ts',
-    '!src/tests/**',
-  ],
-  tsconfig: './tsconfig.json',
   outDir: 'module', // for ESM
+  // tsconfig
+  tsconfig: './tsconfig.json',
 });

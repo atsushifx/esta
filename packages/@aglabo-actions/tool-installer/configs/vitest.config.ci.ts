@@ -1,4 +1,4 @@
-// src: ./configs/vitest.config.unit.ts
+// src: ./configs/vitest.config.ci.ts
 // @(#) : vitest config for integration test
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -6,31 +6,31 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// libs
+// libs for base directory
 import path from 'path';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
+// base directory
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // system config
-import { defineConfig } from 'vitest/config';
+import { mergeConfig } from 'vitest/config';
 
 // user common config
 import baseConfig from '../../../../shared/configs/vitest.config.base';
 
-// constants
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 // config
-export default defineConfig({
-  ...baseConfig,
-  plugins: [],
+export default mergeConfig(baseConfig, {
   test: {
-    ...baseConfig.test,
+    include: [
+      // CI Tests
+      'tests/**/*.test.ts',
+      'tests/**/*.spec.ts',
+    ],
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '../src'),
-      '@shared': path.resolve(__dirname, '../../../../shared/common'),
     },
   },
 });

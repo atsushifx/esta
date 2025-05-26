@@ -9,28 +9,26 @@
   "extends": "../../../shared/configs/tsconfig.base.json",
   "include": [
     "src/**/*.ts",
-    "tests/**/*.ts",
+    "tests/**/*.ts"
   ],
   "exclude": [
     ".git",
     "lib",
     "module",
     "node_modules",
-    ".cache",
+    ".cache"
   ],
   "compilerOptions": {
     // directories
     "outDir": "lib",
     "rootDir": "./src",
-    // ✅ エイリアス設定（←追加！）
+    // alias
     "baseUrl": "./src",
-    // "paths": {},      // 外部パッケージ用にリザーブ
-    // aliases
     // "paths": {},
     // types
     // cache
-    "tsBuildInfoFile": ".cache/tsbuildinfo",
-  },
+    "tsBuildInfoFile": ".cache/tsbuildinfo"
+  }
   // references
   // "references": []
 }

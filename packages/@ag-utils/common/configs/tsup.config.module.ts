@@ -12,10 +12,13 @@ import { defineConfig } from 'tsup';
 // user config
 import { baseConfig } from '../../../../shared/configs/tsup.config.base';
 
+// configs
 export default defineConfig({
   ...baseConfig,
+
   // sub-packages definition
   format: ['esm'],
-  tsconfig: './tsconfig.json',
   outDir: 'module', // for ESM
+  // tsconfig
+  tsconfig: './tsconfig.json',
 });

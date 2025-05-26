@@ -10,14 +10,14 @@
   // compiler options
   "include": [
     "src/**/*.ts",
-    "tests/**/*.ts",
+    "tests/**/*.ts"
   ],
   "exclude": [
     ".git",
     "lib",
     "module",
     "node_modules",
-    ".cache",
+    ".cache"
   ],
   "compilerOptions": {
     // directories
@@ -30,8 +30,8 @@
     // "paths": {},
     // types
     // cache
-    "tsBuildInfoFile": ".cache/tsbuildinfo",
-  },
+    "tsBuildInfoFile": ".cache/tsbuildinfo"
+  }
   // references
   // "references": []
 }

@@ -9,26 +9,24 @@
 // vitest
 import { defineConfig } from 'vitest/config';
 
-// libs
-import { resolve } from 'path';
-
 // configs
 export default defineConfig({
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, '.'), // ルートパスとしての "@"
-    },
-  },
   test: {
     globals: true,
     environment: 'node',
     include: [
-      // Unit Test (develop test) exec only sub repositories
+      // NOTE: DO NOT ENABLE THESE HERE unless you want ALL tests to run in every subpackage.
+      // Recommended: define test.include in each sub-package's vitest.config.*
+      // Examples:
+      //   - For unit tests only: 'src/**/*.spec.ts'
+      //   - For CI-wide tests: 'tests/**/*.spec.ts'
+      //
+      // Unit Test (develop test) : set these sub-packages vitest.config.unit.ts
       // 'src/**/*.test.ts',
       // 'src/**/*.spec.ts',
-      // CI Tests exec all  repositories
-      'tests/**/*.test.ts',
-      'tests/**/*.spec.ts',
+      // CI Tests (integration test) : set these sub-packages vitest.config.ci.ts
+      // 'tests/**/*.test.ts',
+      // 'tests/**/*.spec.ts',
     ],
     exclude: [
       'node_modules/**',
@@ -40,6 +38,14 @@ export default defineConfig({
       '.cache/**',
       // コメントアウト
       `**/#*.ts`,
+      `**/#*tests*`,
     ],
+    coverage: {
+      reporter: ['text', 'json-summary'],
+    },
+  },
+  resolve: {
+    // set on sub-packages configs
+    alias: {},
   },
 });

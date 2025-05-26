@@ -1,34 +1,38 @@
+// src: ./tsconfig.json
+// @(#) : typescript compile settings
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 {
-  "@(#)": "tsconfig.json: for @aglabo-actions/tool-installer",
   "extends": "../../../shared/configs/tsconfig.base.json",
-  // files
   "include": [
-    "src/**/*",
-    "tests/**/*"
+    "src/**/*.ts",
+    "tests/**/*.ts"
   ],
   "exclude": [
     ".git",
-    "node_modules",
     "lib",
-    "module"
+    "module",
+    "node_modules",
+    ".cache"
   ],
-  // compiler options
   "compilerOptions": {
-    // in/out dir
-    "rootDir": "./",
+    // directories
     "outDir": "lib",
-    // aliases
-    "baseUrl": "./",
+    "rootDir": ".",
+    // alias
+    "baseUrl": ".",
     "paths": {
-      // ローカルのプラグイン、ルール
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     },
     // types
-    // incremental build info
+    // cache
     "tsBuildInfoFile": ".cache/tsbuildinfo"
-  },
+  }
   // references
-  "references": []
+  // "references": []
 }
