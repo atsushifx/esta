@@ -76,9 +76,9 @@ importers:
       '@actions/tool-cache':
         specifier: ^2.0.2
         version: 2.0.2
-      '@ag-utils/get-platform':
+      '@ag-utils/common':
         specifier: workspace:*
-        version: link:../../@ag-utils/get-platform
+        version: link:../../@ag-utils/common
       '@shared':
         specifier: workspace:*
         version: link:../../../shared/common
