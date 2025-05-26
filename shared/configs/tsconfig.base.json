@@ -20,7 +20,7 @@
     "module": "ES2022",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     // ✅ 型解決と互換性
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
