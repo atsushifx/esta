@@ -7,8 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // libs
-
 import * as path from 'path';
+import process from 'process';
 
 // vitest
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';

@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import { AgLogLevel } from '@/shared/types';
+import type { AgLogLevel } from '@/shared/types';
 
 // functions
 export const agLogMessage = (...args: unknown[]): string =>

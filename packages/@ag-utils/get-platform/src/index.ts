@@ -7,15 +7,17 @@
 // https://opensource.org/licenses/MIT
 
 // import all
-import * as agUtilsGetPlatform from './getPlatform';
+import * as _agUtilsGetPlatform from './getPlatform';
 
-// -- Namespaced export object ---
-type _agUtilsType = typeof agUtilsGetPlatform & {
-  PlatformType: typeof agUtilsGetPlatform.PlatformType;
+// 値オブジェクトから型を設定
+type _agUtilsType = typeof _agUtilsGetPlatform & {
+  PlatformType: typeof _agUtilsGetPlatform.PlatformType;
 };
-const agUtils = agUtilsGetPlatform as _agUtilsType;
+const agUtils = _agUtilsGetPlatform as _agUtilsType;
 
 // --- export
-export * from './getPlatform'; // named export
-export { agUtils }; //            namespace export
+// named export
+export * from './getPlatform';
+
+export { agUtils };
 export default agUtils;

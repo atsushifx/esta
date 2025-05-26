@@ -7,6 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // --- libs
+import process from 'process';
+
 import { getDelimiter } from '@ag-utils/get-platform';
 // vitest
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
