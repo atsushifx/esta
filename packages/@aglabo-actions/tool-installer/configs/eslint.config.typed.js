@@ -6,28 +6,40 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// libs
+import path from 'path';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
 // import form common base config
 import baseConfig from '../../../../shared/configs/eslint.config.typed.base.js';
 
+// directories
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const rootDir = path.resolve(__dirname, '..');
+
+// eslint configs
 export default [
   ...baseConfig,
-  // --- source code
+
   // source codes settings
   {
     files: [
       'src/**/*.ts',
+      'tests/**/*.ts',
     ],
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.json'],
-        tsconfigRootDir: '.',
+        project: [path.resolve(rootDir, 'tsconfig.json')],
+        tsconfigRootDir: rootDir,
         sourceType: 'module',
       },
     },
     settings: {
       'import/resolver': {
         typescript: {
-          project: './tsconfig.json',
+          project: [path.resolve(rootDir, 'tsconfig.json')],
+          tsconfigRootDir: rootDir,
         },
       },
     },
