@@ -1,32 +1,34 @@
-// src: ./configs/eslint.config.typed.js
-// @(#) : ESLint flat config for check types
+// src: configs/eslint.config.typed.js
+// @(#) : eslint float config for type check
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// libs
-import path from 'path';
-
 // import form common base config
 import baseConfig from '../../../../shared/configs/eslint.config.typed.base.js';
 
 export default [
-  {
-    ignores: [
-      'lib/**',
-      'module/**',
-      'node_modules/**',
-    ],
-  },
   ...baseConfig,
+  // --- source code
+  // source codes settings
   {
-    files: ['src/**/*.ts', 'tests/**/*.ts', 'types/**.*.ts'],
+    files: [
+      'src/**/*.ts',
+    ],
     languageOptions: {
       parserOptions: {
         project: ['./tsconfig.json'],
-        tsconfigRootDir: path.resolve(), // 実行ディレクトリ基準
+        tsconfigRootDir: '.',
+        sourceType: 'module',
+      },
+    },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          project: './tsconfig.json',
+        },
       },
     },
   },

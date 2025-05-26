@@ -1,5 +1,5 @@
-// src: /configs/tsup.config.module.ts
-// @(#)  : ESM用
+// src: configs/tsup.config.module.ts
+// @(#) : tsup config for esm module
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -10,15 +10,15 @@
 import { defineConfig } from 'tsup';
 
 // user config
-import { baseConfig } from '../../configs/tsup.config.base';
+import { baseConfig } from '../../../shared/configs/tsup.config.base';
 
+// configs
 export default defineConfig({
   ...baseConfig,
-  clean: true,
+
+  // sub-packages definition
   format: ['esm'],
-  entry: [
-    'index.ts',
-  ],
-  tsconfig: './tsconfig.json',
   outDir: 'module', // for ESM
+  // tsconfig
+  tsconfig: './tsconfig.json',
 });

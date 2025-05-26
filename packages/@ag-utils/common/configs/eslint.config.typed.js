@@ -12,5 +12,24 @@ import baseConfig from '../../../../shared/configs/eslint.config.typed.base.js';
 export default [
   ...baseConfig,
   // --- source code
-  {},
+  // source codes settings
+  {
+    files: [
+      'src/**/*.ts',
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.json'],
+        tsconfigRootDir: '.',
+        sourceType: 'module',
+      },
+    },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          project: './tsconfig.json',
+        },
+      },
+    },
+  },
 ];

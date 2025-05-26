@@ -12,8 +12,8 @@ import baseConfig from '../../../../shared/configs/eslint.config.typed.base.js';
 
 export default [
   ...baseConfig,
-  // --- source code
-  // source codes
+
+  // source codes settings
   {
     files: [
       'src/**/*.ts',
