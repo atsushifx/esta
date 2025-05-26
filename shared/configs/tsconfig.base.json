@@ -6,13 +6,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 {
-  "exclude": [
-    ".git",
-    "node_modules",
-    "lib",
-    "module",
-    ".cache"
-  ],
+  // --- files settings (set sub-packages)
+  // "include": []
+  // "exclude": [],
+  // --- compile options
   "compilerOptions": {
     // ✅ 厳格チェック
     "alwaysStrict": true,
@@ -23,7 +20,7 @@
     "module": "ES2022",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     // ✅ 型解決と互換性
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -37,21 +34,22 @@
     "composite": false,
     // incremental build
     "incremental": true,
-    // "tsBuildInfoFile": ".cache/tsbuildinfo",  // 各リポジトリで設定
-    // input/output Dir
-    // "outDir": "./dist",  // 各リポジトリで設定
+    "tsBuildInfoFile": ".cache/tsbuildinfo",
     // ✅ ライブラリ
     "lib": [
       "ESNext",
       "DOM"
     ],
+    // input/output Dir
+    //"rootDir": "./src",
+    "outDir": "./dist",
     // ✅ エイリアス設定（←追加！）
-    "baseUrl": ".",
+    //"baseUrl": "./src",
     // "paths": {},      // 外部パッケージ用にリザーブ
     // ✅ 型補完
     // "typeRoots": [],   // typesが読み込めない場合に設定
     "types": [
       "node",
-    ]
+    ],
   }
 }

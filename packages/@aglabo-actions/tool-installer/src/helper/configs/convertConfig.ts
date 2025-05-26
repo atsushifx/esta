@@ -46,7 +46,7 @@ export const convertConfig = (raw: object): AgActionToolConfig => {
     throw new Error('Config is empty');
   }
   const config = raw as AgActionToolConfig;
-  const installer = config.installer as AgActionInstallerType;
+  const installer = config.installer;
   checkValidInstaller(installer);
   switch (installer) {
     case AgActionInstallerType.EGET:

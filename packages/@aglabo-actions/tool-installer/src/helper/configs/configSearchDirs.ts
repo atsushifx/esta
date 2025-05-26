@@ -8,6 +8,7 @@
 
 // --- libs
 import * as os from 'os';
+import process from 'process';
 
 // --- internal libs
 import { getDelimiter } from '@ag-utils/get-platform';

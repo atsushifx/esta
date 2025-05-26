@@ -1,45 +1,54 @@
 // src: /shared/configs/eslint.config.base.js
-// @(#) : ESLint flat config for TypeScript workspace
+// @(#) : ESLint flat base config : project easy-setup-tools
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// libs
-// tsconfig.jsonのパスを絶対パスで指定
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-// constants
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-// eslint plugin
+// eslint plugin / parser
 import js from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
-//
 import importPlugin from 'eslint-plugin-import';
+
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
-  // JavaScriptの推奨設定を統合
+  // --- JavaScript rules
   js.configs.recommended,
 
+  // --- 1. common ignores
   {
-    files: ['src/**/*.ts', 'tests/**/*.ts', 'types/**/*.ts'],
-    ignores: ['**/lib/**', '**/module/**', '**/dist/**', '**/node_modules/**', '**/.cache/**'],
+    ignores: [
+      '**/lib/**',
+      '**/module/**',
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/.cache/**',
+    ],
+  },
+
+  // --- 2. Source code definitions
+  {
+    files: [
+      'src/**/*.ts',
+      'tests/**/*.ts',
+      'types/**/*.ts',
+    ],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
+        // project: ['./tsconfig.json'], // every package has its own tsconfig.json,
       },
       globals: {
         console: 'readonly',
         process: 'readonly',
         __dirname: 'readonly',
         __filename: 'readonly',
+        NodeJS: 'readonly',
       },
     },
     plugins: {
@@ -65,13 +74,32 @@ export default [
     },
     settings: {
       'import/resolver': {
-        typescript: {
-          project: ['./tsconfig.json'],
-        },
         node: {
           moduleDirectory: ['node_modules', 'src/'],
         },
       },
+    },
+  },
+
+  // --- 3. for config files overwritten rules
+  {
+    files: [
+      '*.config*.ts',
+      '*.config*.js',
+    ],
+    languageOptions: {
+      parser: tsparser,
+      parserOptions: {
+        project: false, // 型チェックを無効化
+        sourceType: 'module',
+        ecmaVersion: 'latest',
+      },
+    },
+    plugins: {
+      'import': importPlugin,
+    },
+    rules: {
+      'import/order': 'warn', // 必要なら他の差分ルールもここで
     },
   },
 ];

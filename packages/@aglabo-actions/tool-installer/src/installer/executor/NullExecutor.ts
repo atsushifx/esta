@@ -8,12 +8,12 @@
 
 import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@/shared/types';
 
-export class NotSupportedExecutor implements AgActionInstallerExecutor {
+export class NullExecutor implements AgActionInstallerExecutor {
   public async execute(_options: AgActionInstallOptions): Promise<boolean> {
-    console.warn('このインストーラータイプはまだ実装されていません');
+    console.warn('Thins installer type is not supported yet.');
     return false;
   }
 }
 
 // export
-export default NotSupportedExecutor;
+export default NullExecutor;
