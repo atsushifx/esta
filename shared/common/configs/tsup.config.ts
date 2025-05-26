@@ -15,6 +15,13 @@ import { baseConfig } from '../../../shared/configs/tsup.config.base';
 export default defineConfig({
   ...baseConfig,
 
+  // entry points
+  entry: {
+    'index': './index.ts',
+    'constants/index': './constants/index.ts',
+    'types/index': './types/index.ts',
+  },
+
   // sub packages definition
   format: ['cjs', 'esm'],
   outDir: 'lib', // for CJS

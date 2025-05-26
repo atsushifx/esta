@@ -23,7 +23,7 @@ export const baseConfig: Options = {
   dts: true,
   sourcemap: true,
   minify: false,
-  splitting: true,
+  splitting: false,
   shims: false,
   outDir: './lib',
   // overwrite it if sub-packages is necessary
