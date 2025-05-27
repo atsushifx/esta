@@ -41,5 +41,7 @@
     "test:ci": "pnpm exec vitest run --config ./configs/vitest.config.ci.ts",
     "test:watch": "pnpm exec vitest --config ./configs/vitest.config.unit.ts --watch",
     "sync:configs": "bash ../../scripts/sync_configs.sh . "
+  },
+  "devDependencies": {
   }
 }

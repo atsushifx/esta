@@ -59,9 +59,9 @@ importers:
 
   packages/@ag-utils/command-utils:
     dependencies:
-      '@ag-utils/common':
+      '@ag-utils/get-platform':
         specifier: workspace:*
-        version: link:../common
+        version: link:../get-platform
 
   packages/@ag-utils/common:
     dependencies:

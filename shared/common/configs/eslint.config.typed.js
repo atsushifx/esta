@@ -6,18 +6,26 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// libs
+
+import tsParser from '@typescript-eslint/parser';
+// plugins
+
 // import form common base config
 import baseConfig from '../../../shared/configs/eslint.config.typed.base.js';
 
 export default [
   ...baseConfig,
-  // --- source code
-  // source codes settings
+
+  // --- source codes settings
   {
     files: [
-      'src/**/*.ts',
+      'index.ts',
+      'constants/**/*.ts',
+      'types/**/*.ts',
     ],
     languageOptions: {
+      parser: tsParser,
       parserOptions: {
         project: ['./tsconfig.json'],
         tsconfigRootDir: '.',

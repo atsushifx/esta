@@ -23,15 +23,15 @@ pre-commit:
 
     eslint:
       glob:
-        - "shared/*.{js,ts,tsx}"
-        - "packages/*.{js,ts,tsx}"
-      run: pnpm run lint -- {staged_files}
+        - "shared/**/*.ts"
+        - "packages/**/*.ts"
+      run: pnpm run lint
 
     eslint-types:
       glob:
-        - "shared/*.{js,ts,tsx}"
-        - "packages/*.{js,ts,tsx}"
-      run: pnpm run lint:types -- {staged_files}
+        - "shared/**/*.ts"
+        - "packages/**/*.ts"
+      run: pnpm run lint:types
 
     lint-spells:
       glob:
