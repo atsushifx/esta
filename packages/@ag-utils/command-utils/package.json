@@ -46,7 +46,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@ag-utils/common": "workspace:*"
+    "@ag-utils/get-platform": "workspace:*"
   },
   "devDependencies": {
   }
