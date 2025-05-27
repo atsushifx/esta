@@ -34,10 +34,10 @@
     "vitest": "^3.1.4"
   },
   "scripts": {
-    "build": "pnpm run build:cjs && pnpm run build:esm",
-    "build:esm": "tsup --config tsup.config.module.ts",
-    "build:cjs": "tsup --config tsup.config.ts",
-    "clean": "rimraf lib module",
+    "build": "pnpm -r run build",
+    "build:esm": "pnpm -r run build:esm",
+    "build:cjs": "pnpm -r run build:cjs",
+    "clean": "pnpm -r run clean",
     "format:dprint": "dprint fmt",
     "check:dprint": "dprint check",
     "check:types": "pnpm -r run check:types",
