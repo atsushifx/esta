@@ -1,0 +1,64 @@
+name: pnpm Script CI
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  pnpm-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run lint
+        run: |
+          set -o pipefail
+          pnpm run lint 2>&1 | tee lint-report.txt
+          pnpm run lint:types 2>&1 | tee -a lint-report.txt
+          pnpm run check:spells 2>&1 | tee -a lint-report.txt
+
+      - name: Check for errors or warnings in report
+        id: lint_check
+        run: |
+          upload_report=false
+          if grep -q 'error' lint-report.txt; then
+            echo "errors_found=true" >> $GITHUB_OUTPUT
+            upload_report=true
+          else
+            echo "errors_found=false" >> $GITHUB_OUTPUT
+          fi
+          if grep -q 'warning' lint-report.txt; then
+            upload_report=true
+          fi
+          echo "upload_report=$upload_report" >> $GITHUB_OUTPUT
+
+      - name: Fail on errors
+        if: steps.lint_check.outputs.errors_found == 'true'
+        run: |
+          echo "❌ Lint errors found!"
+          exit 1
+
+      - name: Upload lint report (if problems found)
+        if: steps.lint_check.outputs.upload_report == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: lint-report.txt
