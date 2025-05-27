@@ -10,13 +10,13 @@
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 
+// internal libs
+import { commandExist } from '@ag-utils/common';
 // vitest
 import { describe, expect, it } from 'vitest';
 
 // test unit
 import { EgetInitializer } from '@/installer/executor/EgetInitializer';
-// modules
-import { commandExist } from '@/utils/commandExist';
 
 // types
 import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@/shared/types';
