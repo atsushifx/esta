@@ -35,8 +35,7 @@ pre-commit:
 
     lint-spells:
       glob:
-        - "shared/*.{js,ts,tsx}"
-        - "packages/*.{js,ts,tsx}"
+        - "**/*"
       run: pnpm run check:spells -- {staged_files}
 
 commit-msg:
