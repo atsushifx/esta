@@ -57,8 +57,17 @@ importers:
         specifier: ^3.1.4
         version: 3.1.4(@types/node@22.15.21)(tsx@4.19.4)(yaml@2.8.0)
 
+  packages/@ag-utils/command-utils:
+    dependencies:
+      '@ag-utils/common':
+        specifier: workspace:*
+        version: link:../common
+
   packages/@ag-utils/common:
     dependencies:
+      '@ag-utils/command-utils':
+        specifier: workspace:*
+        version: link:../command-utils
       '@ag-utils/get-platform':
         specifier: workspace:*
         version: link:../get-platform
