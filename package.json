@@ -40,9 +40,10 @@
     "clean": "rimraf lib module",
     "format:dprint": "dprint fmt",
     "check:dprint": "dprint check",
-    "check:spells": "pnpm exec cspell --config .vscode/cspell.json",
-    "lint": "echo 'skip where project root'",
-    "lint:types": "echo 'skip where project root'",
+    "check:types": "pnpm -r run check:types",
+    "check:spells": "pnpm exec cspell --config .vscode/cspell.json ",
+    "lint": "pnpm -r  run lint",
+    "lint:types": "pnpm -r run lint:types",
     "lint:all": "echo 'skip where project root'",
     "lint:fix": "echo 'skip where project root'",
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*"
