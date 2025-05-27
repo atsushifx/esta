@@ -13,12 +13,13 @@ import { join } from 'path';
 import path from 'path';
 import { promisify } from 'util';
 
+// internal libs
 import { getPlatform } from '@ag-utils/common';
+import { commandExist } from '@ag-utils/common';
 // constants
 import { AgActions_DEFAULT_TEMP_DIR, AgDir_WINGET_INSTALL_DIR } from '@shared/constants';
 
 // modules
-import { commandExist } from '@/utils/commandExist';
 import { prepareInstallDirectory } from '@/utils/prepareInstallDirectory';
 
 import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@/shared/types';
