@@ -65,7 +65,27 @@ export default [
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'import/no-unresolved': 'error',
       'import/order': ['warn', {
-        'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
+        'groups': [
+          'builtin',
+          'external',
+          'internal',
+          ['parent', 'sibling', 'index'],
+          'object',
+          'type',
+        ],
+        pathGroups: [
+          {
+            pattern: '@shared/**',
+            group: 'internal',
+            position: 'before',
+          },
+          {
+            pattern: '@/**',
+            group: 'internal',
+            position: 'before',
+          },
+        ],
+        pathGroupsExcludedImportTypes: ['builtin'],
         'newlines-between': 'always',
         'alphabetize': {
           'order': 'asc',
@@ -101,7 +121,13 @@ export default [
       'import': importPlugin,
     },
     rules: {
-      'import/order': 'warn', // 必要なら他の差分ルールもここで
+      'import/order': ['warn', {
+        'newlines-between': 'always', // ← ★ここを統一！
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true,
+        },
+      }],
     },
   },
 ];

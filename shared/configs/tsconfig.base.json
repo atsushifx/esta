@@ -31,7 +31,7 @@
     // ✅ 出力・ソースマップ
     "sourceMap": false,
     "newLine": "LF",
-    "composite": false,
+    "composite": true,
     // incremental build
     "incremental": true,
     // "tsBuildInfoFile": "../../.cache/tsbuild-cache/tsBuildInfo", // set by every sub-packages
@@ -49,6 +49,9 @@
       // sub-packages common aliases
       "@/*": [
         "src/*"
+      ],
+      "@util/*": [
+        "src/utils/*"
       ],
       "@shared/*": [
         "shared/*",

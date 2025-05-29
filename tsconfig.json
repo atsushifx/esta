@@ -29,7 +29,23 @@
     // cache
     "incremental": true,
     "tsBuildInfoFile": ".cache/tsbuild-cache/tsBuildInfo"
-  }
-  // references
-  // "references": []
+  },
+  // project references
+  "references": [
+    {
+      "path": "shared/common/tsconfig.json"
+    },
+    {
+      "path": "packages/@ag-utils/common/tsconfig.json"
+    },
+    {
+      "path": "packages/@ag-utils/command-utils/tsconfig.json"
+    },
+    {
+      "path": "packages/@ag-utils/get-platform/tsconfig.json"
+    },
+    {
+      "path": "packages/@aglabo-actions/tool-installer/tsconfig.json"
+    }
+  ]
 }

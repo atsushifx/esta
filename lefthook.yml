@@ -21,11 +21,17 @@ pre-commit:
         --maskSecrets
         "{staged_files}"
 
-    #    eslint:
-    #      glob:
-    #        - "shared/**/*.ts"
-    #        - "packages/**/*.ts"
-    #      run: pnpm run lint
+    eslint:
+      glob:
+        - "shared/**/*.ts"
+        - "packages/**/*.ts"
+      run: pnpm run lint:update -- {staged_files}
+
+    eslint-types:
+      glob:
+        - "shared/**/*.ts"
+        - "packages/**/*.ts"
+      run: pnpm run lint:types-update -- {staged_files}
 
     lint-spells:
       glob:
