@@ -7,10 +7,10 @@
 // https://opensource.org/licenses/MIT
 
 // module
-import { AgLogLevel } from '@/shared/types';
+import { AgLogLevel } from '@shared/types';
 
 // types/ interface
-import type { IAgLogger } from '@/shared/types';
+import type { IAgLogger } from '@shared/types';
 
 // --- class definition
 export abstract class AgLogger implements IAgLogger {

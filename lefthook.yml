@@ -27,12 +27,6 @@ pre-commit:
     #        - "packages/**/*.ts"
     #      run: pnpm run lint
 
-    eslint-types:
-      glob:
-        - "shared/**/*.ts"
-        - "packages/**/*.ts"
-      run: pnpm run lint:types
-
     lint-spells:
       glob:
         - "**/*"

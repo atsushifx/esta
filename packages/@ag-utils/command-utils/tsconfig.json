@@ -29,8 +29,8 @@
     // types
     // cache
     "tsBuildInfoFile": "../../../.cache/tsbuild-cache/tsbuildInfo"
-  }
+    }
   // references
   // "references": []
 }
-}
+

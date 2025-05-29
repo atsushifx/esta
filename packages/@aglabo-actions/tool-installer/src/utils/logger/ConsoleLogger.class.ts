@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // --- modules
-import { AgLogLevel } from '@/shared/types';
+import { AgLogLevel } from '@shared/types';
 
 // --- class
 import { AgLogger } from './AgLogger.class';

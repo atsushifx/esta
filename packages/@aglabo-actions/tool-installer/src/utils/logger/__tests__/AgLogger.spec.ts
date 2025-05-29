@@ -10,7 +10,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 // CONSTANTS
-import { AgLogLevel } from '@/shared/types';
+import { AgLogLevel } from '@shared/types';
 
 // test unit
 import { agLog } from '../AgLogUtils';

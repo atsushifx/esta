@@ -14,7 +14,7 @@ import process from 'process';
 import { getDelimiter } from '@ag-utils/common';
 
 // --- types
-import { ConfigType } from '@/shared/types';
+import { ConfigType } from '@shared/types';
 
 // functions
 export const configSearchDirs = (appConfig: string, configType: ConfigType): string[] => {

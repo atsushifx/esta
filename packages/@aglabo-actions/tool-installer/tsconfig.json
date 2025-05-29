@@ -9,7 +9,8 @@
   "extends": "../../../shared/configs/tsconfig.base.json",
   "include": [
     "src/**/*.ts",
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    "shared/**/*.ts",
   ],
   "exclude": [
     ".git",

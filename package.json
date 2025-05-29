@@ -45,6 +45,7 @@
     "lint": "pnpm -r run lint",
     "lint:types": "pnpm -r run lint:types",
     "lint:all": "echo 'skip where project root'",
+    "lint:update": "pnpm exec eslint --config ./configs/eslint.config.js  ",
     "lint:fix": "echo 'skip where project root'",
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*"
   }

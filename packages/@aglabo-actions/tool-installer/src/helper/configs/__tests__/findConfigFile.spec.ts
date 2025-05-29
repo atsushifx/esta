@@ -14,7 +14,7 @@ import process from 'process';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 // test unit
-import { ConfigType } from '@/shared/types';
+import { ConfigType } from '@shared/types';
 
 import { findConfigFile } from '../findConfigFile';
 

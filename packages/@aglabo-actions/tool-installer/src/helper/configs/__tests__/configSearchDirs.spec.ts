@@ -20,7 +20,7 @@ vi.mock('os', () => ({
 }));
 
 // libs
-import { ConfigType } from '@/shared/types';
+import { ConfigType } from '@shared/types';
 
 // test unit
 import { configSearchDirs } from '../configSearchDirs';

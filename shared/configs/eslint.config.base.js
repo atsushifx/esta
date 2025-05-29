@@ -25,6 +25,7 @@ export default [
       '**/dist/**',
       '**/node_modules/**',
       '**/.cache/**',
+      '**/configs/**',
     ],
   },
 
@@ -34,6 +35,8 @@ export default [
       'src/**/*.ts',
       'tests/**/*.ts',
       'types/**/*.ts',
+      'packages/**/src/**/*.ts',
+      'shared/**/*.ts',
     ],
     languageOptions: {
       parser: tsparser,

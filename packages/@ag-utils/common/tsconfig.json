@@ -24,7 +24,7 @@
     "outDir": "lib",
     "rootDir": "./src",
     // alias
-    "baseUrl": "./src",
+    // "baseUrl": "./src",
     // "paths": {},
     // types
     // cache

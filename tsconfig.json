@@ -6,11 +6,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 {
-  "extends": "../../shared/configs/tsconfig.base.json",
+  "extends": "./shared/configs/tsconfig.base.json",
   "include": [
-    "index.ts",
-    "constants/**/*.ts",
-    "types/**/*.ts"
+    "packages/**/*.ts",
+    "shared/**/*.ts"
   ],
   "exclude": [
     ".git",
@@ -22,14 +21,14 @@
   "compilerOptions": {
     // directories
     // "outDir": "lib",
-    "rootDir": "./",
+    // "rootDir": "./",
     // aliases
-    // "baseUrl": "./",
-    // "paths": {},      // 外部パッケージ用にリザーブ
+    // "seUrl": "./",
+    // "paths": {},      // 外部ﾊﾟpｯbｹPｰ[ｼﾞW用にﾘ棺ﾞUｰ[ﾌﾞu
     // types
     // cache
     "incremental": true,
-    "tsBuildInfoFile": "../../.cache/tsbuild-cache/tsBuildInfo", // set by every sub-packages, "./.cache/tsbuildinfo"
+    "tsBuildInfoFile": ".cache/tsbuild-cache/tsBuildInfo"
   }
   // references
   // "references": []

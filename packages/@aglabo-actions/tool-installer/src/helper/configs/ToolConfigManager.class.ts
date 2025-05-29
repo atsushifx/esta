@@ -11,7 +11,7 @@
 // constants
 
 // type
-import type { AgActionToolConfig } from '@/shared/types/';
+import type { AgActionToolConfig } from '@shared/types';
 
 // class definition
 export class ToolConfigManager {
