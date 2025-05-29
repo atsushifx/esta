@@ -1,5 +1,5 @@
 // src: ./tsconfig.json
-// @(#) : typescript compile settings
+// @(#) : sub get-platform : tsc settings
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -10,6 +10,7 @@
   // compiler options
   "include": [
     "src/**/*.ts",
+    "shared/**/*.ts",
     "tests/**/*.ts"
   ],
   "exclude": [

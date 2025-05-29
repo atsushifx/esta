@@ -1,8 +1,0 @@
-{
-  "editor.formatOnSave": true,
-  "json.format.enable": true,
-  "eslint.validate": [
-    "typescript",
-    "json"
-  ]
-}

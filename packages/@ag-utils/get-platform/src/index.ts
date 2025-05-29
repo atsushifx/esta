@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // import all
-import {getPlatform, getDelimiter, PlatformType } from './getPlatform';
+import { getDelimiter, getPlatform, PlatformType } from './getPlatform';
 
 // namespace
 const agUtils = {
