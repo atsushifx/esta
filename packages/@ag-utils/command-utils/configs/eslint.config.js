@@ -19,6 +19,8 @@ export default [
   {
     files: [
       'src/**/*.ts',
+      'tests/**/*.ts',
+      'shared/**/*.ts',
     ],
     settings: {
       'import/resolver': {

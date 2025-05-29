@@ -9,6 +9,7 @@
   "extends": "../../../shared/configs/tsconfig.base.json",
   "include": [
     "src/**/*.ts",
+    "shared/**/*.ts",
     "tests/**/*.ts"
   ],
   "exclude": [
@@ -27,7 +28,7 @@
     // "paths": {},
     // types
     // cache
-    "tsBuildInfoFile": ".cache/tsbuildinfo"
+    "tsBuildInfoFile": "../../../.cache/tsbuild-cache/tsbuildInfo"
   }
   // references
   // "references": []

@@ -41,7 +41,9 @@ export default defineConfig({
       `**/#*tests*`,
     ],
     coverage: {
-      reporter: ['text', 'json-summary'],
+      provider: 'istanbul',
+      reportsDirectory: '.cache/coverage',
+      reporter: ['text', 'html'],
     },
   },
   resolve: {

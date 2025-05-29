@@ -16,6 +16,8 @@ export default [
   {
     files: [
       'src/**/*.ts',
+      'shared/**/*.ts',
+      'tests/**/*.ts',
     ],
     languageOptions: {
       parserOptions: {

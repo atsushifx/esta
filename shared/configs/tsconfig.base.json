@@ -34,7 +34,7 @@
     "composite": false,
     // incremental build
     "incremental": true,
-    "tsBuildInfoFile": ".cache/tsbuildinfo",
+    // "tsBuildInfoFile": "../../.cache/tsbuild-cache/tsBuildInfo", // set by every sub-packages
     // ✅ ライブラリ
     "lib": [
       "ESNext",
@@ -44,8 +44,19 @@
     // "rootDir": "./src",
     "outDir": "./dist",
     // ✅ エイリアス設定（←追加！）
-    // "baseUrl": "./src",
-    // "paths": {},      // 外部パッケージ用にリザーブ
+    "baseUrl": ".",
+    // "paths": {}, // 外部パッケージ用にリザーブ
+    "paths": {
+      "@ag-utils/*": [
+        "../../packages/@ag-utils/*/src/"
+      ],
+      "@aglabo-actions/*": [
+        "../../packages/@aglabo-actions/*/src"
+      ],
+      "@shared/*": [
+        "../../shared/common/*",
+      ],
+    },
     // ✅ 型補完
     // "typeRoots": [],   // typesが読み込めない場合に設定
     "types": [

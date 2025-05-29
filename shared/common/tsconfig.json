@@ -28,7 +28,8 @@
     // "paths": {},      // 外部パッケージ用にリザーブ
     // types
     // cache
-    "tsBuildInfoFile": ".cache/tsbuildinfo"
+    "incremental": true,
+    "tsBuildInfoFile": "../../.cache/tsbuild-cache/tsBuildInfo", // set by every sub-packages, "./.cache/tsbuildinfo"
   }
   // references
   // "references": []
