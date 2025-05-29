@@ -8,7 +8,6 @@
 
 // module
 import { AgLogLevel } from '@shared/types';
-
 // types/ interface
 import type { IAgLogger } from '@shared/types';
 

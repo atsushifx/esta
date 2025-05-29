@@ -16,14 +16,14 @@ import { promisify } from 'util';
 // internal libs
 import { getPlatform } from '@ag-utils/common';
 import { commandExist } from '@ag-utils/common';
+
 // constants
 import { AgActions_DEFAULT_TEMP_DIR, AgDir_WINGET_INSTALL_DIR } from '@shared/constants';
+// types
+import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/types';
 
 // modules
-import { prepareInstallDirectory } from '@/utils/prepareInstallDirectory';
-
-import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/types';
-// types
+import { prepareInstallDirectory } from '../../utils/prepareInstallDirectory';
 
 // routine
 const run = promisify(exec);

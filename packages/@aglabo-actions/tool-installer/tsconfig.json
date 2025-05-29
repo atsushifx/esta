@@ -10,7 +10,7 @@
   "include": [
     "src/**/*.ts",
     "tests/**/*.ts",
-    "shared/**/*.ts",
+    "shared/**/*.ts"
   ],
   "exclude": [
     ".git",
@@ -25,14 +25,7 @@
     "rootDir": ".",
     // alias
     "baseUrl": "./",
-    "paths": {
-      "@shared/types": [
-        "shared/types"
-      ],
-      "@/*": [
-        "src/*",
-      ]
-    },
+    // "paths": {},
     // types
     // cache
     "tsBuildInfoFile": "../../../.cache/tsbuild-cache/tsbuildInfo"

@@ -15,11 +15,11 @@ import { commandExist } from '@ag-utils/common';
 // vitest
 import { describe, expect, it } from 'vitest';
 
-// test unit
-import { EgetInitializer } from '@/installer/executor/EgetInitializer';
-
 // types
 import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/types';
+
+// test unit
+import { EgetInitializer } from '@/installer/executor/EgetInitializer';
 
 // global var & executor
 const runFile = promisify(execFile);

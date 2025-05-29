@@ -25,12 +25,12 @@ export default [
       'import/resolver': {
         typescript: {
           project: [
-            './packages/@ag-utils/common/tsconfig.json',
-            './packages/@ag-utils/command-utils/tsconfig.json',
-            './packages/@ag-utils/get-platform/tsconfig.json',
-            './packages/@aglabo-actions/tool-installer/tsconfig.json',
-            './shared/common/tsconfig.json',
             './tsconfig.json',
+            './shared/common/tsconfig.json',
+            './packages/@ag-utils/get-platform/tsconfig.json',
+            './packages/@ag-utils/command-utils/tsconfig.json',
+            './packages/@ag-utils/common/tsconfig.json',
+            './packages/@aglabo-actions/tool-installer/tsconfig.json',
           ],
           alwaysTryTypes: true,
         },
