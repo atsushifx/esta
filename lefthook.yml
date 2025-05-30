@@ -25,13 +25,13 @@ pre-commit:
       glob:
         - "shared/**/*.ts"
         - "packages/**/*.ts"
-      run: pnpm run lint
+      run: pnpm run lint-all -- "{staged_files}"
 
     eslint-types:
       glob:
         - "shared/**/*.ts"
         - "packages/**/*.ts"
-      run: pnpm run lint:types
+      run: pnpm run lint-all-types -- "{staged_files}"
 
     lint-spells:
       glob:

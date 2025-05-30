@@ -107,26 +107,4 @@ export default [
       },
     },
   },
-
-  // --- 3. for config files overwritten rules
-  {
-    files: [
-      '*.config*.ts',
-      '*.config*.js',
-    ],
-    languageOptions: {
-      parser: tsparser,
-      parserOptions: {
-        project: false, // 型チェックを無効化
-        sourceType: 'module',
-        ecmaVersion: 'latest',
-      },
-    },
-    plugins: {
-      'import': importPlugin,
-    },
-    rules: {
-      'import/order': 'warn', // 必要なら他の差分ルールもここで
-    },
-  },
 ];

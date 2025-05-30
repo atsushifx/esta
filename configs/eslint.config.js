@@ -18,8 +18,6 @@ import tsparser from '@typescript-eslint/parser';
 import baseConfig from '../shared/configs/eslint.config.base.js';
 import projectPaths from '../shared/configs/eslint.projects.js';
 
-import projectPaths from '../shared/configs/eslint.projects.js';
-
 // set __dirname for ESM
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../');
