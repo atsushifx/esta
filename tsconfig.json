@@ -8,7 +8,7 @@
 {
   "extends": "./shared/configs/tsconfig.base.json",
   "include": [
-    "packages/**/src/**/*.ts",
+    "packages/**/*.ts",
     "shared/common/**/*.ts",
   ],
   "exclude": [
@@ -24,7 +24,11 @@
     "rootDir": ".",
     // alias
     "baseUrl": ".",
-    // "paths": {    },
+    "paths": {
+      "@/*": [
+        "packages/@aglabo-actions/tool-installer/src/*",
+      ]
+    },
     // types
     // cache
     "tsBuildInfoFile": ".cache/tsbuildinfo"

@@ -21,11 +21,8 @@ import { getPlatform } from '@ag-utils/common';
 import { commandExist } from '@ag-utils/common';
 // constants
 
-// modules
+// internal libs
 import { prepareInstallDirectory } from '@/utils/prepareInstallDirectory';
-
-
-// types
 
 // routine
 const run = promisify(exec);

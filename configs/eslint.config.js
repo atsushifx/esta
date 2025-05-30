@@ -46,6 +46,7 @@ export default [
         typescript: {
           tsconfigRootDir: rootDir,
           project: projectPaths,
+          noWarnOnMultipleProjects: true,
         },
       },
     },
