@@ -11,12 +11,11 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 // constants
 import { AgActionInstallerType } from '@shared/types';
-
-// test units
-import { ToolConfigManager } from '../ToolConfigManager.class';
-
-// type
+// types
 import type { AgActionEgetToolConfig } from '@shared/types';
+
+// test unit
+import { ToolConfigManager } from '../ToolConfigManager.class';
 
 // test main
 describe('ToolConfigManager', () => {

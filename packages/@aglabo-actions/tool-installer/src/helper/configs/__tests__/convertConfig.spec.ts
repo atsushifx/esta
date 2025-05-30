@@ -7,12 +7,17 @@
 // https://opensource.org/licenses/MIT
 
 // vitest
-import { describe, expect, it } from 'vitest';
 
 // Logger
+
+import { describe, expect, it } from 'vitest';
+
 import { AgLogLevel } from '@shared/types';
 import { AgActionInstallerType } from '@shared/types';
+import type { AgActionEgetToolConfig } from '@shared/types';
+
 import { AgLogger } from '@/utils/logger/AgLogger.class';
+
 
 // test unit
 import { convertConfig } from '../convertConfig';
@@ -20,7 +25,7 @@ import { convertConfig } from '../convertConfig';
 import { parseJsoncConfig } from '../parseConfig';
 
 // types
-import type { AgActionEgetToolConfig } from '@shared/types';
+
 
 // Log definition
 AgLogger.setLogLevel(AgLogLevel.DEBUG);

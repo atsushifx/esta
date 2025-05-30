@@ -6,10 +6,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// libs
 // type values
 import { AgActionInstallerType } from '@shared/types';
-
 // types
 import type { AgActionEgetToolConfig, AgActionToolConfig } from '@shared/types';
 

@@ -6,10 +6,14 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// eslint plugin / parser
+// -- import
+// rules
 import js from '@eslint/js';
+// plugins
 import tseslint from '@typescript-eslint/eslint-plugin';
+// parser
 import tsparser from '@typescript-eslint/parser';
+// importer
 import importPlugin from 'eslint-plugin-import';
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
@@ -57,7 +61,32 @@ export default [
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'import/no-unresolved': 'error',
       'import/order': ['warn', {
-        'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
+        'groups': [
+          'builtin',
+          'external',
+          'internal',
+          ['parent', 'sibling', 'index'],
+          'object',
+          'type',
+        ],
+        pathGroups: [
+          {
+            pattern: '@shared/**',
+            group: 'internal',
+            position: 'before',
+          },
+          {
+            pattern: '@ag-utils/**',
+            group: 'internal',
+            position: 'before',
+          },
+          {
+            pattern: '@/**',
+            group: 'internal',
+            position: 'after',
+          },
+        ],
+        pathGroupsExcludedImportTypes: ['builtin'],
         'newlines-between': 'always',
         'alphabetize': {
           'order': 'asc',

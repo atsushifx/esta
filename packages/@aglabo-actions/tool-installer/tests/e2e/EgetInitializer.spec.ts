@@ -10,16 +10,19 @@
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 
-// internal libs
-import { commandExist } from '@ag-utils/common';
 // vitest
 import { describe, expect, it } from 'vitest';
+
+// constants
+import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/types';
+
+// internal libs
+import { commandExist } from '@ag-utils/common';
 
 // test unit
 import { EgetInitializer } from '@/installer/executor/EgetInitializer';
 
 // types
-import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/types';
 
 // global var & executor
 const runFile = promisify(execFile);

@@ -6,16 +6,13 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// import
-
+// constants
 import { AgActionInstallerType } from '@shared/types';
-
 // executor
+import type { AgActionInstallerExecutorsMap } from '@shared/types';
+
 import EgetInitializer from './executor/EgetInitializer';
 import NullExecutor from './executor/NullExecutor';
-
-// type
-import type { AgActionInstallerExecutorsMap } from '@shared/types';
 
 // map
 export const AgExecutorsMap: AgActionInstallerExecutorsMap = {
