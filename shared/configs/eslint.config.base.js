@@ -97,6 +97,10 @@ export default [
     },
     settings: {
       'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: './tsconfig.json',
+        },
         node: {
           moduleDirectory: ['node_modules', 'src/'],
         },

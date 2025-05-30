@@ -18,6 +18,8 @@ import tsparser from '@typescript-eslint/parser';
 import baseConfig from '../shared/configs/eslint.config.base.js';
 import projectPaths from '../shared/configs/eslint.projects.js';
 
+import projectPaths from '../shared/configs/eslint.projects.js';
+
 // set __dirname for ESM
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../');
@@ -36,21 +38,14 @@ export default [
       parser: tsparser,
       parserOptions: {
         tsconfigRootDir: rootDir,
-        project: ['./tsconfig.json'],
+        project: projectPaths,
       },
     },
     settings: {
       'import/resolver': {
         typescript: {
           tsconfigRootDir: rootDir,
-          project: [
-            './tsconfig.json',
-            'shared/common/tsconfig.json',
-            './packages/@ag-utils/get-platform/tsconfig.json',
-            './packages/@ag-utils/command-utils/tsconfig.json',
-            './packages/@ag-utils/common/tsconfig.json',
-            './packages/@aglabo-actions/tool-installer/tsconfig.json',
-          ],
+          project: projectPaths,
         },
       },
     },
