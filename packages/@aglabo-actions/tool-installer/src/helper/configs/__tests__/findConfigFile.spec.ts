@@ -13,8 +13,11 @@ import process from 'process';
 // vitest
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { ConfigType } from '@shared/types';
+
+
+
 // test unit
-import { ConfigType } from '@/shared/types';
 
 import { findConfigFile } from '../findConfigFile';
 

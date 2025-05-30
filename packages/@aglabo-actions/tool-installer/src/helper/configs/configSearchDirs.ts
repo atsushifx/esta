@@ -11,10 +11,10 @@ import * as os from 'os';
 import process from 'process';
 
 // --- internal libs
-import { getDelimiter } from '@ag-utils/common';
+import { ConfigType } from '@shared/types';
 
+import { getDelimiter } from '@ag-utils/common';
 // --- types
-import { ConfigType } from '@/shared/types';
 
 // functions
 export const configSearchDirs = (appConfig: string, configType: ConfigType): string[] => {

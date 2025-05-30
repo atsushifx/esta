@@ -8,7 +8,6 @@
 
 // libs
 
-import tsParser from '@typescript-eslint/parser';
 // plugins
 
 // import form common base config
@@ -25,7 +24,6 @@ export default [
       'types/**/*.ts',
     ],
     languageOptions: {
-      parser: tsParser,
       parserOptions: {
         project: ['./tsconfig.json'],
         tsconfigRootDir: '.',

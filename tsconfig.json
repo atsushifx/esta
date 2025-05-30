@@ -6,11 +6,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 {
-  "extends": "../../../shared/configs/tsconfig.base.json",
+  "extends": "./shared/configs/tsconfig.base.json",
   "include": [
-    "src/**/*.ts",
-    "shared/**/*.ts",
-    "tests/**/*.ts"
+    "packages/**/*.ts",
+    "shared/common/**/*.ts",
   ],
   "exclude": [
     ".git",
@@ -25,9 +24,12 @@
     "rootDir": ".",
     // alias
     "baseUrl": ".",
-    // "paths": {    },
+    "paths": {
+      "@/*": [
+        "packages/@aglabo-actions/tool-installer/src/*",
+      ]
+    },
     // types
-    // "typesRoots": [    ],
     // cache
     "tsBuildInfoFile": ".cache/tsbuildinfo"
   }

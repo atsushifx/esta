@@ -9,18 +9,18 @@
 // --- libs
 import process from 'process';
 
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { ConfigType } from '@shared/types';
+
 import { getDelimiter } from '@ag-utils/common';
 // vitest
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // os モジュールをモック
 vi.mock('os', () => ({
   homedir: () => '/mock/home',
   platform: () => 'win32',
 }));
-
-// libs
-import { ConfigType } from '@/shared/types';
 
 // test unit
 import { configSearchDirs } from '../configSearchDirs';

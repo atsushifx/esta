@@ -10,10 +10,11 @@ import * as fs from 'fs';
 import { resolve } from 'path';
 
 // modules
+import type { ConfigType } from '@shared/types';
+
 import { configSearchDirs } from './configSearchDirs';
 
 // --- types
-import type { ConfigType } from '@/shared/types';
 
 // types
 

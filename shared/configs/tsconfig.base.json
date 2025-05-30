@@ -45,7 +45,15 @@
     "outDir": "./dist",
     // ✅ エイリアス設定（←追加！）
     // "baseUrl": "./src",
-    // "paths": {},      // 外部パッケージ用にリザーブ
+    "paths": {
+      "@/*": [
+        "src/*",
+      ],
+      "@shared/*": [
+        "shared/*",
+        "shared/common/*",
+      ],
+    }, // 外部パッケージ用にリザーブ
     // ✅ 型補完
     // "typeRoots": [],   // typesが読み込めない場合に設定
     "types": [

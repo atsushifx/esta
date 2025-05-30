@@ -11,6 +11,7 @@ import { mkdir } from 'fs/promises';
 
 // GitHub Actions core
 import * as core from '@actions/core';
+
 // constants
 import { AgActions_DEFAULT_INSTALL_DIR } from '@shared/constants';
 
