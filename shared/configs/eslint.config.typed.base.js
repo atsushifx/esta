@@ -7,14 +7,11 @@
 // https://opensource.org/licenses/MIT
 
 // -- import
-// rules
-import js from '@eslint/js';
-// plugins
-import tseslint from '@typescript-eslint/eslint-plugin';
 // parser
 import tsparser from '@typescript-eslint/parser';
-// importer
-import importPlugin from 'eslint-plugin-import';
+
+// plugins
+import tseslint from '@typescript-eslint/eslint-plugin';
 
 // -- rules
 import typedRules from './eslint.rules.typed.js';
@@ -34,15 +31,16 @@ export default [
       '**/configs/**',
       '**/scripts/**',
     ],
+    plugins: {
+      '@typescript-eslint': tseslint,
+    },
     languageOptions: {
+      parser: tsparser,
       parserOptions: {
         project: ['./tsconfig.json'],
         tsconfigRootDir: '.',
         sourceType: 'module',
       },
-    },
-    plugins: {
-      '@typescript-eslint': tseslint,
     },
     rules: typedRules,
   },

@@ -11,6 +11,9 @@ import path from 'path';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
+// parser
+import tsparser from '@typescript-eslint/parser';
+
 // import form common base config
 import baseConfig from '../../../../shared/configs/eslint.config.typed.base.js';
 
@@ -26,11 +29,13 @@ export default [
   {
     files: [
       'src/**/*.ts',
+      'shared/**/*.ts',
       'tests/**/*.ts',
     ],
     languageOptions: {
+      parser: tsparser,
       parserOptions: {
-        project: [path.resolve(rootDir, 'tsconfig.json')],
+        project: './tsconfig.json',
         tsconfigRootDir: rootDir,
         sourceType: 'module',
       },
@@ -38,7 +43,7 @@ export default [
     settings: {
       'import/resolver': {
         typescript: {
-          project: [path.resolve(rootDir, 'tsconfig.json')],
+          project: './tsconfig.json',
           tsconfigRootDir: rootDir,
         },
       },
