@@ -19,7 +19,7 @@ import { describe, expect, it } from 'vitest';
 import { EgetInitializer } from '@/installer/executor/EgetInitializer';
 
 // types
-import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@/shared/types';
+import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/types';
 
 // global var & executor
 const runFile = promisify(execFile);

@@ -13,7 +13,7 @@ import { resolve } from 'path';
 import { configSearchDirs } from './configSearchDirs';
 
 // --- types
-import type { ConfigType } from '@/shared/types';
+import type { ConfigType } from '@shared/types';
 
 // types
 

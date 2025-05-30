@@ -9,6 +9,7 @@
   "extends": "../../../shared/configs/tsconfig.base.json",
   "include": [
     "src/**/*.ts",
+    "shared/**/*.ts",
     "tests/**/*.ts"
   ],
   "exclude": [
@@ -23,16 +24,11 @@
     "outDir": "lib",
     "rootDir": ".",
     // alias
-    "baseUrl": "./src",
-    "paths": {
-      "@/*": [
-        "*"
-      ]
-    },
+    "baseUrl": ".",
+    // "paths": {    },
     // types
+    // "typesRoots": [    ],
     // cache
     "tsBuildInfoFile": ".cache/tsbuildinfo"
   }
-  // references
-  // "references": []
 }

@@ -8,10 +8,10 @@
 
 // libs
 // type values
-import { AgActionInstallerType } from '@/shared/types';
+import { AgActionInstallerType } from '@shared/types';
 
 // types
-import type { AgActionEgetToolConfig, AgActionToolConfig } from '@/shared/types';
+import type { AgActionEgetToolConfig, AgActionToolConfig } from '@shared/types';
 
 // --- functions
 const checkValidInstaller = (installer: AgActionInstallerType): boolean => {

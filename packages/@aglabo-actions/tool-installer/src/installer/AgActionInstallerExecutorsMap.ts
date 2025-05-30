@@ -8,14 +8,14 @@
 
 // import
 
-import { AgActionInstallerType } from '@/shared/types';
+import { AgActionInstallerType } from '@shared/types';
 
 // executor
 import EgetInitializer from './executor/EgetInitializer';
 import NullExecutor from './executor/NullExecutor';
 
 // type
-import type { AgActionInstallerExecutorsMap } from '@/shared/types';
+import type { AgActionInstallerExecutorsMap } from '@shared/types';
 
 // map
 export const AgExecutorsMap: AgActionInstallerExecutorsMap = {
