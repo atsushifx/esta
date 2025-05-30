@@ -1,5 +1,5 @@
-// src: configs/eslint.config.js
-// @(#) : ESLint flat config for TypeScript workspace
+// src: /configs/eslint.config.typed.js
+// @(#) : eslint float config for type check
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -11,42 +11,53 @@ import path from 'path';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
+// plugins
+import tseslint from '@typescript-eslint/eslint-plugin';
 // parser
 import tsparser from '@typescript-eslint/parser';
 
 // import form common base config
-import baseConfig from '../shared/configs/eslint.config.base.js';
 import projectPaths from '../shared/configs/eslint.projects.js';
+import typedRules from '../shared/configs/eslint.rules.typed.js';
 
-// set __dirname for ESM
+// directories
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(__dirname, '../');
+const rootDir = path.resolve(__dirname, '..');
 
-// settings
+// eslint configs
 export default [
-  ...baseConfig,
-
-  // source code settings
   {
     files: [
-      'shared/common/**/*.ts',
-      'packages/**/src/**/*.ts',
+      'shared/**/*.ts',
+      'packages/**/*.ts',
     ],
+    ignores: [
+      '*lib/**',
+      '**/module/**',
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/.cache/**',
+      '**/configs/**',
+    ],
+    plugins: {
+      '@typescript-eslint': tseslint,
+    },
     languageOptions: {
       parser: tsparser,
       parserOptions: {
-        tsconfigRootDir: rootDir,
         project: projectPaths,
+        tsconfigRootDir: rootDir,
+        sourceType: 'module',
       },
     },
     settings: {
       'import/resolver': {
         typescript: {
-          tsconfigRootDir: rootDir,
           project: projectPaths,
-          noWarnOnMultipleProjects: true,
+          tsconfigRootDir: rootDir,
         },
       },
     },
+    rules: typedRules,
   },
 ];

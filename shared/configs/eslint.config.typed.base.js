@@ -6,38 +6,44 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// --- plugins
+// -- import
+// rules
+import js from '@eslint/js';
+// plugins
 import tseslint from '@typescript-eslint/eslint-plugin';
+// parser
+import tsparser from '@typescript-eslint/parser';
+// importer
+import importPlugin from 'eslint-plugin-import';
 
-// --- base configs
-import baseConfig from './eslint.config.base.js';
+// -- rules
+import typedRules from './eslint.rules.typed.js';
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
-  // --- 共通のbaseConfigを先頭に展開
-  ...baseConfig,
-
-  // --- rules for TypeScript type check (override)
   {
     files: [
-      'src/**/*.ts',
-      'tests/**/*.ts',
-      'types/**/*.ts',
+      '**/*.ts',
     ],
+    ignores: [
+      '**/lib/**',
+      '**/module/**',
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/.cache/**',
+      '**/configs/**',
+      '**/scripts/**',
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.json'],
+        tsconfigRootDir: '.',
+        sourceType: 'module',
+      },
+    },
     plugins: {
       '@typescript-eslint': tseslint,
     },
-    rules: {
-      // type check rules
-      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
-      '@typescript-eslint/prefer-optional-chain': 'warn',
-      '@typescript-eslint/explicit-function-return-type': ['warn', {
-        allowExpressions: true,
-        allowConciseArrowFunctionExpressionsStartingWithVoid: true,
-      }],
-      '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
-      '@typescript-eslint/no-unnecessary-condition': 'warn',
-      '@typescript-eslint/restrict-template-expressions': 'warn',
-    },
+    rules: typedRules,
   },
 ];
