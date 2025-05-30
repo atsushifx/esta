@@ -28,13 +28,8 @@ export default [
     ],
   },
 
-  // --- 2. Source code definitions
+  // --- 2. rule definition
   {
-    files: [
-      'src/**/*.ts',
-      'tests/**/*.ts',
-      'types/**/*.ts',
-    ],
     languageOptions: {
       parser: tsparser,
       parserOptions: {

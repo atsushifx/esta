@@ -44,8 +44,8 @@
     "check:spells": "pnpm exec cspell --cache --cache-location .cache/cspellcache --config .vscode/cspell.json ",
     "lint": "pnpm -r run lint",
     "lint:types": "pnpm -r run lint:types",
-    "lint:all": "echo 'skip where project root'",
     "lint:fix": "echo 'skip where project root'",
+    "lint-all": "pnpm exec eslint --config ./configs/eslint.config.js --cache --cache-location .cache/eslint-cache/esLintCache",
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*"
   }
 }
