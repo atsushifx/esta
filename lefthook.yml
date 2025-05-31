@@ -31,11 +31,13 @@ pre-commit:
       glob:
         - "shared/**/*.ts"
         - "packages/**/*.ts"
-      run: pnpm run lint-all-types -- "{staged_files}"
+      run: pnpm run lint-all:types -- "{staged_files}"
 
-    lint-spells:
+    check-spells:
       glob:
-        - "**/*"
+        - "**/*.ts"
+        - "**/*.json"
+        - "**/*.md"
       run: pnpm run check:spells -- {staged_files}
 
 commit-msg:

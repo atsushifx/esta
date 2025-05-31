@@ -11,6 +11,6 @@ export default [
   './packages/@ag-utils/get-platform/tsconfig.json',
   './packages/@ag-utils/command-utils/tsconfig.json',
   './packages/@ag-utils/common/tsconfig.json',
-  './packages/@aglabo-actions/tool-installer/tsconfig.json',
+  './packages/@ag-actions/tool-installer/tsconfig.json',
   './tsconfig.json',
 ];

@@ -31,6 +31,6 @@
     },
     // types
     // cache
-    "tsBuildInfoFile": ".cache/tsbuildinfo"
+    "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"
   }
 }

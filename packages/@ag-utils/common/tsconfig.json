@@ -23,12 +23,10 @@
     "outDir": "lib",
     "rootDir": "./src",
     // alias
-    "baseUrl": "./src",
+    "baseUrl": "./",
     // "paths": {},
     // types
     // cache
-    "tsBuildInfoFile": ".cache/tsbuildinfo"
+    "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"
   }
-  // references
-  // "references": []
 }

@@ -1,17 +1,10 @@
-// @(#) : cspell settings for ths workspa
-/**
- *
- * @version  1.0.0
- * @author   Furukawa, Atsushi <https://github.com/atsushifx>
- * @since    2025-02-27
- * @license  MIT
- *
- * @description<<
- *
- * this files is cspell (Code Specll Checkr) settings for this workspace.
- *
- *<<
- */
+// src: .vscode/cspell.json
+// @(#) : cSpell configs for Easy Setup TOols Actions
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 {
   "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/packages/cspell-types/cspell.schema.json",
   "version": "0.2",
