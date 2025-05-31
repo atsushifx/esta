@@ -8,7 +8,7 @@
 
 // ---import
 // types
-import type { AgActionInstallerType } from '@/shared/types';
+import type { AgActionInstallerType } from './AgActionCommon.types';
 
 // --- type / interface
 export type AgActionInstallOptions = {

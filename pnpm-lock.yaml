@@ -57,24 +57,7 @@ importers:
         specifier: ^3.1.4
         version: 3.1.4(@types/node@22.15.21)(tsx@4.19.4)(yaml@2.8.0)
 
-  packages/@ag-utils/command-utils:
-    dependencies:
-      '@ag-utils/get-platform':
-        specifier: workspace:*
-        version: link:../get-platform
-
-  packages/@ag-utils/common:
-    dependencies:
-      '@ag-utils/command-utils':
-        specifier: workspace:*
-        version: link:../command-utils
-      '@ag-utils/get-platform':
-        specifier: workspace:*
-        version: link:../get-platform
-
-  packages/@ag-utils/get-platform: {}
-
-  packages/@aglabo-actions/tool-installer:
+  packages/@ag-actions/tool-installer:
     dependencies:
       '@actions/core':
         specifier: ^1.11.1
@@ -94,6 +77,23 @@ importers:
       comment-json:
         specifier: ^4.2.5
         version: 4.2.5
+
+  packages/@ag-utils/command-utils:
+    dependencies:
+      '@ag-utils/get-platform':
+        specifier: workspace:*
+        version: link:../get-platform
+
+  packages/@ag-utils/common:
+    dependencies:
+      '@ag-utils/command-utils':
+        specifier: workspace:*
+        version: link:../command-utils
+      '@ag-utils/get-platform':
+        specifier: workspace:*
+        version: link:../get-platform
+
+  packages/@ag-utils/get-platform: {}
 
   shared/common: {}
 

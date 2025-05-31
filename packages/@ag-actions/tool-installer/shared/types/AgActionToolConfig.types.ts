@@ -8,7 +8,8 @@
 
 // --- import
 // types
-import type { AgActionInstallerType, AgActionInstallOptions } from '@/shared/types';
+import type { AgActionInstallerType } from './AgActionCommon.types';
+import type { AgActionInstallOptions } from './AgActionInstallerHandler.types';
 
 // --- type / interface
 type AgActionToolConfigBase = {
