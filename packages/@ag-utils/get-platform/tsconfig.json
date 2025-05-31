@@ -23,15 +23,12 @@
     // directories
     "outDir": "lib",
     "rootDir": "./src",
-    // ✅ エイリアス設定（←追加！）
-    "baseUrl": "./src",
-    // "paths": {},      // 外部パッケージ用にリザーブ
-    // aliases
+    // alias definitions
+    "baseUrl": "./",
     // "paths": {},
     // types
+    // typesRoots: [    ],
     // cache
-    "tsBuildInfoFile": ".cache/tsbuildinfo"
+    "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"
   }
-  // references
-  // "references": []
 }
