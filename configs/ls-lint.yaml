@@ -1,0 +1,26 @@
+# src: ./configs/ls-lin.yaml
+# @(#) : filename type linter
+#
+# Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+#
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+
+ls:
+  .dir: kebab-case
+  .ts: kebab-case
+
+  packages:
+    .dir: kebab-case | regex:^@[a-z\-]+$ | regex:__tests__
+    .ts: camelCase | PascalCase
+
+# ignore directories
+ignore:
+  - "**/.git"
+  - "**/.github"
+  - "**/lib"
+  - "**/module"
+  - "**/node_modules"
+  - "**/.textlint"
+  - "**/.cache"
+  - "**/.vscode"
