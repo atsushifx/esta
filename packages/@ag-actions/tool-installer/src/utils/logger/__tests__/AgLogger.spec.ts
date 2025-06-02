@@ -11,8 +11,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { AgLogLevel } from '@shared/types';
 
-
-
 // CONSTANTS
 
 // test unit
