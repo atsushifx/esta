@@ -40,9 +40,12 @@ pre-commit:
 
     check-spells:
       glob:
-        - "**/*.ts"
+        - "/shared/**/*.ts"
+        - "/packages/**/*.ts"
+        - "/shared/**/*.md"
+        - "/packages/**/*.md"
         - "**/*.json"
-        - "**/*.md"
+        - "docs/**/*.md"
       run: pnpm run check:spells -- {staged_files}
 
 commit-msg:
