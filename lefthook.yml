@@ -33,6 +33,11 @@ pre-commit:
         - "packages/**/*.ts"
       run: pnpm run lint-all:types -- "{staged_files}"
 
+    lint-files:
+      glob:
+        - "**/*.ts"
+      run: pnpm run lint:filename -- {staged_files}
+
     check-spells:
       glob:
         - "**/*.ts"
