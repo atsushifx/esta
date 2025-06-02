@@ -47,12 +47,12 @@
     // "baseUrl": "./src",
     "paths": {
       "@/*": [
-        "src/*",
+        "src/*"
       ],
       "@shared/*": [
         "shared/*",
-        "shared/common/*",
-      ],
+        "shared/common/*"
+      ]
     }, // 外部パッケージ用にリザーブ
     // ✅ 型補完
     // "typeRoots": [],   // typesが読み込めない場合に設定

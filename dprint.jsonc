@@ -28,6 +28,7 @@
     "**/*.jsonc",
     "**/*.yml",
     "**/*.yaml",
+    // Documents
     "**/*.md",
   ],
   "excludes": [
@@ -36,6 +37,11 @@
     "**/lib/**",
     "**/module/**",
     "**/dist/**",
+    //
+    "**lock.*",
+    // Documents
+    "CONTRIBUTING**.md",
+    "CODE_OF_CONDUCT**.md",
   ],
   // Plugins
   "plugins": [

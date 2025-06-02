@@ -9,7 +9,7 @@
   "extends": "./shared/configs/tsconfig.base.json",
   "include": [
     "packages/**/*.ts",
-    "shared/common/**/*.ts",
+    "shared/common/**/*.ts"
   ],
   "exclude": [
     ".git",
@@ -26,7 +26,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "packages/@aglabo-actions/tool-installer/src/*",
+        "packages/@aglabo-actions/tool-installer/src/*"
       ]
     },
     // types
