@@ -1,11 +1,29 @@
-# Easy Setup Tools Action（日本語版）
+---
+title: Easy Setup Tools Action
+description: Install CLI tools easily via config, powered by eget.
+slug: easy-setup-tools-action
+tags:
+  - setup
+  - installer
+  - action
+  - eget
+  - tools
+---
+
+<!-- textlint-disable ja-technical-writing/ja-no-mixed-period -->
+
+[English](README.md) | 日本語
+
+<!--  textlint-enable -->
+
+## Easy Setup Tools Action（日本語版）
 
 > 設定ファイルを使って、CLIツールを簡単にインストールできる GitHub Actions。
 > 現在は [eget](https://github.com/zyedidia/eget) に対応しています。
 
 ---
 
-## 🚀 使い方（GitHub Actions）
+### 🚀 使い方（GitHub Actions）
 
 ```yaml
 uses: atsushifx/easy-setup-tools-action@v1
@@ -16,7 +34,7 @@ with:
 
 ---
 
-## 📂 ツール設定ファイルの例（`tool-configs.json`）
+### 📂 ツール設定ファイルの例（`tool-configs.json`）
 
 ```json
 [
@@ -35,14 +53,14 @@ with:
 
 ---
 
-## ✅ サポートされているインストーラー
+### ✅ サポートされているインストーラー
 
 - `eget`（対応済み）
 - `script`（今後対応予定）
 
 ---
 
-## 🛠 設定スキーマの仕様
+### 🛠 設定スキーマの仕様
 
 | フィールド           | 説明                                                | 必須 |
 | -------------------- | --------------------------------------------------- | ---- |
@@ -57,7 +75,7 @@ with:
 
 ---
 
-## 📦 補足
+### 📦 補足
 
 - `with.tools` で指定されたツール名だけがインストール対象になります。
 - 複数ツールが同時に指定された場合は並列処理されます。
