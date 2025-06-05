@@ -7,6 +7,8 @@ tags:
   - ガイドライン
   - セットアップ
 ---
+<!-- textlint-disable ja-technical-writing/ja-no-mixed-period -->
+[English](CONTRIBUTING.md) | 日本語
 
 ## 🤝 コントリビューションガイドライン
 
