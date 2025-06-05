@@ -31,6 +31,7 @@ rules:
     ja-no-mixed-period:
       allowPeriodMarks:
         - ":"
+        - "✨"
     no-doubled-joshi:
       strict: false
   preset-ja-spacing:
