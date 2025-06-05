@@ -7,9 +7,15 @@
     "en-us",
     "software-terms",
     "public-licenses",
+    "markdown",
+    "css",
+    "html",
+    "fullstack",
+    "typescript",
     "shellscript",
+    "powershell",
     "vim",
+    "user-dic",
     "project-dic"
-  ],
-  "useGitignore": true
+  ]
 }
