@@ -1,9 +1,23 @@
-# 🤝 Contribution Guidelines
+---
+title: Contribution Guidelines
+description: How to contribute, report issues, and set up your environment for easy-setup-tools-action.
+slug: contributing
+tags:
+  - contributing
+  - guideline
+  - setup
+---
 
+English | [日本語](CONTRIBUTING.ja.md)
+
+## 🤝 Contribution Guidelines
+
+<!-- textlint-disable ja-technical-writing/no-exclamation-question-mark -->
 Thank you for thinking about contributing to this project!
 We hope your ideas will help make this project even better.
+<!-- textlint-enable -->
 
-## 🧰 How to use this template
+### 🧰 How to use this template
 
 This `CONTRIBUTING.md` is a template for open source projects.
 When you use it for your own project, please:
@@ -23,14 +37,14 @@ When you use it for your own project, please:
 
 This guide is based on [GitHub Docs: Setting guidelines for repository contributors](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors).
 
-## 📝 How to contribute
+### 📝 How to contribute
 
-### 1. Report an Issue
+#### 1. Report an Issue
 
 - Please use [Issues](https://github.com/atsushifx/.github/issues) to report bugs or suggest features.
 - Add enough details (steps, expected behavior, actual behavior).
 
-### 2. Submit a Pull Request
+#### 2. Submit a Pull Request
 
 - Fork the repository and create a new branch like `feature/your-feature-name`.
 - Make your changes and commit them clearly.
@@ -38,15 +52,15 @@ This guide is based on [GitHub Docs: Setting guidelines for repository contribut
   - Make one commit per change if possible, and rebase later to clean history.
 - Write a clear title and description for your pull request.
 
-## 🔧 Project environment
+### 🔧 Project environment
 
-### Setup
+#### Setup
 
 ```bash
 git clone https://github.com/atsushifx/.github.git
 ```
 
-### Testing
+#### Testing
 
 When you make changes, please test:
 
@@ -55,7 +69,7 @@ When you make changes, please test:
 - **markdownlint**
   Check if Markdown format is correct.
 
-### Code style and format
+#### Code style and format
 
 We use these tools:
 
@@ -63,17 +77,17 @@ We use these tools:
 - Linters: textlint, markdownlint (with `markdownlint-cli2`)
 - Spell checker: cspell
 
-## 📜 Code of Conduct
+### 📜 Code of Conduct
 
 All contributors must follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## 📚 References
+### 📚 References
 
 - [GitHub Docs: Setting guidelines for repository contributors](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors)
 
 ---
 
-## 📬 Create an Issue or PR
+### 📬 Create an Issue or PR
 
 - [🐛 Report a Bug](https://github.com/atsushifx/.github/issues/new?template=bug_report.yml)
 - [✨ Request a Feature](https://github.com/atsushifx/.github/issues/new?template=feature_request.yml)
@@ -82,7 +96,7 @@ All contributors must follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
-## 🤖 Powered by
+### 🤖 Powered by
 
 This project is supported by our AI chat bots:
 
