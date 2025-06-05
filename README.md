@@ -1,8 +1,22 @@
-# Easy Setup Tools Action
+---
+title: Easy Setup Tools Action
+description: Install CLI tools easily via config, powered by eget.
+slug: easy-setup-tools-action
+tags:
+  - setup
+  - installer
+  - action
+  - eget
+  - tools
+---
+
+English | [日本語](README.ja.md)
+
+## Easy Setup Tools Action
 
 > Install CLI tools easily via config, powered by [eget](https://github.com/zyedidia/eget).
 
-## 🚀 Usage
+### 🚀 Usage
 
 ```yaml
 uses: atsushifx/easy-setup-tools-action@v1
@@ -11,7 +25,7 @@ with:
   tools: just,fd
 ```
 
-## 📂 Tool Config Example (`tool-configs.json`)
+### 📂 Tool Config Example (`tool-configs.json`)
 
 ```json
 [
@@ -28,12 +42,12 @@ with:
 ]
 ```
 
-## ✅ Supported Installers
+### ✅ Supported Installers
 
 - `eget` (supported)
 - `script` (planned)
 
-## 🛠 Supported Config Options
+### 🛠 Supported Config Options
 
 | Field                | Description                                      | Required |
 | -------------------- | ------------------------------------------------ | -------- |
