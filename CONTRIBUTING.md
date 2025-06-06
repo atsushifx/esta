@@ -7,79 +7,78 @@ tags:
   - guideline
   - setup
 ---
-
-English | [日本語](CONTRIBUTING.ja.md)
+<!-- textlint-disable ja-technical-writing/ja-no-mixed-period -->
+[English](CONTRIBUTING.md) | 日本語
 
 ## 🤝 Contribution Guidelines
 
-<!-- textlint-disable ja-technical-writing/no-exclamation-question-mark -->
+<!-- textlint-disable -->
 Thank you for thinking about contributing to this project!
-We hope your ideas will help make this project even better.
-<!-- textlint-enable -->
+<!-- textlint-enable -->Your contributions help make this project even better.
 
-### 🧰 How to use this template
-
-This `CONTRIBUTING.md` is a template for open source projects.
-When you use it for your own project, please:
-
-1. **Update repository information**
-   - Replace `atsushifx/.github` with your repository name.
-   - Update links and examples to match your project.
-
-2. **Check the tools**
-   - Make sure tools like `dprint` or `textlint` fit your project.
-
-3. **Confirm Code of Conduct**
-   - Check if your project has a `CODE_OF_CONDUCT.md` and fix links if needed.
-
-4. **Delete extra sections**
-   - Remove this guide and other comments before publishing.
-
-This guide is based on [GitHub Docs: Setting guidelines for repository contributors](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/setting-guidelines-for-repository-contributors).
-
-### 📝 How to contribute
+### 📈 How to Contribute
 
 #### 1. Report an Issue
 
-- Please use [Issues](https://github.com/atsushifx/.github/issues) to report bugs or suggest features.
-- Add enough details (steps, expected behavior, actual behavior).
+- Please report bugs or suggest features through [Issues](https://github.com/atsushifx/easy-setup-tools-action/issues).
+- When reporting, include details such as reproduction steps, expected behavior, and actual behavior.
 
-#### 2. Submit a Pull Request
+#### 2. Use Discussions (Questions, Suggestions, Chat)
 
-- Fork the repository and create a new branch like `feature/your-feature-name`.
-- Make your changes and commit them clearly.
+Join the GitHub Discussions if you have:
+
+- 💬 [Questions / Consultations (Q\&A)](https://github.com/atsushifx/easy-setup-tools-action/discussions/categories/q-a)
+- 💡 [Feature Ideas](https://github.com/atsushifx/easy-setup-tools-action/discussions/categories/ideas)
+- 🔈 [Casual Talk / General Discussion](https://github.com/atsushifx/easy-setup-tools-action/discussions/categories/general)
+
+#### 3. Submit a Pull Request
+
+- Fork the repository and create a branch like `feature/your-feature-name`.
+- Edit the source code or documentation and commit your changes.
+
   - Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
-  - Make one commit per change if possible, and rebase later to clean history.
-- Write a clear title and description for your pull request.
+  - Commit one feature per commit to make history clean.
+  - Rebase before submitting to organize commits by purpose.
+- In the pull request:
 
-### 🔧 Project environment
+  - Use a clear, one-line summary in the title.
+  - Write an explanation or context in the body.
+
+### 🔧 Project Environment
 
 #### Setup
 
-```bash
-git clone https://github.com/atsushifx/.github.git
+Run the following to set up your local development environment:
+
+```powershell
+git clone https://github.com/atsushifx/easy-setup-tools-action.git
+cd easy-setup-tools-action
+.\scripts\installDevTools.ps1
+pnpm install
+pnpm run build
 ```
+
+For details, see the [Onboarding Guide](docs/onboarding/README.ja.md).
 
 #### Testing
 
-When you make changes, please test:
+Please run tests when making changes to ensure nothing breaks. Use `Vitest`:
 
-- **textlint**
-  Check writing quality for technical documentation.
-- **markdownlint**
-  Check if Markdown format is correct.
+- Create unit tests under the `__tests__` directory.
+- Integration tests should go under the `tests` directory at the package root.
 
-#### Code style and format
+#### Code Style & Formatting
 
-We use these tools:
+Use the following tools to ensure consistent code style:
 
 - Formatter: dprint
-- Linters: textlint, markdownlint (with `markdownlint-cli2`)
-- Spell checker: cspell
+- Linter: ESLint
+- Spell Checker: CSpell
+- Documentation Lint: textlint, markdownlint (`markdownlint-cli`)
 
 ### 📜 Code of Conduct
 
-All contributors must follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+All contributors must follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ### 📚 References
 
@@ -89,19 +88,22 @@ All contributors must follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ### 📬 Create an Issue or PR
 
-- [🐛 Report a Bug](https://github.com/atsushifx/.github/issues/new?template=bug_report.yml)
-- [✨ Request a Feature](https://github.com/atsushifx/.github/issues/new?template=feature_request.yml)
-- [💬 Open a Topic](https://github.com/atsushifx/.github/issues/new?template=open_topic.yml)
-- [🔀 Create a Pull Request](https://github.com/atsushifx/.github/compare)
+- 🐛 [Report a Bug](https://github.com/atsushifx/.github/issues/new?template=bug_report.yml)
+- ✨ [Request a Feature](https://github.com/atsushifx/.github/issues/new?template=feature_request.yml)
+- 💬 [Q\&A (Ask a Question)](https://github.com/atsushifx/easy-setup-tools-action/discussions/categories/q-a)
+- 🔈 [General Discussion](https://github.com/atsushifx/easy-setup-tools-action/discussions/categories/general)
+- 💡 [Feature Suggestions](https://github.com/atsushifx/easy-setup-tools-action/discussions/categories/ideas)
+- 🔀 [Create a Pull Request](https://github.com/atsushifx/.github/compare)
 
 ---
 
 ### 🤖 Powered by
 
-This project is supported by our AI chat bots:
+The AI chatbot team supports this project:
 
 - **Elpha** - Cool and precise assistant
-- **Kobeni** - Gentle and supportive helper
-- **Tsumugi** - Cheerful and energetic supporter
+- **Kobeni** - Gentle and caring helper
+- **Tsumugi** - Bright and cheerful supporter
 
-Together, we make your contribution experience better ✨
+Each assistant helps improve the contribution experience.
+Collaboration and shared growth make this project better. ✨
