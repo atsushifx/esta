@@ -14,25 +14,25 @@
     "typescript",
     "monorepo"
   ],
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.12.1",
   "devDependencies": {
     "@commitlint/types": "^19.8.1",
     "@eslint/js": "^9.28.0",
-    "@ls-lint/ls-lint": "^2.3.0",
-    "@secretlint/secretlint-rule-preset-recommend": "^9.3.3",
+    "@ls-lint/ls-lint": "^2.3.1",
+    "@secretlint/secretlint-rule-preset-recommend": "^9.3.4",
     "@textlint/types": "^14.7.2",
-    "@types/node": "^22.15.29",
-    "@typescript-eslint/eslint-plugin": "^8.33.0",
-    "@typescript-eslint/parser": "^8.33.0",
+    "@types/node": "^22.15.30",
+    "@typescript-eslint/eslint-plugin": "^8.33.1",
+    "@typescript-eslint/parser": "^8.33.1",
     "cspell": "^8.19.4",
     "eslint": "^9.28.0",
-    "eslint-import-resolver-typescript": "^4.4.2",
+    "eslint-import-resolver-typescript": "^4.4.3",
     "eslint-plugin-import": "^2.31.0",
     "rimraf": "^6.0.1",
     "tsup": "^8.5.0",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
-    "vitest": "^3.1.4"
+    "vitest": "^3.2.2"
   },
   "scripts": {
     "build": "pnpm -r run build",
@@ -51,6 +51,7 @@
     "lint:filename": "pnpm exec ls-lint --config ./configs/ls-lint.yaml ",
     "lint:text": "textlint --config ./configs/textlintrc.yaml --cache --cache-location .cache/textlint-cache/textlintCache ",
     "lint:markdown": "markdownlint-cli2 --config ./configs/.markdownlint.yaml ",
-    "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*"
+    "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*",
+    "commit:ai": "dotenvx run -- czg --config=./configs/cz.config.cjs ai"
   }
 }
