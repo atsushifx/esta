@@ -1,4 +1,4 @@
-// src: /shared/configs/cz.config.base.js
+// src: /shared/configs/cz.config.base.cjs
 // @(#) : commitizen configuration for this workspace
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>

@@ -1,4 +1,4 @@
-// src: configs/cz.config.js
+// src: configs/cz.config.cjs
 // @(#) : commitizen configuration for this workspace
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -6,16 +6,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { defineConfig } from 'cz-git';
-
+/* eslint-disable @typescript-eslint/no-require-imports */
 // 基本設定
-const { baseCzConfig } = require('./shared/configs/cz.config.base');
+const { baseCzConfig } = require('../shared/configs/cz.config.base.cjs');
 
 // 設定
 module.exports = {
   ...baseCzConfig,
 
-  // 任意の拡張（プロジェクト固有）
+  // 任意の拡張（ﾌﾟvﾛ詐ﾞWｪFｸNﾄg固有）
 
   prompt: {
     ...baseCzConfig.prompt,
