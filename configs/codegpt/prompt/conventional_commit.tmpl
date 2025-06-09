@@ -25,3 +25,18 @@ THE FILE SUMMARIES:
 {{ .summary_points }}
 
 Based on the changes described in the file summaries, What's the best label for the commit? Your answer must be one of the labels above. Don't describe the changes, just write the label.
+
+{{/* ˆÈ‰ºÃeÝ“ÌßvÚŒ°[Äg–{‘Ì */}}
+{{- if .Scope -}}
+{{ .Type }}({{ .Scope }}): {{ .Subject }}
+{{- else -}}
+{{ .Type }}: {{ .Subject }}
+{{- end -}}
+
+{{ if .Body }}
+{{ .Body }}
+{{ end }}
+
+{{ if .Footer }}
+{{ .Footer }}
+{{ end }}
