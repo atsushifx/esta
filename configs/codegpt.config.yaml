@@ -1,6 +1,6 @@
 openai:
   provider: "openai"
-  model: gpt-4o
+  model: gpt-4.1-mini
 
 output:
   lang: ja
