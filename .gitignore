@@ -48,7 +48,7 @@ $~*
 
 ###	Develop
 # Node
-# ������ Node.js / JS project ignores ��������������������������������������������������
+# Node.js / JS project ignores
 # Output directory
 dist
 **/module/*
