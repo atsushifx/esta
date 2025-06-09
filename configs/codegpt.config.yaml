@@ -14,4 +14,4 @@ output:
   lang: ja
 
 #prompt:
-#  folder: "./configs/codegpt/prompt/"
+  folder: "./configs/codegpt/prompt/"
