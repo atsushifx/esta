@@ -17,8 +17,7 @@ const config: UserConfig = {
   ...baseConfig,
   rules: {
     ...baseConfig.rules,
-    // write rules if necessary
-    // 'header-max-length': [2, 'always', 72], etc
+    // override rules write here
   },
 };
 

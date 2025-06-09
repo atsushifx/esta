@@ -1,18 +1,10 @@
 # src: ./configs/textlintrc.yaml
-## @(#) : yaml type textlint config
+# @(#) : yaml type textlint config
 #
-# @version	1.0.0
-# @author   atsushifx <https://github.com/atsushifx>
-# @since    2025-05-14
-# @license  MIT
+# Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 #
-# @description<<
-#
-# This configuration file sets up textlint for Japanese technical writing.
-# It includes rules for sentence length, kanji usage, spacing, and more,
-# ensuring consistent and error-free documentation.
-#
-#<<
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
 
 plugins: {}
 filters:

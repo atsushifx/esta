@@ -12,6 +12,9 @@ ls:
   .types.ts: camelCase
   .class.ts: PascalCase
 
+  scripts:
+    .*: kebab-case
+
   packages:
     .dir: kebab-case | regex:^@[a-z\-]+$ | regex:__tests__
     .ts: camelCase | PascalCase
