@@ -10,16 +10,19 @@
   "types": "./lib/index.d.ts",
   "exports": {
     ".": {
-      "types": "./lib/index.d.ts",
-      "import": "./lib/index.js"
+      "import": "./lib/index.js",
+      "require": "./lib/index.js",
+      "types": "./lib/index.d.ts"
     },
     "./constants": {
-      "types": "./lib/constants/index.d.ts",
-      "import": "./lib/constants/index.js"
+      "import": "./lib/constants/index.js",
+      "require": "./lib/constants/index.js",
+      "types": "./lib/constants/index.d.ts"
     },
     "./types": {
-      "types": "./lib/types/index.d.ts",
-      "import": "./lib/types/index.js"
+      "import": "./lib/types/index.js",
+      "require": "./lib/types/index.js",
+      "types": "./lib/types/index.d.ts"
     }
   },
   "scripts": {
@@ -30,18 +33,17 @@
     "format:dprint": "dprint fmt",
     "check:dprint": "dprint check",
     "check:types": "tsc --noEmit --incremental",
-    "check:spells": "pnpm exec cspell --config ../../.vscode/cspell.json --cache --cache-location ../../.cache/cspell/cSpellCache",
-    "lint": "pnpm exec eslint --config ./configs/eslint.config.js --cache --cache-location ../../.cache/eslint-cache/eslintCache ",
-    "lint:types": "pnpm exec eslint --config ./configs/eslint.config.typed.js --cache --cache-location ../../.cache/eslint-cache/eslintCache ",
+    "check:spells": "pnpm exec cspell --config .vscode/cspell.json --cache --cache-location ../../../.cache/cspell/cspellCache",
+    "lint": "pnpm exec eslint --config ./configs/eslint.config.js --cache --cache-location ../../../.cache/eslint-cache/eslintCache",
+    "lint:types": "pnpm exec eslint --config ./configs/eslint.config.typed.js --cache --cache-location ../../../.cache/eslint-cache/eslintCache",
     "lint:all": "pnpm run lint && pnpm run lint:types",
-    "lint:fix": "pnpm run lint -- --fix",
+    "lint:fix": "pnpm run lint --fix",
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*",
     "test": "pnpm run test:develop && pnpm run test:ci",
     "test:develop": "pnpm exec vitest run --config ./configs/vitest.config.unit.ts",
     "test:ci": "pnpm exec vitest run --config ./configs/vitest.config.ci.ts",
     "test:watch": "pnpm exec vitest --config ./configs/vitest.config.unit.ts --watch",
-    "sync:configs": "bash ../../scripts/sync_configs.sh . "
+    "sync:configs": "bash ../../../scripts/sync-configs.sh . "
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

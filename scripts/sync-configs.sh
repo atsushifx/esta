@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
 ## src: ./scripts/sync-configs.sh
-#
 # @(#) : Sync shared config files into target directory (by type)
 #
-# @version  1.0.0
-# @since    2025-05-14
-# @author   atsushifx <https://github.com/atsushifx>
-# @license  MIT
+# Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+#
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
 #
 # Description <<
 #   Sync shared config files to sub repository root.
 #
 # Usage:
 #   ./scripts/sync-configs.sh <target_dir> <config_type> [--dry-run]
-#   config_type: dprint | lefthook | secretlint | all
+#   config_type: secretlint | package |all
 #
 #<<
 
@@ -61,14 +60,6 @@ sync_config_type() {
   local config_files
 
   case "$config_type" in
-    dprint)
-      config_files=("dprint.base.jsonc:dprint.jsonc")
-      copy_config_files config_files "$target_dir"
-      ;;
-    lefthook)
-      config_files=("lefthook.base.yml:lefthook.yml")
-      copy_config_files config_files "$target_dir"
-      ;;
     secretlint)
       config_files=("secretlint.config.base.yaml:configs/secretlint.config.yaml")
       copy_config_files config_files "$target_dir"
@@ -82,7 +73,7 @@ sync_config_type() {
 
     *)
       echo "❌ Unknown config_type: $config_type"
-      echo "   Must be one of: dprint | lefthook | secretlint | all"
+      echo "   Must be one of: secretlint | all"
       return 1
       ;;
   esac

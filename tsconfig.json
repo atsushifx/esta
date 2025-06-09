@@ -20,7 +20,7 @@
   ],
   "compilerOptions": {
     // directories
-    "outDir": "lib",
+    "outDir": "dist",
     "rootDir": ".",
     // alias
     "baseUrl": ".",

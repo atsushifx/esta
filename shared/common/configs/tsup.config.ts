@@ -23,7 +23,7 @@ export default defineConfig({
   },
 
   // sub packages definition
-  format: ['cjs', 'esm'],
+  format: ['cjs'],
   outDir: 'lib', // for CJS
   // tsconfig
   tsconfig: './tsconfig.json',

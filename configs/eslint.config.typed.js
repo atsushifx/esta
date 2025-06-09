@@ -16,8 +16,8 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 // parser
 import tsparser from '@typescript-eslint/parser';
 
-// import form common base config
-import projectPaths from '../shared/configs/eslint.projects.js';
+import projectPaths from './eslint.projects.js';
+// common rules
 import typedRules from '../shared/configs/eslint.rules.typed.js';
 
 // directories

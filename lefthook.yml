@@ -36,6 +36,7 @@ pre-commit:
     lint-files:
       glob:
         - "**/*.ts"
+        - "scripts/**/*"
       run: pnpm run lint:filename -- {staged_files}
 
     check-spells:
@@ -51,13 +52,7 @@ pre-commit:
 prepare-commit-msg:
   commands:
     prepare-by-codegpt:
-      run: >
-        dotenvx run --
-        codegpt
-        --config ./configs/codegpt.config.yaml
-        commit
-        --no_confirm --preview
-        --file .git/COMMIT_EDITMSG
+      run: bash -c 'scripts/prepare-commit-msg.sh'
 
 commit-msg:
   parallel: true

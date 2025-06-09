@@ -10,6 +10,7 @@
   // compiler options
   "include": [
     "src/**/*.ts",
+    "shared/**/*.ts",
     "tests/**/*.ts"
   ],
   "exclude": [
