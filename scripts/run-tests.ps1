@@ -43,12 +43,15 @@ function Get-TestFiles {
 switch ($Target) {
     "unit" {
         $testTargets += Get-TestFiles -Path "$SCRIPT_ROOT/libs"
+        $testTargets += Get-TestFiles -Path "$SCRIPT_ROOT/common"
     }
     "ci" {
         $testTargets += Get-TestFiles -Path "$SCRIPT_ROOT/tests"
     }
     "all" {
         $testTargets += Get-TestFiles -Path "$SCRIPT_ROOT/libs"
+        $testTargets += Get-TestFiles -Path "$SCRIPT_ROOT/common"
+
         $testTargets += Get-TestFiles -Path "$SCRIPT_ROOT/tests"
     }
 }
