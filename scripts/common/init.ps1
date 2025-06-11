@@ -33,3 +33,7 @@ function Init-ScriptEnvironment {
                      -Option ReadOnly
     }
 }
+
+## 初期設定
+Init-ScriptEnvironment
+. "$SCRIPT_ROOT/common/CommonFunctions.ps1"

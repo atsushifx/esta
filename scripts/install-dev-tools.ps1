@@ -1,125 +1,80 @@
+# src: /scripts/install-dev-tools.ps1
+# @(#) : 開発ツールインストールスクリプト
+#
+# Copyright (c) 2025 Furukawa Atsushi <atsushifx@gmail.com>
+# Released under the MIT License.
+
 <#
 .SYNOPSIS
-    開発支援ツールとコミットフック (lefthook) を一括インストールするスクリプト
+    開発支援ツール を一括インストールするスクリプト
 
 .DESCRIPTION
-    このスクリプトは、Scoop と pnpm を使用して、
-    開発ワークフローをサポートする複数のツールを一括インストールします。
-    pnpm では --global オプションを使用し、プロジェクトによらずに使用できるようにします。
+    このスクリプトは、scoop・pnpm・eget などのツールを用いて、
+    複数の開発支援ツールを一括で導入します。
 
 .NOTES
-    @Version  1.3.1
-    @Since    2025-04-18
-    @Author   atsushifx <https://github.com/atsushifx>
-    @License  MIT <https://opensource.org/licenses/MIT>
+    @Version  1.3.2
+    @Since    2025-06-12
+    @Author   atsushifx
+    @License  MIT
 #>
 
-#region Parameters
-Param (
-    [switch]$Global = $false,
-    [string]$DestinationDir = "."
-)
-#endregion
-
-#region StrictMode and Settings
+#region Setup
 Set-StrictMode -Version Latest
+
+. "$PSScriptRoot/common/init.ps1"
+. "$SCRIPT_ROOT/libs/AgInstaller.ps1"
 #endregion
 
-#region Functions
+#region ツールリスト
 
-function Install-ScoopTools {
-    Write-Host "📦 Installing tools via Scoop..."
+$WinGetPackages = @(
+    #  環境変数マネージャー
+    "dotenvx, dotenvx.dotenvx"
+)
 
-    $tools = @(
-        # Git hook
-        "lefthook",
+$ScoopPackages = @(
+    # Gitフックマネージャー
+    "lefthook",
+    # フォーマッター
+    "dprint",
+    # 機密情報スキャン
+    "gitleaks"
+)
 
-        # コードフォーマッター
-        "dprint",
+$PnpmPackages = @(
+    "commitlint",
+    "@commitlint/cli",
+    "@commitlint/config-conventional",
+    "@commitlint/types",
+    "secretlint",
+    "@secretlint/secretlint-rule-preset-recommend",
+    "cspell"
+)
 
-        # 機密情報チェック
-        "gitleaks",
-    )
-
-    foreach ($tool in $tools) {
-        if ($tool -notmatch "^\s*#") {
-            Write-Host "🔧 Installing: $tool"
-            scoop install $tool
-        }
-    }
-
-    Write-Host "✅ Scoop tools installed."
-}
-
-<#
-.SYNOPSIS
-    pnpmで開発用パッケージをインストールする
-
-.PARAMETER Global
-    パッケージをグローバルにインストールするかどうか
-
-.PARAMETER DestinationDir
-    ローカルインストール時にインストール先とするディレクトリ
-#>
-function Install-PnpmDevTools {
-    param (
-        [switch]$Global = $false,
-        [string]$DestinationDir = "."
-    )
-
-    $devPackagesRaw = @(
-        # コミットメッセージ検証
-        "commitlint",
-        "@commitlint/cli",
-        "@commitlint/config-conventional",
-        "@commitlint/types",
-
-        # 機密チェック
-        "secretlint",
-        "@secretlint/secretlint-rule-preset-recommend",
-
-        # スペルチェック
-        "cspell"
-    )
-
-    $devPackages = $devPackagesRaw | Where-Object { $_ -notmatch "^\s*#" }
-
-    $flag = if ($Global) { "--global" } else { "--save-dev" }
-    $command = "pnpm add $flag " + ($devPackages -join " ")
-
-    if (-not $Global) {
-        Write-Host "📁 Switching to: $DestinationDir"
-        Push-Location $DestinationDir
-    }
-
-    Write-Host "📦 Installing development tools using pnpm ($flag)"
-    Invoke-Expression $command
-
-    if (-not $Global) {
-        Pop-Location
-    }
-
-    Write-Host "✅ pnpm packages installed."
-}
-
-<#
-.SYNOPSIS
-    スクリプトのメインエントリーポイント
-
-.DESCRIPTION
-    Scoopとpnpmを使って必要なツールを一括でインストールします。
-#>
-function local:main {
-    param (
-        [switch]$Global = $false,
-        [string]$DestinationDir = "."
-    )
-
-    Install-ScoopTools
-    Install-PnpmDevTools -Global:$Global -DestinationDir:$DestinationDir
-}
+$EgetPackages = @(
+    "codegpt, appleboy/codegpt"
+)
 
 #endregion
 
-# 実行エントリーポイント
-main -Global:$Global -DestinationDir:$DestinationDir
+#region Main
+function main {
+    if (!(commandExists "eget")) {
+        Write-Warning "eget is not installed."
+        install-WinGetPackages "eget,ZacharyYedidia.Eget"
+    }
+
+    #/ 各種開発ツールのインストール
+    $WinGetPackages | Install-WinGetPackages
+    $ScoopPackages | Install-ScoopPackages
+    $PnpmPackages | Install-PnpmPackages
+    $EgetPackages | Install-EgetPackages
+}
+#endregion
+
+## main
+
+Write-Host "▶ Starting development tool setup..."
+main
+Write-Host "📦 Done."

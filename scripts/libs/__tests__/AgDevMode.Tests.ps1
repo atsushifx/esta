@@ -15,8 +15,9 @@ Describe '開発車モードテスト' {
         AgDevMode-GetMode | Should -BeTrue
     }
 
-    It "モード設定" {
-        AgDevMode-SetMode $true
-        AgDevMode-GetMode | Should -BeTrue
-    }
+    # 用 sudo
+    #It "モード設定" {
+    ##    AgDevMode-SetMode $true
+    #    AgDevMode-GetMode | Should -BeTrue
+    #}
 }
