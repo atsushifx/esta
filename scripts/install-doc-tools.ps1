@@ -1,5 +1,5 @@
 # src: /scripts/install-doc-tools.ps1
-# @(#) : ドキュメントツールインストールスクリプト
+# @(#) : ドキュメントルールインストールスクリプト
 #
 # Copyright (c) 2025 Furukawa Atsushi <atsushifx@gmail.com>
 # Released under the MIT License.
@@ -34,7 +34,7 @@ Set-StrictMode -Version Latest
 #endregion
 
 #region Functions
-function Copy-Configs {
+function Copy-LinterConfigs {
 <#
 .SYNOPSIS
     指定された設定ファイル・ディレクトリをテンプレートから `DestinationDir/configs/` にコピーします。
@@ -109,28 +109,6 @@ function Copy-Configs {
         }
     }
 }
-
-#region Conditions
-function Should-CopyConfig {
-<#
-.SYNOPSIS
-    設定ファイルのコピーが必要かを判定します。
-
-.DESCRIPTION
-    - `.vscode/cspell.json` が存在しない
-    - `$TemplateDir` が存在する
-    → 両方を満たす場合に `$true` を返します。
-#>
-    param (
-        [string]$TemplateDir,
-        [string]$DestinationDir
-    )
-
-    $cspellPath = Join-Path $DestinationDir ".vscode/cspell.json"
-
-    return (-not (Test-Path $cspellPath)) -and (Test-Path $TemplateDir)
-}
-#endregion
 #endregion
 
 #region Main
@@ -161,8 +139,7 @@ function main {
         "cspell"
     ) | Install-PnpmPackages
 
-    if (Should-CopyConfig $TemplateDir $DestinationDir) {
-        Write-Host "📦 Installing document tool configs..."
+    if (Test-Path $TemplateDir) {
         @(
             # textlint settings
             ".textlintrc.yaml",
@@ -173,9 +150,9 @@ function main {
 
             # cSpell
             ".vscode"
-        ) | Copy-Configs -TemplateDir $TemplateDir -DestinationDir $DestinationDir
+        ) | Copy-LinterConfigs -TemplateDir $TemplateDir -DestinationDir $DestinationDir
     } else {
-        Write-Host "⚠️ Skipping config copy (already exists or template missing)."
+        Write-Host "⚠️ Template directory not found: $TemplateDir. Skipping config copy."
     }
 
     Write-Host "✅ Writer environment setup completed." -ForegroundColor Green
