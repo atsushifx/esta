@@ -1,21 +1,24 @@
 ---
-title: グローバル開発ツールのセットアップ
-description: この章では、Volta, pnpm, lefthook などプロジェクトで使用するグローバルツールの導入方法について説明します。
+title: パッケージマネージャーの導入
+description: このプロジェクトで使用する各種開発ツールを導入するために、各種パッケージマネージャーをインストールする方法
 sidebar_position: 2
 ---
 
 ## はじめに
 
-この章では、開発環境の初期化に必要な **パッケージマネージャー**、および**グローバルツール** (システム全体で使用するコマンドラインツール) を導入していきます。
-`Volta`, `pnpm`, `lefthook`, `dprint` などはこのプロジェクトで共通して使われるため、あらかじめセットアップしておくことが推奨されます。
+この章では、開発環境の初期化に必要な **パッケージマネージャー**、を導入します。
+`winget`, `scoop`, `volta` `pnpm` は、各プロジェクトで共通して使われるため、あらかじめセットアップしておくことが推奨されます。
 
 ## 📦 パッケージマネージャーのインストール (Windows)
 
-Windows では以下のパッケージマネージャーを使用します:
+Windows では以下のパッケージマネージャーを使用します:<!-- vale off -->
 
-- `winget`：Microsoft 公式のパッケージ管理コマンド
-- `scoop`：CLI ツール向けに優れた軽量マネージャー
-- 'Volta': Node.js, pnpm など
+- `winget`： Microsoft 公式のパッケージ管理コマンド
+- `scoop`： CLI ツール向けに優れた軽量パッケージマネージャー
+- 'Volta': `Node.js`, `pnpm`などの JavaScript ツール用バージョン管理ツール
+- `pnpm` : 高速かつ効率のよぴ`Node.js`用パッケージマネージャー
+
+<!-- vale on -->
 
 ### `winget` (標準搭載／環境によって再インストールが必要)
 
@@ -28,11 +31,15 @@ winget --version
 
 `winget`がインストールされていない場合は、以下の記事を参考に再インストールをしてください。
 
-➡️ [Zenn記事：wingetの完全再セットアップ手順](https://zenn.dev/atsushifx/articles/winhack-setup-reinstall-winget)
+➡️ [Zenn記事：wingetの再セットアップ手順](https://zenn.dev/atsushifx/articles/winhack-setup-reinstall-winget)
 
 ### `Scoop`
 
-`scoop`は CLI ツール群の導入に最適なパッケージマネージャーです。
+<!-- vale off -->
+
+Scoop`は CLI ツール群の導入に最適なパッケージマネージャーです。
+
+<!-- vale on -->
 
 以下の手順で、`scoop`をインストールします。
 
@@ -43,18 +50,14 @@ irm get.scoop.sh | iex
 ```
 
 **補足**:
-`| iex`とそのまま実行するのでは無く`> inst.ps1`とインストーラースクリプトとしてダウンロードすることで、指定したディレクトリに`scoop`によるファイルを保存できます。
-
-<!-- textlint-disable ja-technical-writing/sentence-length -->
+`| iex`とそのまま実行するのではなく、`> inst.ps1`とインストーラースクリプトとしてダウンロードすることで、アプリの保存先を指定できます。
 
 例: `./inst.ps1 -ScoopDir ~/app/scope -ScoopGlobalDir C:\app\scoop\ -ScoopCacheDir C:\app\scoop\cache`
 
-<!-- textlint-enable -->
-
 ### `Volta`
 
-Volta は、`Node.js`や`pnpm`など開発ツールのためのパッケージマネージャーです。
-Volta を使った場合、`Node.js`は'20.x.x'のような指定バージョンをインストールできます。
+Volta は、`Node.js`や`pnpm`など JavaScript / TypeScript 用のバージョン管理ツールです。
+Volta を使うことで、Node.js`は'20.x'の最新版をインストールする、といったバージョンの管理ができます。
 
 次の手順で、Volta をインストールします。
 
@@ -69,9 +72,10 @@ Volta を使った場合、`Node.js`は'20.x.x'のような指定バージョン
 
 以上で、Volta を使ってインストールしたツールが使用できます。
 
-## `Node`と`pnpm`のインストール
+## `Node`と`pnpm`
 
-プロジェクトの開発に必要な **Node.js** および **pnpm** を Volta を利用して導入する手順を紹介します。
+このプロジェクトは、`Node.js`と`pnpm`を使って開発をしています。
+これらは、実行に使用できるバージョンをしているする必要があるため、`Volta`を利用して指定したバージョンを導入します。
 Volta を活用することで、ツールのバージョンをプロジェクトごとに固定し、チーム全体の開発環境を統一できます。
 
 ### Node.js のインストール (Volta 経由)
@@ -82,7 +86,7 @@ Volta を活用することで、ツールのバージョンをプロジェク�
 volta install node@20
 ```
 
-`node@20`と`20`を指定することで、最新版の LTS 系 (20.x 系) をインストールします。
+`node@20`と`20`を指定することで、LTS の最新版の (20.x) をインストールします。
 
 ### `pnpm`のインストール
 
@@ -92,7 +96,7 @@ volta install node@20
 volta install pnpm@latest
 ```
 
-`latest`により、最新の pnpm をインストールします。
+`latest`と指定することにより、最新の pnpm をインストールします。
 
 #### `pnpm` のグローバルツール用 PATH 設定
 
@@ -109,6 +113,9 @@ pnpm config get global-bin-dir
 この設定で、`cspell` や `commitlint` などのコマンドがターミナル上で直接使用できるようになります。
 
 ## ✅ セットアップ チェックリスト
+
+この章のセットアップのチェックリストです。
+すべてをチェックできた場合、パッケージマネージャーで問題なくツールをインストールできます。
 
 - [ ] `winget` の動作確認ができた
 - [ ] `scoop` をインストールした
