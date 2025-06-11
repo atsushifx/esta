@@ -14,6 +14,10 @@ ls:
 
   scripts:
     .*: kebab-case
+    libs:
+      .*: PascalCase
+    tests:
+      .*: PascalCase
 
   packages:
     .dir: kebab-case | regex:^@[a-z\-]+$ | regex:__tests__
