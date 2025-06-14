@@ -10,18 +10,19 @@ sidebar_position: 8
 
 ### 8.1 概要
 
-本プロジェクトでは、各サブパッケージの `package.json` に定義される `scripts` セクションを共通化しています。
-共通スクリプトは `/shared/configs/base-scripts.json` に記述されており、
-同期コマンドにより各パッケージの `package.json` に自動で反映されます。
+このプロジェクトでは、各サブパッケージの `package.json` に定義される `scripts` セクションを共通化しています。
+共通スクリプトは `/shared/configs/base-scripts.json` に定義されており、同期コマンドによって各パッケージの `package.json` に自動的に反映されます。
 
 > ※ `/shared/common/` 下のスクリプトは対象ディレクトリ構造が異なるため、同期の対象外です。
 > そのため、**手動での設定・更新が必要です。**
 
-これにより、各サブパッケージでのスクリプト管理が効率化され、運用コストが削減されます。
+各サブパッケージのスクリプト定義が統一され、メンテナンス作業の負担が大幅に減ります。
 
 一方、`monorepo`のルート（プロジェクトルート）では、
 **ルート固有のスクリプトや、全体に影響する管理用スクリプト**が定義されています。
 これには、CI/CD の実行、全パッケージ横断の処理などが含まれます。
+
+以下に、共通スクリプトとルートスクリプトの定義場所と主な用途をまとめます。
 
 <!-- markdownlint-disable line-length -->
 
@@ -30,20 +31,20 @@ sidebar_position: 8
 | `/shared/configs/base-scripts.json` | サブパッケージ用の共通スクリプト      | ビルド、テスト、リントなど                                      |
 | Monorepoルートの `package.json`     | 全体管理向けのスクリプト (ルート固有) | 全ソースコードへのリント、ドキュメント生成、CI/CD一括タスクなど |
 
-<!-- markdownlint-enable -->
+*[表1-1] スクリプト定義*<!-- markdownlint-enable -->
 
 > 💡 各サブパッケージのスクリプトは、同期コマンドによって
-> `/shared/configs/base-scripts.json` の内容に上書きされます。
+> `shared/configs/base-scripts.json` の内容に上書きされます。
 > 一方で、ルートのスクリプトは手動で管理します (※ ルート特有の処理があるため同期の対象外です)。
-> 一部の操作は `pnpm -r` 形式により、サブパッケージ全体に対して一括で実行されます。
+> 一部の操作は `pnpm -r` 形式で記述することで、サブパッケージ全体に対して一括実行が可能です。
 
 ### 8.2 スクリプトの同期方法
 
-各サブパッケージの `package.json`のスクリプトは、共通ファイル `/shared/configs/base-scripts.json` を基に、同期スクリプトにより自動で上書き・反映されます。
+<!-- markdown-disable-line line-length -->各サブパッケージの `package.json` に含まれるスクリプトは、同期スクリプトによって共通スクリプトファイル `/shared/config/base-scripts.json`内のスクリプトに上書きされます。
 
 #### 同期スクリプト
 
-同期には、以下のスクリプトを使用します:
+同期には、以下のスクリプトを使用します。
 
 - `/scripts/sync-configs.sh`: Bash スクリプト。共通設定ファイルを指定ディレクトリに同期する。
 - `/scripts/sync-package-scripts.ts`: `package.json` の `scripts` セクションを同期・マージする TypeScript スクリプト。
@@ -52,13 +53,13 @@ sidebar_position: 8
 
 #### 実行方法
 
-次のコマンドにより、サブパッケージ内の `package.json` のスクリプトが共通スクリプトに同期されます:
+次のコマンドにより、共通スクリプトファイルのスクリプトを、指定したパッケージの`package.json`に同期します:
 
 ```bash
 bash ./scripts/sync-configs.sh ./packages/<@package-name-space>/<your-package-name> package
 ```
 
-> 💡 dry-runを有効にしたい場合は、`--dry-run` を末尾に追加してください。
+> 💡 `--dry-run` を末尾に付加することで、dry-runモードで実行できます。
 
 また、`config_type` に `all` を指定すると、`secretlint.config.yaml` など他の共通設定もあわせて同期可能です:
 
@@ -66,7 +67,7 @@ bash ./scripts/sync-configs.sh ./packages/<@package-name-space>/<your-package-na
 ./scripts/sync-configs.sh ./packages/your-package-name all
 ```
 
-あるいは、パッケージ側の `package.json` に定義された `sync:configs` スクリプトを使っても同様に実行できます:
+各パッケージの `package.json` に定義された `sync:configs` スクリプトを使用することで、同様の同期が実行できます。
 
 ```bash
 pnpm run sync:configs package
@@ -79,38 +80,41 @@ pnpm run sync:configs all
 
 | config_type  | 対象ファイル例                                                   | 備考                                     |
 | ------------ | ---------------------------------------------------------------- | ---------------------------------------- |
-| `package`    | `base-scripts.json` → 各パッケージの `package.json`              | `tsx sync-package-scripts.ts` を経由     |
+| `package`    | `base-scripts.json` → 各パッケージの `package.json`              | `tsx sync-package-scripts.ts` 経由       |
 | `secretlint` | `secretlint.config.base.yaml` → `configs/secretlint.config.yaml` | 上書き　(編集内容は失われる)             |
 | `all`        | 上記すべて                                                       | `secretlint`, `package` の両方を順に実行 |
 
-<!-- markdownlint-enable -->
+*[表2-1] 同期対象と動作*<!-- markdownlint-enable -->
 
 ### 8.3 共通スクリプトの内容と役割
 
 共通スクリプトは、`/shared/configs/base-scripts.json` に定義されており、各サブパッケージの`package.json`に同期されます。
 これにより、各サブパッケージは一貫した開発作業が可能です。
-以下に、主なスクリプトとその役割を示します。
 
-| スクリプト名    | 内容・目的 (設定ファイル)                                       |
-| --------------- | --------------------------------------------------------------- |
-| `build`         | CJSとESM両方のビルドを一括実行します (`build:cjs`, `build:esm`) |
-| `build:cjs`     | CommonJS形式でビルド (`tsup.config.ts`)                         |
-| `build:esm`     | ESModules形式でビルド (`tsup.config.module.ts`)                 |
-| `clean`         | `lib`, `module`, `.cache` ディレクトリの削除                    |
-| `format:dprint` | `dprint` によるコードフォーマット実行                           |
-| `check:dprint`  | `dprint` によるコード整形チェック                               |
-| `check:types`   | TypeScriptの型チェック (`tsc --noEmit`)                         |
-| `check:spells`  | `cspell` によるスペルチェック                                   |
-| `lint`          | ESLintによるコード静的解析 (`eslint.config.js`)                 |
-| `lint:types`    | 型チェック用ESLintルール適用 (`eslint.config.typed.js`)         |
-| `lint:all`      | `lint` と `lint:types` の両方を実行                             |
-| `lint:fix`      | `lint` の修正モード実行 (`--fix`)                               |
-| `lint:secrets`  | Secretlint による秘密情報検出 (`secretlint.config.yaml`)        |
-| `test`          | 開発用・CI用のテストを一括実行 (`test:develop`, `test:ci`)      |
-| `test:develop`  | ユニットテストの実行 (`vitest.config.unit.ts`)                  |
-| `test:ci`       | CI用のインテグレーションテスト実行 (`vitest.config.ci.ts`)      |
-| `test:watch`    | ユニットテストのwatchモード (`--watch`)                         |
-| `sync:configs`  | 同期スクリプト (`sync_configs.sh`) によりコンフィグ等を同期     |
+以下に、主なスクリプトとその役割を示します。<!-- markdownlint-disable line-length -->
+
+| スクリプト名    | 内容・目的 (設定ファイル)                                       | 備考                                                     |
+| --------------- | --------------------------------------------------------------- | -------------------------------------------------------- |
+| `build`         | CJSとESM両方のビルドを一括実行します (`build:cjs`, `build:esm`) |                                                          |
+| `build:cjs`     | CommonJS形式でビルド (`tsup.config.ts`)                         |                                                          |
+| `build:esm`     | ESModules形式でビルド (`tsup.config.module.ts`)                 |                                                          |
+| `clean`         | `lib`, `module`, `.cache` ディレクトリの削除                    |                                                          |
+| `format:dprint` | `dprint` によるコードフォーマット実行                           |                                                          |
+| `check:dprint`  | `dprint` によるコード整形チェック                               |                                                          |
+| `check:types`   | TypeScriptの型チェック (`tsc --noEmit`)                         |                                                          |
+| `check:spells`  | `cspell` によるスペルチェック                                   |                                                          |
+| `lint`          | ESLintによるコード静的解析 (`eslint.config.js`)                 |                                                          |
+| `lint:types`    | 型チェック用ESLintルール適用 (`eslint.config.typed.js`)         |                                                          |
+| `lint:all`      | `lint` と `lint:types` の両方を実行                             |                                                          |
+| `lint:fix`      | `lint` の修正モード実行 (`--fix`)                               |                                                          |
+| `lint:secrets`  | Secretlint による秘密情報検出 (`secretlint.config.yaml`)        |                                                          |
+| `test`          | 開発用・CI用のテストを一括実行 (`test:develop`, `test:ci`)      |                                                          |
+| `test:develop`  | ユニットテストの実行 (`vitest.config.unit.ts`)                  |                                                          |
+| `test:ci`       | CI用のインテグレーションテスト実行 (`vitest.config.ci.ts`)      |                                                          |
+| `test:watch`    | ユニットテストのwatchモード (`--watch`)                         |                                                          |
+| `sync:configs`  | 同期スクリプト (`sync_configs.sh`) によりコンフィグ等を同期     | 最後に`--dry-run`をつけると、dry runモードでじっこうする |
+
+*[表3-1] 共通スクリプトと内容*<!-- markdownlint-enable -->
 
 > 💡 これらのスクリプトは各パッケージの`package.json`に同期されて使用されます。
 > コマンドの前には `pnpm run` を付けて実行します。
@@ -144,7 +148,7 @@ pnpm run sync:configs all
 | `lint:markdown`  | `markdownlint-cli2` によるMarkdown構文チェック                         |                                      |
 | `lint:secrets`   | `secretlint` による機密文字列の検出                                    | `.gitignore` を無視リストとして使用  |
 
-<!-- markdownlint-enable -->
+*[表4-1] `<monorepo}`ルートの代表的なスクリプト*<!-- markdownlint-enable -->
 
 **補足**:
 
@@ -197,4 +201,4 @@ pre-commit:
 
 ---
 
-これにより、スクリプト管理の運用が**自動化、属人性が排除される構成**されます。
+これにより、スクリプト管理の運用が**自動化、属人性が排除される構成**にされます。

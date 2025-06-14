@@ -15,9 +15,13 @@ sidebar_position: 0
 
 ## プロジェクトの目的
 
-"easy-setup-tools-action (ESTA)"は、環境構築時に必要なツールを自動で導入することを目的にしています。
+<!-- vale off -->"
+
+easy-setup-tools-action (ESTA)"は、環境構築時に必要なツールを自動で導入することを目的にしています。
 とくに GitHub Actions では自分がおこないたいテストやリントなどの環境を設定するのに手間がかかります。
 ESTA は、CLI での引数、または GitHub Actions での with で、簡単に複数のツールがインストールできることを目指しています。
+
+<!-- vale on -->
 
 ## 対象読者
 
