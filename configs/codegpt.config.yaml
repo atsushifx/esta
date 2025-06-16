@@ -13,5 +13,5 @@ openai:
 output:
   lang: ja
 
-#prompt:
+prompt:
   folder: "./configs/codegpt/prompt/"
