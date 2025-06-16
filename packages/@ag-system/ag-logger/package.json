@@ -1,15 +1,15 @@
 {
-  "name": "@ag-utils/command-utils",
+  "name": "@ag-utils/common",
   "private": true,
   "version": "0.0.0",
-  "description": "command-utils: command executor and other utilities",
+  "description": "Cross-platform Node.js utility to detect runtime platform.",
   "author": "atsushifx <https://github.com/atsushifx>",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
   "main": "./lib/index.js",
   "module": "./module/index.js",
-  "types": "./module/index.d.ts",
+  "types": "./lib/index.d.ts",
   "exports": {
     ".": {
       "types": "./lib/index.d.ts",
@@ -46,8 +46,6 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@ag-utils/get-platform": "workspace:*"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

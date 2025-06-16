@@ -22,12 +22,11 @@
   "compilerOptions": {
     // directories
     "outDir": "lib",
-    "rootDir": ".",
+    "rootDir": "./src",
     // alias
-    "baseUrl": ".",
-    // "paths": {    },
+    "baseUrl": "./",
+    // "paths": {},
     // types
-    // "typesRoots": [    ],
     // cache
     "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"
   }

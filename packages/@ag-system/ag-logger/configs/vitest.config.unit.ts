@@ -1,19 +1,17 @@
-// src: ./configs/vitest.config.ci.ts
-// @(#) : vitest config for integration test
+// src: ./configs/vitest.config.unit.ts
+// @(#) : vitest config for unit test
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// libs : Note path resolver
+// libs for base directory
 import path from 'path';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-
-// Monorepo root directory
+// base directory
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const MonorepoRoot = path.resolve(__dirname, '../../../../');
 
 // system config
 import { mergeConfig } from 'vitest/config';
@@ -25,18 +23,17 @@ import baseConfig from '../../../../shared/configs/vitest.config.base';
 export default mergeConfig(baseConfig, {
   test: {
     include: [
-      // CI Tests
-      'tests/**/*.test.ts',
-      'tests/**/*.spec.ts',
+      // Unit Test (develop test) exec only sub repositories
+      'src/**/*.test.ts',
+      'src/**/*.spec.ts',
     ],
-    cache: {
-      dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/ci/'),
-    },
+    caches: {
+      dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/unit')
+    }
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '../src'),
-      '@shared': path.resolve(MonorepoRoot, 'shared/common'),
     },
   },
 });

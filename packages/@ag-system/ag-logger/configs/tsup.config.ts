@@ -14,7 +14,6 @@ import { baseConfig } from '../../../../shared/configs/tsup.config.base';
 
 export default defineConfig({
   ...baseConfig,
-
   // sub packages definition
   format: ['cjs'],
   outDir: 'lib', // for CJS

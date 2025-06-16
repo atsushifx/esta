@@ -10,14 +10,13 @@
 import type { UserConfig } from '@commitlint/types';
 
 // import base Config
-import { default as baseConfig } from '../../../../shared/configs/commitlint.config.base.js';
+import { default as baseConfig } from '../../../../shared/configs/commitlint.config.base.js'; // ← .js拡張子を必ず付ける
 
 const config: UserConfig = {
   ...baseConfig,
   rules: {
     ...baseConfig.rules,
-    // write rules if necessary
-    // 'header-max-length': [2, 'always', 72], etc
+    // override rules write here
   },
 };
 
