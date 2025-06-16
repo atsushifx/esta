@@ -1,4 +1,4 @@
-// src: /src/shared/types/Logger.types.ts
+// src: /shared/types/AgLogger.types.ts
 // @(#) : Logger用型
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>

@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // export types for  util's function types
-export * from './AgLogger.types';
+// AgLogger types are now in @ag-system/ag-logger package
 
 // export types for agAction
 export * from './AgActionCommon.types';

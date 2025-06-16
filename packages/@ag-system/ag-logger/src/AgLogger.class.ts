@@ -1,4 +1,4 @@
-// src: /src/utils/logger/AbstractAgLogger.class.ts
+// src: /src/AgLogger.class.ts
 // @(#) : AgLogger抽象クラス
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -16,7 +16,7 @@ export abstract class AgLogger implements IAgLogger {
   private static _logger: AgLogger;
   private static _logLevel: AgLogLevel = AgLogLevel.INFO;
 
-  static getLogger<T extends AgLogger>(_construct?: new() => T): T {
+  static getLogger<T extends AgLogger>(_construct?: new () => T): T {
     if (!AgLogger._logger) {
       if (!_construct) {
         throw new Error(`can't create Logger type <unknown}>.`);

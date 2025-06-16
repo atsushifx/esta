@@ -1,4 +1,4 @@
-// src: /src/utils/consoleLogger.ts
+// src: /src/ConsoleLogger.class.ts
 // @(#) : console出力型 Logger
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>

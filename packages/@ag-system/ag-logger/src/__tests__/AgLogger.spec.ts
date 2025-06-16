@@ -1,4 +1,4 @@
-// src: /src/utils/logger/__tests__/AgLogger.spec.ts
+// src: /src/__tests__/AgLogger.spec.ts
 // @(#) : Loggerのユニットテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>

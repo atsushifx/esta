@@ -22,7 +22,7 @@
   "compilerOptions": {
     // directories
     "outDir": "lib",
-    "rootDir": "./",
+    "rootDir": ".",
     // alias
     "baseUrl": "./",
     // "paths": {},
@@ -32,7 +32,7 @@
       ],
       "@shared/*": [
         "shared/*"
-      ]
+      ],
     },
     // types
     // cache

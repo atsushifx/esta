@@ -12,7 +12,6 @@ import { AgLogger, AgLogLevel } from '@ag-system/ag-logger';
 // vitest
 import { describe, expect, it } from 'vitest';
 
-import { AgLogLevel } from '@shared/types';
 import { AgActionInstallerType } from '@shared/types';
 // types
 import type { AgActionEgetToolConfig } from '@shared/types';
