@@ -6,14 +6,6 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// src: /src/__tests__/AgLoggerGetName.spec.ts
-// @(#) : メッセージ取得ユニットテスト
-//
-// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 // vitest
 import { describe, expect, it } from 'vitest';
 
@@ -52,5 +44,4 @@ describe('AgLoggerGetMessage', () => {
       expect(result.args).toEqual([]);
     })
   });
-
 });
