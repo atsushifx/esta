@@ -9,7 +9,7 @@
 // vitest
 import { describe, expect, it, vi } from 'vitest';
 
-import { AgLogLevel } from '@shared/types';
+import { AgLogLevelCode } from '@shared/types';
 
 // CONSTANTS
 
@@ -23,7 +23,7 @@ const MOCK_DATE = '2025-05-05T00:00:00Z';
 describe('Test AgLog as create right log message', () => {
   describe("test log's date", () => {
     it('should use provided ISO date string', () => {
-      const log = agLog(AgLogLevel.INFO, '2025-05-01T12:34:56Z', 'Test message');
+      const log = agLog(AgLogLevelCode.INFO, '2025-05-01T12:34:56Z', 'Test message');
 
       expect(log.startsWith('2025-05-01T12:34:56Z')).toBeTruthy();
       expect(log).contains('info');
@@ -34,7 +34,7 @@ describe('Test AgLog as create right log message', () => {
       vi.useFakeTimers();
       vi.setSystemTime(MOCK_DATE);
 
-      const log = agLog(AgLogLevel.DEBUG, 'Message without date');
+      const log = agLog(AgLogLevelCode.DEBUG, 'Message without date');
 
       expect(log.startsWith(MOCK_DATE)).toBe(true);
       expect(log).toContain('[debug]');
@@ -48,7 +48,7 @@ describe('Test AgLog as create right log message', () => {
     vi.useFakeTimers();
     vi.setSystemTime(MOCK_DATE);
 
-    const log = agLog(AgLogLevel.INFO, 'Invalid date', 'Message');
+    const log = agLog(AgLogLevelCode.INFO, 'Invalid date', 'Message');
     expect(log.startsWith(MOCK_DATE)).toBeTruthy();
     expect(log).toContain('[info]');
     expect(log).toContain('Invalid date');
@@ -59,7 +59,7 @@ describe('Test AgLog as create right log message', () => {
 
   describe('test multiple args', () => {
     it('should join multiple args into a single string', () => {
-      const log = agLog(AgLogLevel.WARN, 'Message', { with: 'multiple' }, 7);
+      const log = agLog(AgLogLevelCode.WARN, 'Message', { with: 'multiple' }, 7);
       expect(log).toContain('Message');
       expect(log).toContain('with');
       expect(log).toContain('multiple');

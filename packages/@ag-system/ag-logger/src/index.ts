@@ -7,8 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-export type { IAgLogger } from '@shared/types';
-export { AgLogLevel } from '@shared/types';
+export { AgLogLevel, AgLogLevelCode } from '@shared/types';
 
 // classes
 export { AgLogger } from './AgLogger.class';

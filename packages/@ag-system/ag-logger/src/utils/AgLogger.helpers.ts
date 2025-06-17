@@ -6,12 +6,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+
+// CONSTANTS
+import { AgLogLevelLabels } from '@shared/constants/AgLogger.constants';
 // types
 import type { AgLogLevel } from '@shared/types';
 
-// CONSTANTS
-import { AgLogLevelNameMap } from '@shared/constants/AgLogger.constants';
-
-export const AgLoggerGetName = (level: AgLogLevel): string => {
-  return AgLogLevelNameMap[level];
+export const AgLoggerGetLabel = (level: AgLogLevel): string => {
+  return AgLogLevelLabels[level];
 };
