@@ -72,7 +72,7 @@ pnpm run build
 - コードフォーマット: dprint
 - リント: ESLint
 - スペルチェック: CSpell
-- ドキュメント: textlint, markdownlint　(コマンドラインツールとして:markdownlint-cli)
+- ドキュメント: textlint, markdownlint (コマンドラインツールとして:markdownlint-cli)
 
 ### 行動規範
 

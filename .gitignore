@@ -45,6 +45,7 @@ $~*
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 !.vscode/cspell*
+!.vscode/*.md
 
 ###	AI Agent
 .claude/
