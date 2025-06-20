@@ -12,7 +12,8 @@ export const AgLoggerGetMessage = (logLevel: AgLogLevel, ...args: unknown[]): Ag
   const args2 = [...args];
 
   const isArgToString = (arg: unknown): boolean => {
-    return typeof arg === 'string' || typeof arg === 'number' || typeof arg === 'boolean' || typeof arg === 'symbol';
+    const type = typeof arg;
+    return ['string', 'number', 'boolean', 'symbol'].includes(type);
   };
 
   const isTimestamp = (arg: unknown): boolean => {
