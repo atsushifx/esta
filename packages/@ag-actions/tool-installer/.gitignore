@@ -2,17 +2,11 @@
 #
 ## @(#) : gitignore for monorepo sub repository
 #
-# @version  1.0.0
-# @author   Furukawa, Atsushi <atsushifx@aglabo.com>
-# @since    2025-04-11
-# @license	MIT
+#/ Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 #
-# @description<<
-#
-# Git ignore rules for textlint plugin development.
-# Includes common Node.js patterns and workspace-specific overrides.
-#
-#<<
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+
 
 ## ─── General (logs, patches) ───────────────────────────────
 *.log*

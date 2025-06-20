@@ -6,16 +6,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+
+// Logger
+import { AgLogger, AgLogLevelCode } from '@ag-system/ag-logger';
 // vitest
 import { describe, expect, it } from 'vitest';
 
-import { AgLogLevel } from '@shared/types';
 import { AgActionInstallerType } from '@shared/types';
 // types
 import type { AgActionEgetToolConfig } from '@shared/types';
-
-// Logger
-import { AgLogger } from '@/utils/logger/AgLogger.class';
 
 // test unit
 import { convertConfig } from '../convertConfig';
@@ -25,7 +24,7 @@ import { parseJsoncConfig } from '../parseConfig';
 // types
 
 // Log definition
-AgLogger.setLogLevel(AgLogLevel.DEBUG);
+AgLogger.setLogLevel(AgLogLevelCode.DEBUG);
 
 // --- test main
 describe('check installer type is valid', () => {

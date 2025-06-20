@@ -9,12 +9,12 @@
   "sideEffects": false,
   "main": "./lib/index.js",
   "module": "./module/index.js",
-  "types": "./lib/index.d.ts",
+  "types": "./module/index.d.ts",
   "exports": {
     ".": {
+      "types": "./lib/index.d.ts",
       "import": "./module/index.js",
-      "require": "./lib/index.js",
-      "types": "./lib/index.d.ts"
+      "require": "./lib/index.cjs"
     }
   },
   "files": [

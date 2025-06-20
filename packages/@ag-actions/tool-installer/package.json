@@ -12,8 +12,9 @@
   "types": "./lib/index.d.ts",
   "exports": {
     ".": {
+      "types": "./lib/index.d.ts",
       "import": "./module/index.js",
-      "types": "./lib/index.d.ts"
+      "require": "./lib/index.cjs"
     }
   },
   "files": [
@@ -50,6 +51,7 @@
     "@actions/tool-cache": "^2.0.2",
     "@shared": "workspace:*",
     "@ag-utils/common": "workspace:*",
+    "@ag-system/ag-logger": "workspace:*",
     "comment-json": "^4.2.5"
   },
   "devDependencies": {}

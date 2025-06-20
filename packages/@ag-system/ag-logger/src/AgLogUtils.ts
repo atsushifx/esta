@@ -1,4 +1,4 @@
-// src: /src/utils/logger/AgLogUtils.ts
+// src: /src/AgLogUtils.ts
 // @(#) : log出力用ユーティリティ
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>

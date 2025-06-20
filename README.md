@@ -16,6 +16,14 @@ English | [日本語](README.ja.md)
 
 > Install CLI tools easily via config, powered by [eget](https://github.com/zyedidia/eget).
 
+### 🤝 Contributing
+
+If you'd like to contribute to this project, please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed information on bug reports, feature requests, and pull requests.
+
+### 📚 Developer Information
+
+For development environment setup and development guidelines, see our [onboarding documentation](docs/onboarding/README.ja.md).
+
 ### 🚀 Usage
 
 ```yaml

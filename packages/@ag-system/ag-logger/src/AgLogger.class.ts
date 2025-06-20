@@ -1,4 +1,4 @@
-// src: /src/utils/logger/AbstractAgLogger.class.ts
+// src: /src/AgLogger.class.ts
 // @(#) : AgLogger抽象クラス
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -6,15 +6,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// types
+import type { AgLogLevel } from '@shared/types';
 // module
-import { AgLogLevel } from '@shared/types';
-// types/ interface
-import type { IAgLogger } from '@shared/types';
+import { AgLogLevelCode } from '@shared/types';
 
 // --- class definition
-export abstract class AgLogger implements IAgLogger {
+export abstract class AgLogger {
   private static _logger: AgLogger;
-  private static _logLevel: AgLogLevel = AgLogLevel.INFO;
+  private static _logLevel: AgLogLevel = AgLogLevelCode.INFO;
 
   static getLogger<T extends AgLogger>(_construct?: new() => T): T {
     if (!AgLogger._logger) {
@@ -28,14 +28,14 @@ export abstract class AgLogger implements IAgLogger {
 
   private isOutputLevel(level: AgLogLevel): boolean {
     switch (AgLogger._logLevel) {
-      case AgLogLevel.DEBUG:
+      case AgLogLevelCode.DEBUG:
         return true;
-      case AgLogLevel.INFO:
-        return (level === AgLogLevel.INFO || level == AgLogLevel.WARN || level == AgLogLevel.ERROR);
-      case AgLogLevel.WARN:
-        return (level === AgLogLevel.WARN || level == AgLogLevel.ERROR);
-      case AgLogLevel.ERROR:
-        return (level === AgLogLevel.ERROR);
+      case AgLogLevelCode.INFO:
+        return (level === AgLogLevelCode.INFO || level == AgLogLevelCode.WARN || level == AgLogLevelCode.ERROR);
+      case AgLogLevelCode.WARN:
+        return (level === AgLogLevelCode.WARN || level == AgLogLevelCode.ERROR);
+      case AgLogLevelCode.ERROR:
+        return (level === AgLogLevelCode.ERROR);
       default:
         return false;
     }
@@ -47,22 +47,22 @@ export abstract class AgLogger implements IAgLogger {
 
   // log method (output by logLevel)
   debug(...args: unknown[]): void {
-    if (this.isOutputLevel(AgLogLevel.DEBUG)) {
+    if (this.isOutputLevel(AgLogLevelCode.DEBUG)) {
       this.logDebug(...args);
     }
   }
   info(...args: unknown[]): void {
-    if (this.isOutputLevel(AgLogLevel.INFO)) {
+    if (this.isOutputLevel(AgLogLevelCode.INFO)) {
       this.logInfo(...args);
     }
   }
   warn(...args: unknown[]): void {
-    if (this.isOutputLevel(AgLogLevel.WARN)) {
+    if (this.isOutputLevel(AgLogLevelCode.WARN)) {
       this.logWarn(...args);
     }
   }
   error(...args: unknown[]): void {
-    if (this.isOutputLevel(AgLogLevel.ERROR)) {
+    if (this.isOutputLevel(AgLogLevelCode.ERROR)) {
       this.logError(...args);
     }
   }

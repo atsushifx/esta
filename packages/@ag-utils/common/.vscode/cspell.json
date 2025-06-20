@@ -1,7 +1,7 @@
 // src: ./vscode/cspell.json
-// @(#) : cspell settings: use monorep common project-dic
+// @(#) : cspell settings: use monorepo common project-dic
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
@@ -14,8 +14,4 @@
   ],
   "language": "en",
   "caseSensitive": true,
-  "dictionaries": [
-    "user-dic",
-    "project-dic"
-  ]
 }

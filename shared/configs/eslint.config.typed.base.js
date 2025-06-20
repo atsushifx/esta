@@ -7,11 +7,10 @@
 // https://opensource.org/licenses/MIT
 
 // -- import
-// parser
-import tsparser from '@typescript-eslint/parser';
-
 // plugins
 import tseslint from '@typescript-eslint/eslint-plugin';
+// parser
+import tsparser from '@typescript-eslint/parser';
 
 // -- rules
 import typedRules from './eslint.rules.typed.js';

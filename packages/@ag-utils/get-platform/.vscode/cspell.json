@@ -1,4 +1,4 @@
-// @(#) : cspell settings for ths workspa
+// @(#) : cspell settings for this workspace
 /**
  *
  * @version  1.0.0
@@ -8,7 +8,7 @@
  *
  * @description<<
  *
- * this files is cspell (Code Specll Checkr) settings for this workspace.
+ * this file is cspell (Code Spell Checker) settings for this workspace.
  *
  *<<
  */
@@ -21,8 +21,4 @@
   ],
   "language": "en",
   "caseSensitive": true,
-  "dictionaries": [
-    "user-dic",
-    "project-dic"
-  ]
 }

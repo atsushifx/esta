@@ -1,5 +1,5 @@
 // src: ./vscode/cspell.json
-// @(#) : cspell settings: use monorep common project-dic
+// @(#) : cspell settings: use monorepo common project-dic
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -14,8 +14,4 @@
   ],
   "language": "en",
   "caseSensitive": true,
-  "dictionaries": [
-    "user-dic",
-    "project-dic"
-  ]
 }

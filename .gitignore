@@ -45,8 +45,15 @@ $~*
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 !.vscode/cspell*
+!.vscode/*.md
 
-###	Develop
+###	AI Agent
+.claude/
+**/.claude/
+
+
+
+### Develop
 # Node
 # Node.js / JS project ignores
 # Output directory

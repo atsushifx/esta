@@ -1,4 +1,4 @@
-// src: /src/utils/consoleLogger.ts
+// src: /src/ConsoleLogger.class.ts
 // @(#) : console出力型 Logger
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // --- modules
-import { AgLogLevel } from '@shared/types';
+import { AgLogLevelCode } from '@shared/types';
 
 // --- class
 import { AgLogger } from './AgLogger.class';
@@ -21,19 +21,19 @@ export class ConsoleLogger extends AgLogger {
   }
 
   logDebug(...args: unknown[]): void {
-    console.debug(agLog(AgLogLevel.DEBUG, ...args));
+    console.debug(agLog(AgLogLevelCode.DEBUG, ...args));
   }
 
   logInfo(...args: unknown[]): void {
-    console.debug(agLog(AgLogLevel.INFO, ...args));
+    console.debug(agLog(AgLogLevelCode.INFO, ...args));
   }
 
   logWarn(...args: unknown[]): void {
-    console.warn(agLog(AgLogLevel.WARN, ...args));
+    console.warn(agLog(AgLogLevelCode.WARN, ...args));
   }
 
   logError(...args: unknown[]): void {
-    console.error(agLog(AgLogLevel.ERROR, ...args));
+    console.error(agLog(AgLogLevelCode.ERROR, ...args));
   }
 }
 

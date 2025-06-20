@@ -74,6 +74,9 @@ importers:
       '@actions/tool-cache':
         specifier: ^2.0.2
         version: 2.0.2
+      '@ag-system/ag-logger':
+        specifier: workspace:*
+        version: link:../../@ag-system/ag-logger
       '@ag-utils/common':
         specifier: workspace:*
         version: link:../../@ag-utils/common
@@ -83,6 +86,8 @@ importers:
       comment-json:
         specifier: ^4.2.5
         version: 4.2.5
+
+  packages/@ag-system/ag-logger: {}
 
   packages/@ag-utils/command-utils:
     dependencies:
