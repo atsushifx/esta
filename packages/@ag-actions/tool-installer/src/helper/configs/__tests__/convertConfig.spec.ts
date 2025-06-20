@@ -8,16 +8,13 @@
 
 
 // Logger
-import { AgLogger, AgLogLevel } from '@ag-system/ag-logger';
+import { AgLogger, AgLogLevelCode } from '@ag-system/ag-logger';
 // vitest
 import { describe, expect, it } from 'vitest';
 
 import { AgActionInstallerType } from '@shared/types';
 // types
 import type { AgActionEgetToolConfig } from '@shared/types';
-
-// Logger
-import { AgLogger, AgLogLevel } from '@ag-system/ag-logger';
 
 // test unit
 import { convertConfig } from '../convertConfig';
@@ -27,7 +24,7 @@ import { parseJsoncConfig } from '../parseConfig';
 // types
 
 // Log definition
-AgLogger.setLogLevel(AgLogLevel.DEBUG);
+AgLogger.setLogLevel(AgLogLevelCode.DEBUG);
 
 // --- test main
 describe('check installer type is valid', () => {
