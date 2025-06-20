@@ -15,7 +15,6 @@ import { AgLogLevelCode } from '@shared/types/AgLogger.types';
 // test unit
 import { AgLoggerGetMessage } from '../AgLoggerGetMessage';
 
-
 // test main
 describe('AgLoggerGetMessage', () => {
   describe('通常のログメッセージ (引数にJSONに渡すオブジェクトがない)', () => {

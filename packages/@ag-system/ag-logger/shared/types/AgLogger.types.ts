@@ -49,5 +49,4 @@ export type AgLogMessage = {
    * Typically includes object-like context (e.g. user info, metadata).
    */
   args: unknown[];
-
 };

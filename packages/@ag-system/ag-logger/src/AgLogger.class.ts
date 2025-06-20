@@ -16,7 +16,7 @@ export abstract class AgLogger {
   private static _logger: AgLogger;
   private static _logLevel: AgLogLevel = AgLogLevelCode.INFO;
 
-  static getLogger<T extends AgLogger>(_construct?: new () => T): T {
+  static getLogger<T extends AgLogger>(_construct?: new() => T): T {
     if (!AgLogger._logger) {
       if (!_construct) {
         throw new Error(`can't create Logger type <unknown}>.`);

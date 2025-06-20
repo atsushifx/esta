@@ -16,7 +16,7 @@ export const AgLoggerGetMessage = (logLevel: AgLogLevel, ...args: unknown[]): Ag
   };
 
   const isTimestamp = (arg: unknown): boolean => {
-    if (typeof arg !== 'string') return false;
+    if (typeof arg !== 'string') { return false; }
     const timestamp = new Date(arg);
     return !isNaN(timestamp.getTime());
   };
@@ -45,4 +45,3 @@ export const AgLoggerGetMessage = (logLevel: AgLogLevel, ...args: unknown[]): Ag
     args: argsPrm,
   };
 };
-

@@ -6,7 +6,6 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-
 // CONSTANTS
 import { AgLogLevelLabels } from '@shared/constants/AgLogger.constants';
 // types
