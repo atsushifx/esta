@@ -12,7 +12,7 @@ import type { AgLogLevel } from '@shared/types/AgLogger.types';
 import { AgLogLevelCode } from '@shared/types/AgLogger.types';
 
 /** AgLogLevel names mapping */
-export const AgLogLevelNameMap: Record<AgLogLevel, string> = {
+export const AgLogLevelLabels: Record<AgLogLevel, string> = {
   [AgLogLevelCode.OFF]: 'off',
   [AgLogLevelCode.FATAL]: 'fatal',
   [AgLogLevelCode.ERROR]: 'error',
