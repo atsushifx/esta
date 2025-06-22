@@ -1,4 +1,4 @@
-// src: /tests/e2e/AgLogger.json.spec.ts
+// src/tests/e2e/AgLogger.json.spec.ts
 // @(#) : AgLogger E2E Test - JSON format with Console logger
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
@@ -11,7 +11,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // constants
 import { AgLogLevelCode } from '../../shared/types';
-// test unit
+// test targets
 import { getLogger } from '../../src/AgLogger.class';
 import { JsonFormat } from '../../src/plugins/format/JsonFormat';
 import { ConsoleLogger } from '../../src/plugins/logger/ConsoleLogger';
@@ -25,19 +25,28 @@ const mockConsole = {
   log: vi.fn(),
 };
 
-// test main
+/**
+ * End-to-end tests verifying the integration of AgLogger with JsonFormat and ConsoleLogger.
+ * These tests cover log output correctness for various log levels, handling of multiple
+ * arguments, log level filtering behavior, JSON format specifics, and realistic integration
+ * scenarios to ensure logging behaves as expected in a production-like environment.
+ */
 describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.assign(console, mockConsole);
   });
 
-  describe('基本的なJSONログ出力テスト', () => {
-    it('JsonFormat + ConsoleLoggerでINFOログをJSON形式で出力', () => {
+  /**
+   * Tests that logs at each level output correctly formatted JSON strings,
+   * with proper level, message, and timestamp fields.
+   */
+  describe('Basic JSON log output tests', () => {
+    it('outputs INFO log as JSON with JsonFormat and ConsoleLogger', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.INFO);
 
-      logger.info('テストメッセージ');
+      logger.info('Test message');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
@@ -45,16 +54,16 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(parsedLog).toMatchObject({
         level: 'INFO',
-        message: 'テストメッセージ',
+        message: 'Test message',
       });
       expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
-    it('JsonFormat + ConsoleLoggerでERRORログをJSON形式で出力', () => {
+    it('outputs ERROR log as JSON with JsonFormat and ConsoleLogger', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.ERROR);
 
-      logger.error('エラーメッセージ');
+      logger.error('Error message');
 
       expect(mockConsole.error).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.error.mock.calls[0];
@@ -62,16 +71,16 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(parsedLog).toMatchObject({
         level: 'ERROR',
-        message: 'エラーメッセージ',
+        message: 'Error message',
       });
       expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
-    it('JsonFormat + ConsoleLoggerでWARNログをJSON形式で出力', () => {
+    it('outputs WARN log as JSON with JsonFormat and ConsoleLogger', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.WARN);
 
-      logger.warn('警告メッセージ');
+      logger.warn('Warning message');
 
       expect(mockConsole.warn).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.warn.mock.calls[0];
@@ -79,16 +88,16 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(parsedLog).toMatchObject({
         level: 'WARN',
-        message: '警告メッセージ',
+        message: 'Warning message',
       });
       expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
-    it('JsonFormat + ConsoleLoggerでDEBUGログをJSON形式で出力', () => {
+    it('outputs DEBUG log as JSON with JsonFormat and ConsoleLogger', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.DEBUG);
 
-      logger.debug('デバッグメッセージ');
+      logger.debug('Debug message');
 
       expect(mockConsole.debug).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.debug.mock.calls[0];
@@ -96,19 +105,23 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(parsedLog).toMatchObject({
         level: 'DEBUG',
-        message: 'デバッグメッセージ',
+        message: 'Debug message',
       });
       expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
   });
 
-  describe('複数引数を含むJSONログ出力テスト', () => {
-    it('オブジェクトと文字列を含むJSONログメッセージ', () => {
+  /**
+   * Tests that JSON log output correctly includes multiple argument types
+   * such as objects, arrays, and primitives, correctly separated into message and args.
+   */
+  describe('JSON log output tests with multiple arguments', () => {
+    it('logs JSON message containing object and string', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.INFO);
 
       const userData = { userId: 123, userName: 'testUser' };
-      logger.info('ユーザー情報', userData, 'additional info');
+      logger.info('User info', userData, ' additional info');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
@@ -116,18 +129,18 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(parsedLog).toMatchObject({
         level: 'INFO',
-        message: 'ユーザー情報additional info',
+        message: 'User info additional info',
         args: [{ userId: 123, userName: 'testUser' }],
       });
       expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
-    it('配列を含むJSONログメッセージ', () => {
+    it('logs JSON message containing array', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.DEBUG);
 
       const items = ['item1', 'item2', 'item3'];
-      logger.debug('処理対象', items);
+      logger.debug('Processing items', items);
 
       expect(mockConsole.debug).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.debug.mock.calls[0];
@@ -135,17 +148,17 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(parsedLog).toMatchObject({
         level: 'DEBUG',
-        message: '処理対象',
+        message: 'Processing items',
         args: [['item1', 'item2', 'item3']],
       });
       expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
-    it('数値とブール値を含むJSONログメッセージ', () => {
+    it('logs JSON message containing number and boolean', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.INFO);
 
-      logger.info('ステータス更新', 42, true, null);
+      logger.info('Status update', 42, true, null);
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
@@ -153,20 +166,24 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(parsedLog).toMatchObject({
         level: 'INFO',
-        message: 'ステータス更新42true',
+        message: 'Status update42true',
         args: [null],
       });
       expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
   });
 
-  describe('JSONログレベル制御テスト', () => {
-    it('ログレベルがINFOの場合、DEBUGログは出力されない', () => {
+  /**
+   * Tests the filtering of logs according to the configured log level,
+   * ensuring lower-level logs are not emitted when the level is higher.
+   */
+  describe('JSON log level filtering tests', () => {
+    it('does not output DEBUG logs when level is INFO', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.INFO);
 
-      logger.debug('デバッグメッセージ');
-      logger.info('情報メッセージ');
+      logger.debug('Debug message');
+      logger.info('Info message');
 
       expect(mockConsole.debug).not.toHaveBeenCalled();
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
@@ -176,13 +193,13 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
       expect(parsedLog.level).toBe('INFO');
     });
 
-    it('ログレベルがERRORの場合、INFO/WARNログは出力されない', () => {
+    it('does not output INFO/WARN logs when level is ERROR', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.ERROR);
 
-      logger.info('情報メッセージ');
-      logger.warn('警告メッセージ');
-      logger.error('エラーメッセージ');
+      logger.info('Info message');
+      logger.warn('Warning message');
+      logger.error('Error message');
 
       expect(mockConsole.info).not.toHaveBeenCalled();
       expect(mockConsole.warn).not.toHaveBeenCalled();
@@ -193,24 +210,28 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
       expect(parsedLog.level).toBe('ERROR');
     });
 
-    it('ログレベルがOFFの場合、すべてのログが出力されない', () => {
+    it('does not output any logs when level is OFF', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.OFF);
 
-      logger.error('エラーメッセージ');
-      logger.info('情報メッセージ');
+      logger.error('Error message');
+      logger.info('Info message');
 
       expect(mockConsole.error).not.toHaveBeenCalled();
       expect(mockConsole.info).not.toHaveBeenCalled();
     });
   });
 
-  describe('JSONフォーマット特有のテスト', () => {
-    it('args配列が空の場合、argsプロパティは含まれない', () => {
+  /**
+   * Tests JSON format-specific behaviors such as omission of empty args
+   * and correct serialization of nested complex objects.
+   */
+  describe('JSON format specific tests', () => {
+    it('does not include args property when args array is empty', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.INFO);
 
-      logger.info('シンプルメッセージ');
+      logger.info('Simple message');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
@@ -218,13 +239,13 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(parsedLog).toMatchObject({
         level: 'INFO',
-        message: 'シンプルメッセージ',
+        message: 'Simple message',
         timestamp: expect.any(String),
       });
       expect(parsedLog).not.toHaveProperty('args');
     });
 
-    it('複雑なネストしたオブジェクトをJSONで正しく出力', () => {
+    it('correctly outputs deeply nested complex objects in JSON', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.INFO);
 
@@ -232,7 +253,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
         user: {
           id: 123,
           profile: {
-            name: '太郎',
+            name: 'Taro',
             settings: {
               theme: 'dark',
               notifications: true,
@@ -245,7 +266,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
         },
       };
 
-      logger.info('複雑なデータ', complexData);
+      logger.info('Complex data', complexData);
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
@@ -253,29 +274,33 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(parsedLog).toMatchObject({
         level: 'INFO',
-        message: '複雑なデータ',
+        message: 'Complex data',
         args: [complexData],
       });
       expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
   });
 
-  describe('実際の統合シナリオテスト（JSON版）', () => {
-    it('アプリケーション起動からエラー発生までの一連のJSONログ出力', () => {
+  /**
+   * Tests a real-world sequence of log events from application startup
+   * through error handling, verifying complete and correct JSON output.
+   */
+  describe('Real integration scenario tests (JSON version)', () => {
+    it('outputs a sequence of JSON logs from application start to error', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.DEBUG);
 
-      // アプリケーション起動
-      logger.info('アプリケーションを開始します');
+      // Application start
+      logger.info('Application is starting');
 
-      // 設定読み込み
-      logger.debug('設定ファイルを読み込み中', { configPath: '/app/config.json' });
+      // Config loading
+      logger.debug('Loading config file', { configPath: '/app/config.json' });
 
-      // 警告
-      logger.warn('非推奨のAPIを使用しています', { api: 'oldMethod' });
+      // Warning
+      logger.warn('Using deprecated API', { api: 'oldMethod' });
 
-      // エラー発生
-      logger.error('データベース接続に失敗しました', {
+      // Error
+      logger.error('Failed to connect to database', {
         host: 'localhost',
         port: 5432,
         error: 'Connection timeout',
@@ -286,7 +311,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
       expect(mockConsole.warn).toHaveBeenCalledTimes(1);
       expect(mockConsole.error).toHaveBeenCalledTimes(1);
 
-      // 各ログのJSON内容を検証
+      // Validate JSON content of each log
       const infoLog = JSON.parse(mockConsole.info.mock.calls[0][0]);
       const debugLog = JSON.parse(mockConsole.debug.mock.calls[0][0]);
       const warnLog = JSON.parse(mockConsole.warn.mock.calls[0][0]);
@@ -294,24 +319,24 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(infoLog).toMatchObject({
         level: 'INFO',
-        message: 'アプリケーションを開始します',
+        message: 'Application is starting',
       });
 
       expect(debugLog).toMatchObject({
         level: 'DEBUG',
-        message: '設定ファイルを読み込み中',
+        message: 'Loading config file',
         args: [{ configPath: '/app/config.json' }],
       });
 
       expect(warnLog).toMatchObject({
         level: 'WARN',
-        message: '非推奨のAPIを使用しています',
+        message: 'Using deprecated API',
         args: [{ api: 'oldMethod' }],
       });
 
       expect(errorLog).toMatchObject({
         level: 'ERROR',
-        message: 'データベース接続に失敗しました',
+        message: 'Failed to connect to database',
         args: [{
           host: 'localhost',
           port: 5432,
@@ -319,17 +344,17 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
         }],
       });
 
-      // タイムスタンプの検証
+      // Validate timestamps
       [infoLog, debugLog, warnLog, errorLog].forEach((log) => {
         expect(log.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
       });
     });
 
-    it('ログメソッド（log）のJSON出力動作確認', () => {
+    it('verifies JSON output for generic log method (log)', () => {
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AgLogLevelCode.INFO);
 
-      logger.log('一般的なログメッセージ');
+      logger.log('General log message');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
@@ -337,7 +362,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(parsedLog).toMatchObject({
         level: 'INFO',
-        message: '一般的なログメッセージ',
+        message: 'General log message',
       });
       expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });

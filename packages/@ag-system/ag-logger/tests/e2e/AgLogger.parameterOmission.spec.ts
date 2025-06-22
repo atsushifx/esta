@@ -1,4 +1,4 @@
-// src: /tests/e2e/AgLogger.parameterOmission.spec.ts
+// src/tests/e2e/AgLogger.parameterOmission.spec.ts
 // @(#) : AgLogger E2E Test - Parameter omission and setLogger functionality
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
@@ -11,7 +11,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // constants
 import { AgLogLevelCode } from '../../shared/types';
-// test unit
+// test targets
 import { getLogger } from '../../src/AgLogger.class';
 import { PlainFormat } from '../../src/plugins/format/PlainFormat';
 import { ConsoleLogger } from '../../src/plugins/logger/ConsoleLogger';
@@ -25,48 +25,55 @@ const mockConsole = {
   log: vi.fn(),
 };
 
-// test main
+/**
+ * End-to-end tests for AgLogger covering parameter omission in getLogger calls
+ * and setLogger method functionality.
+ */
 describe('AgLogger E2E Tests - Parameter Omission and setLogger', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.assign(console, mockConsole);
   });
 
-  describe('getLoggerパラメータ省略機能', () => {
-    it('初回設定後、全パラメータ省略で前回設定を使用', () => {
-      // 初回設定
+  /**
+   * Tests that after initial configuration,
+   * omitting all parameters in getLogger reuses previous settings.
+   */
+  describe('Parameter omission behavior in getLogger', () => {
+    it('uses previous settings when all parameters are omitted after initial setup', () => {
+      // Initial setup
       const logger1 = getLogger(ConsoleLogger, PlainFormat);
       logger1.setLogLevel(AgLogLevelCode.INFO);
-      logger1.info('初回設定でのログ出力');
+      logger1.info('Log after initial setup');
 
-      // 全省略でgetLogger
+      // getLogger with all parameters omitted
       const logger2 = getLogger();
-      logger2.info('全省略getLogger後のログ出力');
+      logger2.info('Log after parameter omission in getLogger');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(2);
 
       const [firstLog] = mockConsole.info.mock.calls[0];
       const [secondLog] = mockConsole.info.mock.calls[1];
 
-      expect(firstLog).toMatch(/\[INFO\] 初回設定でのログ出力$/);
-      expect(secondLog).toMatch(/\[INFO\] 全省略getLogger後のログ出力$/);
+      expect(firstLog).toMatch(/\[INFO\] Log after initial setup$/);
+      expect(secondLog).toMatch(/\[INFO\] Log after parameter omission in getLogger$/);
     });
 
-    it('部分的なパラメータ省略で前回設定を使用', () => {
-      // 初回設定
+    it('uses previous settings when only partial parameters are omitted', () => {
+      // Initial setup
       getLogger(ConsoleLogger, PlainFormat);
 
-      // formatterのみ省略
+      // Omit formatter only
       const logger = getLogger(ConsoleLogger);
       logger.setLogLevel(AgLogLevelCode.INFO);
-      logger.info('部分省略でのログ出力');
+      logger.info('Log after partial parameter omission');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
-      expect(logOutput).toMatch(/\[INFO\] 部分省略でのログ出力$/);
+      expect(logOutput).toMatch(/\[INFO\] Log after partial parameter omission$/);
     });
 
-    it('シングルトンパターンの確認', () => {
+    it('ensures singleton behavior', () => {
       const logger1 = getLogger(ConsoleLogger, PlainFormat);
       const logger2 = getLogger();
       const logger3 = getLogger(ConsoleLogger);
@@ -76,106 +83,112 @@ describe('AgLogger E2E Tests - Parameter Omission and setLogger', () => {
     });
   });
 
-  describe('setLoggerメソッド機能', () => {
-    it('setLoggerで全設定を一括変更', () => {
+  /**
+   * Tests setLogger method's ability to update logger and formatter settings.
+   */
+  describe('setLogger method functionality', () => {
+    it('updates all settings at once via setLogger', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
       logger.setLogLevel(AgLogLevelCode.INFO);
 
-      // setLoggerで設定変更
+      // Change settings via setLogger
       logger.setLogger({
         defaultLogger: ConsoleLogger,
         formatter: PlainFormat,
       });
 
-      logger.info('setLogger後のログ出力');
+      logger.info('Log after setLogger update');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
-      expect(logOutput).toMatch(/\[INFO\] setLogger後のログ出力$/);
+      expect(logOutput).toMatch(/\[INFO\] Log after setLogger update$/);
     });
 
-    it('setLoggerで部分的な設定変更', () => {
+    it('updates partial settings via setLogger', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
       logger.setLogLevel(AgLogLevelCode.INFO);
 
-      // フォーマッターのみ変更
+      // Change only formatter
       logger.setLogger({
         formatter: PlainFormat,
       });
 
-      logger.info('部分設定変更後のログ出力');
+      logger.info('Log after partial settings update');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
-      expect(logOutput).toMatch(/\[INFO\] 部分設定変更後のログ出力$/);
+      expect(logOutput).toMatch(/\[INFO\] Log after partial settings update$/);
     });
 
-    it('setLoggerでdefaultLoggerのみ変更', () => {
+    it('updates only defaultLogger via setLogger', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
       logger.setLogLevel(AgLogLevelCode.INFO);
 
-      // defaultLoggerのみ変更
+      // Change only defaultLogger
       logger.setLogger({
         defaultLogger: ConsoleLogger,
       });
 
-      logger.info('defaultLogger変更後のログ出力');
+      logger.info('Log after defaultLogger update');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
-      expect(logOutput).toMatch(/\[INFO\] defaultLogger変更後のログ出力$/);
+      expect(logOutput).toMatch(/\[INFO\] Log after defaultLogger update$/);
     });
   });
 
-  describe('統合シナリオテスト', () => {
-    it('設定変更と省略を組み合わせた使用パターン', () => {
-      // 初回設定
+  /**
+   * Tests combined usage scenarios of settings changes and parameter omission.
+   */
+  describe('Integration scenario tests', () => {
+    it('combines setting changes and parameter omission', () => {
+      // Initial setup
       const logger1 = getLogger(ConsoleLogger, PlainFormat);
       logger1.setLogLevel(AgLogLevelCode.INFO);
-      logger1.info('初回設定');
+      logger1.info('Initial setup');
 
-      // setLoggerで設定変更
+      // Change settings via setLogger
       logger1.setLogger({
         formatter: PlainFormat,
       });
-      logger1.info('設定変更後');
+      logger1.info('After settings update');
 
-      // 新しいgetLoggerで省略
+      // getLogger with omitted parameters
       const logger2 = getLogger();
-      logger2.info('省略getLogger');
+      logger2.info('After parameter omission');
 
-      // 同じインスタンスであることを確認
+      // Ensure same instance
       expect(logger1).toBe(logger2);
 
       expect(mockConsole.info).toHaveBeenCalledTimes(3);
 
       const logs = mockConsole.info.mock.calls.map((call) => call[0]);
-      expect(logs[0]).toMatch(/\[INFO\] 初回設定$/);
-      expect(logs[1]).toMatch(/\[INFO\] 設定変更後$/);
-      expect(logs[2]).toMatch(/\[INFO\] 省略getLogger$/);
+      expect(logs[0]).toMatch(/\[INFO\] Initial setup$/);
+      expect(logs[1]).toMatch(/\[INFO\] After settings update$/);
+      expect(logs[2]).toMatch(/\[INFO\] After parameter omission$/);
     });
 
-    it('複数回のsetLoggerによる設定上書き', () => {
+    it('overwrites settings via multiple setLogger calls', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
       logger.setLogLevel(AgLogLevelCode.INFO);
 
-      // 1回目の設定変更
+      // First settings update
       logger.setLogger({
         defaultLogger: ConsoleLogger,
       });
-      logger.info('1回目設定変更');
+      logger.info('First settings update');
 
-      // 2回目の設定変更
+      // Second settings update
       logger.setLogger({
         formatter: PlainFormat,
       });
-      logger.info('2回目設定変更');
+      logger.info('Second settings update');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(2);
 
       const logs = mockConsole.info.mock.calls.map((call) => call[0]);
-      expect(logs[0]).toMatch(/\[INFO\] 1回目設定変更$/);
-      expect(logs[1]).toMatch(/\[INFO\] 2回目設定変更$/);
+      expect(logs[0]).toMatch(/\[INFO\] First settings update$/);
+      expect(logs[1]).toMatch(/\[INFO\] Second settings update$/);
     });
   });
 });
