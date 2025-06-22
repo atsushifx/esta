@@ -8,20 +8,33 @@
 
 // types
 import type { AgLogLevel } from '@shared/types';
-// module
+// code
 import { AgLogLevelCode } from '@shared/types';
+// interfaces
+import type { AgLoggerFunction, AgLoggerMap } from '@shared/types/AgLogger.interface';
+
+// utils
+import { AgLoggerManager } from '@/utils/AgLoggerManager.class';
 
 // --- class definition
 export abstract class AgLogger {
   private static _logger: AgLogger;
   private static _logLevel: AgLogLevel = AgLogLevelCode.INFO;
+  private _loggerManager: AgLoggerManager;
 
-  static getLogger<T extends AgLogger>(_construct?: new() => T): T {
-    if (!AgLogger._logger) {
-      if (!_construct) {
-        throw new Error(`can't create Logger type <unknown}>.`);
-      }
-      AgLogger._logger = new _construct();
+  private constructor(
+    defaultLogger?: AgLoggerFunction,
+    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>
+  ) {
+    this._loggerManager = AgLoggerManager.getInstance(defaultLogger, loggerMap);
+  }
+
+  static getInstance(
+    defaultLogger?: AgLoggerFunction,
+    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>
+  ): AgLogger {
+    if (!AgLogger._instance) {
+      AgLogger._instance = new AgLogger(defaultLogger, loggerMap);
     }
     return AgLogger._logger as T;
   }
@@ -45,33 +58,63 @@ export abstract class AgLogger {
     return AgLogger._logLevel;
   }
 
-  // log method (output by logLevel)
-  debug(...args: unknown[]): void {
-    if (this.isOutputLevel(AgLogLevelCode.DEBUG)) {
-      this.logDebug(...args);
+  static getLogLevel(): AgLogLevel {
+    return AgLogger._logLevel;
+  }
+
+  private logWithLevel(level: AgLogLevel, ...args: unknown[]): void {
+    if (this.isOutputLevel(level)) {
+      const logger = this._loggerManager.getLogger(level);
+      logger(...args);
     }
   }
-  info(...args: unknown[]): void {
-    if (this.isOutputLevel(AgLogLevelCode.INFO)) {
-      this.logInfo(...args);
-    }
+
+  updateLoggerMap(loggerMap: Partial<AgLoggerMap<AgLoggerFunction>>): void {
+    Object.keys(loggerMap).forEach((key) => {
+      const level = parseInt(key) as AgLogLevel;
+      if (loggerMap[level] !== undefined) {
+        this._loggerManager.setLogger(level, loggerMap[level]!);
+      }
+    });
   }
-  warn(...args: unknown[]): void {
-    if (this.isOutputLevel(AgLogLevelCode.WARN)) {
-      this.logWarn(...args);
-    }
+
+  setLogger(level: AgLogLevel, logger: AgLoggerFunction | null): void {
+    this._loggerManager.setLogger(level, logger);
+  }
+
+  // log method (public API)
+  fatal(...args: unknown[]): void {
+    this.logWithLevel(AgLogLevelCode.FATAL, ...args);
   }
   error(...args: unknown[]): void {
-    if (this.isOutputLevel(AgLogLevelCode.ERROR)) {
-      this.logError(...args);
-    }
+    this.logWithLevel(AgLogLevelCode.ERROR, ...args);
   }
-  // log method (output)
-  abstract log(...args: unknown[]): void;
-  abstract logDebug(...args: unknown[]): void;
-  abstract logInfo(...args: unknown[]): void;
-  abstract logWarn(...args: unknown[]): void;
-  abstract logError(...args: unknown[]): void;
+  warn(...args: unknown[]): void {
+    this.logWithLevel(AgLogLevelCode.WARN, ...args);
+  }
+  info(...args: unknown[]): void {
+    this.logWithLevel(AgLogLevelCode.INFO, ...args);
+  }
+  debug(...args: unknown[]): void {
+    this.logWithLevel(AgLogLevelCode.DEBUG, ...args);
+  }
+  trace(...args: unknown[]): void {
+    this.logWithLevel(AgLogLevelCode.TRACE, ...args);
+  }
+
+  // general log method using default logger
+  log(...args: unknown[]): void {
+    const defaultLogger = this._loggerManager.getLogger(AgLogLevelCode.INFO);
+    defaultLogger(...args);
+  }
 }
+
+// --- Convenience function for getting logger instance
+export const getLogger = (
+  defaultLogger?: AgLoggerFunction,
+  loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>
+): AgLogger => {
+  return AgLogger.getInstance(defaultLogger, loggerMap);
+};
 
 export default AgLogger;

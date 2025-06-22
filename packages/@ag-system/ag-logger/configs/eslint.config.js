@@ -9,8 +9,6 @@
 // import form common base config
 import baseConfig from '../../../../shared/configs/eslint.config.base.js';
 
-// libs
-
 // settings
 export default [
   ...baseConfig,
@@ -24,7 +22,7 @@ export default [
     settings: {
       'import/resolver': {
         typescript: {
-          project: './tsconfig.json',
+          project: ['./tsconfig.json'],
         },
       },
     },
