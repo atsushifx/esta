@@ -13,10 +13,10 @@ import type { AgLogLevel } from '@shared/types/AgLogger.types';
 import { AgLogLevelCode } from '@shared/types/AgLogger.types';
 
 // logger
-import { NullLogger } from '@plugins/logger/NullLogger';
+import { NullLogger } from '../plugins/logger/NullLogger';
 
 export class AgLoggerManager {
-  private static instance: AgLoggerManager;
+  private static instance: AgLoggerManager | undefined;
   private loggerMap: AgLoggerMap<AgLoggerFunction>;
   private defaultLogger: AgLoggerFunction;
 
@@ -33,17 +33,18 @@ export class AgLoggerManager {
     };
   }
 
-  static getInstance(loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>, defaultLogger?: AgLoggerFunction): AgLoggerManager {
-    if (!AgLoggerManager.instance) {
-      AgLoggerManager.instance = new AgLoggerManager();
-    }
+  static getInstance(
+    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,
+    defaultLogger?: AgLoggerFunction,
+  ): AgLoggerManager {
+    AgLoggerManager.instance ??= new AgLoggerManager();
 
     if (defaultLogger) {
       AgLoggerManager.instance.defaultLogger = defaultLogger;
     }
 
     if (loggerMap) {
-      Object.keys(AgLogLevelCode).forEach(key => {
+      Object.keys(AgLogLevelCode).forEach((key) => {
         const levelCode = AgLogLevelCode[key as keyof typeof AgLogLevelCode];
         if (loggerMap[levelCode] !== undefined) {
           AgLoggerManager.instance.loggerMap[levelCode] = loggerMap[levelCode]!;
@@ -57,11 +58,10 @@ export class AgLoggerManager {
   }
 
   getLogger(logLevel: AgLogLevel): AgLoggerFunction {
-    return this.loggerMap[logLevel] || this.defaultLogger;
+    return this.loggerMap[logLevel] ?? this.defaultLogger;
   }
 
   setLogger(logLevel: AgLogLevel, logFunction: AgLoggerFunction | null): void {
-    this.loggerMap[logLevel] = logFunction || this.defaultLogger;
+    this.loggerMap[logLevel] = logFunction ?? this.defaultLogger;
   }
 }
-

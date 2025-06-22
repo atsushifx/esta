@@ -17,7 +17,7 @@ import { NullFormat } from '@/plugins/format/NullFormat';
 import { NullLogger } from '@/plugins/logger/NullLogger';
 
 export class AgLoggerManager {
-  private static instance: AgLoggerManager;
+  private static instance: AgLoggerManager | undefined;
   private loggerMap: AgLoggerMap<AgLoggerFunction>;
   private defaultLogger: AgLoggerFunction;
   private formatter: AgFormatFunction;
@@ -41,9 +41,7 @@ export class AgLoggerManager {
     formatter?: AgFormatFunction,
     loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,
   ): AgLoggerManager {
-    if (!AgLoggerManager.instance) {
-      AgLoggerManager.instance = new AgLoggerManager();
-    }
+    AgLoggerManager.instance ??= new AgLoggerManager();
 
     if (defaultLogger) {
       AgLoggerManager.instance.defaultLogger = defaultLogger;

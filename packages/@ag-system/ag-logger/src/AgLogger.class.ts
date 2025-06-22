@@ -20,13 +20,23 @@ import { AgLoggerGetMessage } from './helpers/AgLoggerGetMessage';
 // plugins
 import { NullFormat } from './plugins/format/NullFormat';
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
+import { NullLogger } from './plugins/logger/NullLogger';
 
 // --- class definition
 export class AgLogger {
-  private static _instance: AgLogger;
-  private static _logLevel: AgLogLevel = AgLogLevelCode.INFO;
-  private _defaultLogger: AgLoggerFunction;
-  private _loggerMap: AgLoggerMap;
+  private static _instance: AgLogger | undefined;
+  private static _logLevel: AgLogLevel = AgLogLevelCode.OFF;
+  private _defaultLogger: AgLoggerFunction = NullLogger;
+  private _loggerMap: AgLoggerMap = {
+    [AgLogLevelCode.OFF]: NullLogger,
+    [AgLogLevelCode.FATAL]: NullLogger,
+    [AgLogLevelCode.ERROR]: NullLogger,
+    [AgLogLevelCode.WARN]: NullLogger,
+    [AgLogLevelCode.INFO]: NullLogger,
+    [AgLogLevelCode.DEBUG]: NullLogger,
+    [AgLogLevelCode.TRACE]: NullLogger,
+  };
+  private _loggerManager: AgLoggerManager;
 
   private constructor(
     defaultLogger?: AgLoggerFunction,
@@ -35,8 +45,8 @@ export class AgLogger {
   ) {
     this._loggerManager = AgLoggerManager.getInstance(
       defaultLogger,
-      formatter || NullFormat,
-      loggerMap
+      formatter ?? NullFormat,
+      loggerMap,
     );
   }
 
@@ -89,8 +99,8 @@ export class AgLogger {
     // Update all null entries with the new default logger
     Object.keys(this._loggerMap).forEach((key) => {
       const level = parseInt(key) as AgLogLevel;
-      if (loggerMap[level] !== undefined) {
-        this._loggerManager.setLogger(level, loggerMap[level]);
+      if (this._loggerMap[level] != null) {
+        this._loggerManager.setLogger(level, this._loggerMap[level]);
       }
     });
   }

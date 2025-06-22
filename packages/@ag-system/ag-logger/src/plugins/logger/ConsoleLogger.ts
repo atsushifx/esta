@@ -12,6 +12,7 @@ import type { AgLoggerFunction, AgLoggerMap } from '@shared/types/AgLogger.inter
 
 // utility functions
 import { agLog } from '../../AgLogUtils';
+import { NullLogger } from './NullLogger';
 
 // --- Default Console Logger Function
 export const ConsoleLogger: AgLoggerFunction = (...args: unknown[]) => {
@@ -20,7 +21,7 @@ export const ConsoleLogger: AgLoggerFunction = (...args: unknown[]) => {
 
 // --- Console Logger Function Plugins
 export const ConsoleLoggerMap: AgLoggerMap = {
-  [AgLogLevelCode.OFF]: null,
+  [AgLogLevelCode.OFF]: NullLogger,
   [AgLogLevelCode.FATAL]: (...args: unknown[]) => {
     console.error(agLog(AgLogLevelCode.FATAL, ...args));
   },

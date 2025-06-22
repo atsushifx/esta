@@ -13,15 +13,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AgLogLevelCode } from '@shared/types';
 
 // test unit
-import {
-  consoleLogDebug,
-  consoleLogError,
-  consoleLogFatal,
-  ConsoleLogger,
-  consoleLogInfo,
-  consoleLogTrace,
-  consoleLogWarn,
-} from '../ConsoleLogger';
+import { ConsoleLoggerMap } from '../ConsoleLogger';
 
 // mock console methods
 const mockConsole = {
@@ -39,12 +31,13 @@ describe('ConsoleLogger', () => {
   });
 
   describe('ConsoleLogger Map', () => {
-    it('OFF レベルは null を返す', () => {
-      expect(ConsoleLogger[AgLogLevelCode.OFF]).toBeNull();
+    it('OFF レベルは NullLogger を返す', () => {
+      expect(ConsoleLoggerMap[AgLogLevelCode.OFF]).toBeDefined();
+      expect(typeof ConsoleLoggerMap[AgLogLevelCode.OFF]).toBe('function');
     });
 
     it('FATAL レベルでconsole.errorを呼び出す', () => {
-      const logFunction = ConsoleLogger[AgLogLevelCode.FATAL];
+      const logFunction = ConsoleLoggerMap[AgLogLevelCode.FATAL];
       expect(logFunction).toBeDefined();
 
       logFunction!('test fatal message');
@@ -52,7 +45,7 @@ describe('ConsoleLogger', () => {
     });
 
     it('ERROR レベルでconsole.errorを呼び出す', () => {
-      const logFunction = ConsoleLogger[AgLogLevelCode.ERROR];
+      const logFunction = ConsoleLoggerMap[AgLogLevelCode.ERROR];
       expect(logFunction).toBeDefined();
 
       logFunction!('test error message');
@@ -60,7 +53,7 @@ describe('ConsoleLogger', () => {
     });
 
     it('WARN レベルでconsole.warnを呼び出す', () => {
-      const logFunction = ConsoleLogger[AgLogLevelCode.WARN];
+      const logFunction = ConsoleLoggerMap[AgLogLevelCode.WARN];
       expect(logFunction).toBeDefined();
 
       logFunction!('test warn message');
@@ -68,7 +61,7 @@ describe('ConsoleLogger', () => {
     });
 
     it('INFO レベルでconsole.infoを呼び出す', () => {
-      const logFunction = ConsoleLogger[AgLogLevelCode.INFO];
+      const logFunction = ConsoleLoggerMap[AgLogLevelCode.INFO];
       expect(logFunction).toBeDefined();
 
       logFunction!('test info message');
@@ -76,7 +69,7 @@ describe('ConsoleLogger', () => {
     });
 
     it('DEBUG レベルでconsole.debugを呼び出す', () => {
-      const logFunction = ConsoleLogger[AgLogLevelCode.DEBUG];
+      const logFunction = ConsoleLoggerMap[AgLogLevelCode.DEBUG];
       expect(logFunction).toBeDefined();
 
       logFunction!('test debug message');
@@ -84,7 +77,7 @@ describe('ConsoleLogger', () => {
     });
 
     it('TRACE レベルでconsole.debugを呼び出す', () => {
-      const logFunction = ConsoleLogger[AgLogLevelCode.TRACE];
+      const logFunction = ConsoleLoggerMap[AgLogLevelCode.TRACE];
       expect(logFunction).toBeDefined();
 
       logFunction!('test trace message');
@@ -92,41 +85,9 @@ describe('ConsoleLogger', () => {
     });
   });
 
-  describe('Individual Logger Functions', () => {
-    it('consoleLogFatal は console.error を呼び出す', () => {
-      consoleLogFatal('fatal message');
-      expect(mockConsole.error).toHaveBeenCalledTimes(1);
-    });
-
-    it('consoleLogError は console.error を呼び出す', () => {
-      consoleLogError('error message');
-      expect(mockConsole.error).toHaveBeenCalledTimes(1);
-    });
-
-    it('consoleLogWarn は console.warn を呼び出す', () => {
-      consoleLogWarn('warn message');
-      expect(mockConsole.warn).toHaveBeenCalledTimes(1);
-    });
-
-    it('consoleLogInfo は console.info を呼び出す', () => {
-      consoleLogInfo('info message');
-      expect(mockConsole.info).toHaveBeenCalledTimes(1);
-    });
-
-    it('consoleLogDebug は console.debug を呼び出す', () => {
-      consoleLogDebug('debug message');
-      expect(mockConsole.debug).toHaveBeenCalledTimes(1);
-    });
-
-    it('consoleLogTrace は console.debug を呼び出す', () => {
-      consoleLogTrace('trace message');
-      expect(mockConsole.debug).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe('複数引数のテスト', () => {
     it('複数の引数を正しく処理する', () => {
-      const logFunction = ConsoleLogger[AgLogLevelCode.INFO];
+      const logFunction = ConsoleLoggerMap[AgLogLevelCode.INFO];
       logFunction!('message', 123, { data: 'test' });
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
     });
