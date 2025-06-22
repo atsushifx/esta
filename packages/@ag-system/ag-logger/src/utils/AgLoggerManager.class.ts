@@ -7,21 +7,25 @@
 // https://opensource.org/licenses/MIT
 
 // type
-import type { AgLoggerFunction, AgLoggerMap } from '@shared/types/AgLogger.interface';
+import type { AgLoggerFunction, AgLoggerMap, AgFormatFunction } from '@shared/types/AgLogger.interface';
 import type { AgLogLevel } from '@shared/types/AgLogger.types';
 // code
 import { AgLogLevelCode } from '@shared/types/AgLogger.types';
 
 // logger
+import { NullFormat } from '@/plugins/format/NullFormat';
 import { NullLogger } from '@/plugins/logger/NullLogger';
+// format
 
 export class AgLoggerManager {
   private static instance: AgLoggerManager;
   private loggerMap: AgLoggerMap<AgLoggerFunction>;
   private defaultLogger: AgLoggerFunction;
+  private formatter: AgFormatFunction;
 
   private constructor() {
     this.defaultLogger = NullLogger;
+    this.formatter = NullFormat;
     this.loggerMap = {
       [AgLogLevelCode.OFF]: NullLogger,
       [AgLogLevelCode.FATAL]: NullLogger,
@@ -33,13 +37,21 @@ export class AgLoggerManager {
     };
   }
 
-  static getInstance(defaultLogger?: AgLoggerFunction, loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>): AgLoggerManager {
+  static getInstance(
+    defaultLogger?: AgLoggerFunction, 
+    formatter?: AgFormatFunction,
+    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>
+  ): AgLoggerManager {
     if (!AgLoggerManager.instance) {
       AgLoggerManager.instance = new AgLoggerManager();
     }
 
     if (defaultLogger) {
       AgLoggerManager.instance.defaultLogger = defaultLogger;
+    }
+
+    if (formatter) {
+      AgLoggerManager.instance.formatter = formatter;
     }
 
     if (loggerMap) {

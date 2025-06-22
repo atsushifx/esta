@@ -12,5 +12,7 @@ import type { AgLogLevel } from './AgLogger.types';
 
 export type AgLoggerFunction = (...args: unknown[]) => void;
 
+export type AgFormatFunction = (level: AgLogLevel, ...args: unknown[]) => string;
+
 export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<AgLogLevel, T | null>;
 

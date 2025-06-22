@@ -10,7 +10,14 @@
 import type { AgLogLevel } from '@shared/types';
 import { AgLogLevelCode } from '@shared/types';
 // interfaces
-import type { AgLoggerFunction, AgLoggerMap } from '@shared/types/AgLogger.interface';
+import type { AgLoggerFunction, AgLoggerMap, AgFormatFunction } from '@shared/types/AgLogger.interface';
+
+// plugins
+import { AgLoggerManager } from '@/utils/AgLoggerManager.class';
+
+import { NullFormat } from './plugins/format/NullFormat';
+
+// utils
 
 // --- class definition
 export class AgLogger {
@@ -20,31 +27,24 @@ export class AgLogger {
   private _loggerMap: AgLoggerMap;
 
   private constructor(
-    defaultLogger: AgLoggerFunction,
-    loggerMap?: Partial<AgLoggerMap>
+    defaultLogger?: AgLoggerFunction,
+    formatter?: AgFormatFunction,
+    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>
   ) {
-    this._defaultLogger = defaultLogger;
-    this._loggerMap = {
-      [AgLogLevelCode.OFF]: null,
-      [AgLogLevelCode.FATAL]: defaultLogger,
-      [AgLogLevelCode.ERROR]: defaultLogger,
-      [AgLogLevelCode.WARN]: defaultLogger,
-      [AgLogLevelCode.INFO]: defaultLogger,
-      [AgLogLevelCode.DEBUG]: defaultLogger,
-      [AgLogLevelCode.TRACE]: defaultLogger,
-      ...loggerMap,
-    };
+    this._loggerManager = AgLoggerManager.getInstance(
+      defaultLogger,
+      formatter || NullFormat,
+      loggerMap
+    );
   }
 
   static getInstance(
     defaultLogger?: AgLoggerFunction,
-    loggerMap?: Partial<AgLoggerMap>
+    formatter?: AgFormatFunction,
+    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>
   ): AgLogger {
     if (!AgLogger._instance) {
-      if (!defaultLogger) {
-        throw new Error('Default logger is required for first initialization');
-      }
-      AgLogger._instance = new AgLogger(defaultLogger, loggerMap);
+      AgLogger._instance = new AgLogger(defaultLogger, formatter, loggerMap);
     }
     return AgLogger._instance;
   }
@@ -118,9 +118,10 @@ export class AgLogger {
 // --- Convenience function for getting logger instance
 export const getLogger = (
   defaultLogger?: AgLoggerFunction,
-  loggerMap?: Partial<AgLoggerMap>
+  formatter?: AgFormatFunction,
+  loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>
 ): AgLogger => {
-  return AgLogger.getInstance(defaultLogger, loggerMap);
+  return AgLogger.getInstance(defaultLogger, formatter, loggerMap);
 };
 
 export default AgLogger;
