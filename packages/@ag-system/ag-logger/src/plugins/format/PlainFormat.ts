@@ -7,19 +7,28 @@
 // https://opensource.org/licenses/MIT
 
 import type { AgLogMessage } from '@shared/types';
+// types
+import type { AgFormatFunction, AgLogMessage } from '@shared/types';
 
 import { AgLoggerGetLabel } from '../../utils/AgLoggerHelpers';
 
-export const PlainFormat = (logMessage: AgLogMessage): string => {
+/**
+ * Formats a log message into a plain text string.
+ * The format includes ISO8601 timestamp (without milliseconds), log level label in uppercase,
+ * the log message, and optional JSON-stringified arguments separated by spaces.
+ *
+ * @param logMessage - The log message object containing timestamp, level, message, and optional args.
+ * @returns A formatted plain text log string.
+ */
+export const PlainFormat: AgFormatFunction = (logMessage: AgLogMessage): string => {
   const timestamp = logMessage.timestamp.toISOString().replace(/\.\d{3}Z$/, 'Z');
   const levelLabel = AgLoggerGetLabel(logMessage.logLevel).toUpperCase();
   const message = logMessage.message;
-
   const argsString = logMessage.args.length > 0
-    ? ' ' + logMessage.args.map((arg) => JSON.stringify(arg)).join(' ')
+    ? logMessage.args.map((arg) => JSON.stringify(arg)).join(' ')
     : '';
 
-  return `${timestamp} [${levelLabel}] ${message}${argsString}`;
+  return `${timestamp} [${levelLabel}] ${message} ${argsString}`.trim();
 };
 
 export default PlainFormat;

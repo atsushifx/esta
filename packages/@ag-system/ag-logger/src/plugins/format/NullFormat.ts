@@ -6,9 +6,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import type { AgLogMessage } from '@shared/types';
+// types
+import type { AgFormatFunction, AgLogMessage } from '@shared/types';
 
-export const NullFormat = (
+export const NullFormat: AgFormatFunction = (
   _logMessage: AgLogMessage,
 ): string => {
   return '';
