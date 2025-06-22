@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest';
 import { AgLogLevelCode } from '@shared/types';
 
 // test unit
-import { AgLoggerGetLabel } from '../AgLogger.helpers';
+import { AgLoggerGetLabel } from '../AgLoggerHelpers';
 
 // test main
 describe('Test AgLoggerGetLabel', () => {

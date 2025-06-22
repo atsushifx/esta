@@ -8,7 +8,7 @@
 
 import type { AgLogMessage } from '@shared/types';
 
-import { AgLoggerGetLabel } from '../../utils/AgLogger.helpers';
+import { AgLoggerGetLabel } from '../../utils/AgLoggerHelpers';
 
 export const PlainFormat = (logMessage: AgLogMessage): string => {
   const timestamp = logMessage.timestamp.toISOString().replace(/\.\d{3}Z$/, 'Z');

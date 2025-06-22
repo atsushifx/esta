@@ -1,4 +1,4 @@
-// src: /src/utils/agLogger.helpers.ts
+// src: /src/utils/AgLoggerHelpers.ts
 // @(#) : ag-logger helper functions
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>

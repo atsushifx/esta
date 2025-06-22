@@ -9,9 +9,13 @@
 // types
 export { AgLogLevel, AgLogLevelCode } from '@shared/types';
 
-// classes
+// logger interfaces
 export { AgLogger } from './AgLogger.class';
 export { ConsoleLogger } from './plugins/logger/ConsoleLogger';
 
+// formatter interfaces
+export { NullFormat } from './plugins/format/NullFormat';
+export { PlainFormat } from './plugins/format/PlainFormat';
+
 // utilities
-export { AgLoggerGetMessage } from './helpers/AgLoggerGetMessage';
+export { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
