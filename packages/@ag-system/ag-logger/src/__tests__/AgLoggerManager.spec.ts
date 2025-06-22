@@ -11,6 +11,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // constants
 import { AgLogLevelCode } from '@shared/types';
+// types
+import type { AgLogLevel } from '@shared/types';
 
 // test target
 import { AgLoggerManager } from '../AgLoggerManager.class';
@@ -35,8 +37,7 @@ describe('AgLoggerManager', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset singleton instance
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (AgLoggerManager as any).instance = undefined;
+    (AgLoggerManager as unknown as { instance?: AgLoggerManager }).instance = undefined;
   });
 
   /**
@@ -45,8 +46,7 @@ describe('AgLoggerManager', () => {
   afterEach(() => {
     vi.clearAllMocks();
     // Reset singleton instance
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (AgLoggerManager as any).instance = undefined;
+    (AgLoggerManager as unknown as { instance?: AgLoggerManager }).instance = undefined;
   });
 
   /**
@@ -164,8 +164,7 @@ describe('AgLoggerManager', () => {
     it('returns default logger if log level does not exist', () => {
       const manager = AgLoggerManager.getInstance(mockDefaultLogger);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const logger = manager.getLogger(999 as any);
+      const logger = manager.getLogger(999 as AgLogLevel);
       expect(logger).toBe(mockDefaultLogger);
     });
   });
