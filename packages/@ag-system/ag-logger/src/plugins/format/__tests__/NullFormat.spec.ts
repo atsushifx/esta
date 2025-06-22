@@ -1,24 +1,27 @@
-// src: /src/plugins/format/__tests__/NullFormat.spec.ts
-// @(#) : NullFormat プラグインユニットテスト
+// src/plugins/format/__tests__/NullFormat.spec.ts
+// @(#) : Unit tests for NullFormat plugin
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// vitest
+// vitest imports
 import { describe, expect, it } from 'vitest';
 
 // constants
 import { AgLogLevelCode } from '@shared/types';
+// types
 import type { AgLogMessage } from '@shared/types';
 
-// test unit
+// subject under test
 import { NullFormat } from '../NullFormat';
 
-// test main
 describe('NullFormat', () => {
-  it('引数に関係なく空文字列を返す', () => {
+  /**
+   * Returns an empty string regardless of input arguments.
+   */
+  it('returns an empty string regardless of arguments', () => {
     const logMessage: AgLogMessage = {
       logLevel: AgLogLevelCode.INFO,
       timestamp: new Date(),
@@ -28,7 +31,10 @@ describe('NullFormat', () => {
     expect(NullFormat(logMessage)).toBe('');
   });
 
-  it('複数の引数があっても空文字列を返す', () => {
+  /**
+   * Returns an empty string even if multiple arguments are present.
+   */
+  it('returns an empty string even with multiple arguments', () => {
     const logMessage: AgLogMessage = {
       logLevel: AgLogLevelCode.WARN,
       timestamp: new Date(),
@@ -38,7 +44,10 @@ describe('NullFormat', () => {
     expect(NullFormat(logMessage)).toBe('');
   });
 
-  it('全てのログレベルで空文字列を返す', () => {
+  /**
+   * Returns an empty string for all log levels.
+   */
+  it('returns an empty string for all log levels', () => {
     const baseMessage: Omit<AgLogMessage, 'logLevel'> = {
       timestamp: new Date(),
       message: 'test',

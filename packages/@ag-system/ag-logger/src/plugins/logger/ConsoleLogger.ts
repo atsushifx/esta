@@ -1,4 +1,4 @@
-// src: /src/plugins/logger/ConsoleLogger.ts
+// src/plugins/logger/ConsoleLogger.ts
 // @(#) : Console Logger Plugin Implementation
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -7,18 +7,28 @@
 // https://opensource.org/licenses/MIT
 
 // --- modules
+// constants
 import { AgLogLevelCode } from '@shared/types';
+// types
 import type { AgLoggerFunction, AgLoggerMap } from '@shared/types/AgLogger.interface';
 
-// logger
+// logger if log level is OFF
 import { NullLogger } from './NullLogger';
 
-// --- Default Console Logger Function
-export const ConsoleLogger: AgLoggerFunction = (...args: unknown[]) => {
-  console.log(...args);
+/**
+ * Default console logger function.
+ * Uses `console.log` to output the formatted log message.
+ *
+ * @param formattedLogMessage - The formatted log message to be logged.
+ */
+export const ConsoleLogger: AgLoggerFunction = (formattedLogMessage: string) => {
+  console.log(formattedLogMessage);
 };
 
-// --- Console Logger Function Plugins
+/**
+ * Mapping of log level codes to their respective console logging functions.
+ * Uses appropriate console methods per log level for better log categorization.
+ */
 export const ConsoleLoggerMap: AgLoggerMap = {
   [AgLogLevelCode.OFF]: NullLogger,
   [AgLogLevelCode.FATAL]: (formattedMessage: string) => {

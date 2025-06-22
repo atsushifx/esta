@@ -1,4 +1,4 @@
-// src: /src/plugins/format/PlainFormat.ts
+// src/plugins/format/PlainFormat.ts
 // @(#) : Plain Format Plugin Implementation
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -6,10 +6,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import type { AgLogMessage } from '@shared/types';
 // types
 import type { AgFormatFunction, AgLogMessage } from '@shared/types';
 
+// utils
 import { AgLoggerGetLabel } from '../../utils/AgLoggerHelpers';
 
 /**
@@ -20,9 +20,9 @@ import { AgLoggerGetLabel } from '../../utils/AgLoggerHelpers';
  * @param logMessage - The log message object containing timestamp, level, message, and optional args.
  * @returns A formatted plain text log string.
  */
-export const PlainFormat: AgFormatFunction = (logMessage: AgLogMessage): string => {
+export const PlainFormat = (logMessage: AgLogMessage): string => {
   const timestamp = logMessage.timestamp.toISOString().replace(/\.\d{3}Z$/, 'Z');
-  const levelLabel = AgLoggerGetLabel(logMessage.logLevel).toUpperCase();
+  const levelLabel = AgLoggerGetLabel(logMessage.logLevel);
   const message = logMessage.message;
   const argsString = logMessage.args.length > 0
     ? logMessage.args.map((arg) => JSON.stringify(arg)).join(' ')

@@ -1,52 +1,61 @@
-// src: /src/plugins/format/__tests__/PlainFormat.spec.ts
-// @(#) : PlainFormat プラグインユニットテスト
+// src/plugins/format/__tests__/PlainFormat.spec.ts
+// @(#) : Unit tests for PlainFormat plugin
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// vitest
+// vitest imports
 import { describe, expect, it } from 'vitest';
 
 // constants
 import { AgLogLevelCode } from '@shared/types';
+// types
 import type { AgLogMessage } from '@shared/types';
 
-// test unit
+// subject under test
 import { PlainFormat } from '../PlainFormat';
 
-// test main
 describe('PlainFormat', () => {
-  it('基本的なメッセージをフォーマットする', () => {
+  /**
+   * Tests basic message formatting.
+   */
+  it('formats a basic log message', () => {
     const logMessage: AgLogMessage = {
       logLevel: AgLogLevelCode.INFO,
       timestamp: new Date('2025-01-01T12:00:00.000Z'),
-      message: 'テストメッセージ',
+      message: 'Test message',
       args: [],
     };
 
     const result = PlainFormat(logMessage);
-    expect(result).toBe('2025-01-01T12:00:00Z [INFO] テストメッセージ');
+    expect(result).toBe('2025-01-01T12:00:00Z [INFO] Test message');
   });
 
-  it('引数付きのメッセージをフォーマットする', () => {
+  /**
+   * Tests formatting a message with arguments.
+   */
+  it('formats a log message with arguments', () => {
     const logMessage: AgLogMessage = {
       logLevel: AgLogLevelCode.ERROR,
       timestamp: new Date('2025-06-22T15:30:45.123Z'),
-      message: 'エラーが発生しました',
+      message: 'An error occurred',
       args: [{ userId: 123, action: 'login' }],
     };
 
     const result = PlainFormat(logMessage);
-    expect(result).toBe('2025-06-22T15:30:45Z [ERROR] エラーが発生しました {"userId":123,"action":"login"}');
+    expect(result).toBe('2025-06-22T15:30:45Z [ERROR] An error occurred {"userId":123,"action":"login"}');
   });
 
-  it('複数の引数をJSONとして処理する', () => {
+  /**
+   * Tests formatting multiple arguments as JSON.
+   */
+  it('formats multiple arguments as JSON strings', () => {
     const logMessage: AgLogMessage = {
       logLevel: AgLogLevelCode.DEBUG,
       timestamp: new Date('2025-03-15T09:15:30.500Z'),
-      message: 'デバッグ情報',
+      message: 'Debug info',
       args: [
         { name: 'John Doe' },
         { age: 30 },
@@ -55,31 +64,37 @@ describe('PlainFormat', () => {
     };
 
     const result = PlainFormat(logMessage);
-    expect(result).toBe('2025-03-15T09:15:30Z [DEBUG] デバッグ情報 {"name":"John Doe"} {"age":30} ["item1","item2"]');
+    expect(result).toBe('2025-03-15T09:15:30Z [DEBUG] Debug info {"name":"John Doe"} {"age":30} ["item1","item2"]');
   });
 
-  it('全てのログレベルで正しくフォーマットする', () => {
+  /**
+   * Tests correct formatting for all log levels.
+   */
+  it('formats correctly for all log levels', () => {
     const baseMessage: Omit<AgLogMessage, 'logLevel'> = {
       timestamp: new Date('2025-01-01T00:00:00.000Z'),
-      message: 'テスト',
+      message: 'Test',
       args: [],
     };
 
     expect(PlainFormat({ ...baseMessage, logLevel: AgLogLevelCode.FATAL }))
-      .toBe('2025-01-01T00:00:00Z [FATAL] テスト');
+      .toBe('2025-01-01T00:00:00Z [FATAL] Test');
     expect(PlainFormat({ ...baseMessage, logLevel: AgLogLevelCode.ERROR }))
-      .toBe('2025-01-01T00:00:00Z [ERROR] テスト');
+      .toBe('2025-01-01T00:00:00Z [ERROR] Test');
     expect(PlainFormat({ ...baseMessage, logLevel: AgLogLevelCode.WARN }))
-      .toBe('2025-01-01T00:00:00Z [WARN] テスト');
+      .toBe('2025-01-01T00:00:00Z [WARN] Test');
     expect(PlainFormat({ ...baseMessage, logLevel: AgLogLevelCode.INFO }))
-      .toBe('2025-01-01T00:00:00Z [INFO] テスト');
+      .toBe('2025-01-01T00:00:00Z [INFO] Test');
     expect(PlainFormat({ ...baseMessage, logLevel: AgLogLevelCode.DEBUG }))
-      .toBe('2025-01-01T00:00:00Z [DEBUG] テスト');
+      .toBe('2025-01-01T00:00:00Z [DEBUG] Test');
     expect(PlainFormat({ ...baseMessage, logLevel: AgLogLevelCode.TRACE }))
-      .toBe('2025-01-01T00:00:00Z [TRACE] テスト');
+      .toBe('2025-01-01T00:00:00Z [TRACE] Test');
   });
 
-  it('空のメッセージでも正しくフォーマットする', () => {
+  /**
+   * Tests formatting with an empty message string.
+   */
+  it('formats correctly even with an empty message', () => {
     const logMessage: AgLogMessage = {
       logLevel: AgLogLevelCode.WARN,
       timestamp: new Date('2025-12-31T23:59:59.999Z'),
@@ -91,7 +106,10 @@ describe('PlainFormat', () => {
     expect(result).toBe('2025-12-31T23:59:59Z [WARN]  {"warning":"empty message"}');
   });
 
-  it('JSON.stringify できないオブジェクトも処理する', () => {
+  /**
+   * Tests that JSON.stringify throws on circular references.
+   */
+  it('throws when JSON.stringify cannot serialize circular objects', () => {
     const circularObj: { name: string; self?: unknown } = { name: 'test' };
     circularObj.self = circularObj;
 

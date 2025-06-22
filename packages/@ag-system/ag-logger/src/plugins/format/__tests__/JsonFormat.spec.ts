@@ -1,5 +1,5 @@
 // src: /src/plugins/format/__tests__/JsonFormat.spec.ts
-// @(#) : JsonFormat プラグインユニットテスト
+// @(#) : JUnit tests for JsonFormat plugin
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -18,12 +18,16 @@ import type { AgLogMessage } from '@shared/types';
 import { JsonFormat } from '../JsonFormat';
 
 // test main
+
 describe('JsonFormat', () => {
-  it('基本的なメッセージをJSONフォーマットする', () => {
+  /**
+   * Tests basic message formatting into JSON.
+   */
+  it('formats a basic log message as JSON', () => {
     const logMessage: AgLogMessage = {
       logLevel: AgLogLevelCode.INFO,
       timestamp: new Date('2025-01-01T12:00:00.000Z'),
-      message: 'テストメッセージ',
+      message: 'Test message',
       args: [],
     };
 
@@ -32,15 +36,18 @@ describe('JsonFormat', () => {
 
     expect(parsed.timestamp).toBe('2025-01-01T12:00:00.000Z');
     expect(parsed.level).toBe('INFO');
-    expect(parsed.message).toBe('テストメッセージ');
+    expect(parsed.message).toBe('Test message');
     expect(parsed.args).toBeUndefined();
   });
 
-  it('引数付きのメッセージをJSONフォーマットする', () => {
+  /**
+   * Tests formatting of a message with additional arguments.
+   */
+  it('formats a log message with arguments as JSON', () => {
     const logMessage: AgLogMessage = {
       logLevel: AgLogLevelCode.ERROR,
       timestamp: new Date('2025-06-22T15:30:45.123Z'),
-      message: 'エラーが発生しました',
+      message: 'An error occurred',
       args: [{ userId: 123, action: 'login' }],
     };
 
@@ -49,15 +56,18 @@ describe('JsonFormat', () => {
 
     expect(parsed.timestamp).toBe('2025-06-22T15:30:45.123Z');
     expect(parsed.level).toBe('ERROR');
-    expect(parsed.message).toBe('エラーが発生しました');
+    expect(parsed.message).toBe('An error occurred');
     expect(parsed.args).toEqual([{ userId: 123, action: 'login' }]);
   });
 
-  it('複数の引数をJSON配列として処理する', () => {
+  /**
+   * Tests formatting of multiple arguments as a JSON array.
+   */
+  it('formats multiple arguments as a JSON array', () => {
     const logMessage: AgLogMessage = {
       logLevel: AgLogLevelCode.DEBUG,
       timestamp: new Date('2025-03-15T09:15:30.500Z'),
-      message: 'デバッグ情報',
+      message: 'Debug info',
       args: [
         { name: 'John Doe' },
         { age: 30 },
@@ -70,7 +80,7 @@ describe('JsonFormat', () => {
 
     expect(parsed.timestamp).toBe('2025-03-15T09:15:30.500Z');
     expect(parsed.level).toBe('DEBUG');
-    expect(parsed.message).toBe('デバッグ情報');
+    expect(parsed.message).toBe('Debug info');
     expect(parsed.args).toEqual([
       { name: 'John Doe' },
       { age: 30 },
@@ -78,10 +88,13 @@ describe('JsonFormat', () => {
     ]);
   });
 
-  it('全てのログレベルで正しくJSONフォーマットする', () => {
+  /**
+   * Tests correct JSON formatting for all log levels.
+   */
+  it('formats correctly for all log levels', () => {
     const baseMessage: Omit<AgLogMessage, 'logLevel'> = {
       timestamp: new Date('2025-01-01T00:00:00.000Z'),
-      message: 'テスト',
+      message: 'Test',
       args: [],
     };
 
@@ -101,7 +114,10 @@ describe('JsonFormat', () => {
     });
   });
 
-  it('空のメッセージでも正しくJSONフォーマットする', () => {
+  /**
+   * Tests JSON formatting with an empty message string.
+   */
+  it('formats correctly even with an empty message', () => {
     const logMessage: AgLogMessage = {
       logLevel: AgLogLevelCode.WARN,
       timestamp: new Date('2025-12-31T23:59:59.999Z'),
@@ -118,7 +134,10 @@ describe('JsonFormat', () => {
     expect(parsed.args).toEqual([{ warning: 'empty message' }]);
   });
 
-  it('JSON.stringify できないオブジェクトも処理する', () => {
+  /**
+   * Tests that circular references throw during JSON.stringify.
+   */
+  it('throws when JSON.stringify cannot serialize circular objects', () => {
     const circularObj: { name: string; self?: unknown } = { name: 'test' };
     circularObj.self = circularObj;
 
@@ -132,20 +151,23 @@ describe('JsonFormat', () => {
     expect(() => JsonFormat(logMessage)).toThrow();
   });
 
-  it('有効なJSONオブジェクトとして出力される', () => {
+  /**
+   * Tests that the output is a valid JSON string without line breaks.
+   */
+  it('outputs valid JSON string without newlines', () => {
     const logMessage: AgLogMessage = {
       logLevel: AgLogLevelCode.INFO,
       timestamp: new Date('2025-01-01T12:00:00.000Z'),
-      message: 'テスト',
+      message: 'Test',
       args: [{ key: 'value' }],
     };
 
     const result = JsonFormat(logMessage);
 
-    // JSONとして解析可能であることを確認
+    // Verify that output is valid JSON
     expect(() => JSON.parse(result)).not.toThrow();
 
-    // 改行がないことを確認（一行のJSONであること）
+    // Verify output is single-line JSON string
     expect(result).not.toContain('\n');
   });
 });
