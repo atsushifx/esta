@@ -17,7 +17,7 @@ import { AgLoggerGetLabel } from '../AgLoggerHelpers';
 
 /**
  * Unit tests for the AgLoggerGetLabel helper function.
- * Validates that each log level code returns the correctly uppercased label string.
+ * Validates that each log level code returns the correctly uppercase label string.
  */
 describe('Test AgLoggerGetLabel', () => {
   /**

@@ -20,7 +20,7 @@ import { AgLoggerGetLabel } from '../../utils/AgLoggerHelpers';
  * @param logMessage - The log message object containing timestamp, level, message, and optional args.
  * @returns A formatted plain text log string.
  */
-export const PlainFormat = (logMessage: AgLogMessage): string => {
+export const PlainFormat: AgFormatFunction = (logMessage: AgLogMessage): string => {
   const timestamp = logMessage.timestamp.toISOString().replace(/\.\d{3}Z$/, 'Z');
   const levelLabel = AgLoggerGetLabel(logMessage.logLevel);
   const message = logMessage.message;
