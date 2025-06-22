@@ -11,7 +11,7 @@ export { AgLogLevel, AgLogLevelCode } from '@shared/types';
 
 // classes
 export { AgLogger } from './AgLogger.class';
-export { ConsoleLogger } from './ConsoleLogger.class';
+export { ConsoleLogger } from './plugins/logger/ConsoleLogger';
 
 // utilities
 export { agLog, agLogMessage } from './AgLogUtils';

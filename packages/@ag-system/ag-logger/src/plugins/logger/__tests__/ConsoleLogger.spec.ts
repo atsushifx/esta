@@ -14,13 +14,13 @@ import { AgLogLevelCode } from '@shared/types';
 
 // test unit
 import {
-  ConsoleLogger,
   consoleLogDebug,
   consoleLogError,
   consoleLogFatal,
+  ConsoleLogger,
   consoleLogInfo,
   consoleLogTrace,
-  consoleLogWarn
+  consoleLogWarn,
 } from '../ConsoleLogger';
 
 // mock console methods
@@ -46,7 +46,7 @@ describe('ConsoleLogger', () => {
     it('FATAL レベルでconsole.errorを呼び出す', () => {
       const logFunction = ConsoleLogger[AgLogLevelCode.FATAL];
       expect(logFunction).toBeDefined();
-      
+
       logFunction!('test fatal message');
       expect(mockConsole.error).toHaveBeenCalledTimes(1);
     });
@@ -54,7 +54,7 @@ describe('ConsoleLogger', () => {
     it('ERROR レベルでconsole.errorを呼び出す', () => {
       const logFunction = ConsoleLogger[AgLogLevelCode.ERROR];
       expect(logFunction).toBeDefined();
-      
+
       logFunction!('test error message');
       expect(mockConsole.error).toHaveBeenCalledTimes(1);
     });
@@ -62,7 +62,7 @@ describe('ConsoleLogger', () => {
     it('WARN レベルでconsole.warnを呼び出す', () => {
       const logFunction = ConsoleLogger[AgLogLevelCode.WARN];
       expect(logFunction).toBeDefined();
-      
+
       logFunction!('test warn message');
       expect(mockConsole.warn).toHaveBeenCalledTimes(1);
     });
@@ -70,7 +70,7 @@ describe('ConsoleLogger', () => {
     it('INFO レベルでconsole.infoを呼び出す', () => {
       const logFunction = ConsoleLogger[AgLogLevelCode.INFO];
       expect(logFunction).toBeDefined();
-      
+
       logFunction!('test info message');
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
     });
@@ -78,7 +78,7 @@ describe('ConsoleLogger', () => {
     it('DEBUG レベルでconsole.debugを呼び出す', () => {
       const logFunction = ConsoleLogger[AgLogLevelCode.DEBUG];
       expect(logFunction).toBeDefined();
-      
+
       logFunction!('test debug message');
       expect(mockConsole.debug).toHaveBeenCalledTimes(1);
     });
@@ -86,7 +86,7 @@ describe('ConsoleLogger', () => {
     it('TRACE レベルでconsole.debugを呼び出す', () => {
       const logFunction = ConsoleLogger[AgLogLevelCode.TRACE];
       expect(logFunction).toBeDefined();
-      
+
       logFunction!('test trace message');
       expect(mockConsole.debug).toHaveBeenCalledTimes(1);
     });

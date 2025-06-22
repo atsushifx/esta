@@ -16,18 +16,18 @@ import { NullLogger } from '../NullLogger';
 describe('NullLogger', () => {
   it('引数なしで呼び出しても何もしない', () => {
     const consoleSpy = vi.spyOn(console, 'log');
-    
+
     NullLogger();
-    
+
     expect(consoleSpy).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
 
   it('引数ありで呼び出しても何もしない', () => {
     const consoleSpy = vi.spyOn(console, 'log');
-    
+
     NullLogger('test message', 123, { data: 'test' });
-    
+
     expect(consoleSpy).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
@@ -39,11 +39,11 @@ describe('NullLogger', () => {
 
   it('複数回呼び出しても何もしない', () => {
     const consoleSpy = vi.spyOn(console, 'log');
-    
+
     NullLogger('message 1');
     NullLogger('message 2', 456);
     NullLogger();
-    
+
     expect(consoleSpy).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
   });

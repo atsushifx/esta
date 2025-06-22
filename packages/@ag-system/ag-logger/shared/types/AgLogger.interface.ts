@@ -1,4 +1,3 @@
-
 // src: /shared/types/AgLogger.interface.ts
 // @(#) : Logger Interface Definitions
 //
@@ -8,11 +7,10 @@
 // https://opensource.org/licenses/MIT
 
 // type
-import type { AgLogLevel } from './AgLogger.types';
+import type { AgLogLevel, AgLogMessage } from './AgLogger.types';
 
 export type AgLoggerFunction = (...args: unknown[]) => void;
 
-export type AgFormatFunction = (level: AgLogLevel, ...args: unknown[]) => string;
+export type AgFormatFunction = (logMessage: AgLogMessage) => string;
 
 export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<AgLogLevel, T | null>;
-

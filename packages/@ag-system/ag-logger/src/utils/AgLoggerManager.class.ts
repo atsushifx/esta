@@ -7,15 +7,14 @@
 // https://opensource.org/licenses/MIT
 
 // type
-import type { AgLoggerFunction, AgLoggerMap, AgFormatFunction } from '@shared/types/AgLogger.interface';
+import type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from '@shared/types/AgLogger.interface';
 import type { AgLogLevel } from '@shared/types/AgLogger.types';
 // code
 import { AgLogLevelCode } from '@shared/types/AgLogger.types';
 
-// logger
+// plugins
 import { NullFormat } from '@/plugins/format/NullFormat';
 import { NullLogger } from '@/plugins/logger/NullLogger';
-// format
 
 export class AgLoggerManager {
   private static instance: AgLoggerManager;
@@ -38,9 +37,9 @@ export class AgLoggerManager {
   }
 
   static getInstance(
-    defaultLogger?: AgLoggerFunction, 
+    defaultLogger?: AgLoggerFunction,
     formatter?: AgFormatFunction,
-    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>
+    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,
   ): AgLoggerManager {
     if (!AgLoggerManager.instance) {
       AgLoggerManager.instance = new AgLoggerManager();
@@ -55,7 +54,7 @@ export class AgLoggerManager {
     }
 
     if (loggerMap) {
-      Object.keys(AgLogLevelCode).forEach(key => {
+      Object.keys(AgLogLevelCode).forEach((key) => {
         const levelCode = AgLogLevelCode[key as keyof typeof AgLogLevelCode];
         if (loggerMap[levelCode] !== undefined) {
           AgLoggerManager.instance.loggerMap[levelCode] = loggerMap[levelCode]!;
@@ -69,11 +68,14 @@ export class AgLoggerManager {
   }
 
   getLogger(logLevel: AgLogLevel): AgLoggerFunction {
-    return this.loggerMap[logLevel] || this.defaultLogger;
+    return this.loggerMap[logLevel] ?? this.defaultLogger;
+  }
+
+  getFormatter(): AgFormatFunction {
+    return this.formatter;
   }
 
   setLogger(logLevel: AgLogLevel, logFunction: AgLoggerFunction | null): void {
-    this.loggerMap[logLevel] = logFunction || this.defaultLogger;
+    this.loggerMap[logLevel] = logFunction ?? this.defaultLogger;
   }
 }
-

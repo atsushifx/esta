@@ -6,13 +6,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import type { AgLogLevel } from '@shared/types';
+import type { AgLogMessage } from '@shared/types';
 
 export const NullFormat = (
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  level: AgLogLevel,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ...args: unknown[]
+  _logMessage: AgLogMessage,
 ): string => {
   return '';
 };

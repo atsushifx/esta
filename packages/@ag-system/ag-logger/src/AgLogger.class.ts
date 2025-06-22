@@ -10,14 +10,16 @@
 import type { AgLogLevel } from '@shared/types';
 import { AgLogLevelCode } from '@shared/types';
 // interfaces
-import type { AgLoggerFunction, AgLoggerMap, AgFormatFunction } from '@shared/types/AgLogger.interface';
-
-// plugins
-import { AgLoggerManager } from '@/utils/AgLoggerManager.class';
-
-import { NullFormat } from './plugins/format/NullFormat';
+import type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from '@shared/types/AgLogger.interface';
 
 // utils
+import { AgLoggerManager } from '@/utils/AgLoggerManager.class';
+
+// helpers
+import { AgLoggerGetMessage } from './helpers/AgLoggerGetMessage';
+// plugins
+import { NullFormat } from './plugins/format/NullFormat';
+import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 
 // --- class definition
 export class AgLogger {
@@ -29,7 +31,7 @@ export class AgLogger {
   private constructor(
     defaultLogger?: AgLoggerFunction,
     formatter?: AgFormatFunction,
-    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>
+    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,
   ) {
     this._loggerManager = AgLoggerManager.getInstance(
       defaultLogger,
@@ -41,12 +43,9 @@ export class AgLogger {
   static getInstance(
     defaultLogger?: AgLoggerFunction,
     formatter?: AgFormatFunction,
-    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>
+    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,
   ): AgLogger {
-    if (!AgLogger._instance) {
-      AgLogger._instance = new AgLogger(defaultLogger, formatter, loggerMap);
-    }
-    return AgLogger._instance;
+    return (AgLogger._instance ??= new AgLogger(defaultLogger, formatter, loggerMap));
   }
 
   private isOutputLevel(level: AgLogLevel): boolean {
@@ -67,10 +66,17 @@ export class AgLogger {
 
   private logWithLevel(level: AgLogLevel, ...args: unknown[]): void {
     if (this.isOutputLevel(level)) {
-      const logger = this._loggerMap[level];
-      if (logger) {
-        logger(...args);
+      const logMessage = AgLoggerGetMessage(level, ...args);
+      const formatter = this._loggerManager.getFormatter();
+      const formattedMessage = formatter(logMessage);
+
+      // formatterが空文字列を返した場合はログを出力しない
+      if (formattedMessage === '') {
+        return;
       }
+
+      const logger = this._loggerManager.getLogger(level);
+      logger(formattedMessage);
     }
   }
 
@@ -83,8 +89,8 @@ export class AgLogger {
     // Update all null entries with the new default logger
     Object.keys(this._loggerMap).forEach((key) => {
       const level = parseInt(key) as AgLogLevel;
-      if (level !== AgLogLevelCode.OFF && !this._loggerMap[level]) {
-        this._loggerMap[level] = defaultLogger;
+      if (loggerMap[level] !== undefined) {
+        this._loggerManager.setLogger(level, loggerMap[level]);
       }
     });
   }
@@ -111,7 +117,7 @@ export class AgLogger {
 
   // general log method using default logger
   log(...args: unknown[]): void {
-    this._defaultLogger(...args);
+    this.logWithLevel(AgLogLevelCode.INFO, ...args);
   }
 }
 
@@ -119,8 +125,13 @@ export class AgLogger {
 export const getLogger = (
   defaultLogger?: AgLoggerFunction,
   formatter?: AgFormatFunction,
-  loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>
+  loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,
 ): AgLogger => {
+  // ConsoleLoggerが指定されていてloggerMapが未指定の場合、ConsoleLoggerMapを自動適用
+  if (defaultLogger === ConsoleLogger && !loggerMap) {
+    loggerMap = ConsoleLoggerMap;
+  }
+
   return AgLogger.getInstance(defaultLogger, formatter, loggerMap);
 };
 
