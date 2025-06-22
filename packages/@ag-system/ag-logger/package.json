@@ -1,7 +1,7 @@
 {
   "name": "@ag-system/ag-logger",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Abstract logger system with various implementations.",
   "author": "atsushifx <https://github.com/atsushifx>",
   "license": "MIT",
