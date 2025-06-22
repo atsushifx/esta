@@ -9,7 +9,7 @@
 // type
 import type { AgLogLevel, AgLogMessage } from './AgLogger.types';
 
-export type AgLoggerFunction = (...args: unknown[]) => void;
+export type AgLoggerFunction = (formattedLogMessage: string) => void;
 
 export type AgFormatFunction = (logMessage: AgLogMessage) => string;
 

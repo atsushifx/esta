@@ -74,6 +74,14 @@ export class AgLogger {
     return AgLogger._logLevel;
   }
 
+  setLogLevel(level: AgLogLevel): AgLogLevel {
+    return AgLogger.setLogLevel(level);
+  }
+
+  getLogLevel(): AgLogLevel {
+    return AgLogger.getLogLevel();
+  }
+
   private logWithLevel(level: AgLogLevel, ...args: unknown[]): void {
     if (this.isOutputLevel(level)) {
       const logMessage = AgLoggerGetMessage(level, ...args);

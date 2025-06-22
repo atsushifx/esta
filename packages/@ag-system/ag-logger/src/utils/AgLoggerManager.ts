@@ -47,9 +47,9 @@ export class AgLoggerManager {
       Object.keys(AgLogLevelCode).forEach((key) => {
         const levelCode = AgLogLevelCode[key as keyof typeof AgLogLevelCode];
         if (loggerMap[levelCode] !== undefined) {
-          AgLoggerManager.instance.loggerMap[levelCode] = loggerMap[levelCode]!;
+          AgLoggerManager.instance!.loggerMap[levelCode] = loggerMap[levelCode]!;
         } else {
-          AgLoggerManager.instance.loggerMap[levelCode] = AgLoggerManager.instance.defaultLogger;
+          AgLoggerManager.instance!.loggerMap[levelCode] = AgLoggerManager.instance!.defaultLogger;
         }
       });
     }

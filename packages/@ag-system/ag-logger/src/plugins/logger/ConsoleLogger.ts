@@ -10,8 +10,7 @@
 import { AgLogLevelCode } from '@shared/types';
 import type { AgLoggerFunction, AgLoggerMap } from '@shared/types/AgLogger.interface';
 
-// utility functions
-import { agLog } from '../../AgLogUtils';
+// logger
 import { NullLogger } from './NullLogger';
 
 // --- Default Console Logger Function
@@ -22,24 +21,24 @@ export const ConsoleLogger: AgLoggerFunction = (...args: unknown[]) => {
 // --- Console Logger Function Plugins
 export const ConsoleLoggerMap: AgLoggerMap = {
   [AgLogLevelCode.OFF]: NullLogger,
-  [AgLogLevelCode.FATAL]: (...args: unknown[]) => {
-    console.error(agLog(AgLogLevelCode.FATAL, ...args));
+  [AgLogLevelCode.FATAL]: (formattedMessage: string) => {
+    console.error(formattedMessage);
   },
-  [AgLogLevelCode.ERROR]: (...args: unknown[]) => {
-    console.error(agLog(AgLogLevelCode.ERROR, ...args));
+  [AgLogLevelCode.ERROR]: (formattedMessage: string) => {
+    console.error(formattedMessage);
   },
-  [AgLogLevelCode.WARN]: (...args: unknown[]) => {
-    console.warn(agLog(AgLogLevelCode.WARN, ...args));
+  [AgLogLevelCode.WARN]: (formattedMessage: string) => {
+    console.warn(formattedMessage);
   },
-  [AgLogLevelCode.INFO]: (...args: unknown[]) => {
-    console.info(agLog(AgLogLevelCode.INFO, ...args));
+  [AgLogLevelCode.INFO]: (formattedMessage: string) => {
+    console.info(formattedMessage);
   },
-  [AgLogLevelCode.DEBUG]: (...args: unknown[]) => {
-    console.debug(agLog(AgLogLevelCode.DEBUG, ...args));
+  [AgLogLevelCode.DEBUG]: (formattedMessage: string) => {
+    console.debug(formattedMessage);
   },
-  [AgLogLevelCode.TRACE]: (...args: unknown[]) => {
-    console.debug(agLog(AgLogLevelCode.TRACE, ...args));
+  [AgLogLevelCode.TRACE]: (formattedMessage: string) => {
+    console.debug(formattedMessage);
   },
 };
 
-export default ConsoleLoggerMap;
+export default ConsoleLogger;

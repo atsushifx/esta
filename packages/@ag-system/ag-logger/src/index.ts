@@ -14,4 +14,4 @@ export { AgLogger } from './AgLogger.class';
 export { ConsoleLogger } from './plugins/logger/ConsoleLogger';
 
 // utilities
-export { agLog, agLogMessage } from './AgLogUtils';
+export { AgLoggerGetMessage } from './helpers/AgLoggerGetMessage';

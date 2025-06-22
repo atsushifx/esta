@@ -14,35 +14,25 @@ import { NullLogger } from '../NullLogger';
 
 // test main
 describe('NullLogger', () => {
-  it('引数なしで呼び出しても何もしない', () => {
+  it('フォーマット済みメッセージで呼び出しても何もしない', () => {
     const consoleSpy = vi.spyOn(console, 'log');
 
-    NullLogger();
-
-    expect(consoleSpy).not.toHaveBeenCalled();
-    consoleSpy.mockRestore();
-  });
-
-  it('引数ありで呼び出しても何もしない', () => {
-    const consoleSpy = vi.spyOn(console, 'log');
-
-    NullLogger('test message', 123, { data: 'test' });
+    NullLogger('formatted message');
 
     expect(consoleSpy).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
 
   it('戻り値はundefinedである', () => {
-    const result = NullLogger('any message');
+    const result = NullLogger('any formatted message');
     expect(result).toBeUndefined();
   });
 
   it('複数回呼び出しても何もしない', () => {
     const consoleSpy = vi.spyOn(console, 'log');
 
-    NullLogger('message 1');
-    NullLogger('message 2', 456);
-    NullLogger();
+    NullLogger('formatted message 1');
+    NullLogger('formatted message 2');
 
     expect(consoleSpy).not.toHaveBeenCalled();
     consoleSpy.mockRestore();

@@ -88,8 +88,9 @@ describe('ConsoleLogger', () => {
   describe('複数引数のテスト', () => {
     it('複数の引数を正しく処理する', () => {
       const logFunction = ConsoleLoggerMap[AgLogLevelCode.INFO];
-      logFunction!('message', 123, { data: 'test' });
-      expect(mockConsole.info).toHaveBeenCalledTimes(1);
+      const formattedMessage = 'formatted log message';
+      logFunction!(formattedMessage);
+      expect(mockConsole.info).toHaveBeenCalledWith(formattedMessage);
     });
   });
 });

@@ -11,3 +11,5 @@ import type { AgLoggerFunction } from '@shared/types/AgLogger.interface';
 export const NullLogger: AgLoggerFunction = () => {
   // Do nothing - null logger implementation
 };
+
+export default NullLogger;
