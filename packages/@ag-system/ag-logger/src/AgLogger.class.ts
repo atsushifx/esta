@@ -81,8 +81,14 @@ export class AgLogger {
     formatter?: AgFormatFunction;
     loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
   }): void {
+    // ConsoleLoggerが指定されていてloggerMapが未指定の場合、ConsoleLoggerMapを自動適用
+    const enhancedOptions = { ...options };
+    if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
+      enhancedOptions.loggerMap = ConsoleLoggerMap;
+    }
+
     // AgLoggerManagerに設定を委譲して処理を統一
-    this._loggerManager.setLogger(options);
+    this._loggerManager.setLogger(enhancedOptions);
   }
 
   // log method (public API)
