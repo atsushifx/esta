@@ -6,4 +6,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// types
 export * from './AgLogger.types';
+
+// Interface
+export * from './AgLogger.interface';
