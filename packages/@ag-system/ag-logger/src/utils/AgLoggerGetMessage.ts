@@ -1,5 +1,5 @@
-// src: /src/helpers/AgLoggerGetMessage.ts
-// @(#)  : 引数 → メッセージ変換
+// src/helpers/AgLoggerGetMessage.ts
+// @(#)  : Argument to Message Conversion Utility
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -8,6 +8,17 @@
 
 import type { AgLogLevel, AgLogMessage } from '@shared/types/AgLogger.types';
 
+/**
+ * Parses log arguments into a structured log message object.
+ * Extracts an optional timestamp if the first argument is a valid ISO string,
+ * concatenates primitive arguments into a single message string,
+ * and collects remaining complex arguments separately.
+ *
+ * @param logLevel - The severity level of the log.
+ * @param args - The variable list of log arguments, which may include
+ *               a timestamp string, primitive values, and complex objects.
+ * @returns A structured `AgLogMessage` object with parsed timestamp, message, and arguments.
+ */
 export const AgLoggerGetMessage = (logLevel: AgLogLevel, ...args: unknown[]): AgLogMessage => {
   const args2 = [...args];
 

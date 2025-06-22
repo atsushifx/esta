@@ -46,9 +46,6 @@
     // ✅ エイリアス設定（←追加！）
     // "baseUrl": "./src",
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
       "@shared/*": [
         "shared/*",
         "shared/common/*"

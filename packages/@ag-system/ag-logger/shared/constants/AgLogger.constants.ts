@@ -1,17 +1,20 @@
-// src: /shared/constants/AgLogger.constants.ts
-// @(#) : Logger用定数
+// src/shared/constants/AgLogger.constants.ts
+// @(#) : Logger Constants
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// type
+// types
 import type { AgLogLevel } from '@shared/types/AgLogger.types';
 // code
 import { AgLogLevelCode } from '@shared/types/AgLogger.types';
 
-/** AgLogLevel names mapping */
+/**
+ * Mapping of `AgLogLevel` numeric codes to their string label names.
+ * Used for displaying or formatting log level names in output.
+ */
 export const AgLogLevelLabels: Record<AgLogLevel, string> = {
   [AgLogLevelCode.OFF]: 'off',
   [AgLogLevelCode.FATAL]: 'fatal',
