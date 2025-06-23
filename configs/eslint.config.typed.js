@@ -32,12 +32,11 @@ export default [
       'packages/**/*.ts',
     ],
     ignores: [
-      '*lib/**',
+      '**/lib/**',
       '**/module/**',
       '**/dist/**',
       '**/node_modules/**',
       '**/.cache/**',
-      '**/configs/**',
     ],
     plugins: {
       '@typescript-eslint': tseslint,

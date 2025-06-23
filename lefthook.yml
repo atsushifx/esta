@@ -21,7 +21,7 @@ pre-commit:
 
     eslint:
       glob:
-        - "shared/common/**/*.ts"
+        - "shared/**/*.ts"
         - "packages/**/*.ts"
       run: pnpm run lint-all -- {staged_files}
 

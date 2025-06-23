@@ -10,7 +10,7 @@ import * as fs from 'fs';
 import { resolve } from 'path';
 
 // modules
-import type { ConfigType } from '@shared/types';
+import type { SearchConfigFileType } from '@shared/types/common.types';
 
 import { configSearchDirs } from './configSearchDirs';
 
@@ -31,9 +31,9 @@ const EXTENSIONS = ['json', 'jsonc', 'yml', 'yaml', 'js', 'ts'] as const;
 export const findConfigFile = (
   baseNames: readonly string[],
   dirName: string,
-  configType: ConfigType,
+  SearchConfigFileType: SearchConfigFileType,
 ): string => {
-  const searchDirs = configSearchDirs(dirName, configType);
+  const searchDirs = configSearchDirs(dirName, SearchConfigFileType);
   const configFilesList = searchDirs.flatMap((dir) =>
     baseNames.flatMap((base) =>
       PREFIXES.flatMap((pref) => EXTENSIONS.map((ext) => resolve(dir, `${pref}${base}.${ext}`)))

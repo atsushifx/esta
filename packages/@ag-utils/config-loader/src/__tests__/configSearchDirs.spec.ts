@@ -11,7 +11,7 @@ import process from 'process';
 
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ConfigType } from '@shared/types';
+import { SearchConfigFileType } from '@shared/types/common.types';
 
 import { getDelimiter } from '@ag-utils/common';
 // vitest
@@ -46,27 +46,27 @@ describe('configSearchDirs - System', () => {
   it('includes XDG_CONFIG_HOME/appName directory in system mode', () => {
     process.env.XDG_CONFIG_HOME = '/home/tester/.config';
 
-    const dirs = configSearchDirs('appConfig', ConfigType.SYSTEM);
+    const dirs = configSearchDirs('appConfig', SearchConfigFileType.SYSTEM);
     expect(dirs).toContain('/home/tester/.config/appConfig');
   });
 
   it('falls back to HOME/.config when XDG_CONFIG_HOME is undefined', () => {
     delete process.env.XDG_CONFIG_HOME;
 
-    const dirs = configSearchDirs('appConfig', ConfigType.SYSTEM);
+    const dirs = configSearchDirs('appConfig', SearchConfigFileType.SYSTEM);
     const expected = `${MOCK_HOME}/.config/appConfig`;
     expect(dirs).toContain(expected);
   });
 
   it('include unix dotfiles directory', () => {
-    const dirs = configSearchDirs('appConfig', ConfigType.SYSTEM);
+    const dirs = configSearchDirs('appConfig', SearchConfigFileType.SYSTEM);
     const expected = `${MOCK_HOME}/.appConfig`;
     expect(dirs).toContain(expected);
   });
 
   it('search XDG_CONFIG_DIRS', () => {
     process.env.XDG_CONFIG_DIRS = '/usr/local/etc' + getDelimiter() + '/etc';
-    const dirs = configSearchDirs('appConfig', ConfigType.SYSTEM);
+    const dirs = configSearchDirs('appConfig', SearchConfigFileType.SYSTEM);
     const expected = `/usr/local/etc/appConfig`;
 
     expect(dirs).toContain(expected);
@@ -74,7 +74,7 @@ describe('configSearchDirs - System', () => {
 
   it('XDG_CONFIG_DIRS is undefined: use /etc/xdg', () => {
     delete process.env.XDG_CONFIG_DIRS;
-    const dirs = configSearchDirs('appConfig', ConfigType.SYSTEM);
+    const dirs = configSearchDirs('appConfig', SearchConfigFileType.SYSTEM);
     const expected = '/etc/xdg/appConfig';
 
     expect(dirs).toContain(expected);
@@ -94,14 +94,14 @@ describe('configSearchDirs - User', () => {
   it('includes XDG_CONFIG_HOME/appName directory in system mode', () => {
     process.env.XDG_CONFIG_HOME = '/home/tester/.config';
 
-    const dirs = configSearchDirs('appConfig', ConfigType.USER);
+    const dirs = configSearchDirs('appConfig', SearchConfigFileType.USER);
     expect(dirs).toContain('/home/tester/.config/appConfig');
   });
 
   it('falls back to HOME/.config when XDG_CONFIG_HOME is undefined', () => {
     delete process.env.XDG_CONFIG_HOME;
 
-    const dirs = configSearchDirs('appConfig', ConfigType.USER);
+    const dirs = configSearchDirs('appConfig', SearchConfigFileType.USER);
     const expected = `${MOCK_HOME}/.config/appConfig`;
     expect(dirs).toContain(expected);
   });
@@ -109,7 +109,7 @@ describe('configSearchDirs - User', () => {
   it('check if default config directory is included', () => {
     delete process.env.XDG_CONFIG_HOME;
 
-    const dirs = configSearchDirs('appConfig', ConfigType.USER);
+    const dirs = configSearchDirs('appConfig', SearchConfigFileType.USER);
     const expected1 = `${MOCK_HOME}/configs/appConfig`;
     expect(dirs).toContain(expected1);
 
