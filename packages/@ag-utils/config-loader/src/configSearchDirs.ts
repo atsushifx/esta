@@ -11,13 +11,13 @@ import * as os from 'os';
 import process from 'process';
 
 // --- internal libs
-import { ConfigType } from '@shared/types';
+import { SearchConfigFileType } from '@shared/types/common.types';
 
 import { getDelimiter } from '@ag-utils/common';
 // --- types
 
 // functions
-export const configSearchDirs = (appConfig: string, configType: ConfigType): string[] => {
+export const configSearchDirs = (appConfig: string, configFileType: SearchConfigFileType): string[] => {
   const dirs: string[] = [];
 
   const configDirsSystem = (appConfig: string): string[] => {
@@ -26,7 +26,7 @@ export const configSearchDirs = (appConfig: string, configType: ConfigType): str
     const XDG_HOME = process.env.XDG_CONFIG_HOME ?? `${HOME}/.config`;
 
     // search XDG_CONFIG_DIRS
-    const getXdgDirs = () => {
+    const getXdgDirs = (): string[] => {
       const delimiter = getDelimiter();
       const XDG_CONFIG_DIRS: string = process.env.XDG_CONFIG_DIRS + delimiter + '/etc/xdg';
       const xdgDirs = XDG_CONFIG_DIRS
@@ -56,7 +56,7 @@ export const configSearchDirs = (appConfig: string, configType: ConfigType): str
     return dirs;
   };
 
-  if (configType === ConfigType.SYSTEM) {
+  if (configFileType === SearchConfigFileType.SYSTEM) {
     dirs.push(...configDirsSystem(appConfig));
   } else {
     dirs.push(...configDirsUser(appConfig));

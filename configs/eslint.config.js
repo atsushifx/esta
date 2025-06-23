@@ -30,8 +30,16 @@ export default [
   // source code settings
   {
     files: [
-      'shared/common/**/*.ts',
-      'packages/**/src/**/*.ts',
+      'shared/**/*.ts',
+      'packages/**/*.ts',
+    ],
+    ignores: [
+      '**/lib/**',
+      '**/module/**',
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/.cache/**',
+      '**/configs/**',
     ],
     languageOptions: {
       parser: tsparser,
