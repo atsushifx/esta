@@ -24,11 +24,7 @@
     "rootDir": ".",
     // alias
     "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "packages/@aglabo-actions/tool-installer/src/*"
-      ]
-    },
+    "paths": {},
     // types
     // cache
     "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"
