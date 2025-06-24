@@ -35,7 +35,7 @@
     "lint:all": "pnpm run lint && pnpm run lint:types",
     "lint:fix": "pnpm run lint --fix",
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*",
-    "test": "test:develop && pnpm run test:ci",
+    "test": "pnpm run test:develop && pnpm run test:ci",
     "test:develop": "pnpm exec vitest run --config ./configs/vitest.config.unit.ts",
     "test:ci": "pnpm exec vitest run --config ./configs/vitest.config.ci.ts",
     "test:watch": "pnpm exec vitest --config ./configs/vitest.config.unit.ts --watch",
@@ -45,8 +45,7 @@
     "pnpm": ">=10",
     "node": ">=20"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
     "@ag-utils/common": "workspace:*",
     "comment-json": "^4.2.5",
