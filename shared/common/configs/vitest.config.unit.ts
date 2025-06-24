@@ -27,6 +27,9 @@ export default mergeConfig(baseConfig, {
       'src/**/*.test.ts',
       'src/**/*.spec.ts',
     ],
+    caches: {
+      dir: path.resolve(__dirname, '../../../.cache/vitest-cache/ci'),
+    },
   },
   resolve: {
     alias: {
