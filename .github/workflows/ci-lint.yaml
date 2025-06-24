@@ -33,6 +33,22 @@ jobs:
         with:
           version: 10
 
+      - name: Cache pnpm store and build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            ~/.cache
+            packages/*/*/lib
+            packages/*/*/module
+            packages/*/*/.cache
+            shared/common/lib
+            shared/common/module
+            shared/common/.cache
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}-${{ env.NODE_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: Install dependencies
         run: pnpm install
 
@@ -42,20 +58,20 @@ jobs:
       - name: Run lint
         run: |
           set -o pipefail
-          pnpm run lint 2>&1 | tee lint-report.txt
-          pnpm run lint:types 2>&1 | tee lint-report.txt
+          pnpm run lint 2>&1 | tee "lint-report.txt"
+          pnpm run lint:types 2>&1 | tee "lint-report.txt"
 
       - name: Check for errors or warnings in report
         id: lint_check
         run: |
           upload_report=false
-          if grep -E '[1-9][0-9]* errors)?' lint-report.txt; then
+          if grep -E '[1-9][0-9]* errors)?' "lint-report.txt"; then
             echo "errors_found=true" >> $GITHUB_OUTPUT
             upload_report=true
           else
             echo "errors_found=false" >> $GITHUB_OUTPUT
           fi
-          if grep -q 'warning' lint-report.txt; then
+          if grep -q 'warning' "lint-report.txt"; then
             upload_report=true
           fi
           echo "upload_report=$upload_report" >> $GITHUB_OUTPUT
