@@ -46,7 +46,6 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@types/node": "^22.15.32"
   },
   "dependencies": {
     "@ag-utils/common": "workspace:*",

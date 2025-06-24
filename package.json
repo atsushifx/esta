@@ -14,7 +14,7 @@
     "typescript",
     "monorepo"
   ],
-  "packageManager": "pnpm@10.12.1",
+  "packageManager": "pnpm@10.12.3",
   "devDependencies": {
     "@commitlint/config-conventional": "^19.8.1",
     "@commitlint/types": "^19.8.1",
@@ -23,8 +23,8 @@
     "@secretlint/secretlint-rule-preset-recommend": "^9.3.4",
     "@textlint/types": "^14.8.4",
     "@types/node": "^22.15.32",
-    "@typescript-eslint/eslint-plugin": "^8.34.1",
-    "@typescript-eslint/parser": "^8.34.1",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
     "cspell": "^8.19.4",
     "eslint": "^9.29.0",
     "eslint-import-resolver-typescript": "^4.4.3",
