@@ -10,19 +10,19 @@
   "types": "./lib/index.d.ts",
   "exports": {
     ".": {
+      "types": "./lib/index.d.ts",
       "import": "./lib/index.js",
-      "require": "./lib/index.js",
-      "types": "./lib/index.d.ts"
+      "require": "./lib/index.js"
     },
     "./constants": {
+      "types": "./lib/constants/index.d.ts",
       "import": "./lib/constants/index.js",
-      "require": "./lib/constants/index.js",
-      "types": "./lib/constants/index.d.ts"
+      "require": "./lib/constants/index.js"
     },
     "./types": {
+      "types": "./lib/types/index.d.ts",
       "import": "./lib/types/index.js",
-      "require": "./lib/types/index.js",
-      "types": "./lib/types/index.d.ts"
+      "require": "./lib/types/index.js"
     }
   },
   "scripts": {
