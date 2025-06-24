@@ -28,8 +28,8 @@ export default mergeConfig(baseConfig, {
       'tests/**/*.spec.ts',
     ],
     caches: {
-      dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/ci/')
-    }
+      dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/ci/'),
+    },
   },
   resolve: {
     alias: {
