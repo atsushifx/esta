@@ -29,7 +29,7 @@ export default mergeConfig(baseConfig, {
       'tests/**/*.test.ts',
       'tests/**/*.spec.ts',
     ],
-    cache: {
+    caches: {
       dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/ci/'),
     },
   },
