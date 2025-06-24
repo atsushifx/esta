@@ -6,13 +6,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// libs
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-
 // vitest
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 // types
 import { SearchConfigFileType } from '@shared/types/common.types';
@@ -20,48 +15,30 @@ import { SearchConfigFileType } from '@shared/types/common.types';
 // test unit
 import { loadConfig } from '@/loadConfig';
 
+// test framework
+import { type ConfigFileSpec, testFramework, type TestScenario } from './FileIoFramework';
+
 describe('loadConfig E2E', () => {
-  let tempDir: string;
-  let configDir: string;
-  let originalXdgConfigHome: string | undefined;
-
-  beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'config-loader-test-'));
-    configDir = path.join(tempDir, 'testapp');
-    fs.mkdirSync(configDir, { recursive: true });
-
-    // XDG_CONFIG_HOME環境変数を設定してconfigDirを検索対象にする
-    originalXdgConfigHome = process.env.XDG_CONFIG_HOME;
-    process.env.XDG_CONFIG_HOME = tempDir;
-  });
-
-  afterEach(() => {
-    if (fs.existsSync(tempDir)) {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    }
-
-    // 環境変数を元に戻す
-    if (originalXdgConfigHome !== undefined) {
-      process.env.XDG_CONFIG_HOME = originalXdgConfigHome;
-    } else {
-      delete process.env.XDG_CONFIG_HOME;
-    }
-  });
-
   it('loads JSON config file', () => {
-    const configPath = path.join(configDir, 'myapp.json');
     const configData = { name: 'Test App', version: '1.0.0', debug: true };
+    const configFiles: ConfigFileSpec[] = [
+      { filename: 'myapp.json', content: configData, format: 'json' },
+    ];
 
-    fs.writeFileSync(configPath, JSON.stringify(configData, null, 2));
-
-    const result = loadConfig<typeof configData>('myapp', 'testapp');
+    const result = testFramework.executeTest(
+      'json-test',
+      'testApp',
+      configFiles,
+      loadConfig<typeof configData>,
+      'myapp',
+      'testApp',
+    );
 
     expect(result).toEqual(configData);
   });
 
   it('loads YAML config file', () => {
-    const configPath = path.join(configDir, 'myapp.yaml');
-    const configData = `
+    const yamlContent = `
 name: Test App
 version: 1.0.0
 debug: true
@@ -69,10 +46,18 @@ features:
   - auth
   - logging
 `;
+    const configFiles: ConfigFileSpec[] = [
+      { filename: 'myapp.yaml', content: yamlContent, format: 'yaml' },
+    ];
 
-    fs.writeFileSync(configPath, configData);
-
-    const result = loadConfig('myapp', 'testapp');
+    const result = testFramework.executeTest(
+      'yaml-test',
+      'testApp',
+      configFiles,
+      loadConfig,
+      'myapp',
+      'testApp',
+    );
 
     expect(result).toEqual({
       name: 'Test App',
@@ -83,8 +68,7 @@ features:
   });
 
   it('loads JSONC config file with comments', () => {
-    const configPath = path.join(configDir, 'myapp.jsonc');
-    const configData = `{
+    const jsoncContent = `{
   // Application configuration
   "name": "Test App",
   "version": "1.0.0",
@@ -92,10 +76,18 @@ features:
      for debug flag */
   "debug": true
 }`;
+    const configFiles: ConfigFileSpec[] = [
+      { filename: 'myapp.jsonc', content: jsoncContent, format: 'jsonc' },
+    ];
 
-    fs.writeFileSync(configPath, configData);
-
-    const result = loadConfig('myapp', 'testapp');
+    const result = testFramework.executeTest(
+      'jsonc-test',
+      'testApp',
+      configFiles,
+      loadConfig,
+      'myapp',
+      'testApp',
+    );
 
     expect(result).toEqual({
       name: 'Test App',
@@ -105,8 +97,7 @@ features:
   });
 
   it('loads TypeScript config file', () => {
-    const configPath = path.join(configDir, 'myapp.ts');
-    const configData = `export default {
+    const tsContent = `export default {
   name: 'Test App',
   version: '1.0.0',
   debug: true,
@@ -115,10 +106,18 @@ features:
     port: 5432
   }
 };`;
+    const configFiles: ConfigFileSpec[] = [
+      { filename: 'myapp.ts', content: tsContent, format: 'ts' },
+    ];
 
-    fs.writeFileSync(configPath, configData);
-
-    const result = loadConfig('myapp', 'testapp');
+    const result = testFramework.executeTest(
+      'ts-test',
+      'testApp',
+      configFiles,
+      loadConfig,
+      'myapp',
+      'testApp',
+    );
 
     expect(result).toEqual({
       name: 'Test App',
@@ -132,81 +131,161 @@ features:
   });
 
   it('loads config with dot prefix', () => {
-    const configPath = path.join(configDir, '.myapp.json');
     const configData = { hidden: true, name: 'Hidden Config' };
+    const configFiles: ConfigFileSpec[] = [
+      { filename: '.myapp.json', content: configData, format: 'json' },
+    ];
 
-    fs.writeFileSync(configPath, JSON.stringify(configData));
-
-    const result = loadConfig('myapp', 'testapp');
+    const result = testFramework.executeTest(
+      'dot-prefix-test',
+      'testApp',
+      configFiles,
+      loadConfig,
+      'myapp',
+      'testApp',
+    );
 
     expect(result).toEqual(configData);
   });
 
   it('prioritizes files without dot prefix over files with dot prefix', () => {
-    const configPath1 = path.join(configDir, 'myapp.json');
-    const configPath2 = path.join(configDir, '.myapp.json');
-    const configData1 = { priority: 'normal', name: 'Normal Config' };
-    const configData2 = { priority: 'hidden', name: 'Hidden Config' };
+    const normalConfigData = { priority: 'normal', name: 'Normal Config' };
+    const hiddenConfigData = { priority: 'hidden', name: 'Hidden Config' };
+    const configFiles: ConfigFileSpec[] = [
+      { filename: 'myapp.json', content: normalConfigData, format: 'json' },
+      { filename: '.myapp.json', content: hiddenConfigData, format: 'json' },
+    ];
 
-    fs.writeFileSync(configPath1, JSON.stringify(configData1));
-    fs.writeFileSync(configPath2, JSON.stringify(configData2));
+    const result = testFramework.executeTest(
+      'priority-test',
+      'testApp',
+      configFiles,
+      loadConfig,
+      'myapp',
+      'testApp',
+    );
 
-    const result = loadConfig('myapp', 'testapp');
-
-    expect(result).toEqual(configData1);
+    expect(result).toEqual(normalConfigData);
   });
 
   it('throws error when config file not found', () => {
+    const configFiles: ConfigFileSpec[] = [];
+
     expect(() => {
-      loadConfig('nonexistent', 'testapp');
+      testFramework.executeTest(
+        'not-found-test',
+        'testApp',
+        configFiles,
+        loadConfig,
+        'nonexistent',
+        'testApp',
+      );
     }).toThrow('Config file not found.');
   });
 
   it('uses current working directory as default', () => {
-    // テスト用のホームディレクトリ設定ファイルを作成
-    const configPath = path.join(tempDir, 'testconfig', 'testconfig.json');
     const configData = { test: true };
+    const configFiles: ConfigFileSpec[] = [
+      { filename: 'testConfig.json', content: configData, format: 'json' },
+    ];
 
-    fs.mkdirSync(path.dirname(configPath), { recursive: true });
-    fs.writeFileSync(configPath, JSON.stringify(configData));
+    const result = testFramework.executeTest(
+      'cwd-test',
+      'testConfig',
+      configFiles,
+      loadConfig,
+      'testConfig',
+      'testConfig',
+    );
 
-    const result = loadConfig('testconfig', 'testconfig');
     expect(result).toEqual(configData);
   });
 
   describe('SearchConfigFileType tests', () => {
     it('loads config with USER search type (default)', () => {
-      const configPath = path.join(configDir, 'userapp.json');
       const configData = { type: 'user', name: 'User Config' };
+      const configFiles: ConfigFileSpec[] = [
+        { filename: 'userApp.json', content: configData, format: 'json' },
+      ];
 
-      fs.writeFileSync(configPath, JSON.stringify(configData));
-
-      const result = loadConfig('userapp', 'testapp', SearchConfigFileType.USER);
+      const result = testFramework.executeTest(
+        'user-type-test',
+        'testApp',
+        configFiles,
+        loadConfig,
+        'userApp',
+        'testApp',
+        SearchConfigFileType.USER,
+      );
 
       expect(result).toEqual(configData);
     });
 
     it('loads config with SYSTEM search type', () => {
-      const configPath = path.join(configDir, 'systemapp.json');
       const configData = { type: 'system', name: 'System Config' };
+      const configFiles: ConfigFileSpec[] = [
+        { filename: 'systemApp.json', content: configData, format: 'json' },
+      ];
 
-      fs.writeFileSync(configPath, JSON.stringify(configData));
-
-      const result = loadConfig('systemapp', 'testapp', SearchConfigFileType.SYSTEM);
+      const result = testFramework.executeTest(
+        'system-type-test',
+        'testApp',
+        configFiles,
+        loadConfig,
+        'systemApp',
+        'testApp',
+        SearchConfigFileType.SYSTEM,
+      );
 
       expect(result).toEqual(configData);
     });
 
     it('defaults to USER search type when not specified', () => {
-      const configPath = path.join(configDir, 'defaultapp.json');
       const configData = { type: 'default', name: 'Default Config' };
+      const configFiles: ConfigFileSpec[] = [
+        { filename: 'defaultApp.json', content: configData, format: 'json' },
+      ];
 
-      fs.writeFileSync(configPath, JSON.stringify(configData));
-
-      // SearchConfigFileTypeを指定しない場合、デフォルトでUSERが使用される
-      const result = loadConfig('defaultapp', 'testapp');
+      const result = testFramework.executeTest(
+        'default-type-test',
+        'testApp',
+        configFiles,
+        loadConfig,
+        'defaultApp',
+        'testApp',
+      );
 
       expect(result).toEqual(configData);
+    });
+  });
+
+  describe('Parameterized tests example', () => {
+    it('runs multiple config format tests', () => {
+      const scenarios: TestScenario[] = [
+        {
+          description: 'JSON format',
+          configFiles: [{ filename: 'app.json', content: { format: 'json' }, format: 'json' }],
+          functionArgs: ['app', 'testApp'],
+          expectedResult: { format: 'json' },
+        },
+        {
+          description: 'YAML format',
+          configFiles: [{ filename: 'app.yaml', content: 'format: yaml', format: 'yaml' }],
+          functionArgs: ['app', 'testApp'],
+          expectedResult: { format: 'yaml' },
+        },
+      ];
+
+      const results = testFramework.runParameterizedTests(
+        'multi-format-test',
+        'testApp',
+        scenarios,
+        loadConfig,
+      );
+
+      results.forEach(({ scenario, result }) => {
+        expect(result).toEqual(scenario.expectedResult);
+      });
     });
   });
 });
