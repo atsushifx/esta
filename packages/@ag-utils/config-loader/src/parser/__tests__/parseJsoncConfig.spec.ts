@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 
 // test unit
-import { parseJsoncConfig } from '../parseConfig';
+import { parseJsoncConfig } from '../parseWithModule';
 
 // types
 

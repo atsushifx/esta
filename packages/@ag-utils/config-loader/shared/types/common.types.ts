@@ -12,4 +12,18 @@ export enum SearchConfigFileType {
   SYSTEM = 'system',
 }
 
+/**
+ * サポートされる設定ファイルの拡張子
+ */
+export const CONFIG_FILE_EXTENSIONS = {
+  JSON: 'json',
+  JSONC: 'jsonc',
+  YML: 'yml',
+  YAML: 'yaml',
+  JS: 'js',
+  TS: 'ts',
+} as const;
+
+export type ConfigFileExtension = typeof CONFIG_FILE_EXTENSIONS[keyof typeof CONFIG_FILE_EXTENSIONS];
+
 // --  type / interface definition
