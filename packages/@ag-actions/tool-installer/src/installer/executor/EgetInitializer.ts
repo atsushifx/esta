@@ -22,7 +22,7 @@ import { commandExist } from '@ag-utils/common';
 // constants
 
 // internal libs
-import { prepareInstallDirectory } from '@/utils/prepareInstallDirectory';
+import { prepareInstallDirectory } from '../../utils/prepareInstallDirectory';
 
 // routine
 const run = promisify(exec);

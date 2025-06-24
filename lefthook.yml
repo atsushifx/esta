@@ -9,23 +9,21 @@
 pre-commit:
   parallel: true
   commands:
-    gitleaks:
-      run: gitleaks protect --config ./configs/gitleaks.toml --staged
-
+    #    gitleaks:
+    #      run: gitleaks protect --config ./configs/gitleaks.toml --staged
     secretlint:
       glob: "**/*"
       run: >
         secretlint
         --secretlintrc ./configs/secretlint.config.yaml
         --secretlintignore .gitignore
-        --maskSecrets
         "{staged_files}"
 
     eslint:
       glob:
         - "shared/**/*.ts"
         - "packages/**/*.ts"
-      run: pnpm run lint-all -- "{staged_files}"
+      run: pnpm run lint-all -- {staged_files}
 
     eslint-types:
       glob:

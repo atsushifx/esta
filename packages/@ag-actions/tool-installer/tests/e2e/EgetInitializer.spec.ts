@@ -20,7 +20,7 @@ import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/
 import { commandExist } from '@ag-utils/common';
 
 // test unit
-import { EgetInitializer } from '@/installer/executor/EgetInitializer';
+import { EgetInitializer } from '../../src/installer/executor/EgetInitializer';
 
 // types
 
