@@ -45,9 +45,12 @@
     "pnpm": ">=10",
     "node": ">=20"
   },
+  "devDependencies": {
+    "@types/node": "^22.15.32"
+  },
   "dependencies": {
     "@ag-utils/common": "workspace:*",
-    "comment-json": "^4.2.5"
-  },
-  "devDependencies": {}
+    "comment-json": "^4.2.5",
+    "yaml": "^2.8.0"
+  }
 }
