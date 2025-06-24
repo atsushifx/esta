@@ -7,7 +7,7 @@
 # https://opensource.org/licenses/MIT
 
 ls:
-  .dir: kebab-case
+  .dir: kebab-case | regex:^.[aa-z]+$
   .ts: kebab-case
   .types.ts: camelCase
   .class.ts: PascalCase
