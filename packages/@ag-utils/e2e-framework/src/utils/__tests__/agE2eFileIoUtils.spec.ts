@@ -15,7 +15,14 @@ import * as path from 'path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 // test target
-import { createDirectory, fileExists, readFile, writeExpectedResult, writeFile } from '../agE2eFileIoUtils';
+import {
+  createDirectory,
+  fileExists,
+  readFile,
+  readFileTyped,
+  writeExpectedResult,
+  writeFile,
+} from '../agE2eFileIoUtils';
 
 describe('createDirectory', () => {
   let tempDir: string;
@@ -102,11 +109,11 @@ describe('writeFile', () => {
     expect(JSON.parse(writtenContent)).toEqual(content);
   });
 
-  test('writes object as JSON with jsonc format', () => {
-    const filePath = path.join(tempDir, 'test.jsonc');
+  test('writes object as JSON with json format (unified)', () => {
+    const filePath = path.join(tempDir, 'test.json');
     const content = { test: true };
 
-    writeFile(filePath, content, 'jsonc');
+    writeFile(filePath, content, 'json');
 
     expect(fs.existsSync(filePath)).toBe(true);
     const writtenContent = fs.readFileSync(filePath, 'utf8');
@@ -124,15 +131,37 @@ describe('writeFile', () => {
     expect(JSON.parse(writtenContent)).toEqual(content);
   });
 
-  test('writes object as TypeScript export with ts format', () => {
+  test('writes object as TypeScript export with typescript format', () => {
     const filePath = path.join(tempDir, 'test.ts');
     const content = { key: 'value' };
 
-    writeFile(filePath, content, 'ts');
+    writeFile(filePath, content, 'typescript');
 
     expect(fs.existsSync(filePath)).toBe(true);
     const writtenContent = fs.readFileSync(filePath, 'utf8');
     expect(writtenContent).toBe(`export default ${JSON.stringify(content, null, 2)};`);
+  });
+
+  test('writes string content as markdown format', () => {
+    const filePath = path.join(tempDir, 'test.md');
+    const content = '# Test Markdown\n\nThis is a test.';
+
+    writeFile(filePath, content, 'markdown');
+
+    expect(fs.existsSync(filePath)).toBe(true);
+    const writtenContent = fs.readFileSync(filePath, 'utf8');
+    expect(writtenContent).toBe(content);
+  });
+
+  test('writes string content as text format', () => {
+    const filePath = path.join(tempDir, 'test.txt');
+    const content = 'Plain text content';
+
+    writeFile(filePath, content, 'text');
+
+    expect(fs.existsSync(filePath)).toBe(true);
+    const writtenContent = fs.readFileSync(filePath, 'utf8');
+    expect(writtenContent).toBe(content);
   });
 });
 
@@ -163,6 +192,47 @@ describe('readFile', () => {
     const nonExistentPath = path.join(tempDir, 'non-existent.txt');
 
     expect(() => readFile(nonExistentPath)).toThrow();
+  });
+});
+
+describe('readFileTyped', () => {
+  let tempDir: string;
+
+  beforeEach(() => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'file-io-utils-test-'));
+  });
+
+  afterEach(() => {
+    if (fs.existsSync(tempDir)) {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('reads supported file extensions successfully', () => {
+    const supportedExtensions = ['json', 'yaml', 'ts', 'js', 'md', 'txt'];
+
+    supportedExtensions.forEach((ext) => {
+      const filePath = path.join(tempDir, `test.${ext}`);
+      const content = `Test content for ${ext}`;
+      fs.writeFileSync(filePath, content, 'utf8');
+
+      const result = readFileTyped(filePath);
+      expect(result).toBe(content);
+    });
+  });
+
+  test('throws error for unsupported file extension', () => {
+    const filePath = path.join(tempDir, 'test.unsupported');
+    fs.writeFileSync(filePath, 'content', 'utf8');
+
+    expect(() => readFileTyped(filePath)).toThrow('Unsupported file extension: unsupported');
+  });
+
+  test('throws error for file without extension', () => {
+    const filePath = path.join(tempDir, 'test');
+    fs.writeFileSync(filePath, 'content', 'utf8');
+
+    expect(() => readFileTyped(filePath)).toThrow('Unsupported file extension: ');
   });
 });
 

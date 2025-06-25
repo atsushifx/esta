@@ -14,10 +14,9 @@ import * as path from 'path';
 // file io utils
 import { createDirectory, fileExists, readFile, writeExpectedResult, writeFile } from './utils/agE2eFileIoUtils';
 
+// types
 import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '../shared/types/e2e-framework.types';
 import type { TestEnvironment } from './types';
-
-// types
 
 export class AgE2eFileIOFramework {
   private environments: Map<string, TestEnvironment> = new Map();

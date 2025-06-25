@@ -8,6 +8,10 @@
 
 // lib
 import * as fs from 'fs';
+import * as path from 'path';
+
+// types
+import type { AgE2eFileExtension, AgE2eFileFormat } from '../../shared/types/e2e-framework.types';
 
 /**
  * ディレクトリ作成
@@ -19,7 +23,11 @@ export const createDirectory = (dirPath: string): void => {
 /**
  * ファイル書き込み
  */
-export const writeFile = (filePath: string, content: string | Record<string, unknown>, format?: string): void => {
+export const writeFile = (
+  filePath: string,
+  content: string | Record<string, unknown>,
+  format?: AgE2eFileFormat,
+): void => {
   let fileContent: string;
 
   if (typeof content === 'string') {
@@ -27,14 +35,19 @@ export const writeFile = (filePath: string, content: string | Record<string, unk
   } else {
     switch (format) {
       case 'json':
-      case 'jsonc':
         fileContent = JSON.stringify(content, null, 2);
         break;
       case 'yaml':
-        fileContent = JSON.stringify(content, null, 2);
+        fileContent = JSON.stringify(content, null, 2); // TODO: Implement proper YAML serialization
         break;
-      case 'ts':
+      case 'typescript':
         fileContent = `export default ${JSON.stringify(content, null, 2)};`;
+        break;
+      case 'markdown':
+        fileContent = typeof content === 'object' ? JSON.stringify(content, null, 2) : String(content);
+        break;
+      case 'text':
+        fileContent = typeof content === 'object' ? JSON.stringify(content, null, 2) : String(content);
         break;
       default:
         fileContent = JSON.stringify(content, null, 2);
@@ -48,6 +61,21 @@ export const writeFile = (filePath: string, content: string | Record<string, unk
  * ファイル読み込み
  */
 export const readFile = (filePath: string): string => {
+  return fs.readFileSync(filePath, 'utf8');
+};
+
+/**
+ * 型安全なファイル読み込み（拡張子チェック付き）
+ */
+export const readFileTyped = (filePath: string): string => {
+  const ext = path.extname(filePath).slice(1) as AgE2eFileExtension;
+
+  // サポートされる拡張子かチェック
+  const supportedExtensions: AgE2eFileExtension[] = ['json', 'jsonc', 'yaml', 'ts', 'js', 'md', 'txt'];
+  if (!supportedExtensions.includes(ext)) {
+    throw new Error(`Unsupported file extension: ${ext}. Supported extensions: ${supportedExtensions.join(', ')}`);
+  }
+
   return fs.readFileSync(filePath, 'utf8');
 };
 
