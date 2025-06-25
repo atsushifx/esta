@@ -7,12 +7,35 @@
 // https://opensource.org/licenses/MIT
 
 /**
+ * ファイル拡張子と形式の対応表
+ */
+export const AG_E2E_FILE_FORMAT_MAP = {
+  json: 'json',
+  jsonc: 'json',
+  yaml: 'yaml',
+  ts: 'typescript',
+  js: 'typescript',
+  md: 'markdown',
+  txt: 'text',
+} as const;
+
+/**
+ * サポートされるファイル拡張子の型
+ */
+export type AgE2eFileExtension = keyof typeof AG_E2E_FILE_FORMAT_MAP;
+
+/**
+ * サポートされるファイル形式の型
+ */
+export type AgE2eFileFormat = typeof AG_E2E_FILE_FORMAT_MAP[AgE2eFileExtension];
+
+/**
  * E2Eテストで使用する設定ファイルの仕様
  */
 export type AgE2eConfigFileSpec = {
   filename: string;
   content: string | Record<string, unknown>;
-  format?: 'json' | 'yaml' | 'jsonc' | 'ts';
+  format?: AgE2eFileFormat;
 };
 
 /**

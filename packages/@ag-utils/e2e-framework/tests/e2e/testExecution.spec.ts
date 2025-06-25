@@ -35,7 +35,7 @@ describe('E2E Test Execution Workflow', () => {
     test('executes full workflow: setup → config creation → test execution → cleanup', () => {
       const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'app.json', content: { name: 'test-app', version: '1.0.0' }, format: 'json' },
-        { filename: 'settings.ts', content: { debug: true, port: 3000 }, format: 'ts' },
+        { filename: 'settings.ts', content: { debug: true, port: 3000 }, format: 'typescript' },
       ];
 
       const mockConfigLoader = (configPath: string): Record<string, unknown> => {
@@ -126,7 +126,7 @@ describe('E2E Test Execution Workflow', () => {
         {
           description: 'TypeScript configuration export',
           configFiles: [
-            { filename: 'config.ts', content: { database: { host: 'localhost', port: 5432 } }, format: 'ts' },
+            { filename: 'config.ts', content: { database: { host: 'localhost', port: 5432 } }, format: 'typescript' },
           ],
           functionArgs: ['typescript'],
           expectedResult: { database: { host: 'localhost', port: 5432 } },
@@ -275,6 +275,97 @@ db.name=test_database
         framework.cleanupEnvironment(testId);
       }
     });
+
+    test('compareWithFileContent returns true for matching JSON content', () => {
+      const env = framework.setupEnvironment(testId, 'json-comparison-test');
+      try {
+        const filePath = path.join(env.configDir, 'expected.json');
+        const expectedContent = { name: 'test', value: 42 };
+        fs.writeFileSync(filePath, JSON.stringify(expectedContent, null, 2));
+
+        const result = framework.compareWithFileContent(expectedContent, filePath);
+
+        expect(result).toBe(true);
+      } finally {
+        framework.cleanupEnvironment(testId);
+      }
+    });
+
+    test('compareWithFileContent returns true for matching string content', () => {
+      const env = framework.setupEnvironment(testId, 'string-comparison-test');
+      try {
+        const filePath = path.join(env.configDir, 'expected.txt');
+        const expectedContent = 'test string';
+        fs.writeFileSync(filePath, expectedContent);
+
+        const result = framework.compareWithFileContent(expectedContent, filePath);
+
+        expect(result).toBe(true);
+      } finally {
+        framework.cleanupEnvironment(testId);
+      }
+    });
+
+    test('compareWithFileContent returns false for non-matching content', () => {
+      const env = framework.setupEnvironment(testId, 'mismatch-test');
+      try {
+        const filePath = path.join(env.configDir, 'expected.json');
+        const fileContent = { name: 'test', value: 42 };
+        const testContent = { name: 'different', value: 99 };
+        fs.writeFileSync(filePath, JSON.stringify(fileContent, null, 2));
+
+        const result = framework.compareWithFileContent(testContent, filePath);
+
+        expect(result).toBe(false);
+      } finally {
+        framework.cleanupEnvironment(testId);
+      }
+    });
+
+    test('compareWithFileContent returns false for non-existent file', () => {
+      const env = framework.setupEnvironment(testId, 'nonexistent-test');
+      try {
+        const filePath = path.join(env.configDir, 'non-existent.json');
+        const testContent = { name: 'test' };
+
+        const result = framework.compareWithFileContent(testContent, filePath);
+
+        expect(result).toBe(false);
+      } finally {
+        framework.cleanupEnvironment(testId);
+      }
+    });
+
+    test('writeExpectedResult writes string content', () => {
+      const env = framework.setupEnvironment(testId, 'write-string-test');
+      try {
+        const filePath = path.join(env.configDir, 'expected.txt');
+        const content = 'expected result';
+
+        framework.writeExpectedResult(content, filePath);
+
+        expect(fs.existsSync(filePath)).toBe(true);
+        expect(fs.readFileSync(filePath, 'utf8')).toBe(content);
+      } finally {
+        framework.cleanupEnvironment(testId);
+      }
+    });
+
+    test('writeExpectedResult writes JSON content', () => {
+      const env = framework.setupEnvironment(testId, 'write-json-test');
+      try {
+        const filePath = path.join(env.configDir, 'expected.json');
+        const content = { name: 'test', value: 42 };
+
+        framework.writeExpectedResult(content, filePath);
+
+        expect(fs.existsSync(filePath)).toBe(true);
+        const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        expect(fileContent).toEqual(content);
+      } finally {
+        framework.cleanupEnvironment(testId);
+      }
+    });
   });
 
   describe('Environment Integration', () => {
@@ -295,6 +386,97 @@ db.name=test_database
 
       // Verify XDG_CONFIG_HOME is restored after cleanup
       expect(process.env.XDG_CONFIG_HOME).toBe(originalXdgConfigHome);
+    });
+
+    test('setupEnvironment creates temporary directory and sets XDG_CONFIG_HOME', () => {
+      const configDirName = 'test-config';
+      const originalXdgConfigHome = process.env.XDG_CONFIG_HOME;
+
+      const env = framework.setupEnvironment(testId, configDirName);
+
+      expect(env.tempDir).toBeTruthy();
+      expect(fs.existsSync(env.tempDir)).toBe(true);
+      expect(env.configDir).toBe(path.join(env.tempDir, configDirName));
+      expect(fs.existsSync(env.configDir)).toBe(true);
+      expect(env.originalXdgConfigHome).toBe(originalXdgConfigHome);
+      expect(process.env.XDG_CONFIG_HOME).toBe(env.tempDir);
+    });
+
+    test('cleanupEnvironment removes temporary directory and restores XDG_CONFIG_HOME', () => {
+      const configDirName = 'test-config';
+      const originalXdgConfigHome = process.env.XDG_CONFIG_HOME;
+
+      const env = framework.setupEnvironment(testId, configDirName);
+      const tempDir = env.tempDir;
+
+      expect(fs.existsSync(tempDir)).toBe(true);
+
+      framework.cleanupEnvironment(testId);
+
+      expect(fs.existsSync(tempDir)).toBe(false);
+      expect(process.env.XDG_CONFIG_HOME).toBe(originalXdgConfigHome);
+    });
+
+    test('cleanupEnvironment handles non-existent environment gracefully', () => {
+      expect(() => framework.cleanupEnvironment('non-existent-id')).not.toThrow();
+    });
+  });
+
+  describe('Config File Management E2E', () => {
+    test('createConfigFile creates file with string content', () => {
+      const env = framework.setupEnvironment(testId, 'config-string-test');
+      try {
+        const spec = {
+          filename: 'test.txt',
+          content: 'test content',
+        };
+
+        const filePath = framework.createConfigFile(env, spec);
+
+        expect(filePath).toBe(path.join(env.configDir, spec.filename));
+        expect(fs.existsSync(filePath)).toBe(true);
+        expect(fs.readFileSync(filePath, 'utf8')).toBe(spec.content);
+      } finally {
+        framework.cleanupEnvironment(testId);
+      }
+    });
+
+    test('createConfigFile creates JSON file with object content', () => {
+      const env = framework.setupEnvironment(testId, 'config-json-test');
+      try {
+        const spec = {
+          filename: 'config.json',
+          content: { name: 'test', value: 42 },
+          format: 'json' as const,
+        };
+
+        const filePath = framework.createConfigFile(env, spec);
+
+        expect(fs.existsSync(filePath)).toBe(true);
+        const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        expect(fileContent).toEqual(spec.content);
+      } finally {
+        framework.cleanupEnvironment(testId);
+      }
+    });
+
+    test('createConfigFiles creates multiple files', () => {
+      const env = framework.setupEnvironment(testId, 'config-multiple-test');
+      try {
+        const specs = [
+          { filename: 'config1.json', content: { a: 1 }, format: 'json' as const },
+          { filename: 'config2.txt', content: 'text content' },
+        ];
+
+        const filePaths = framework.createConfigFiles(env, specs);
+
+        expect(filePaths).toHaveLength(2);
+        filePaths.forEach((filePath) => {
+          expect(fs.existsSync(filePath)).toBe(true);
+        });
+      } finally {
+        framework.cleanupEnvironment(testId);
+      }
     });
   });
 });
