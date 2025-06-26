@@ -1,16 +1,10 @@
 ## src: ./.gitignore
 ## @(#) : gitignore for textlint filter (skip-frontmatter)
 #
-# @version	1.0.0
-# @author   atsushifx <https://github.com/atsushifx/>
-# @since    2025-05-14
+# Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 #
-# @description<<
-#
-# Git ignore rules for development template
-# Includes OS Specific  files, VSCode, general(logs, patch, ...)
-#
-#<<
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
 
 ##		General
 #	OS specific files
@@ -22,11 +16,15 @@ thumbs.db
 *.diff
 *.patch
 
-# 	history, cache
+# history, cache
 .history/
 .cache/
 **/*cache
 
+# env
+.env
+.env.key*
+.env*
 
 #	backup/swap/temp
 $~*
@@ -35,7 +33,6 @@ $~*
 *tmp
 *swp
 *lock
-**/temp/
 
 ##		Editor
 #	VSCode
@@ -46,16 +43,8 @@ $~*
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 !.vscode/cspell*
-!.vscode/*.md
 
-###	AI Agent
-.claude/*
-!.claude/commands
-!.claude/commands/*
-
-
-
-### Develop
+###	Develop
 # Node
 # Node.js / JS project ignores
 # Output directory

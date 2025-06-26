@@ -60,39 +60,7 @@ export default [
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'import/no-unresolved': 'error',
-      'import/order': ['warn', {
-        'groups': [
-          'builtin',
-          'external',
-          'internal',
-          ['parent', 'sibling', 'index'],
-          'object',
-          'type',
-        ],
-        pathGroups: [
-          {
-            pattern: '@shared/**',
-            group: 'internal',
-            position: 'before',
-          },
-          {
-            pattern: '@ag-utils/**',
-            group: 'internal',
-            position: 'before',
-          },
-          {
-            pattern: '@/**',
-            group: 'internal',
-            position: 'after',
-          },
-        ],
-        pathGroupsExcludedImportTypes: ['builtin'],
-        'newlines-between': 'always',
-        'alphabetize': {
-          'order': 'asc',
-          'caseInsensitive': true,
-        },
-      }],
+      'import/order': 'off',
       'func-style': ['error', 'expression'],
     },
     settings: {
