@@ -1,5 +1,5 @@
 // src: ./tests/e2e/FileIOFramework.ts
-// @(#): ファイルI/Oテストフレームワーク - パラメータ化されたファイル操作
+// @(#): File I/O Test Framework - Parameterized File Operations
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -25,8 +25,12 @@ import {
   writeFileSync,
 } from './utils/agE2eFileIoUtils';
 
-// types
-
+/**
+ * Main class for E2E File I/O testing framework.
+ * Provides methods to setup isolated test environments,
+ * manage configuration files, execute parameterized tests,
+ * and perform file operations with convenience utilities.
+ */
 export class AgE2eFileIOFramework {
   private environments: Map<string, TestEnvironment> = new Map();
 
@@ -34,6 +38,11 @@ export class AgE2eFileIOFramework {
   // PRIVATE HELPER METHODS
   // ---------------------------------------------------------------------------
 
+  /**
+   * Restores the original XDG_CONFIG_HOME environment variable after a test.
+   *
+   * @param originalXdgConfigHome - The original XDG_CONFIG_HOME value or undefined if not set.
+   */
   private _restoreEnvironmentVariables(originalXdgConfigHome: string | undefined): void {
     if (originalXdgConfigHome !== undefined) {
       process.env.XDG_CONFIG_HOME = originalXdgConfigHome;
@@ -42,6 +51,13 @@ export class AgE2eFileIOFramework {
     }
   }
 
+  /**
+   * Parses the expected result content, attempting JSON parse,
+   * otherwise returns the raw string.
+   *
+   * @param content - The content string to parse.
+   * @returns Parsed object or original string if parse fails.
+   */
   private _parseExpectedResult(content: string): unknown {
     try {
       return JSON.parse(content);
@@ -54,6 +70,15 @@ export class AgE2eFileIOFramework {
   // PUBLIC API - ENVIRONMENT MANAGEMENT
   // ---------------------------------------------------------------------------
 
+  /**
+   * Sets up a temporary isolated environment for a test case.
+   * Creates a temporary directory and configuration subdirectory,
+   * and sets environment variables accordingly.
+   *
+   * @param testId - Unique identifier for the test.
+   * @param configDirName - Name for the config directory inside temp directory.
+   * @returns The created TestEnvironment object.
+   */
   setupEnvironment(testId: string, configDirName: string): TestEnvironment {
     const tempDir = createTempDirectory('config-loader-test-');
     const configDir = path.join(tempDir, configDirName);
@@ -73,6 +98,12 @@ export class AgE2eFileIOFramework {
     return env;
   }
 
+  /**
+   * Cleans up the environment for a given test ID.
+   * Removes temporary directories and restores environment variables.
+   *
+   * @param testId - The test ID whose environment to clean up.
+   */
   async cleanupEnvironment(testId: string): Promise<void> {
     const env = this.environments.get(testId);
     if (!env) { return; }
@@ -86,6 +117,13 @@ export class AgE2eFileIOFramework {
   // PUBLIC API - CONFIG FILE OPERATIONS
   // ---------------------------------------------------------------------------
 
+  /**
+   * Creates a configuration file in the test environment.
+   *
+   * @param env - The test environment.
+   * @param spec - Specification of the config file to create.
+   * @returns The full file path of the created file.
+   */
   createConfigFile(env: TestEnvironment, spec: AgE2eConfigFileSpec): string {
     const filePath = path.join(env.configDir, spec.filename);
 
@@ -98,6 +136,13 @@ export class AgE2eFileIOFramework {
     return filePath;
   }
 
+  /**
+   * Creates multiple configuration files from specs.
+   *
+   * @param env - The test environment.
+   * @param specs - Array of config file specifications.
+   * @returns Array of created file paths.
+   */
   createConfigFiles(env: TestEnvironment, specs: AgE2eConfigFileSpec[]): string[] {
     return specs.map((spec) => this.createConfigFile(env, spec));
   }
@@ -106,6 +151,17 @@ export class AgE2eFileIOFramework {
   // PUBLIC API - TEST EXECUTION
   // ---------------------------------------------------------------------------
 
+  /**
+   * Executes a test function within a temporary environment.
+   * Sets up environment, creates config files, executes test, and cleans up.
+   *
+   * @param testId - Unique test identifier.
+   * @param configDirName - Config directory name inside temp environment.
+   * @param configFiles - Config files to create.
+   * @param testFunction - Test function to execute.
+   * @param functionArgs - Arguments to pass to the test function.
+   * @returns The result of the test function execution.
+   */
   executeTest<T>(
     testId: string,
     configDirName: string,
@@ -123,6 +179,15 @@ export class AgE2eFileIOFramework {
     }
   }
 
+  /**
+   * Runs multiple parameterized test scenarios.
+   *
+   * @param testId - Base test ID.
+   * @param configDirName - Config directory name.
+   * @param scenarios - Array of test scenarios.
+   * @param testFunction - Test function to run for each scenario.
+   * @returns Array of objects containing scenario and result or error.
+   */
   runParameterizedTests<T>(
     testId: string,
     configDirName: string,
@@ -150,6 +215,14 @@ export class AgE2eFileIOFramework {
   // PUBLIC API - TEST RESULT OPERATIONS
   // ---------------------------------------------------------------------------
 
+  /**
+   * Compares a test result with the content of a file.
+   * Reads and parses the expected file content, then compares JSON stringified values.
+   *
+   * @param result - The test result to compare.
+   * @param filePath - The file path containing expected content.
+   * @returns True if result matches expected content, false otherwise.
+   */
   async compareWithFileContent(result: unknown, filePath: string): Promise<boolean> {
     if (!fileExists(filePath)) {
       return false;
@@ -161,6 +234,12 @@ export class AgE2eFileIOFramework {
     return JSON.stringify(result) === JSON.stringify(expectedResult);
   }
 
+  /**
+   * Writes the expected result to a file.
+   *
+   * @param result - The expected result to write.
+   * @param filePath - The file path to write to.
+   */
   writeExpectedResult(result: unknown, filePath: string): void {
     writeExpectedResult(result, filePath);
   }
@@ -169,22 +248,51 @@ export class AgE2eFileIOFramework {
   // PUBLIC API - FILE OPERATIONS (DELEGATED)
   // ---------------------------------------------------------------------------
 
+  /**
+   * Reads a file asynchronously.
+   *
+   * @param filePath - The path of the file to read.
+   * @returns Promise resolving to file content string.
+   */
   async readFile(filePath: string): Promise<string> {
     return await readFile(filePath);
   }
 
+  /**
+   * Writes content to a file asynchronously.
+   *
+   * @param filePath - The path of the file to write.
+   * @param content - The string content to write.
+   */
   async writeFile(filePath: string, content: string): Promise<void> {
     await writeFile(filePath, content);
   }
 
+  /**
+   * Checks synchronously if a file or directory exists.
+   *
+   * @param filePath - The path to check.
+   * @returns True if exists, false otherwise.
+   */
   fileExists(filePath: string): boolean {
     return fileExists(filePath);
   }
 
+  /**
+   * Creates a temporary directory with a given prefix.
+   *
+   * @param prefix - Prefix for the temporary directory.
+   * @returns Path to the created temporary directory.
+   */
   createTempDirectory(prefix: string): string {
     return createTempDirectory(prefix);
   }
 
+  /**
+   * Removes a directory asynchronously.
+   *
+   * @param dirPath - The directory path to remove.
+   */
   async removeDirectory(dirPath: string): Promise<void> {
     await removeDirectory(dirPath);
   }

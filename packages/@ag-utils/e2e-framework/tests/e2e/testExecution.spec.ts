@@ -1,14 +1,31 @@
-// tests: ./tests/e2e/testExecution.spec.ts
-// @(#): E2Eテスト実行 - AgE2eFileIOFrameworkの完全なワークフローテスト
+// tests/e2e/testExecution.spec.ts
+// @(#): End-to-End Test Execution - Full Workflow Validation for AgE2eFileIOFramework
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// lib
+/**
+ * @fileoverview
+ * Comprehensive end-to-end test suite for the AgE2eFileIOFramework,
+ * verifying the entire lifecycle from environment setup, configuration file management,
+ * execution of parameterized test scenarios, to cleanup.
+ *
+ * This suite ensures that the framework correctly handles:
+ * - Temporary environment management
+ * - Creation and reading of config files in various formats
+ * - Parameterized scenario execution with error handling
+ * - Comparison of actual results with expected outputs
+ * - Proper environment variable restoration
+ *
+ * Test runner: Vitest
+ */
+
+// types
 import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '../../shared/types/e2e-framework.types';
 
+// lib
 import * as path from 'path';
 
 // vitest
@@ -17,6 +34,16 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 // test target
 import { AgE2eFileIOFramework } from '../../src/AgE2eFileIoFramework';
 
+/**
+ * @description
+ * Main test suite for the AgE2eFileIOFramework covering:
+ *
+ * - Setup and cleanup of isolated test environments
+ * - Creation of configuration files for testing
+ * - Execution of individual and parameterized test scenarios
+ * - Verification of test results against expected data files
+ * - Environment integration tests focusing on environment variables
+ */
 describe('E2E Test Execution Workflow', () => {
   let framework: AgE2eFileIOFramework;
   let testId: string;
