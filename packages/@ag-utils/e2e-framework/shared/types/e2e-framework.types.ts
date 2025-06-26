@@ -1,5 +1,5 @@
-// shared/types/e2e-framework.types.ts
-// @(#): E2Eフレームワーク型定義 - 外部公開用AgE2e型定義
+// src: shared/types/e2e-framework.types.ts
+// @(#): Type Definitions for E2E Framework - Public AgE2e Types
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -7,7 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 /**
- * ファイル拡張子と形式の対応表
+ * Mapping between supported file extensions and their corresponding content formats.
+ * This map is used to determine how to parse or handle files based on their extension.
  */
 export const AG_E2E_FILE_FORMAT_MAP = {
   json: 'json',
@@ -20,17 +21,23 @@ export const AG_E2E_FILE_FORMAT_MAP = {
 } as const;
 
 /**
- * サポートされるファイル拡張子の型
+ * Supported file extensions recognized by the E2E testing framework.
+ * These extensions are keys in the AG_E2E_FILE_FORMAT_MAP.
  */
 export type AgE2eFileExtension = keyof typeof AG_E2E_FILE_FORMAT_MAP;
 
 /**
- * サポートされるファイル形式の型
+ * Supported file content formats corresponding to the recognized file extensions.
+ * This type is derived from the values of AG_E2E_FILE_FORMAT_MAP.
  */
 export type AgE2eFileFormat = typeof AG_E2E_FILE_FORMAT_MAP[AgE2eFileExtension];
 
 /**
- * E2Eテストで使用する設定ファイルの仕様
+ * Specification of configuration files used within E2E tests.
+ *
+ * - `filename`: The name of the configuration file.
+ * - `content`: The raw content of the file, either as a string or an object.
+ * - `format`: Optional. The format/type of the file content, such as 'json', 'yaml', etc.
  */
 export type AgE2eConfigFileSpec = {
   filename: string;
@@ -39,7 +46,14 @@ export type AgE2eConfigFileSpec = {
 };
 
 /**
- * E2Eテストのシナリオ定義
+ * Defines an individual test scenario for E2E testing.
+ *
+ * - `description`: A human-readable summary of the test scenario.
+ * - `configFiles`: An array of configuration files to set up the test environment.
+ * - `functionArgs`: The arguments to be passed into the test function.
+ * - `expectedResult`: Optional. The expected output or result of the test.
+ * - `shouldThrow`: Optional. Indicates if the test expects an error to be thrown.
+ * - `expectedError`: Optional. A string message expected if an error is thrown.
  */
 export type AgE2eTestScenario = {
   description: string;
@@ -51,7 +65,10 @@ export type AgE2eTestScenario = {
 };
 
 /**
- * E2Eテストの実行結果
+ * Represents the result of an E2E test execution.
+ *
+ * - `scenario`: The test scenario that was executed.
+ * - `result`: The outcome of the test, either a successful result of generic type `T` or an Error instance if the test failed.
  */
 export type AgE2eTestResult<T> = {
   scenario: AgE2eTestScenario;

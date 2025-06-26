@@ -1,11 +1,10 @@
 // src: ./src/utils/__tests__/fileOperations.async.spec.ts
-// @(#): 非同期ファイル操作テスト - async/await版ファイルI/Oユーティリティのテスト
+// @(#): Async File Operations Test - async/await version file I/O utility tests
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
-
 // lib
 import * as fs from 'fs';
 import * as os from 'os';
@@ -17,6 +16,16 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 // test target
 import { readFile, readFileTyped, removeDirectory, writeFile } from '../agE2eFileIoUtils';
 
+/**
+ * Test suite for asynchronous file operations in the E2E file I/O utilities.
+ *
+ * This suite verifies the correctness and robustness of async file and directory operations,
+ * including writing files in various formats, reading files with type awareness,
+ * directory removal, and integration scenarios combining these operations.
+ *
+ * The tests use temporary directories to isolate file system effects and ensure
+ * proper cleanup after execution.
+ */
 describe('Async File Operations', () => {
   let tempDir: string;
 

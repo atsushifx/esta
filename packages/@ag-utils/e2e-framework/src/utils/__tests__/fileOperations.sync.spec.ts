@@ -1,11 +1,10 @@
 // src: ./src/utils/__tests__/fileOperations.sync.spec.ts
-// @(#): 同期ファイル操作テスト - 同期版ファイルI/Oユーティリティのテスト
+// @(#): Synchronous File Operations Test - tests for sync version of file I/O utilities
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
-
 // lib
 import * as fs from 'fs';
 import * as os from 'os';
@@ -25,6 +24,15 @@ import {
   writeFileSync,
 } from '../agE2eFileIoUtils';
 
+/**
+ * Test suite for synchronous file operations in the E2E file I/O utilities.
+ *
+ * This suite tests the correctness of synchronous file and directory operations,
+ * including directory creation, file writing/reading in multiple formats,
+ * existence checks, and directory removal.
+ *
+ * Each test runs in a temporary isolated directory to avoid side effects.
+ */
 describe('Sync File Operations', () => {
   let tempDir: string;
 
@@ -38,6 +46,11 @@ describe('Sync File Operations', () => {
     }
   });
 
+  /**
+   * Tests for the createDirectory function.
+   * Verifies creation of directories including nested paths,
+   * and graceful handling of already existing directories.
+   */
   describe('createDirectory', () => {
     test('creates directory successfully', () => {
       const dirPath = path.join(tempDir, 'new-directory');
@@ -66,6 +79,11 @@ describe('Sync File Operations', () => {
     });
   });
 
+  /**
+   * Tests for the synchronous writeFileSync function.
+   * Covers writing of string content and objects serialized as JSON,
+   * with support for different file formats.
+   */
   describe('writeFileSync', () => {
     test('writes string content to file', () => {
       const filePath = path.join(tempDir, 'test.txt');
@@ -144,6 +162,11 @@ describe('Sync File Operations', () => {
     });
   });
 
+  /**
+   * Tests for the synchronous readFileSync function.
+   * Validates reading string and JSON contents,
+   * and correct error throwing for missing files.
+   */
   describe('readFileSync', () => {
     test('reads file content as string', () => {
       const filePath = path.join(tempDir, 'read-test.txt');
@@ -173,6 +196,11 @@ describe('Sync File Operations', () => {
     });
   });
 
+  /**
+   * Tests for the fileExists function.
+   * Checks correct detection of files and directories,
+   * and false return for non-existent paths.
+   */
   describe('fileExists', () => {
     test('returns true for existing file', () => {
       const filePath = path.join(tempDir, 'existing.txt');
@@ -195,6 +223,11 @@ describe('Sync File Operations', () => {
     });
   });
 
+  /**
+   * Tests for writeExpectedResult function.
+   * Ensures that various result types (string, object, number, boolean, null)
+   * are correctly serialized and written to files.
+   */
   describe('writeExpectedResult', () => {
     test('writes string result to file', () => {
       const filePath = path.join(tempDir, 'expected.txt');
@@ -251,6 +284,9 @@ describe('Sync File Operations', () => {
     });
   });
 
+  /**
+   * Integration tests for writing and reading files synchronously.
+   */
   describe('integration tests', () => {
     test('write then read same content', () => {
       const filePath = path.join(tempDir, 'roundtrip.txt');
@@ -278,6 +314,10 @@ describe('Sync File Operations', () => {
     });
   });
 
+  /**
+   * Tests for createTempDirectory utility.
+   * Checks creation of temporary directories with specified prefix.
+   */
   describe('createTempDirectory', () => {
     test('creates temporary directory with prefix', () => {
       const prefix = 'test-';
@@ -292,6 +332,10 @@ describe('Sync File Operations', () => {
     });
   });
 
+  /**
+   * Tests for synchronous directory removal function removeDirectorySync.
+   * Validates removal of existing directories and handling of non-existent ones without errors.
+   */
   describe('removeDirectorySync', () => {
     test('removes existing directory', () => {
       const testDir = path.join(tempDir, 'to-remove');
