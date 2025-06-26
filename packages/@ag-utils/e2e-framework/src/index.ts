@@ -22,9 +22,11 @@ export { AG_E2E_FILE_FORMAT_MAP } from '../shared/types/e2e-framework.types';
 // Utility functions
 export {
   createDirectory,
+  createTempDirectory,
   fileExists,
   readFile,
   readFileTyped,
+  removeDirectory,
   writeExpectedResult,
   writeFile,
 } from './utils/agE2eFileIoUtils';

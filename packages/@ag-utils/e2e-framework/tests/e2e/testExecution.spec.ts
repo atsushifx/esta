@@ -7,7 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // lib
-import * as fs from 'fs';
+import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '../../shared/types/e2e-framework.types';
+
 import * as path from 'path';
 
 // vitest
@@ -15,8 +16,6 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 // test target
 import { AgE2eFileIOFramework } from '../../src/AgE2eFileIoFramework';
-
-import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '../../shared/types/e2e-framework.types';
 
 describe('E2E Test Execution Workflow', () => {
   let framework: AgE2eFileIOFramework;
@@ -27,19 +26,19 @@ describe('E2E Test Execution Workflow', () => {
     testId = `e2e-test-${Date.now()}-${Math.random().toString(36).substring(7)}`;
   });
 
-  afterEach(() => {
-    framework.cleanupEnvironment(testId);
+  afterEach(async () => {
+    await framework.cleanupEnvironment(testId);
   });
 
   describe('Complete Test Workflow', () => {
-    test('executes full workflow: setup → config creation → test execution → cleanup', () => {
+    test('executes full workflow: setup → config creation → test execution → cleanup', async () => {
       const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'app.json', content: { name: 'test-app', version: '1.0.0' }, format: 'json' },
         { filename: 'settings.ts', content: { debug: true, port: 3000 }, format: 'typescript' },
       ];
 
-      const mockConfigLoader = (configPath: string): Record<string, unknown> => {
-        const configContent = fs.readFileSync(configPath, 'utf8');
+      const mockConfigLoader = async (configPath: string): Promise<Record<string, unknown>> => {
+        const configContent = await framework.readFile(configPath);
         if (configPath.endsWith('.json')) {
           return JSON.parse(configContent);
         }
@@ -56,29 +55,29 @@ describe('E2E Test Execution Workflow', () => {
       try {
         framework.createConfigFiles(env, configFiles);
         const configPath = path.join(env.configDir, 'app.json');
-        result = mockConfigLoader(configPath);
+        result = await mockConfigLoader(configPath);
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
 
       expect(result).toEqual({ name: 'test-app', version: '1.0.0' });
     });
 
-    test('handles complex multi-step configuration loading workflow', () => {
+    test('handles complex multi-step configuration loading workflow', async () => {
       const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'base.json', content: { environment: 'test', logging: { level: 'debug' } }, format: 'json' },
         { filename: 'overrides.json', content: { logging: { level: 'info', format: 'json' } }, format: 'json' },
         { filename: 'secrets.json', content: { apiKey: 'test-key-123', dbUrl: 'test://localhost' }, format: 'json' },
       ];
 
-      const mockComplexConfigLoader = (basePath: string): Record<string, unknown> => {
+      const mockComplexConfigLoader = async (basePath: string): Promise<Record<string, unknown>> => {
         const baseConfigPath = path.join(basePath, 'base.json');
         const overridePath = path.join(basePath, 'overrides.json');
         const secretsPath = path.join(basePath, 'secrets.json');
 
-        const baseConfig = JSON.parse(fs.readFileSync(baseConfigPath, 'utf8'));
-        const overrides = JSON.parse(fs.readFileSync(overridePath, 'utf8'));
-        const secrets = JSON.parse(fs.readFileSync(secretsPath, 'utf8'));
+        const baseConfig = JSON.parse(await framework.readFile(baseConfigPath));
+        const overrides = JSON.parse(await framework.readFile(overridePath));
+        const secrets = JSON.parse(await framework.readFile(secretsPath));
 
         return {
           ...baseConfig,
@@ -90,7 +89,7 @@ describe('E2E Test Execution Workflow', () => {
       const env = framework.setupEnvironment(testId, 'complex-config');
       try {
         framework.createConfigFiles(env, configFiles);
-        const result = mockComplexConfigLoader(env.configDir);
+        const result = await mockComplexConfigLoader(env.configDir);
 
         expect(result).toEqual({
           environment: 'test',
@@ -99,13 +98,13 @@ describe('E2E Test Execution Workflow', () => {
           dbUrl: 'test://localhost',
         });
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
   });
 
   describe('Parameterized E2E Test Scenarios', () => {
-    test('runs multiple real-world configuration scenarios', () => {
+    test('runs multiple real-world configuration scenarios', async () => {
       const scenarios: AgE2eTestScenario[] = [
         {
           description: 'Development environment configuration',
@@ -133,34 +132,37 @@ describe('E2E Test Execution Workflow', () => {
         },
       ];
 
-      const mockEnvironmentConfigLoader = (envType: string, configDir: string): Record<string, unknown> => {
+      const mockEnvironmentConfigLoader = async (
+        envType: string,
+        configDir: string,
+      ): Promise<Record<string, unknown>> => {
         if (envType === 'typescript') {
           const tsConfigPath = path.join(configDir, 'config.ts');
-          const content = fs.readFileSync(tsConfigPath, 'utf8');
+          const content = await framework.readFile(tsConfigPath);
           const match = content.match(/export default (.+);/s);
           return match ? JSON.parse(match[1]) : {};
         } else {
           const jsonConfigPath = path.join(configDir, 'config.json');
-          return JSON.parse(fs.readFileSync(jsonConfigPath, 'utf8'));
+          return JSON.parse(await framework.readFile(jsonConfigPath));
         }
       };
 
       const results: { scenario: AgE2eTestScenario; result: Record<string, unknown> | Error }[] = [];
 
-      scenarios.forEach((scenario, index) => {
+      for (const [index, scenario] of scenarios.entries()) {
         const uniqueTestId = `${testId}-${index}`;
         const env = framework.setupEnvironment(uniqueTestId, 'test-config');
 
         try {
           framework.createConfigFiles(env, scenario.configFiles);
-          const result = mockEnvironmentConfigLoader(scenario.functionArgs[0] as string, env.configDir);
+          const result = await mockEnvironmentConfigLoader(scenario.functionArgs[0] as string, env.configDir);
           results.push({ scenario, result });
         } catch (error) {
           results.push({ scenario, result: error as Error });
         } finally {
-          framework.cleanupEnvironment(uniqueTestId);
+          await framework.cleanupEnvironment(uniqueTestId);
         }
-      });
+      }
 
       expect(results).toHaveLength(3);
 
@@ -220,7 +222,7 @@ describe('E2E Test Execution Workflow', () => {
   });
 
   describe('File Content Comparison E2E', () => {
-    test('compares test results with expected output files', () => {
+    test('compares test results with expected output files', async () => {
       const testResult = {
         status: 'success',
         tests: [
@@ -238,19 +240,19 @@ describe('E2E Test Execution Workflow', () => {
         framework.writeExpectedResult(testResult, expectedFilePath);
 
         // Compare with same result
-        const comparisonResult = framework.compareWithFileContent(testResult, expectedFilePath);
+        const comparisonResult = await framework.compareWithFileContent(testResult, expectedFilePath);
         expect(comparisonResult).toBe(true);
 
         // Compare with different result
         const differentResult = { ...testResult, summary: { total: 2, passed: 1, failed: 1 } };
-        const differentComparisonResult = framework.compareWithFileContent(differentResult, expectedFilePath);
+        const differentComparisonResult = await framework.compareWithFileContent(differentResult, expectedFilePath);
         expect(differentComparisonResult).toBe(false);
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
 
-    test('handles string-based configuration comparison', () => {
+    test('handles string-based configuration comparison', async () => {
       const configContent = `
 # Application Configuration
 app.name=test-application
@@ -269,74 +271,74 @@ db.name=test_database
         const configFilePath = path.join(env.configDir, 'app.properties');
         framework.writeExpectedResult(configContent, configFilePath);
 
-        const comparisonResult = framework.compareWithFileContent(configContent, configFilePath);
+        const comparisonResult = await framework.compareWithFileContent(configContent, configFilePath);
         expect(comparisonResult).toBe(true);
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
 
-    test('compareWithFileContent returns true for matching JSON content', () => {
+    test('compareWithFileContent returns true for matching JSON content', async () => {
       const env = framework.setupEnvironment(testId, 'json-comparison-test');
       try {
         const filePath = path.join(env.configDir, 'expected.json');
         const expectedContent = { name: 'test', value: 42 };
-        fs.writeFileSync(filePath, JSON.stringify(expectedContent, null, 2));
+        await framework.writeFile(filePath, JSON.stringify(expectedContent, null, 2));
 
-        const result = framework.compareWithFileContent(expectedContent, filePath);
+        const result = await framework.compareWithFileContent(expectedContent, filePath);
 
         expect(result).toBe(true);
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
 
-    test('compareWithFileContent returns true for matching string content', () => {
+    test('compareWithFileContent returns true for matching string content', async () => {
       const env = framework.setupEnvironment(testId, 'string-comparison-test');
       try {
         const filePath = path.join(env.configDir, 'expected.txt');
         const expectedContent = 'test string';
-        fs.writeFileSync(filePath, expectedContent);
+        await framework.writeFile(filePath, expectedContent);
 
-        const result = framework.compareWithFileContent(expectedContent, filePath);
+        const result = await framework.compareWithFileContent(expectedContent, filePath);
 
         expect(result).toBe(true);
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
 
-    test('compareWithFileContent returns false for non-matching content', () => {
+    test('compareWithFileContent returns false for non-matching content', async () => {
       const env = framework.setupEnvironment(testId, 'mismatch-test');
       try {
         const filePath = path.join(env.configDir, 'expected.json');
         const fileContent = { name: 'test', value: 42 };
         const testContent = { name: 'different', value: 99 };
-        fs.writeFileSync(filePath, JSON.stringify(fileContent, null, 2));
+        await framework.writeFile(filePath, JSON.stringify(fileContent, null, 2));
 
-        const result = framework.compareWithFileContent(testContent, filePath);
+        const result = await framework.compareWithFileContent(testContent, filePath);
 
         expect(result).toBe(false);
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
 
-    test('compareWithFileContent returns false for non-existent file', () => {
+    test('compareWithFileContent returns false for non-existent file', async () => {
       const env = framework.setupEnvironment(testId, 'nonexistent-test');
       try {
         const filePath = path.join(env.configDir, 'non-existent.json');
         const testContent = { name: 'test' };
 
-        const result = framework.compareWithFileContent(testContent, filePath);
+        const result = await framework.compareWithFileContent(testContent, filePath);
 
         expect(result).toBe(false);
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
 
-    test('writeExpectedResult writes string content', () => {
+    test('writeExpectedResult writes string content', async () => {
       const env = framework.setupEnvironment(testId, 'write-string-test');
       try {
         const filePath = path.join(env.configDir, 'expected.txt');
@@ -344,14 +346,15 @@ db.name=test_database
 
         framework.writeExpectedResult(content, filePath);
 
-        expect(fs.existsSync(filePath)).toBe(true);
-        expect(fs.readFileSync(filePath, 'utf8')).toBe(content);
+        expect(framework.fileExists(filePath)).toBe(true);
+        const readContent = await framework.readFile(filePath);
+        expect(readContent).toBe(content);
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
 
-    test('writeExpectedResult writes JSON content', () => {
+    test('writeExpectedResult writes JSON content', async () => {
       const env = framework.setupEnvironment(testId, 'write-json-test');
       try {
         const filePath = path.join(env.configDir, 'expected.json');
@@ -359,17 +362,18 @@ db.name=test_database
 
         framework.writeExpectedResult(content, filePath);
 
-        expect(fs.existsSync(filePath)).toBe(true);
-        const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        expect(framework.fileExists(filePath)).toBe(true);
+        const readContent = await framework.readFile(filePath);
+        const fileContent = JSON.parse(readContent);
         expect(fileContent).toEqual(content);
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
   });
 
   describe('Environment Integration', () => {
-    test('verifies XDG_CONFIG_HOME environment variable handling', () => {
+    test('verifies XDG_CONFIG_HOME environment variable handling', async () => {
       const originalXdgConfigHome = process.env.XDG_CONFIG_HOME;
 
       const env = framework.setupEnvironment(testId, 'xdg-test');
@@ -380,9 +384,9 @@ db.name=test_database
 
       // Verify config directory exists within XDG_CONFIG_HOME
       expect(env.configDir).toBe(path.join(env.tempDir, 'xdg-test'));
-      expect(fs.existsSync(env.configDir)).toBe(true);
+      expect(framework.fileExists(env.configDir)).toBe(true);
 
-      framework.cleanupEnvironment(testId);
+      await framework.cleanupEnvironment(testId);
 
       // Verify XDG_CONFIG_HOME is restored after cleanup
       expect(process.env.XDG_CONFIG_HOME).toBe(originalXdgConfigHome);
@@ -395,35 +399,35 @@ db.name=test_database
       const env = framework.setupEnvironment(testId, configDirName);
 
       expect(env.tempDir).toBeTruthy();
-      expect(fs.existsSync(env.tempDir)).toBe(true);
+      expect(framework.fileExists(env.tempDir)).toBe(true);
       expect(env.configDir).toBe(path.join(env.tempDir, configDirName));
-      expect(fs.existsSync(env.configDir)).toBe(true);
+      expect(framework.fileExists(env.configDir)).toBe(true);
       expect(env.originalXdgConfigHome).toBe(originalXdgConfigHome);
       expect(process.env.XDG_CONFIG_HOME).toBe(env.tempDir);
     });
 
-    test('cleanupEnvironment removes temporary directory and restores XDG_CONFIG_HOME', () => {
+    test('cleanupEnvironment removes temporary directory and restores XDG_CONFIG_HOME', async () => {
       const configDirName = 'test-config';
       const originalXdgConfigHome = process.env.XDG_CONFIG_HOME;
 
       const env = framework.setupEnvironment(testId, configDirName);
       const tempDir = env.tempDir;
 
-      expect(fs.existsSync(tempDir)).toBe(true);
+      expect(framework.fileExists(tempDir)).toBe(true);
 
-      framework.cleanupEnvironment(testId);
+      await framework.cleanupEnvironment(testId);
 
-      expect(fs.existsSync(tempDir)).toBe(false);
+      expect(framework.fileExists(tempDir)).toBe(false);
       expect(process.env.XDG_CONFIG_HOME).toBe(originalXdgConfigHome);
     });
 
-    test('cleanupEnvironment handles non-existent environment gracefully', () => {
-      expect(() => framework.cleanupEnvironment('non-existent-id')).not.toThrow();
+    test('cleanupEnvironment handles non-existent environment gracefully', async () => {
+      await expect(framework.cleanupEnvironment('non-existent-id')).resolves.not.toThrow();
     });
   });
 
   describe('Config File Management E2E', () => {
-    test('createConfigFile creates file with string content', () => {
+    test('createConfigFile creates file with string content', async () => {
       const env = framework.setupEnvironment(testId, 'config-string-test');
       try {
         const spec = {
@@ -434,14 +438,14 @@ db.name=test_database
         const filePath = framework.createConfigFile(env, spec);
 
         expect(filePath).toBe(path.join(env.configDir, spec.filename));
-        expect(fs.existsSync(filePath)).toBe(true);
-        expect(fs.readFileSync(filePath, 'utf8')).toBe(spec.content);
+        expect(framework.fileExists(filePath)).toBe(true);
+        expect(await framework.readFile(filePath)).toBe(spec.content);
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
 
-    test('createConfigFile creates JSON file with object content', () => {
+    test('createConfigFile creates JSON file with object content', async () => {
       const env = framework.setupEnvironment(testId, 'config-json-test');
       try {
         const spec = {
@@ -452,15 +456,15 @@ db.name=test_database
 
         const filePath = framework.createConfigFile(env, spec);
 
-        expect(fs.existsSync(filePath)).toBe(true);
-        const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        expect(framework.fileExists(filePath)).toBe(true);
+        const fileContent = JSON.parse(await framework.readFile(filePath));
         expect(fileContent).toEqual(spec.content);
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
 
-    test('createConfigFiles creates multiple files', () => {
+    test('createConfigFiles creates multiple files', async () => {
       const env = framework.setupEnvironment(testId, 'config-multiple-test');
       try {
         const specs = [
@@ -472,10 +476,10 @@ db.name=test_database
 
         expect(filePaths).toHaveLength(2);
         filePaths.forEach((filePath) => {
-          expect(fs.existsSync(filePath)).toBe(true);
+          expect(framework.fileExists(filePath)).toBe(true);
         });
       } finally {
-        framework.cleanupEnvironment(testId);
+        await framework.cleanupEnvironment(testId);
       }
     });
   });
