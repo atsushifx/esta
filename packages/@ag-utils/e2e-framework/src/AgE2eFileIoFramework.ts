@@ -6,26 +6,56 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// type
+import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '../shared/types/e2e-framework.types';
+import type { TestEnvironment } from './types';
+
 // lib
-import * as fs from 'fs';
-import * as os from 'os';
 import * as path from 'path';
 
 // file io utils
-import { createDirectory, fileExists, readFile, writeExpectedResult, writeFile } from './utils/agE2eFileIoUtils';
+import {
+  createDirectory,
+  createTempDirectory,
+  fileExists,
+  readFile,
+  removeDirectory,
+  writeExpectedResult,
+  writeFile,
+  writeFileSync,
+} from './utils/agE2eFileIoUtils';
 
 // types
-import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '../shared/types/e2e-framework.types';
-import type { TestEnvironment } from './types';
 
 export class AgE2eFileIOFramework {
   private environments: Map<string, TestEnvironment> = new Map();
 
-  /**
-   * テスト環境のセットアップ
-   */
+  // ---------------------------------------------------------------------------
+  // PRIVATE HELPER METHODS
+  // ---------------------------------------------------------------------------
+
+  private _restoreEnvironmentVariables(originalXdgConfigHome: string | undefined): void {
+    if (originalXdgConfigHome !== undefined) {
+      process.env.XDG_CONFIG_HOME = originalXdgConfigHome;
+    } else {
+      delete process.env.XDG_CONFIG_HOME;
+    }
+  }
+
+  private _parseExpectedResult(content: string): unknown {
+    try {
+      return JSON.parse(content);
+    } catch {
+      return content;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // PUBLIC API - ENVIRONMENT MANAGEMENT
+  // ---------------------------------------------------------------------------
+
   setupEnvironment(testId: string, configDirName: string): TestEnvironment {
-    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'config-loader-test-'));
+    const tempDir = createTempDirectory('config-loader-test-');
     const configDir = path.join(tempDir, configDirName);
 
     createDirectory(configDir);
@@ -43,51 +73,39 @@ export class AgE2eFileIOFramework {
     return env;
   }
 
-  /**
-   * テスト環境のクリーンアップ
-   */
-  cleanupEnvironment(testId: string): void {
+  async cleanupEnvironment(testId: string): Promise<void> {
     const env = this.environments.get(testId);
     if (!env) { return; }
 
-    if (fs.existsSync(env.tempDir)) {
-      fs.rmSync(env.tempDir, { recursive: true, force: true });
-    }
-
-    if (env.originalXdgConfigHome !== undefined) {
-      process.env.XDG_CONFIG_HOME = env.originalXdgConfigHome;
-    } else {
-      delete process.env.XDG_CONFIG_HOME;
-    }
-
+    await removeDirectory(env.tempDir);
+    this._restoreEnvironmentVariables(env.originalXdgConfigHome);
     this.environments.delete(testId);
   }
 
-  /**
-   * 設定ファイルの作成
-   */
+  // ---------------------------------------------------------------------------
+  // PUBLIC API - CONFIG FILE OPERATIONS
+  // ---------------------------------------------------------------------------
+
   createConfigFile(env: TestEnvironment, spec: AgE2eConfigFileSpec): string {
     const filePath = path.join(env.configDir, spec.filename);
 
     if (typeof spec.content === 'string') {
-      writeFile(filePath, spec.content);
+      writeFileSync(filePath, spec.content);
     } else {
-      writeFile(filePath, spec.content, spec.format);
+      writeFileSync(filePath, spec.content, spec.format);
     }
 
     return filePath;
   }
 
-  /**
-   * 複数の設定ファイルを作成
-   */
   createConfigFiles(env: TestEnvironment, specs: AgE2eConfigFileSpec[]): string[] {
     return specs.map((spec) => this.createConfigFile(env, spec));
   }
 
-  /**
-   * 汎用テスト実行関数
-   */
+  // ---------------------------------------------------------------------------
+  // PUBLIC API - TEST EXECUTION
+  // ---------------------------------------------------------------------------
+
   executeTest<T>(
     testId: string,
     configDirName: string,
@@ -105,9 +123,6 @@ export class AgE2eFileIOFramework {
     }
   }
 
-  /**
-   * パラメータ化されたテストの実行
-   */
   runParameterizedTests<T>(
     testId: string,
     configDirName: string,
@@ -131,31 +146,47 @@ export class AgE2eFileIOFramework {
     });
   }
 
-  /**
-   * テスト結果とファイル内容の比較
-   */
-  compareWithFileContent(result: unknown, filePath: string): boolean {
+  // ---------------------------------------------------------------------------
+  // PUBLIC API - TEST RESULT OPERATIONS
+  // ---------------------------------------------------------------------------
+
+  async compareWithFileContent(result: unknown, filePath: string): Promise<boolean> {
     if (!fileExists(filePath)) {
       return false;
     }
 
-    const fileContent = readFile(filePath);
-    let expectedResult: unknown;
-
-    try {
-      expectedResult = JSON.parse(fileContent);
-    } catch {
-      expectedResult = fileContent;
-    }
+    const fileContent = await readFile(filePath);
+    const expectedResult = this._parseExpectedResult(fileContent);
 
     return JSON.stringify(result) === JSON.stringify(expectedResult);
   }
 
-  /**
-   * 期待値ファイルへの結果書き込み
-   */
   writeExpectedResult(result: unknown, filePath: string): void {
     writeExpectedResult(result, filePath);
+  }
+
+  // ---------------------------------------------------------------------------
+  // PUBLIC API - FILE OPERATIONS (DELEGATED)
+  // ---------------------------------------------------------------------------
+
+  async readFile(filePath: string): Promise<string> {
+    return await readFile(filePath);
+  }
+
+  async writeFile(filePath: string, content: string): Promise<void> {
+    await writeFile(filePath, content);
+  }
+
+  fileExists(filePath: string): boolean {
+    return fileExists(filePath);
+  }
+
+  createTempDirectory(prefix: string): string {
+    return createTempDirectory(prefix);
+  }
+
+  async removeDirectory(dirPath: string): Promise<void> {
+    await removeDirectory(dirPath);
   }
 }
 

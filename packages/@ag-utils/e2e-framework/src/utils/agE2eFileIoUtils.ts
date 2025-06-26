@@ -7,92 +7,140 @@
 // https://opensource.org/licenses/MIT
 
 // lib
+import type { AgE2eFileExtension, AgE2eFileFormat } from '../../shared/types/e2e-framework.types';
+
 import * as fs from 'fs';
+import * as fsp from 'fs/promises';
+import * as os from 'os';
 import * as path from 'path';
 
 // types
-import type { AgE2eFileExtension, AgE2eFileFormat } from '../../shared/types/e2e-framework.types';
+import { AG_E2E_FILE_FORMAT_MAP } from '../../shared/types/e2e-framework.types';
 
-/**
- * ディレクトリ作成
- */
+// -----------------------------------------------------------------------------
+// INTERNAL HELPER FUNCTIONS
+// -----------------------------------------------------------------------------
+
+const _convertContentToString = (
+  content: string | Record<string, unknown>,
+  format?: AgE2eFileFormat,
+): string => {
+  if (typeof content === 'string') {
+    return content;
+  }
+
+  switch (format) {
+    case 'json':
+      return JSON.stringify(content, null, 2);
+    case 'yaml':
+      return JSON.stringify(content, null, 2); // TODO: Implement proper YAML serialization
+    case 'typescript':
+      return `export default ${JSON.stringify(content, null, 2)};`;
+    case 'markdown':
+      return typeof content === 'object' ? JSON.stringify(content, null, 2) : String(content);
+    case 'text':
+      return typeof content === 'object' ? JSON.stringify(content, null, 2) : String(content);
+    default:
+      return JSON.stringify(content, null, 2);
+  }
+};
+
+const _ensureDirectoryExists = async (dirPath: string): Promise<void> => {
+  if (!fs.existsSync(dirPath)) {
+    await fsp.mkdir(dirPath, { recursive: true });
+  }
+};
+
+const _checkFileExists = (filePath: string): boolean => {
+  return fs.existsSync(filePath);
+};
+
+const _getSupportedExtensions = (): AgE2eFileExtension[] => {
+  return Object.keys(AG_E2E_FILE_FORMAT_MAP) as AgE2eFileExtension[];
+};
+
+// -----------------------------------------------------------------------------
+// PUBLIC API - DIRECTORY OPERATIONS
+// -----------------------------------------------------------------------------
+
+// Synchronous Directory Operations
 export const createDirectory = (dirPath: string): void => {
   fs.mkdirSync(dirPath, { recursive: true });
 };
 
-/**
- * ファイル書き込み
- */
-export const writeFile = (
+export const createTempDirectory = (prefix: string): string => {
+  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+};
+
+export const removeDirectorySync = (dirPath: string): void => {
+  if (_checkFileExists(dirPath)) {
+    fs.rmSync(dirPath, { recursive: true, force: true });
+  }
+};
+
+// Asynchronous Directory Operations
+export const removeDirectory = async (dirPath: string): Promise<void> => {
+  if (_checkFileExists(dirPath)) {
+    await fsp.rm(dirPath, { recursive: true, force: true });
+  }
+};
+
+// -----------------------------------------------------------------------------
+// PUBLIC API - FILE OPERATIONS
+// -----------------------------------------------------------------------------
+
+// Synchronous File Operations
+export const fileExists = (filePath: string): boolean => {
+  return _checkFileExists(filePath);
+};
+
+export const readFileSync = (filePath: string): string => {
+  return fs.readFileSync(filePath, 'utf8');
+};
+
+export const writeFileSync = (
   filePath: string,
   content: string | Record<string, unknown>,
   format?: AgE2eFileFormat,
 ): void => {
-  let fileContent: string;
-
-  if (typeof content === 'string') {
-    fileContent = content;
-  } else {
-    switch (format) {
-      case 'json':
-        fileContent = JSON.stringify(content, null, 2);
-        break;
-      case 'yaml':
-        fileContent = JSON.stringify(content, null, 2); // TODO: Implement proper YAML serialization
-        break;
-      case 'typescript':
-        fileContent = `export default ${JSON.stringify(content, null, 2)};`;
-        break;
-      case 'markdown':
-        fileContent = typeof content === 'object' ? JSON.stringify(content, null, 2) : String(content);
-        break;
-      case 'text':
-        fileContent = typeof content === 'object' ? JSON.stringify(content, null, 2) : String(content);
-        break;
-      default:
-        fileContent = JSON.stringify(content, null, 2);
-    }
-  }
-
+  const fileContent = _convertContentToString(content, format);
   fs.writeFileSync(filePath, fileContent);
 };
 
-/**
- * ファイル読み込み
- */
-export const readFile = (filePath: string): string => {
-  return fs.readFileSync(filePath, 'utf8');
+// Asynchronous File Operations
+export const readFile = async (filePath: string): Promise<string> => {
+  return await fsp.readFile(filePath, 'utf8');
 };
 
-/**
- * 型安全なファイル読み込み（拡張子チェック付き）
- */
-export const readFileTyped = (filePath: string): string => {
+export const readFileTyped = async (filePath: string): Promise<string> => {
   const ext = path.extname(filePath).slice(1) as AgE2eFileExtension;
+  const supportedExtensions = _getSupportedExtensions();
 
-  // サポートされる拡張子かチェック
-  const supportedExtensions: AgE2eFileExtension[] = ['json', 'jsonc', 'yaml', 'ts', 'js', 'md', 'txt'];
   if (!supportedExtensions.includes(ext)) {
     throw new Error(`Unsupported file extension: ${ext}. Supported extensions: ${supportedExtensions.join(', ')}`);
   }
 
-  return fs.readFileSync(filePath, 'utf8');
+  return await fsp.readFile(filePath, 'utf8');
 };
 
-/**
- * ファイル存在確認
- */
-export const fileExists = (filePath: string): boolean => {
-  return fs.existsSync(filePath);
+export const writeFile = async (
+  filePath: string,
+  content: string | Record<string, unknown>,
+  format?: AgE2eFileFormat,
+): Promise<void> => {
+  const fileContent = _convertContentToString(content, format);
+  const dirPath = path.dirname(filePath);
+
+  await _ensureDirectoryExists(dirPath);
+  await fsp.writeFile(filePath, fileContent, 'utf8');
 };
 
-/**
- * 期待値ファイルへの結果書き込み
- */
+// -----------------------------------------------------------------------------
+// PUBLIC API - SPECIALIZED OPERATIONS
+// -----------------------------------------------------------------------------
+
+// Synchronous Specialized Operations
 export const writeExpectedResult = (result: unknown, filePath: string): void => {
-  if (typeof result === 'string') {
-    fs.writeFileSync(filePath, result);
-  } else {
-    fs.writeFileSync(filePath, JSON.stringify(result, null, 2));
-  }
+  const content = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
+  fs.writeFileSync(filePath, content);
 };
