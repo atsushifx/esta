@@ -13,6 +13,7 @@ import type { ExtensionList } from '@shared/types/common.types';
 import { TEXT_EXT_TYPE_MAP } from '@shared/types/common.types';
 
 // parsers
+import { parseMarkdown } from './parser/parseMarkdown';
 import { parsePlainText } from './parser/parsePlainText';
 
 export const parseText = <T = object>(extension: string, raw: string): T => {
@@ -21,7 +22,7 @@ export const parseText = <T = object>(extension: string, raw: string): T => {
 
   switch (textType) {
     case 'markdown':
-      return {} as T;
+      return parseMarkdown(raw) as T;
     case 'void':
       return {} as T;
     case 'plaintext':
