@@ -1,5 +1,5 @@
 {
-  "name": "@ag-utils/text-parser",
+  "name": "@ag-utils/e2e-fixture-framework",
   "private": true,
   "version": "0.0.0",
   "description": "Universal configuration file loader and manager utilities.",

@@ -1,9 +1,1 @@
-// src: ./framework/io/index.ts
-// I/O関数エクスポート
-//
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
-export * from './fileReader';
+export * from './AgE2eFileReader';
