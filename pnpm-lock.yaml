@@ -116,6 +116,19 @@ importers:
         specifier: ^2.8.0
         version: 2.8.0
 
+  packages/@ag-utils/e2e-fixture-framework:
+    dependencies:
+      remark:
+        specifier: ^15.0.1
+        version: 15.0.1
+      remark-parse:
+        specifier: ^11.0.0
+        version: 11.0.0
+    devDependencies:
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
+
   packages/@ag-utils/e2e-framework: {}
 
   packages/@ag-utils/get-platform: {}
