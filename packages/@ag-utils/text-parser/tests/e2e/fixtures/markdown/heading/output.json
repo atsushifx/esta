@@ -1,7 +1,6 @@
 {
-  "type": "ast",
+  "type": "markdown",
   "expected": {
-    "type": "root",
     "children": [
       {
         "type": "heading",

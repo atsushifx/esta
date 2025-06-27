@@ -1,4 +1,4 @@
 {
-  "type": "string",
+  "type": "plaintext",
   "expected": "This is a plain text file for testing.\nIt contains multiple lines.\n\nAnd some empty lines too."
 }

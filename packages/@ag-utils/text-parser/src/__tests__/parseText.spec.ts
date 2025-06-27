@@ -12,7 +12,7 @@ import { TEXT_EXT_TYPE_MAP } from '@shared/types/common.types';
 import type { Root } from 'mdast';
 // vitest
 import { describe, expect, test } from 'vitest';
-// parser: test target
+// parser
 import { parseText } from '../parseText';
 
 describe('parseText', () => {

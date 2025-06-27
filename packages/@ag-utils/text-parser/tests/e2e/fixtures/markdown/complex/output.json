@@ -1,7 +1,6 @@
 {
-  "type": "ast",
+  "type": "markdown",
   "expected": {
-    "type": "root",
     "properties": {
       "childCount": ">5",
       "hasHeading": true,

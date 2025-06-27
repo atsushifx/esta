@@ -6,7 +6,9 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// types
 import type { Root } from 'mdast';
+// markdown
 import { remark } from 'remark';
 
 export const parseMarkdown = (text: string): Root => {
