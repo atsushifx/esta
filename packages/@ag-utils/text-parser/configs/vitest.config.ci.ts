@@ -1,5 +1,5 @@
 // src: ./configs/vitest.config.ci.ts
-// @(#) : vitest config for integration test
+// @(#) : vitest config for e2e test
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -27,6 +27,10 @@ export default mergeConfig(baseConfig, {
       'tests/**/*.test.ts',
       'tests/**/*.spec.ts',
     ],
+    exclude: [
+      'tests/e2e/fixtures/**',
+    ],
+    testTimeout: 10000,
     caches: {
       dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/ci/'),
     },
@@ -35,6 +39,7 @@ export default mergeConfig(baseConfig, {
     alias: {
       '@': path.resolve(__dirname, '../src'),
       '@shared': path.resolve(__dirname, '../shared'),
+      '@fixtures': path.resolve(__dirname, '../tests/e2e/fixtures'),
     },
   },
 });
