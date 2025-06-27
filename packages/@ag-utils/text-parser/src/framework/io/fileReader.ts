@@ -6,6 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// lib
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 // types
