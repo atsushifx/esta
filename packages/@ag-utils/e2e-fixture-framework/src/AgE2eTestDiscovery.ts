@@ -9,88 +9,97 @@
 import { readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 // types
-import type { TestCase, TestTypeInfo } from '@shared/types';
+import type { TestCase } from '@shared/types';
 
-// === 内部関数 ===
+// ------------------------------------
+// 外部関数
+// ------------------------------------
 
-const _isCommentedOut = (dirName: string): boolean => {
-  return dirName.startsWith('#');
+/**
+ * 1段階構造用: fixtures/test-case/
+ */
+export const AgE2eScanFlatTests = (fixturesDir: string): readonly TestCase[] => {
+  return _safeReadDirectory(fixturesDir)
+    .filter(_isNotCommentedOut)
+    .map((entry) => ({ entry, path: join(fixturesDir, entry) }))
+    .filter(({ path }) => _isValidTestDirectory(path))
+    .map(({ entry, path }) => _createTestCase(entry, entry, path));
 };
 
-const _isValidTestDirectory = (dirPath: string): boolean => {
+/**
+ * 2段階構造用: fixtures/category/test-case/
+ */
+export const AgE2eScanCategorizedTests = (fixturesDir: string): readonly TestCase[] => {
+  return _safeReadDirectory(fixturesDir)
+    .filter(_isNotCommentedOut)
+    .map((entry) => ({ entry, path: join(fixturesDir, entry) }))
+    .filter(({ path }) => _isDirectory(path))
+    .flatMap(({ entry, path }) => _scanCategoryTestCases(path, entry));
+};
+
+// ------------------------------------
+// 内部関数
+// ------------------------------------
+
+const _safeReadDirectory = (dirPath: string): readonly string[] => {
   try {
-    const stat = statSync(dirPath);
-    if (!stat.isDirectory()) { return false; }
+    return Object.freeze(readdirSync(dirPath));
+  } catch {
+    return Object.freeze([]);
+  }
+};
 
-    // input.* と output.json の存在をチェック
-    const files = readdirSync(dirPath);
-    const hasInput = files.some((file) => file.startsWith('input.'));
-    const hasOutput = files.includes('output.json');
-
-    return hasInput && hasOutput;
+const _isDirectory = (dirPath: string): boolean => {
+  try {
+    return statSync(dirPath).isDirectory();
   } catch {
     return false;
   }
 };
 
-// === 外部関数 ===
-
-export const AgE2eScanTestCases = (typeDir: string, typeName: string): TestCase[] => {
-  const testCases: TestCase[] = [];
-
-  try {
-    const entries = readdirSync(typeDir);
-
-    for (const entry of entries) {
-      // #で始まるディレクトリはコメントアウトとしてスキップ
-      if (_isCommentedOut(entry)) {
-        continue;
-      }
-
-      const testCasePath = join(typeDir, entry);
-      if (_isValidTestDirectory(testCasePath)) {
-        testCases.push({
-          type: typeName,
-          name: entry,
-          path: testCasePath,
-        });
-      }
-    }
-  } catch {
-    // ディレクトリが存在しない場合は空配列を返す
-  }
-
-  return testCases;
+const _isCommentedOut = (dirName: string): boolean => {
+  return dirName.startsWith('#');
 };
 
-export const AgE2eScanTestTypes = (fixturesDir: string): TestTypeInfo[] => {
-  const testTypes: TestTypeInfo[] = [];
+const _isNotCommentedOut = (dirName: string): boolean => {
+  return !_isCommentedOut(dirName);
+};
 
-  try {
-    const entries = readdirSync(fixturesDir);
-
-    for (const entry of entries) {
-      // #で始まるディレクトリはコメントアウトとしてスキップ
-      if (_isCommentedOut(entry)) {
-        continue;
-      }
-
-      const typeDir = join(fixturesDir, entry);
-      const stat = statSync(typeDir);
-
-      if (stat.isDirectory()) {
-        const testCases = AgE2eScanTestCases(typeDir, entry);
-        if (testCases.length > 0) {
-          testTypes.push({
-            type: entry,
-            testCases,
-          });
-        }
-      }
-    }
-  } catch {
-    // ディレクトリが存在しない場合は空配列を返す
+const _isValidTestDirectory = (dirPath: string): boolean => {
+  if (!_isDirectory(dirPath)) {
+    return false;
   }
 
-  return testTypes;
+  const files = _safeReadDirectory(dirPath);
+  return _hasInputFile(files) && _hasOutputFile(files);
+};
+
+const _hasInputFile = (files: readonly string[]): boolean => {
+  return files.some((file) => file.startsWith('input.'));
+};
+
+const _hasOutputFile = (files: readonly string[]): boolean => {
+  return files.includes('output.json');
+};
+
+const _createTestCase = (type: string, name: string, path: string): TestCase => {
+  return Object.freeze({
+    type,
+    name,
+    path,
+  });
+};
+
+const _scanCategoryTestCases = (categoryDir: string, categoryName: string): readonly TestCase[] => {
+  return _safeReadDirectory(categoryDir)
+    .filter(_isNotCommentedOut)
+    .map((entry) => ({ entry, path: join(categoryDir, entry) }))
+    .filter(({ path }) => _isValidTestDirectory(path))
+    .map(({ entry, path }) =>
+      _createTestCase(
+        categoryName,
+        `${categoryName}/${entry}`,
+        path,
+      )
+    );
 };
