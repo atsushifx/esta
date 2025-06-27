@@ -1,4 +1,4 @@
-// src: ./framework/testDiscovery.ts
+// src: ./framework/AgE2eTestDiscovery.ts
 // テスト走査関数
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -35,7 +35,7 @@ const _isValidTestDirectory = (dirPath: string): boolean => {
 
 // === 外部関数 ===
 
-export const scanTestCases = (typeDir: string, typeName: string): TestCase[] => {
+export const AgE2eScanTestCases = (typeDir: string, typeName: string): TestCase[] => {
   const testCases: TestCase[] = [];
 
   try {
@@ -63,7 +63,7 @@ export const scanTestCases = (typeDir: string, typeName: string): TestCase[] => 
   return testCases;
 };
 
-export const scanTestTypes = (fixturesDir: string): TestTypeInfo[] => {
+export const AgE2eScanTestTypes = (fixturesDir: string): TestTypeInfo[] => {
   const testTypes: TestTypeInfo[] = [];
 
   try {
@@ -79,7 +79,7 @@ export const scanTestTypes = (fixturesDir: string): TestTypeInfo[] => {
       const stat = statSync(typeDir);
 
       if (stat.isDirectory()) {
-        const testCases = scanTestCases(typeDir, entry);
+        const testCases = AgE2eScanTestCases(typeDir, entry);
         if (testCases.length > 0) {
           testTypes.push({
             type: entry,

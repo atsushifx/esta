@@ -10,7 +10,7 @@ import { join } from 'node:path';
 // vitest
 import { describe, expect, test } from 'vitest';
 // framework
-import { runFixtureTest, scanTestTypes } from '../../src';
+import { AgE2eFixtureFramework, AgE2eScanTestTypes } from '../../src';
 
 const fixturesDir = join(__dirname, 'fixtures');
 
@@ -53,13 +53,14 @@ const mockTestFunction = (extension: string, content: string): unknown => {
 };
 
 describe('Fixture Framework E2E', () => {
-  const testTypes = scanTestTypes(fixturesDir);
+  const testTypes = AgE2eScanTestTypes(fixturesDir);
 
   for (const testType of testTypes) {
     describe(`${testType.type} files`, () => {
       for (const testCase of testType.testCases) {
         test(`should process ${testCase.name} ${testCase.type} file`, () => {
-          const isValid = runFixtureTest(testCase.path, testCase.name, mockTestFunction);
+          const framework = new AgE2eFixtureFramework(mockTestFunction);
+          const isValid = framework.runTest(testCase.path);
           expect(isValid).toBe(true);
         });
       }
@@ -72,13 +73,15 @@ describe('Fixture Framework E2E', () => {
       if (testType.testCases.length > 0) {
         const firstTestCase = testType.testCases[0];
         test(`should detect .${testType.type} extension correctly`, () => {
-          expect(runFixtureTest(firstTestCase.path, `${firstTestCase.name} with extension`, mockTestFunction)).toBe(
+          const framework = new AgE2eFixtureFramework(mockTestFunction);
+          expect(framework.runTest(firstTestCase.path)).toBe(
             true,
           );
         });
 
         test(`should handle uppercase ${testType.type.toUpperCase()} extension`, () => {
-          expect(runFixtureTest(firstTestCase.path, `${firstTestCase.name} uppercase`, mockTestFunction)).toBe(true);
+          const framework = new AgE2eFixtureFramework(mockTestFunction);
+          expect(framework.runTest(firstTestCase.path)).toBe(true);
         });
       }
     }
