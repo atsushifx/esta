@@ -120,6 +120,8 @@ importers:
 
   packages/@ag-utils/get-platform: {}
 
+  packages/@ag-utils/text-parser: {}
+
   shared/common: {}
 
 packages:

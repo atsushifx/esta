@@ -35,6 +35,8 @@ $~*
 *tmp
 *swp
 *lock
+
+## temporary directory
 **/temp/
 
 ##		Editor
@@ -52,8 +54,6 @@ $~*
 .claude/*
 !.claude/commands
 !.claude/commands/*
-
-
 
 ### Develop
 # Node
