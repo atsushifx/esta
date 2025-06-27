@@ -13,23 +13,47 @@ import { join } from 'node:path';
 import type { ExpectedConfig, FileInput } from '@shared/types';
 
 export class AgE2eFileReader {
+  // ------------------------------------
+  // 外部メソッド
+  // ------------------------------------
+
   readInputFile(testCasePath: string): FileInput {
-    const files = readdirSync(testCasePath);
-    const inputFile = files.find((file) => file.startsWith('input.'));
+    const files = this._readDirectory(testCasePath);
+    const inputFile = this._findInputFile(files);
 
-    if (!inputFile) {
-      throw new Error(`No input file found in ${testCasePath}`);
-    }
-
-    const extension = inputFile.split('.').pop() ?? '';
-    const content = readFileSync(join(testCasePath, inputFile), 'utf8');
+    const extension = this._extractExtension(inputFile);
+    const content = this._readFile(join(testCasePath, inputFile));
 
     return { content, extension };
   }
 
   readExpectedConfig(testCasePath: string): ExpectedConfig {
     const configPath = join(testCasePath, 'output.json');
-    const content = readFileSync(configPath, 'utf8');
+    const content = this._readFile(configPath);
     return JSON.parse(content) as ExpectedConfig;
+  }
+
+  // ------------------------------------
+  // 内部メソッド
+  // ------------------------------------
+
+  private _readDirectory(dirPath: string): string[] {
+    return readdirSync(dirPath);
+  }
+
+  private _readFile(filePath: string): string {
+    return readFileSync(filePath, 'utf8');
+  }
+
+  private _findInputFile(files: string[]): string {
+    const inputFile = files.find((file) => file.startsWith('input.'));
+    if (!inputFile) {
+      throw new Error('No input file found');
+    }
+    return inputFile;
+  }
+
+  private _extractExtension(fileName: string): string {
+    return fileName.split('.').pop() ?? '';
   }
 }

@@ -9,8 +9,18 @@
 // types
 import type { PlaintextExpected } from '@shared/types';
 
-// === 外部関数 ===
+// ------------------------------------
+// 外部関数
+// ------------------------------------
 
 export const validatePlaintextResult = (result: unknown, expected: PlaintextExpected): boolean => {
-  return result === expected.expected;
+  return _isEqual(result, expected.expected);
+};
+
+// ------------------------------------
+// 内部関数
+// ------------------------------------
+
+const _isEqual = (actual: unknown, expected: unknown): boolean => {
+  return actual === expected;
 };

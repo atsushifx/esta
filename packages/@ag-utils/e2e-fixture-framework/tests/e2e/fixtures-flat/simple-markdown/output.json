@@ -1,0 +1,19 @@
+{
+  "type": "markdown",
+  "expected": {
+    "children": [
+      {
+        "type": "heading",
+        "depth": 1
+      },
+      {
+        "type": "heading",
+        "depth": 2
+      },
+      {
+        "type": "heading",
+        "depth": 3
+      }
+    ]
+  }
+}

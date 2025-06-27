@@ -10,9 +10,10 @@ import { join } from 'node:path';
 // vitest
 import { describe, expect, test } from 'vitest';
 // framework
-import { AgE2eFixtureFramework, AgE2eScanTestTypes } from '../../src';
+import { AgE2eFixtureFramework, AgE2eScanCategorizedTests, AgE2eScanFlatTests, type TestCase } from '../../src';
 
 const fixturesDir = join(__dirname, 'fixtures');
+const fixturesFlatDir = join(__dirname, 'fixtures-flat');
 
 // モックテスト関数（実際の使用では実際のパーサー関数を渡す）
 const mockTestFunction = (extension: string, content: string): unknown => {
@@ -53,12 +54,21 @@ const mockTestFunction = (extension: string, content: string): unknown => {
 };
 
 describe('Fixture Framework E2E', () => {
-  const testTypes = AgE2eScanTestTypes(fixturesDir);
+  const testCases = AgE2eScanCategorizedTests(fixturesDir);
 
-  for (const testType of testTypes) {
-    describe(`${testType.type} files`, () => {
-      for (const testCase of testType.testCases) {
-        test(`should process ${testCase.name} ${testCase.type} file`, () => {
+  // タイプ別にグループ化
+  const testTypeMap = new Map<string, TestCase[]>();
+  for (const testCase of testCases) {
+    if (!testTypeMap.has(testCase.type)) {
+      testTypeMap.set(testCase.type, []);
+    }
+    testTypeMap.get(testCase.type)!.push(testCase);
+  }
+
+  for (const [type, cases] of testTypeMap) {
+    describe(`${type} files`, () => {
+      for (const testCase of cases) {
+        test(`should process ${testCase.name}`, () => {
           const framework = new AgE2eFixtureFramework(mockTestFunction);
           const isValid = framework.runTest(testCase.path);
           expect(isValid).toBe(true);
@@ -69,21 +79,51 @@ describe('Fixture Framework E2E', () => {
 
   // Extension detection tests
   describe('File extension detection', () => {
-    for (const testType of testTypes) {
-      if (testType.testCases.length > 0) {
-        const firstTestCase = testType.testCases[0];
-        test(`should detect .${testType.type} extension correctly`, () => {
+    for (const [type, cases] of testTypeMap) {
+      if (cases.length > 0) {
+        const firstTestCase = cases[0];
+        test(`should detect .${type} extension correctly`, () => {
           const framework = new AgE2eFixtureFramework(mockTestFunction);
           expect(framework.runTest(firstTestCase.path)).toBe(
             true,
           );
         });
 
-        test(`should handle uppercase ${testType.type.toUpperCase()} extension`, () => {
+        test(`should handle uppercase ${type.toUpperCase()} extension`, () => {
           const framework = new AgE2eFixtureFramework(mockTestFunction);
           expect(framework.runTest(firstTestCase.path)).toBe(true);
         });
       }
+    }
+  });
+});
+
+describe('Fixture Framework E2E - Flat Structure', () => {
+  const testCases = AgE2eScanFlatTests(fixturesFlatDir);
+
+  // 基本的なフラット構造テスト
+  describe('Flat structure tests', () => {
+    for (const testCase of testCases) {
+      test(`should process flat test ${testCase.name}`, () => {
+        const framework = new AgE2eFixtureFramework(mockTestFunction);
+        const isValid = framework.runTest(testCase.path);
+        expect(isValid).toBe(true);
+      });
+    }
+  });
+
+  // コメントアウト機能テスト
+  test('should skip commented out tests in flat structure', () => {
+    const allTestCases = AgE2eScanFlatTests(fixturesFlatDir);
+    const disabledTests = allTestCases.filter((tc) => tc.name.startsWith('#'));
+    expect(disabledTests).toHaveLength(0);
+  });
+
+  // フラット構造の特性テスト
+  test('should have type equal to name in flat structure', () => {
+    const flatTestCases = AgE2eScanFlatTests(fixturesFlatDir);
+    for (const testCase of flatTestCases) {
+      expect(testCase.type).toBe(testCase.name);
     }
   });
 });
