@@ -12,15 +12,15 @@
 export const TEXT_EXT_TYPE_MAP = {
   'md': 'markdown',
   'error': 'void',
+  'txt': 'plaintext',
 } as const;
 
 /**
  * extension constants derived from map keys
  */
-export const EXTENSIONS = Object.keys(TEXT_EXT_TYPE_MAP).reduce((acc, key) => {
-  acc[key as keyof typeof TEXT_EXT_TYPE_MAP] = key;
-  return acc;
-}, {} as Record<keyof typeof TEXT_EXT_TYPE_MAP, string>) as {
+export const EXTENSIONS = Object.fromEntries(
+  Object.keys(TEXT_EXT_TYPE_MAP).map((key) => [key, key]),
+) as {
   readonly [K in keyof typeof TEXT_EXT_TYPE_MAP]: K;
 };
 
