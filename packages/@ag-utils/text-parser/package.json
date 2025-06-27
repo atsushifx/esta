@@ -46,6 +46,10 @@
     "node": ">=20"
   },
   "dependencies": {
-    "marked": "^15.0.12"
+    "remark": "^15.0.1",
+    "remark-parse": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4"
   }
 }

@@ -8,6 +8,8 @@
 
 // constants
 import { TEXT_EXT_TYPE_MAP } from '@shared/types/common.types';
+// types
+import type { Root } from 'mdast';
 // vitest
 import { describe, expect, test } from 'vitest';
 // parser: test target
@@ -33,5 +35,13 @@ describe('parseText', () => {
     const multilineText = 'Line 1\nLine 2\nLine 3';
     const result = parseText('txt', multilineText);
     expect(result).toBe(multilineText);
+  });
+
+  test('should parse markdown extension and return AST', () => {
+    const markdown = '# Hello World';
+    const result = parseText<Root>('md', markdown);
+    expect(result).toHaveProperty('type', 'root');
+    expect(result).toHaveProperty('children');
+    expect(result.children[0]).toHaveProperty('type', 'heading');
   });
 });
