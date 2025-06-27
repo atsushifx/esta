@@ -45,7 +45,7 @@
     "pnpm": ">=10",
     "node": ">=20"
   },
-  "devDependencies": {},
   "dependencies": {
+    "marked": "^15.0.12"
   }
 }
