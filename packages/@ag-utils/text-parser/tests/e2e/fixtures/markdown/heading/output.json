@@ -1,0 +1,20 @@
+{
+  "type": "ast",
+  "expected": {
+    "type": "root",
+    "children": [
+      {
+        "type": "heading",
+        "depth": 1
+      },
+      {
+        "type": "heading",
+        "depth": 2
+      },
+      {
+        "type": "heading",
+        "depth": 3
+      }
+    ]
+  }
+}

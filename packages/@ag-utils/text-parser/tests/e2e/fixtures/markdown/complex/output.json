@@ -1,0 +1,13 @@
+{
+  "type": "ast",
+  "expected": {
+    "type": "root",
+    "properties": {
+      "childCount": ">5",
+      "hasHeading": true,
+      "hasList": true,
+      "hasCode": true,
+      "hasBlockquote": true
+    }
+  }
+}
