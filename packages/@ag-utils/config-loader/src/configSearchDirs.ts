@@ -14,59 +14,79 @@ import process from 'process';
 import { SearchConfigFileType } from '@shared/types/common.types';
 
 import { getDelimiter } from '@ag-utils/common';
-// --- types
 
-// functions
+// ----------------
+// private
+// ----------------
+
+/**
+ * XDG設定ディレクトリを取得する内部関数
+ */
+const _getXdgDirs = (): string[] => {
+  const delimiter = getDelimiter();
+  const XDG_CONFIG_DIRS: string = process.env.XDG_CONFIG_DIRS + delimiter + '/etc/xdg';
+  const xdgDirs = XDG_CONFIG_DIRS
+    .split(getDelimiter())
+    .map((dir) => dir.trim())
+    .filter((dir) => (dir.length > 0) && (dir !== 'undefined'));
+  return xdgDirs;
+};
+
+/**
+ * システム設定ディレクトリを取得する内部関数
+ */
+const _configDirsSystem = (appConfig: string): string[] => {
+  const dirs: string[] = [];
+  const HOME = os.homedir();
+  const XDG_HOME = process.env.XDG_CONFIG_HOME ?? `${HOME}/.config`;
+
+  // add dirs
+  dirs.push(XDG_HOME + '/' + appConfig);
+  dirs.push(`${HOME}/.${appConfig}`);
+  const xdgDirs = _getXdgDirs();
+  xdgDirs.forEach((dir) => dirs.push(`${dir}/${appConfig}`));
+  return dirs;
+};
+
+/**
+ * ユーザー設定ディレクトリを取得する内部関数
+ */
+const _configDirsUser = (appConfig: string): string[] => {
+  const dirs: string[] = [];
+  const HOME = os.homedir();
+  const XDG_HOME = process.env.XDG_CONFIG_HOME ?? `${HOME}/.config`;
+  // add dirs
+  dirs.push(XDG_HOME + '/' + appConfig);
+  dirs.push(`${HOME}/configs/${appConfig}`);
+  dirs.push(`${HOME}/.configs/${appConfig}`);
+  dirs.push(`${HOME}/.${appConfig}`);
+
+  return dirs;
+};
+
+/**
+ * ディレクトリ配列から重複を削除する内部関数
+ */
+const _uniqDirs = (dirs: string[]): string[] =>
+  dirs
+    .filter((dir) => dir.length > 0)
+    .reduce<string[]>((acc, dir) => acc.includes(dir) ? acc : [...acc, dir], []);
+
+// ----------------
+// public
+// ----------------
+
+/**
+ * 設定ファイル検索用ディレクトリリストを作成する
+ */
 export const configSearchDirs = (appConfig: string, configFileType: SearchConfigFileType): string[] => {
   const dirs: string[] = [];
 
-  const configDirsSystem = (appConfig: string): string[] => {
-    const dirs: string[] = [];
-    const HOME = os.homedir();
-    const XDG_HOME = process.env.XDG_CONFIG_HOME ?? `${HOME}/.config`;
-
-    // search XDG_CONFIG_DIRS
-    const getXdgDirs = (): string[] => {
-      const delimiter = getDelimiter();
-      const XDG_CONFIG_DIRS: string = process.env.XDG_CONFIG_DIRS + delimiter + '/etc/xdg';
-      const xdgDirs = XDG_CONFIG_DIRS
-        .split(getDelimiter())
-        .map((dir) => dir.trim())
-        .filter((dir) => (dir.length > 0) && (dir !== 'undefined'));
-      return xdgDirs;
-    };
-
-    // add dirs
-    dirs.push(XDG_HOME + '/' + appConfig);
-    dirs.push(`${HOME}/.${appConfig}`);
-    const xdgDirs = getXdgDirs();
-    xdgDirs.forEach((dir) => dirs.push(`${dir}/${appConfig}`));
-    return dirs;
-  };
-  const configDirsUser = (appConfig: string): string[] => {
-    const dirs: string[] = [];
-    const HOME = os.homedir();
-    const XDG_HOME = process.env.XDG_CONFIG_HOME ?? `${HOME}/.config`;
-    // add dirs
-    dirs.push(XDG_HOME + '/' + appConfig);
-    dirs.push(`${HOME}/configs/${appConfig}`);
-    dirs.push(`${HOME}/.configs/${appConfig}`);
-    dirs.push(`${HOME}/.${appConfig}`);
-
-    return dirs;
-  };
-
   if (configFileType === SearchConfigFileType.SYSTEM) {
-    dirs.push(...configDirsSystem(appConfig));
+    dirs.push(..._configDirsSystem(appConfig));
   } else {
-    dirs.push(...configDirsUser(appConfig));
+    dirs.push(..._configDirsUser(appConfig));
   }
 
-  // dir to uniq
-  const uniqDirs = (dirs: string[]): string[] =>
-    dirs
-      .filter((dir) => dir.length > 0)
-      .reduce<string[]>((acc, dir) => acc.includes(dir) ? acc : [...acc, dir], []);
-
-  return uniqDirs(dirs);
+  return _uniqDirs(dirs);
 };

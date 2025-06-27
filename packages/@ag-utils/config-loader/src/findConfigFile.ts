@@ -11,19 +11,26 @@ import { resolve } from 'path';
 
 // types
 import type { SearchConfigFileType } from '@shared/types/common.types';
+
+// constants
 import { CONFIG_FILE_EXTENSIONS } from '@shared/types/common.types';
 
 // modules
 import { configSearchDirs } from './configSearchDirs';
 
-// --- types
+// ----------------
+// private
+// ----------------
 
-// types
-
+// constants
 /**
  * 固定化するプレフィックス
  */
 const PREFIXES = ['', '.'] as const;
+
+// ----------------
+// public
+// ----------------
 
 /**
  * baseNames （拡張子なしのベース名）と searchDirs（絶対パスの配列）から、

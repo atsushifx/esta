@@ -17,6 +17,10 @@ import { SearchConfigFileType } from '@shared/types/common.types';
 import { findConfigFile } from './findConfigFile';
 import { parseConfig } from './parser/parseConfig';
 
+// ----------------
+// public
+// ----------------
+
 export const loadConfig = <T = object>(
   basename: string,
   dirName: string = process.cwd(),

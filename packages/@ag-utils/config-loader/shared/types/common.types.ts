@@ -22,8 +22,17 @@ export const CONFIG_FILE_EXTENSIONS = {
   YAML: 'yaml',
   JS: 'js',
   TS: 'ts',
+  MD: 'md',
+  ERROR: 'error',
 } as const;
 
 export type ConfigFileExtension = typeof CONFIG_FILE_EXTENSIONS[keyof typeof CONFIG_FILE_EXTENSIONS];
+
+/**
+ * パーサーオプション
+ */
+export type ParseConfigOptions = {
+  parseAs?: 'md' | 'plaintext';
+};
 
 // --  type / interface definition
