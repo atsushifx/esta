@@ -6,10 +6,9 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// import commitlint config type
+// types
 import type { UserConfig } from '@commitlint/types';
-
-// import base Config
+// config
 import { default as baseConfig } from '../../../../shared/configs/commitlint.config.base.js';
 
 const config: UserConfig = {
