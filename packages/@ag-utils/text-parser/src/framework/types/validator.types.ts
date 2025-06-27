@@ -1,4 +1,4 @@
-// tests: ./e2e/utils/validators/types.ts
+// src: ./framework/types/validator.types.ts
 // バリデーター型定義
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>

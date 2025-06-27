@@ -9,9 +9,8 @@
 import { join } from 'node:path';
 // vitest
 import { describe, expect, test } from 'vitest';
-// test utilities
-import { runFixtureTest, runFixtureTestWithExpect } from './utils/fixtureRunner';
-import { scanTestTypes } from './utils/testDiscovery';
+// framework
+import { runFixtureTest, scanTestTypes } from '../../src/framework';
 
 const fixturesDir = join(__dirname, 'fixtures');
 
@@ -22,12 +21,6 @@ describe('parseText E2E (Final)', () => {
     describe(`${testType.type} files`, () => {
       for (const testCase of testType.testCases) {
         test(`should process ${testCase.name} ${testCase.type} file`, () => {
-          // Option 1: Using expect inside test
-          runFixtureTestWithExpect(testCase.path, testCase.name);
-        });
-
-        test(`should validate ${testCase.name} ${testCase.type} file (return value)`, () => {
-          // Option 2: Using return value
           const isValid = runFixtureTest(testCase.path, testCase.name);
           expect(isValid).toBe(true);
         });
@@ -38,8 +31,8 @@ describe('parseText E2E (Final)', () => {
   // Extension detection tests
   describe('File extension detection', () => {
     for (const testType of testTypes) {
-      const firstTestCase = testType.testCases[0];
-      if (firstTestCase) {
+      if (testType.testCases.length > 0) {
+        const firstTestCase = testType.testCases[0];
         test(`should detect .${testType.type} extension correctly`, () => {
           expect(runFixtureTest(firstTestCase.path, `${firstTestCase.name} with extension`)).toBe(true);
         });

@@ -1,5 +1,5 @@
-// tests: ./e2e/utils/testDiscovery.ts
-// テスト走査ルーチン
+// src: ./framework/testDiscovery.ts
+// テスト走査関数
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -8,23 +8,16 @@
 
 import { readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+// types
+import type { TestCase, TestTypeInfo } from './types';
 
-export type TestCase = {
-  type: string;
-  name: string;
-  path: string;
-};
+// === 内部関数 ===
 
-export type TestTypeInfo = {
-  type: string;
-  testCases: TestCase[];
-};
-
-const isCommentedOut = (dirName: string): boolean => {
+const _isCommentedOut = (dirName: string): boolean => {
   return dirName.startsWith('#');
 };
 
-const isValidTestDirectory = (dirPath: string): boolean => {
+const _isValidTestDirectory = (dirPath: string): boolean => {
   try {
     const stat = statSync(dirPath);
     if (!stat.isDirectory()) { return false; }
@@ -40,6 +33,8 @@ const isValidTestDirectory = (dirPath: string): boolean => {
   }
 };
 
+// === 外部関数 ===
+
 export const scanTestCases = (typeDir: string, typeName: string): TestCase[] => {
   const testCases: TestCase[] = [];
 
@@ -48,12 +43,12 @@ export const scanTestCases = (typeDir: string, typeName: string): TestCase[] => 
 
     for (const entry of entries) {
       // #で始まるディレクトリはコメントアウトとしてスキップ
-      if (isCommentedOut(entry)) {
+      if (_isCommentedOut(entry)) {
         continue;
       }
 
       const testCasePath = join(typeDir, entry);
-      if (isValidTestDirectory(testCasePath)) {
+      if (_isValidTestDirectory(testCasePath)) {
         testCases.push({
           type: typeName,
           name: entry,
@@ -76,7 +71,7 @@ export const scanTestTypes = (fixturesDir: string): TestTypeInfo[] => {
 
     for (const entry of entries) {
       // #で始まるディレクトリはコメントアウトとしてスキップ
-      if (isCommentedOut(entry)) {
+      if (_isCommentedOut(entry)) {
         continue;
       }
 

@@ -1,4 +1,4 @@
-// tests: ./e2e/utils/validators/markdownValidator.ts
+// src: ./framework/validators/markdownValidator.ts
 // Markdown ASTバリデーター
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -8,9 +8,11 @@
 
 // types
 import type { Root } from 'mdast';
-import type { MarkdownExpected } from './types';
+import type { MarkdownExpected } from '../types';
 
-const validateChildrenStructure = (
+// === 内部関数 ===
+
+const _validateChildrenStructure = (
   astResult: Root,
   expectedChildren: Array<{ type: string; depth?: number }>,
 ): boolean => {
@@ -30,7 +32,7 @@ const validateChildrenStructure = (
   });
 };
 
-const validateProperties = (
+const _validateProperties = (
   astResult: Root,
   properties: NonNullable<MarkdownExpected['expected']['properties']>,
 ): boolean => {
@@ -73,38 +75,40 @@ const validateProperties = (
   }
 
   if (properties.hasText) {
-    const hasTextNode = (node: unknown): boolean => {
+    const _hasTextNode = (node: unknown): boolean => {
       const astNode = node as { type: string; children?: unknown[] };
       if (astNode.type === 'text') { return true; }
       if (astNode.children) {
-        return astNode.children.some(hasTextNode);
+        return astNode.children.some(_hasTextNode);
       }
       return false;
     };
-    const hasText = astResult.children.some(hasTextNode);
+    const hasText = astResult.children.some(_hasTextNode);
     if (!hasText) { return false; }
   }
 
   return true;
 };
 
-export const validateMarkdownResult = (result: unknown, expected: MarkdownExpected): boolean => {
-  const astResult = result as Root;
+// === 外部関数 ===
 
-  if (!astResult || astResult.type !== 'root') {
+export const validateMarkdownResult = (result: unknown, expected: MarkdownExpected): boolean => {
+  if (!result || typeof result !== 'object' || !('type' in result) || result.type !== 'root') {
     return false;
   }
+
+  const astResult = result as Root;
 
   const expectedAst = expected.expected;
 
   if (expectedAst.children) {
-    if (!validateChildrenStructure(astResult, expectedAst.children)) {
+    if (!_validateChildrenStructure(astResult, expectedAst.children)) {
       return false;
     }
   }
 
   if (expectedAst.properties) {
-    if (!validateProperties(astResult, expectedAst.properties)) {
+    if (!_validateProperties(astResult, expectedAst.properties)) {
       return false;
     }
   }

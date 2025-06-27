@@ -1,4 +1,4 @@
-// tests: ./e2e/utils/validators/index.ts
+// src: ./framework/validators/index.ts
 // バリデーターエクスポート
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -8,13 +8,14 @@
 
 export * from './markdownValidator';
 export * from './plaintextValidator';
-export * from './types';
 
 // types
-import type { ExpectedConfig } from './types';
+import type { ExpectedConfig } from '../types';
 // validators
 import { validateMarkdownResult } from './markdownValidator';
 import { validatePlaintextResult } from './plaintextValidator';
+
+// === 外部関数 ===
 
 export const validateResult = (result: unknown, expected: ExpectedConfig): boolean => {
   switch (expected.type) {
@@ -23,6 +24,6 @@ export const validateResult = (result: unknown, expected: ExpectedConfig): boole
     case 'markdown':
       return validateMarkdownResult(result, expected);
     default:
-      throw new Error(`Unknown expected type: ${expected.type}`);
+      throw new Error(`Unknown expected type: ${(expected as { type: string }).type}`);
   }
 };
