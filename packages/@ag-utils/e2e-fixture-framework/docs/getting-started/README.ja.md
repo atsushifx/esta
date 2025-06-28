@@ -1,9 +1,16 @@
-# E2E Fixture Framework はじめてガイド
+---
+title: E2E Fixture Framework スタートガイド
+description: E2E Fixture Framework を使ってテストを作成する開発者向けの導入ガイドです。
+sidebar_position: 1
+slug: /getting-started
+---
+
+[English](./README.md) | 日本語
+
+## E2E Fixture Framework はじめてガイド
 
 このドキュメントは、E2E Fixture Framework を使ってテストを作成する開発者のための「最初の一歩」をサポートするガイドです。
 テスト構成、ファイルレイアウト、最初のケースの作り方、実行方法などを丁寧に説明します。
-
-[English version 🇬🇧](./README.md)
 
 ---
 
@@ -31,3 +38,5 @@
   エラーが出たときの対処法、テストがスキップされる理由などを掲載しています。
 
 ---
+
+> 💡 より高度なカスタマイズやバリデータの拡張方法については、今後追加予定の `advanced/` ガイドをご参照ください。
