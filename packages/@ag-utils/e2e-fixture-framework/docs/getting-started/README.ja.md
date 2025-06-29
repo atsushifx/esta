@@ -16,19 +16,19 @@ slug: /getting-started
 
 📘 **目次 / Table of Contents**
 
-- [1. はじめに](./01-introduction.md)
+- [1. はじめに](01-introduction.md)
   このフレームワークの目的と特長、他のテスト方法との違いを説明します。
 
-- [2. インストール手順](./02-installation.md)
-  必要なパッケージと、インストール方法の手順を紹介します。
+- [2. 概要](02-overview.ja.md)
+  このフレームワークの概要を示します。
 
-- [3. Fixture構成ルール](./03-fixture-layout.md)
+- [3. Fixture構成ルール](03-fixture-layout.ja.md)
   `input` / `output` ファイルの配置方法、無効化ディレクトリの命名規則などを解説します。
 
-- [4. 最初のテストを書く](./04-writing-your-first-test.md)
+- [4. 最初のテストを書く](04-writing-your-first-test.ja.md)
   基本的なMarkdown/PlainTextのテストケースを作ってみましょう。
 
-- [5. テストを実行する](./05-running-the-tests.md)
+- [5. テストを実行する](05-running-the-tests.ja.md)
   テストの実行方法、ログの確認方法、CIへの組み込み方法を説明します。
 
 - [6. よくある質問](./06-faq.md)
