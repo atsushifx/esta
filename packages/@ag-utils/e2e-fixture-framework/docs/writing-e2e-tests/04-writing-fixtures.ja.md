@@ -1,0 +1,170 @@
+---
+title: フィクスチャの書き方
+description: input.md, output.json を用いたテストデータの作成方法と設計のポイントを解説します。
+sidebar_position: 4
+slug: /writing-fixtures
+---
+
+## 第4章 フィクスチャの書き方
+
+この章では、E2E Fixture Framework における **テストデータ（フィクスチャ）の作成方法**と、
+より効率的でメンテナブルなテスト設計を行うためのポイントを解説します。
+
+---
+
+### フィクスチャファイルの基本構成
+
+```bash
+fixtures/
+└── markdown/
+    └── headings/
+        └── h1-basic/
+            ├── input.md
+            └── output.json
+```
+
+`fixture`ファイルはテスト用の`input.<ext>` (`<ext>`:任意の拡張子) とテスト結果チェック用の`output.json` からなります。
+それぞれのファイルの役割は、次の通りです。
+
+- `input.md` (または、`.txt`, `.error`):
+  - テスト対象となる**入力データ**を記述
+  - 拡張子に制限はないが、一貫性のある命名を推奨
+  - 例: `.md` → マークダウン/ `txt` → テキストファイル / `.error` → マークダウンまたはテキストファイル (エラーを含む)
+
+- `output.json`:
+  - `input.<ext>`を処理した結果 (**`json`型式の構造化データ**)を定義
+  - `type`プロパティを使って処理種別を宣言します (例: `"type": "markdown"`)
+  - JSON型式で比較するため、差分比較が容易です
+
+📌 命名のルールと工夫
+
+| 要素           | 命名ガイドライン                                                          |
+| -------------- | ------------------------------------------------------------------------- |
+| ディレクトリ名 | スネークケース／ケバブケースどちらでもOK (`heading-level1`, `table_test`) |
+| ファイル名     | 常に `input.*` / `output.json` の組み合わせで固定                         |
+| コメントアウト | `#`で始まるディレクトリ名 (カテゴリー、テストケースとも) は除外           |
+
+> 💡 ファイル名に "OK", "NG", "error" などの接尾語を使うと状態がわかりやすくなります
+
+### 拡張子と`type`プロパティ
+
+`output.json`の先頭に必ず記述する`type`プロパティには、以下のファイル種別を指定します。
+マッピングは定数 `EXT_TO_FILETYPE` で定義されています。
+
+| 拡張子   | ファイル種別 (`type` の値) | `output.json`の`type`プロパティ              |
+| -------- | -------------------------- | -------------------------------------------- |
+| `.txt`   | `plaintext`                | `plaintext`                                  |
+| `.md`    | `markdown`                 | `markdown`                                   |
+| `.error` | `void` (エラー検証用)      | 実ファイル種別 (`plaintext`または`markdown`) |
+
+> 注記:
+>
+> - ファイル種別 `void` は、エラー検証用の特別なファイル種別です、`output.json`には、実際のファイル種別である
+>   `plaintext`か`markdown`を指定します。
+> - 将来的に新しい拡張子／種別を追加する場合は、`EXT_TO_FILETYPE` に項目を追加してください。
+> - ここに挙げた以外の `type` 値を使う場面があれば、あわせてドキュメントと定数定義を更新しましょう。
+
+### 正常系／異常系の構成例
+
+#### 正常系 (`input.md' + 'output.json`)
+
+以下は、下記の`input.md`を入力した場合の、期待される`output.json`の例です。
+
+input.md:
+
+```markdown
+# 見出し1
+
+## 見出し2
+```
+
+output.json:
+
+```json
+{
+  "type": "markdown",
+  "ast": {
+    "headers": ["見出し1", "見出し2"],
+    "tokens": [
+      { "type": "heading", "level": 1, "text": "見出し1" },
+      { "type": "heading", "level": 2, "text": "見出し2" }
+    ]
+  }
+}
+```
+
+- 最初のパラメータ: `"type": "markdown"`は、ファイル種別が Markdown であることを示しています。
+- 最初の`type` プロパティにあわせたパーサとバリデータを実行します
+- それ以外のキーはパーサごとに自由な構造でOK
+- 配列・オブジェクトなどを活用して精密な検証が可能です
+
+#### 異常系 (`input.error` + `output.json`)
+
+- **`.error`** はエラー期待ケースを示すマーカーです。入力データのパース／テスト処理は、同じディレクトリ
+  (例: `fixtures/markdown/...`)で使われるパーサが用いられます。
+- `output.json` の `type` プロパティは **必ず実ファイル種別** (`"markdown"` または `"plaintext"`) を指定します。
+
+異常系の`fixtures`の例:
+
+```bash
+fixtures/
+└── markdown/
+    └── headings-error/
+        ├── input.error         ← Markdown 形式のエラーケース入力
+        └── output.json         ← type: "markdown", expectedErrorMessage を定義
+```
+
+- input.error:
+  ```markdown
+  # 見出し1
+
+  ### 見出し2 ← 見出しLevel3なのでエラー
+  ```
+
+- output.json:
+  ```json
+  {
+    "type": "markdown",
+    "expectedErrorMessage": "Heading level 3 is not allowed"
+  }
+  ```
+
+実行フロー (擬似コード):
+
+```typescript
+expect(() => {
+  const parsedInput = parse(input);
+  const result = tester(parsedInput);
+}).toThrow(expectedErrorMessage);
+```
+
+> 🧪 補足：エラーメッセージの検証 (将来対応予定)
+> 将来的に `output.json` に `expectedErrorMessage` を記述することで、
+> エラー出力に特定の文言が含まれているかどうかを検証可能にする予定です。
+>
+> - 例外が発生: エラーメッセージをチェック
+>   `expectedErrorMessage`が含まれていればテスト成功、含まれていなければテスト失敗
+> - 例外が発生しない: 正常系が通ったので、テスト失敗とする
+
+#### 💡 テスト設計のポイント
+
+- 最小ケース → 正常系／異常系のセット → 境界値ケース、の順に広げていく
+- コメントアウト (`#skip-case/`) を使って開発中のケースを分離可能
+- JSONが大きくなる場合は、コメントで適宜補完 (`コメント機能は、将来対応予定`)
+
+### JSON Schema の提供
+
+将来、GitHub Pages でJSON Schemaを提供する予定です。これにより、多様なエディタやツールで `output.json` のエラー検出・補完が効くようになります。
+
+- `base.json` - 共通スキーマ
+- `plaintext.json` → Plaintext Fixture用スキーマ
+- `markdown.json` → Markdown Fixture用スキーマ
+- `mdast.json` → 公式仕様 (Web IDL) を元に生成された MDAST JSON Schema (計画中)
+
+公開後は、各`output.json` の先頭で `$schema` プロパティに URL を指定し、エディタやCIで自動的にバリデーションが行えるようにします。
+
+### まとめ
+
+- `fixture` は `input + output` をペアでディレクトリに格納
+- ディレクトリ名/ファイル名 の名称/階層を工夫することで、整理された保守性・視認性の高いテストが書けます
+- プロパティ `type` によって、パーサ／バリデータが自動的に切り替わります
