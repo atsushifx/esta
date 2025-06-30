@@ -5,7 +5,7 @@ sidebar_position: 5
 slug: /writing-e2e-tests
 ---
 
-## E2Eテストの実装
+## 第5章 E2Eテストの実装
 
 この章では、E2E Fixture Framework を用いて実際にテストを記述する `framework.e2e.spec.ts` の構成と、
 fixtureディレクトリからの読み込み・実行のパターンを解説します。

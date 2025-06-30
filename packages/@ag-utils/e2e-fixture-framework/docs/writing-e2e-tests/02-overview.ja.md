@@ -5,7 +5,7 @@ sidebar_position: 2
 slug: /overview
 ---
 
-## フレームワーク全体像
+## 第2章 フレームワーク全体像
 
 この章では、E2E Fixture Framework がどのような目的と設計方針で作られているのか、
 そして fixture を使ったテストがどのように実行・検証されるのかを説明します。

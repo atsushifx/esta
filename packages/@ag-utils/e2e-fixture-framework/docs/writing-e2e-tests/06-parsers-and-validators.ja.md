@@ -5,7 +5,7 @@ sidebar_position: 6
 slug: /parsers-and-validators
 ---
 
-## 🔍 06. パーサ、バリデータの理解と拡張
+## 第6章 パーサ、バリデータの理解と拡張
 
 この章では、E2E Fixture Framework における **パーサ（parser）** と **バリデータ（validator）** の役割、およびそれらを拡張する方法について解説します。
 

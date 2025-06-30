@@ -5,7 +5,7 @@ sidebar_position: 3
 slug: /project-structure
 ---
 
-## プロジェクト構成ガイド
+## 第3章 プロジェクト構成ガイド
 
 この章では、E2E Fixture Framework を導入する際の**プロジェクト構成ルール**と、
 推奨されるフォルダの分け方・命名規則について解説します。
