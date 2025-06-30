@@ -1,56 +1,60 @@
 ---
-title: E2Eテスト書き方ガイド
-description: ESTAのe2e-fixture-frameworkを使ったテスト作成のための実践ガイド
+title: E2E Fixture Framework – Writing Tests Guide
+description: Learn how to use the E2E Fixture Framework to write flexible, fixture-based end-to-end tests.
 sidebar_position: 0
-slug: /e2e-guide
 ---
 
-## E2Eテスト書き方ガイド
-
-このガイドは、`e2e-fixture-framework` を用いた E2E テストの構築・実装・運用のための**完全マニュアル**です。
-セットアップからAPI仕様まで、段階的にテスト作成に必要な知識を習得できます。
+English | [日本語](./README.ja.md)
 
 ---
 
-### はじめに
+# 🧪 E2E Fixture Framework – Writing Tests Guide
 
-本ガイドは「どうやってこのフレームワークでE2Eテストを書くか？」に答えることを目的としています。
-最小構成の立ち上げから、高度なfixture連携、CI統合までを一貫してカバーします。
-
----
-
-### 目次
-
-- 🚀 [**01. はじめてのセットアップ**](01-getting-started.ja.md)
-  フレームワークのインストール、初期ファイル作成、最初のテストの実行手順
-
-- 🧭 [**02. フレームワーク全体像**](02-overview.ja.md)
-  設計思想、処理フロー、ディレクトリ構成の基本理解
-
-- 🧩 [**03. プロジェクト構成ガイド**](03-project-structure.ja.md)
-  テスト・フィクスチャのファイル配置とルール
-
-- 📦 [**04. フィクスチャの書き方**](04-writing-fixtures.ja.md)
-  `input.md`, `output.json` の組み立て方、命名規則と設計のコツ
-
-- 🧪 [**05. E2Eテストの実装**](05-writing-e2e-tests.ja.md)
-  `framework.e2e.spec.ts` の例と、fixture活用によるテスト記述パターン
-
-- 🔍 [**06. バリデータの理解と拡張**](06-validators-overview.ja.md)
-  用意されたvalidatorの役割、カスタムバリデーションの作り方
-
-- ⚙️ [**07. 条件指定によるテストの一括実行**](07-run-tests-with-options.ja.md)
-  テスト実行時の条件指定・ディレクトリ除外など、柔軟なコントロール方法
-
-- 🔄 [**08. CI連携と自動実行**](08-ci-integration.ja.md)
-  GitHub Actionsによるテスト自動化とCI構成のポイント
-
-- 📘 [**09. APIリファレンス**](09-api-reference.ja.md)
-  `AgE2eTestDiscovery`, `AgE2eFileReader`, `fixtureRunner` などの仕様と使用例
+This guide explains how to **write end-to-end (E2E) tests using fixtures** with the E2E Fixture Framework.
+It is intended for developers who are *using* the framework to write tests in other packages or projects—not for those maintaining the framework itself.
 
 ---
 
-### おわりに
+## 📚 Table of Contents
 
-各章は独立して参照可能ですが、`01 → 08` の順に読み進めることで、より深く体系的に理解できます。
-改善提案やご質問は、GitHub Discussions や Pull Request で歓迎します！
+- 🔰 **[01. Getting Started](01-getting-started.ja.md)**
+  How to install the framework, create the initial files, and run your first test
+
+- 🧭 **[02. Framework Overview](02-overview.ja.md)**
+  The design philosophy, internal flow, and directory structure
+
+- 📁 **[03. Project Structure Guide](03-project-structure.ja.md)**
+  How to organize test files and fixtures with naming conventions
+
+- 📝 **[04. Writing Fixtures](04-writing-fixtures.ja.md)**
+  How to write `input.md` / `output.json`, with design tips
+
+- 🧪 **[05. Implementing E2E Tests](05-writing-e2e-tests.ja.md)**
+  Writing `framework.e2e.spec.ts` using fixtures effectively
+
+- 🧩 **[06. Parsers and Validators](06-parsers-and-validators.ja.md)**
+  Understanding built-in parser/validator behavior and how to extend them
+
+- ⚙️ **[07. Running Tests with Conditions](07-run-tests-with-options.ja.md)**
+  How to run selective tests with filters, excludes, and categories
+
+- 🤖 **[08. CI Integration](08-ci-integration.ja.md)**
+  Running tests in GitHub Actions and tips for CI configuration
+
+- 🧰 **[09. API Reference](09-api-reference.ja.md)**
+  Usage and specs for `AgE2eTestDiscovery`, `AgE2eFileReader`, and `fixtureRunner`
+
+---
+
+## 🧭 About This Guide
+
+Each chapter can be read independently, but we recommend reading from `01 → 08` for a complete understanding.
+If you'd like to improve the docs or report issues, please submit a GitHub Discussion or Pull Request!
+
+---
+
+## License
+
+MIT License
+© 2025 [atsushifx](https://github.com/atsushifx)
+*Powered by AI Agents (Elpha, Kobeni, Tsumugi)*
