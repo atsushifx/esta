@@ -65,11 +65,13 @@ output.json:
 ```json
 {
   "type": "markdown",
-  "headers": ["見出し1", "見出し2"],
-  "tokens": [
-    { "type": "heading", "level": 1, "text": "見出し1" },
-    { "type": "heading", "level": 2, "text": "見出し2" }
-  ]
+  "ast": {
+    "headers": ["見出し1", "見出し2"],
+    "tokens": [
+      { "type": "heading", "level": 1, "text": "見出し1" },
+      { "type": "heading", "level": 2, "text": "見出し2" }
+    ]
+  }
 }
 ```
 
