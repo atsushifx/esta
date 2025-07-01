@@ -55,6 +55,10 @@ $~*
 !.claude/commands
 !.claude/commands/*
 
+#  Test Result
+**/*results/*
+
+
 ### Develop
 # Node
 # Node.js / JS project ignores
