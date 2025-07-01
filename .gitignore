@@ -63,6 +63,9 @@ dist
 **/module/*
 **/lib/*
 
+# Test Report
+*results/*
+
 # temporary directory
 temp/
 tmp/

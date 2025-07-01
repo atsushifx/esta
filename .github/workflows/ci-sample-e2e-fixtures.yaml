@@ -1,0 +1,41 @@
+# src: .github/workflows/ci-sample-e2e-fixtures.yaml
+# @(#) : E2E Fixture Tests sample
+#
+# Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+#
+# This software is released under the MIT License.
+# https://opensource.org/licenses/MIT
+# .github/workflows/ci-e2e-fixture-tests.yml
+name: CI E2E Fixture Tests sample
+
+on:
+  workflow_dispatch: # 手動トリガーを追加
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run Vitest E2E Fixture tests
+        run: pnpm run test:gha
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-e2e-fixture-test-results
+          path: test-results/

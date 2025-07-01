@@ -24,7 +24,14 @@
     "rootDir": ".",
     // alias
     "baseUrl": ".",
-    "paths": {},
+    "paths": {
+      "@/*": [
+        "packages/@ag-utils/e2e-fixture-framework/src/*"
+      ],
+      "@shared/*": [
+        "packages/@ag-utils/e2e-fixture-framework/shared/*"
+      ]
+    },
     // types
     // cache
     "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"
