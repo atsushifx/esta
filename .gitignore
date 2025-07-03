@@ -27,7 +27,6 @@ thumbs.db
 .cache/
 **/*cache
 
-
 #	backup/swap/temp
 $~*
 ~*
@@ -57,7 +56,6 @@ $~*
 
 #  Test Result
 **/*results/*
-
 
 ### Develop
 # Node
