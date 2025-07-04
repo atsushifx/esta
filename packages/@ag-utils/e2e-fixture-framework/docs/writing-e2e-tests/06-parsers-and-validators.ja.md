@@ -65,6 +65,7 @@ output.json（期待値）との比較 → 成否
 #### `output.json`の例
 
 - `plaintext`:
+
   ```json
   // output.json
   {
@@ -74,6 +75,7 @@ output.json（期待値）との比較 → 成否
   ```
 
 - `markdown`:
+
   ```json
   // output.json
   {
@@ -96,11 +98,16 @@ output.json（期待値）との比較 → 成否
 
 #### カスタムパーサの作成
 
+<!-- textlint-disable ja-technical-writing/sentence-length -->
+
 Issue #73 で検討中の仕様に合わせ、パーサ自体は「生のパース結果」(Markdown なら AST、プレーンテキストなら文字列) を返し、executor 側で `TResult` を組み立てる方針とします。
 
-カスタムパーサの例
+<!-- textlint-enable -->
+
+カスタムパーサの例。
 
 - `plaintext`:
+
   ```typescript
   // src/parsers/parseText.ts
   import type { ParserFunction } from '@ag-e2e/framework';
@@ -110,6 +117,7 @@ Issue #73 で検討中の仕様に合わせ、パーサ自体は「生のパー�
   ```
 
 - `markdown`:
+
   ```typescript
   // src/parsers/parseMarkdown.ts
   import type { ParserFunction } from '@ag-e2e/framework';
@@ -126,9 +134,10 @@ Issue #73 で検討中の仕様に合わせ、パーサ自体は「生のパー�
 
 Issue #73 で検討中の仕様に合わせ、バリデータも`tester`の処理結果 (`plaintext`: `string`, `markdown`: `ast`) を渡す方式とします。
 
-カスタムバリデータの例
+カスタムバリデータの例。
 
 - `plaintext`:
+
   ```typescript
   // src/validators/validateText.ts
   import type { ValidatorFunction } from '@ag-e2e/framework';
@@ -140,6 +149,7 @@ Issue #73 で検討中の仕様に合わせ、バリデータも`tester`の処�
   ```
 
 - `markdown`:
+
   ```typescript
   import type { ValidatorFunction } from '@ag-e2e/framework';
   import type { Root } from 'mdast';
