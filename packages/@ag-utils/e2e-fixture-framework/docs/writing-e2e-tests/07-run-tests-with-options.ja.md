@@ -7,113 +7,151 @@ slug: /run-tests-with-options
 
 ## 第7章 条件指定によるテストの一括実行
 
+<!-- textlint-disable ja-technical-writing/sentence-length -->
+
 この章では、`e2e-fixture-framework` における `runAllFoundTests()` および `findTestCases()` メソッドを用いた、テスト実行の柔軟な制御方法について解説します。
 
-### テストケースの構造
+<!-- textlint-enable -->
 
-本フレームワークにおける E2E テストケースは、以下の構造で管理されます：
+### 1. テストケースの構造
 
-- 各テストは **ディレクトリ単位**で構成
-  (`fixtures/<mainCategory>/<subCategory>/<testCase>`型式)
-- 以下の2ファイルの組み合わせで1テストケースを定義：
-  - `input.*` (任意の入力ファイル)
-  - `output.json` (期待される出力)
+本フレームワークにおける E2E テストケースは、以下の構造で管理されます。
 
-### オプションの指定による、テスト実行の制御
+- 各テストは **ディレクトリ単位**で構成されており、`fixtures/<mainCategory>/<subCategory>/<testCase>` という階層構造を持つ。
+- 1つのテストケースは、次の 2つのファイルで定義される。
+  - `input.*` : 任意の拡張子を持つ入力ファイル。テスト対象のデータを含む。
+  - `output.json` : 期待されるテスト結果を JSON 形式で記述したファイル。
 
-#### 一括実行メソッド`runAllFoundTests`でのオプション指定
+このディレクトリ構造とファイルの組み合わせにより、テストケースの管理と実行が容易に行えます。
 
-テスト一括実行メソッド`runAllFoundTests`は、オプションを指定することにより実行するテストを制御できます。
-`runAllFoundTests`では、以下のオプションが使用できます:
+### 2. オプションの指定による、テスト実行の制御
 
-| オプション | 型        | 説明                             |
-| ---------- | --------- | -------------------------------- |
-| `pattern`  | `regexp`  | ディレクトリを正規表現で絞り込み |
-| `dryRun`   | `boolean` | 実行せず一覧のみ出力             |
-| `verbose`  | `boolean` | 実行ログを詳細出力               |
-| `timeout`  | `number`  | 各テストの最大実行時間（ミリ秒） |
+`runAllFoundTests` メソッドは、テストケースの絞り込みや、テストの細かい挙動を設定するオプションを指定できます。
 
-オプションを指定した場合の`runAllFoundTests`の記述は以下のようになります:
+#### 2.1 主なオプション
+
+設定できる主なオプションは、以下の通りです。
+
+<!-- markdownlint-disable line-length -->
+
+| オプション | 型        | 説明                                                                                                                                                 |
+| ---------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pattern`  | `regexp`  | 実行対象のディレクトリ名を正規表現でフィルタリングします。例えば `/^heading/` のように指定すると、`heading` で始まるディレクトリのみを対象にします。 |
+| `dryRun`   | `boolean` | `true` に設定すると、実際のテストは実行せず、対象となるテストケースの一覧のみを出力します。                                                          |
+| `verbose`  | `boolean` | 詳細な実行ログを出力します。テストの進行状況や詳細情報を確認したい場合に有効です。                                                                   |
+| `timeout`  | `number`  | 各テストケースの最大実行時間をミリ秒単位で指定します。タイムアウト時間を超えると、そのテストは失敗扱いとなります。                                   |
+
+<!-- markdownlint-enable -->
+
+これらのオプションを用いることで、実行対象の柔軟な選択や挙動の制御が可能です。
+例えば、特定のカテゴリだけを絞って実行したり、テスト実行の事前確認として一覧表示だけ行うことができます。
+
+#### 2.2 `runAllFoundTests`の記述例
+
+`runAllFoundTests` は、指定したディレクトリ以下のテストケースを一括で実行するためのメソッドです。
+オプションを用いて、実行対象の絞り込みや動作の詳細設定が可能です。
+
+以下のコードは、名前が `heading` で始まるテストケースのみ、タイムアウト 10秒で実行、詳細ログを出力する例です。
 
 ```typescript
-import { runAllFoundTests } from "e2e-fixture-framework";
+import { runAllFoundTests } from 'e2e-fixture-framework';
 
-await runAllFoundTests("fixtures", {
-  pattern: /^heading/   // headingではじまるカテゴリー/テストケースのみテスト
-  dryRun: false,        // dryRunではなく実際にテストする (`true`: テストするテストケースを表示)
-  verbose: true,        // verbose mode (実行時のログを詳細に出力)
-  timeout: 10_000,      // テスト実行時のタイムアウト秒数 (ミリ秒単位: 10_000=10秒)
+await runAllFoundTests('fixtures', {
+  pattern: /^heading/, // headingで始まるカテゴリーやテストケースを対象に絞り込み
+  dryRun: false, // 実際にテストを実行
+  verbose: true, // 詳細ログを有効化
+  timeout: 10_000, // タイムアウト時間を10秒 (10000ミリ秒) に設定
 });
 ```
 
-> 注記:
+> 注意事項:
 >
-> - ディレクトリは`<メインカテゴリー>`、`<サブカテゴリー>`、`<テストケース>`の3階層までスキャンします。
->   上記の正規表現の場合、上記のどれかのディレクトリが条件にあえばテストを実行します。
-> - Fixture Frameworkでは、指定の方法でテストをスキップできます。 （詳細は下記「[テストのスキップ (除外)](#テストのスキップ-除外)」を参照）
+> - ディレクトリは`<メインカテゴリー>`、`<サブカテゴリー>`、`<テストケース>`の3階層までスキャンする。
+> - 正規表現は 3階層いずれかの名前にマッチすれば対象となる。
+> - テストをスキップしたい場合は、特定のファイルやディレクトリ名の付与で制御可能 (後述)
 
-#### テストケース検索メソッド `findTestCases`におけるオプション設定
+### 3. テストケース検索メソッド `findTestCases` におけるオプション設定
 
-テストケース検索メソッド `findTestCases` でも同様のオプションが指定できます。
-`findTestCases`で使用できるオプションは、`runAllFoundTests`と同様です:
+`findTestCases` メソッドは、指定したディレクトリから条件に合致するテストケースを検索して一覧を取得する機能です。
+`runAllFoundTests` と同様にオプションで絞り込みや動作制御が可能で、より細かくテストケースを操作したい場合に適しています。
 
-| オプション | 型        | 説明                             |
-| ---------- | --------- | -------------------------------- |
-| `pattern`  | `regexp`  | ディレクトリを正規表現で絞り込み |
-| `dryRun`   | `boolean` | 実行せず一覧のみ出力             |
-| `verbose`  | `boolean` | 実行ログを詳細出力               |
-| `timeout`  | `number`  | 各テストの最大実行時間（ミリ秒） |
+### 3.1 オプションの一覧
 
-`findTestCases`を使用した記述は以下になります:
+`findTestCases`の主なオプションは以下の通りです。
+
+| オプション | 型        | 説明                                                     |
+| ---------- | --------- | -------------------------------------------------------- |
+| `pattern`  | `regexp`  | ディレクトリを正規表現で絞り込みます                     |
+| `dryRun`   | `boolean` | `true` の場合、テストは実行せず一覧のみ返します。        |
+| `verbose`  | `boolean` | 詳細なログを出力します                                   |
+| `timeout`  | `number`  | 各テストケースの最大実行時間 (ミリ秒単位) を指定します。 |
+
+#### 3.2 `findTestCases`の記述例
+
+以下は `findTestCases` を利用して、条件に合ったテストケースをループで明示的に実行する例です。
 
 ```typescript
-// libs
+// ライブラリのインポート
 import path from 'path';
 
-// vitest
+//  vitest
 import { describe, expect, it } from 'vitest';
 
-// E2E Fixture Framework
+//  E2E Fixtures Framework
 import { AgE2eFixtureFramework, findTestCases } from '@ag-utils/e2e-fixture-framework';
 
-// test target
+// テスト対象の関数
 import { analyzeMarkdown } from '../src/analyzeMarkdown';
 
-// framework setup
+// フレームワーク初期化
 const framework = new AgE2eFixtureFramework(analyzeMarkdown);
 const fixturesDir = path.resolve(__dirname, 'fixtures');
 
-async describe('E2E Fixture Framework - 明示的ループ実行', () => {
-  const testCases = await findTestCases(fixturesDir, {
-    pattern: /^heading/,
-    dryRun: false,
-    verbose: true,
-    timeout: 10_000,
-  });
+describe('E2E Fixture Framework - 明示的ループ実行', () => {
+  it('指定パターンに合致するテストケースのみ実行', async () => {
+    const testCases = await findTestCases(fixturesDir, {
+      pattern: /^heading/,
+      dryRun: false,
+      verbose: true,
+      timeout: 10_000,
+    });
 
-  testCases.forEach(({ name, path: casePath }) => {
-    const [mainCategory, subCategory, testCase] = name.split('/');
-    if (!subCategory.includes('with-frontmatter')) { continue; } // フロントマターがない入力はテストしない
+    for (const { name, path: casePath } of testCases) {
+      const [mainCategory, subCategory] = name.split('/');
+      if (!subCategory.includes('with-frontmatter')) { continue; // フロントマターがないテストは除外
+       }
 
-    it(name, async () => {
       const passed = await framework.runTest(casePath);
       expect(passed).toBe(true);
-    });
+    }
   });
 });
 ```
 
-> 注記:
->
-> - ループを明示的に記述するので、`runAllFoundTests`より細かなテストの制御ができます。
-> - Fixture Frameworkでは、指定の方法でテストをスキップできます。 （詳細は下記「[テストのスキップ (除外)](#テストのスキップ-除外)」を参照）
+この方法では、実行制御をプログラム側で柔軟に実装でき、
+特定の条件でフィルターをかけたり、独自のロジックを組み込むことが可能です。
 
-### テストのスキップ (除外)
+### 4. テストのスキップ
 
-E2E Fixtures Frameworkでは、以下の方法で、テストをスキップできます。
+E2E Fixtures Framework では、テストの実行から特定のテストケースやディレクトリを除外 (スキップ) するために、以下の方法が用意されています。
 
-1. 適当なディレクトリ (`<メインカテゴリー>`, `<サブカテゴリー>`, `<テストケース>`) の先頭に`#`を挿入する
-   → 該当ディレクトリはコメントアウト扱いとなり、テスト検索対象から除外されます
+1. **ディレクトリ名の先頭に `#` を付ける方法**
+   - `<メインカテゴリー>`、`<サブカテゴリー>`、`<テストケース>` のいずれかのディレクトリ名の先頭に `#` を付けることで、そのディレクトリはコメントアウト扱いとなり、テストの検索対象から除外される。
+   - これにより、該当ディレクトリとその配下の全テストケースがスキップされる。
 
-2. スキップしたいディレクトリに、ファイル`.skip-e2e`を作成する
-   → 該当ディレクトリおよびその配下は、すべてスキップ対象になります
+2. **`.skip-e2e` ファイルを設置する方法**
+   - スキップしたいディレクトリに空ファイルまたは任意の内容の `.skip-e2e` ファイルを作成する。
+   - このディレクトリおよびその配下のテストケースはすべてスキップされる。
+
+これらの方法を利用して、テスト対象から特定のケースを柔軟に除外できます。
+開発中や問題のあるテストを一時的にスキップしたい場合に有効です。
+
+### まとめ
+
+本章では、`e2e-fixture-framework` におけるテストの一括実行を柔軟に制御する方法を解説しました。
+
+- `runAllFoundTests` メソッドでは、正規表現による絞り込みや詳細ログ出力、タイムアウト設定などのオプション指定により、実行対象や挙動を柔軟に制御可能である。
+- `findTestCases` メソッドは、検索のみを行い取得したテストケースに対して任意の処理を行うためのメソッドで、より細かな制御をプログラムで実装できる。
+- テストのスキップには、ディレクトリ名の先頭に `#` を付ける方法や、`.skip-e2e` ファイルの設置による方法があり、特定のテストケースをテスト実行から除外できる。
+
+これらの機能を活用することで、大規模なテストセットを効率的かつ柔軟に管理し、安定した品質保証が可能となります。
