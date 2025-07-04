@@ -27,7 +27,6 @@ thumbs.db
 .cache/
 **/*cache
 
-
 #	backup/swap/temp
 $~*
 ~*
@@ -54,6 +53,9 @@ $~*
 .claude/*
 !.claude/commands
 !.claude/commands/*
+
+#  Test Result
+**/*results/*
 
 ### Develop
 # Node
