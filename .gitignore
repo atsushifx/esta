@@ -54,6 +54,9 @@ $~*
 !.claude/commands
 !.claude/commands/*
 
+# CLAUDE Memory file
+CLAUDE*.md
+
 #  Test Result
 **/*results/*
 
