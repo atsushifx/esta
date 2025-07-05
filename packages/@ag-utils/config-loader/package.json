@@ -46,7 +46,7 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@ag-utils/e2e-framework": "workspace:*"
+    "@agla-e2e/fileio-framework": "workspace:*"
   },
   "dependencies": {
     "@ag-utils/common": "workspace:*",
