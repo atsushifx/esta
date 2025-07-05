@@ -50,6 +50,8 @@ $~*
 !.vscode/*.md
 
 ###	AI Agent
+# claude code
+**/.claude/*
 .claude/*
 !.claude/commands
 !.claude/commands/*
