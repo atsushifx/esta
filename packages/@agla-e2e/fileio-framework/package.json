@@ -1,8 +1,8 @@
 {
-  "name": "@ag-utils/e2e-framework",
+  "name": "@agla-e2e/fileio-framework",
   "private": true,
   "version": "0.1.0",
-  "description": "Universal configuration file loader and manager utilities.",
+  "description": "E2E framework for testing configuration file operations.",
   "author": "atsushifx <https://github.com/atsushifx>",
   "license": "MIT",
   "type": "module",

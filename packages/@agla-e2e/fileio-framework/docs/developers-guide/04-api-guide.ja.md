@@ -1,6 +1,6 @@
 ---
 title: APIガイド（API Guide）
-description: ESTA E2Eテストフレームワークの主要APIを機能別に分類し、使い方と共に解説します。
+description: AgE2eFileIOFrameworkの主要APIを機能別に分類し、使い方と共に解説します。
 sidebar_position: 4
 ---
 

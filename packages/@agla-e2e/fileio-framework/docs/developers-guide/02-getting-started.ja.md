@@ -1,6 +1,6 @@
 ---
 title: はじめに（Getting Started）
-description: ESTA E2Eテストフレームワークの環境構築と簡単なサンプルでの使い方を解説します。
+description: AgE2eFileIOFrameworkの環境構築と簡単なサンプルでの使い方を解説します。
 sidebar_position: 2
 ---
 
@@ -17,13 +17,13 @@ sidebar_position: 2
 
 ## 2. テストの実行方法
 
-E2Eテストを実行するには以下のコマンドを使います。
+設定ファイル操作のテストを実行するには以下のコマンドを使います。
 
 ```bash
 pnpm run test:ci
 ```
 
-- テストコードは `packages/@ag-utils/e2e-framework/tests/e2e/` 配下にあります。
+- テストコードは `packages/@agla-e2e/fileio-framework/tests/e2e/` 配下にあります。
 - 変更を加えた場合は必ずテストが通るか確認してください。
 
 ---
@@ -34,14 +34,14 @@ pnpm run test:ci
 // vitest
 import { describe, expect, it } from 'vitest';
 // framework
-import { AgE2eFileIOFramework } from '@ag-utils/e2e-framework/src/AgE2eFileIoFramework';
+import { AgE2eFileIOFramework } from '@agla-e2e/fileio-framework/src/AgE2eFileIoFramework';
 
-describe('簡単なファイル操作テスト', () => {
+describe('簡単な設定ファイル操作テスト', () => {
   const framework = new AgE2eFileIOFramework();
 
   it('ファイルを書き込み読み込む', async () => {
     const filePath = './temp/hello.txt';
-    const content = 'Hello, ESTA E2E Framework!';
+    const content = 'Hello, AgE2eFileIOFramework!';
 
     await framework.writeFile(filePath, content);
     const readContent = await framework.readFile(filePath);
@@ -61,16 +61,16 @@ VitestはJavaScript/TypeScript向けの軽量で高速なテストランナー�
 // vitest
 import { describe, expect, it } from 'vitest';
 // framework
-import { AgE2eFileIOFramework } from '@ag-utils/e2e-framework/src/AgE2eFileIoFramework';
+import { AgE2eFileIOFramework } from '@agla-e2e/fileio-framework/src/AgE2eFileIoFramework';
 ```
 
 - vitestからテスト関数をインポートし、テスト定義と検証に使用します。
-- AgE2eFileIOFrameworkはファイル入出力を含んだユニットテスト用のフレームワークです。
+- AgE2eFileIOFrameworkは設定ファイル操作をテストするためのフレームワークです。
 
 ### 2. describe ブロック
 
 ```typescript
-describe('簡単なファイル操作テスト', () => {
+describe('簡単な設定ファイル操作テスト', () => {
   // テストコード
 });
 ```
@@ -110,7 +110,7 @@ expect(readContent).toBe(content);
 
 ---
 
-このテストはE2Eフレームワークの基本的なファイルI/O機能が正しく動作するかを確認するものです。
+このテストは設定ファイル操作フレームワークの基本的なファイルI/O機能が正しく動作するかを確認するものです。
 Vitestの使い方とファイル操作の流れが理解しやすいシンプルな例となっています。
 
 ---
@@ -118,8 +118,8 @@ Vitestの使い方とファイル操作の流れが理解しやすいシンプ�
 ## 4. まとめ
 
 - 必要な環境を整え、依存パッケージをインストールするだけで準備完了。
-- コマンド一つでE2Eテストを簡単に実行可能。
-- サンプルコードを参考に、まずは基本的なファイル操作テストから始めましょう。
+- コマンド一つで設定ファイル操作のテストを簡単に実行可能。
+- サンプルコードを参考に、まずは基本的な設定ファイル操作テストから始めましょう。
 
 ---
 

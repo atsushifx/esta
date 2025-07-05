@@ -1,19 +1,19 @@
 ---
 title: 使い方（Usage）
-description: ESTA E2Eテストフレームワークの主要APIの使い方や応用例を解説します。
+description: AgE2eFileIOFrameworkの主要APIの使い方や応用例を解説します。
 sidebar_position: 3
 ---
 
 # 使い方（Usage）
 
-この章では、`AgE2eFileIOFramework` を中心に、ESTAのE2Eテストフレームワークで利用できる主なAPIの使い方と応用例を紹介します。
+この章では、`AgE2eFileIOFramework` を中心に、設定ファイル操作をテストするためのE2Eフレームワークで利用できる主なAPIの使い方と応用例を紹介します。
 
 ---
 
 ## 1. フレームワークの初期化
 
 ```typescript
-import { AgE2eFileIOFramework } from '@ag-utils/e2e-framework/src/AgE2eFileIoFramework';
+import { AgE2eFileIOFramework } from '@agla-e2e/fileio-framework/src/AgE2eFileIoFramework';
 
 const framework = new AgE2eFileIOFramework();
 ```
