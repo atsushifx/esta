@@ -50,7 +50,7 @@
     "lint:fix": "echo 'skip where project root'",
     "lint-all": "pnpm exec eslint --config ./configs/eslint.config.js --cache --cache-location .cache/eslint-cache/esLintCache",
     "lint-all:types": "pnpm exec eslint --config ./configs/eslint.config.typed.js  --cache --cache-location .cache/eslint-cache/esLintCache",
-    "lint:filename": "pnpm exec ls-lint --config ./configs/ls-lint.yaml ",
+    "lint:filenames": "pnpm exec ls-lint --config ./configs/ls-lint.yaml ",
     "lint:text": "textlint --config ./configs/textlintrc.yaml --cache --cache-location .cache/textlint-cache/textlintCache ",
     "lint:markdown": "markdownlint-cli2 --config ./configs/.markdownlint.yaml ",
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*",

@@ -35,7 +35,7 @@ pre-commit:
       glob:
         - "**/*.ts"
         - "scripts/**/*"
-      run: pnpm run lint:filename -- {staged_files}
+      run: pnpm run lint:filenames -- {staged_files}
 
     check-spells:
       glob:
