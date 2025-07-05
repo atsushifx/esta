@@ -1,5 +1,5 @@
 {
-  "name": "setup-tool-with-eget",
+  "name": "easy-setup-tools-action",
   "private": true,
   "version": "0.1.0",
   "description": "GitHub Action to install CLI tools via eget (monorepo package)",
