@@ -7,23 +7,25 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import { CONFIG_FILE_EXTENSIONS, type ConfigFileExtension } from '@shared/types/common.types';
+import {
+  EstaExtensionToFileTypeMap,
+  TEstaConfigFileType,
+  type TEstaSupportedExtension,
+} from '@shared/types/configFile.types';
 
 // parser
 import { parseJsoncConfig, parseTSConfig, parseYamlConfig } from './parseWithModule';
 
 export const parseConfig = <T = object>(extension: string, raw: string | undefined): T => {
-  const normalizedExt = extension.replace(/^\./, '').toLowerCase() as ConfigFileExtension;
+  const normalizedExt = extension.replace(/^\./, '').toLowerCase() as TEstaSupportedExtension;
+  const fileType = EstaExtensionToFileTypeMap[normalizedExt];
 
-  switch (normalizedExt) {
-    case CONFIG_FILE_EXTENSIONS.JSON:
-    case CONFIG_FILE_EXTENSIONS.JSONC:
+  switch (fileType) {
+    case TEstaConfigFileType.JSON:
       return parseJsoncConfig<T>(raw);
-    case CONFIG_FILE_EXTENSIONS.YAML:
-    case CONFIG_FILE_EXTENSIONS.YML:
+    case TEstaConfigFileType.YAML:
       return parseYamlConfig<T>(raw);
-    case CONFIG_FILE_EXTENSIONS.TS:
-    case CONFIG_FILE_EXTENSIONS.JS:
+    case TEstaConfigFileType.SCRIPT:
       return parseTSConfig<T>(raw);
     default:
       return {} as T;

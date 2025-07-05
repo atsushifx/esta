@@ -10,8 +10,8 @@ import * as fs from 'fs';
 import { resolve } from 'path';
 
 // types
-import type { SearchConfigFileType } from '@shared/types/common.types';
-import { CONFIG_FILE_EXTENSIONS } from '@shared/types/common.types';
+import type { TEstaSearchConfigFileType } from '@shared/types/common.types';
+import { EstaSupportedExtensions } from '@shared/types/configFile.types';
 
 // modules
 import { configSearchDirs } from './configSearchDirs';
@@ -32,14 +32,12 @@ const PREFIXES = ['', '.'] as const;
 export const findConfigFile = (
   baseNames: readonly string[],
   dirName: string,
-  SearchConfigFileType: SearchConfigFileType,
+  searchType: TEstaSearchConfigFileType,
 ): string => {
-  const searchDirs = configSearchDirs(dirName, SearchConfigFileType);
+  const searchDirs = configSearchDirs(dirName, searchType);
   const configFilesList = searchDirs.flatMap((dir) =>
     baseNames.flatMap((base) =>
-      PREFIXES.flatMap((pref) =>
-        Object.values(CONFIG_FILE_EXTENSIONS).map((ext) => resolve(dir, `${pref}${base}.${ext}`))
-      )
+      PREFIXES.flatMap((pref) => EstaSupportedExtensions.map((ext) => resolve(dir, `${pref}${base}.${ext}`)))
     )
   );
   const found = configFilesList.find((file) => fs.existsSync(file));

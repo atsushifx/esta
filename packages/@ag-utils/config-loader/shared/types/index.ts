@@ -7,3 +7,4 @@
 // https://opensource.org/licenses/MIT
 
 export * from './common.types';
+export * from './configFile.types';

@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 
 // types
-import { SearchConfigFileType } from '@shared/types/common.types';
+import { TEstaSearchConfigFileType } from '@shared/types/common.types';
 
 // test unit
 import { loadConfig } from '@/loadConfig';
@@ -201,7 +201,7 @@ features:
     expect(result).toEqual(configData);
   });
 
-  describe('SearchConfigFileType tests', () => {
+  describe('TEstaSearchConfigFileType tests', () => {
     it('loads config with USER search type (default)', () => {
       const configData = { type: 'user', name: 'User Config' };
       const configFiles: ConfigFileSpec[] = [
@@ -215,7 +215,7 @@ features:
         loadConfig,
         'userApp',
         'testApp',
-        SearchConfigFileType.USER,
+        TEstaSearchConfigFileType.USER,
       );
 
       expect(result).toEqual(configData);
@@ -234,7 +234,7 @@ features:
         loadConfig,
         'systemApp',
         'testApp',
-        SearchConfigFileType.SYSTEM,
+        TEstaSearchConfigFileType.SYSTEM,
       );
 
       expect(result).toEqual(configData);

@@ -11,7 +11,7 @@ import * as fs from 'fs';
 import { extname } from 'path';
 
 // types
-import { SearchConfigFileType } from '@shared/types/common.types';
+import { TEstaSearchConfigFileType } from '@shared/types/common.types';
 
 // modules
 import { findConfigFile } from './findConfigFile';
@@ -20,7 +20,7 @@ import { parseConfig } from './parser/parseConfig';
 export const loadConfig = <T = object>(
   basename: string,
   dirName: string = process.cwd(),
-  searchType: SearchConfigFileType = SearchConfigFileType.USER,
+  searchType: TEstaSearchConfigFileType = TEstaSearchConfigFileType.USER,
 ): T => {
   const configFilePath = findConfigFile([basename], dirName, searchType);
   const rawContent = fs.readFileSync(configFilePath, 'utf-8');

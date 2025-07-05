@@ -11,13 +11,13 @@ import * as os from 'os';
 import process from 'process';
 
 // --- internal libs
-import { SearchConfigFileType } from '@shared/types/common.types';
+import { TEstaSearchConfigFileType } from '@shared/types/common.types';
 
 import { getDelimiter } from '@ag-utils/common';
 // --- types
 
 // functions
-export const configSearchDirs = (appConfig: string, configFileType: SearchConfigFileType): string[] => {
+export const configSearchDirs = (appConfig: string, searchType: TEstaSearchConfigFileType): string[] => {
   const dirs: string[] = [];
 
   const configDirsSystem = (appConfig: string): string[] => {
@@ -56,7 +56,7 @@ export const configSearchDirs = (appConfig: string, configFileType: SearchConfig
     return dirs;
   };
 
-  if (configFileType === SearchConfigFileType.SYSTEM) {
+  if (searchType === TEstaSearchConfigFileType.SYSTEM) {
     dirs.push(...configDirsSystem(appConfig));
   } else {
     dirs.push(...configDirsUser(appConfig));
