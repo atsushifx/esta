@@ -1,8 +1,8 @@
 {
-  "name": "@ag-utils/get-platform",
+  "name": "@esta-utils/get-platform",
   "private": true,
-  "version": "0.0.1",
-  "description": "Cross-platform Node.js utility to detect runtime platform.",
+  "version": "0.0.2",
+  "description": "Platform detection utility for cross-platform applications.",
   "author": "atsushifx <https://github.com/atsushifx>",
   "license": "MIT",
   "type": "module",

@@ -8,7 +8,7 @@
 
 // import
 import { agUtils as commandUtils } from '@ag-utils/command-utils';
-import { agUtils as getPlatform } from '@ag-utils/get-platform';
+import { agUtils as getPlatform } from '@esta-utils/get-platform';
 
 const agUtils = {
   ...getPlatform,
@@ -18,7 +18,7 @@ const agUtils = {
 // --- export
 // named export
 export * from '@ag-utils/command-utils';
-export * from '@ag-utils/get-platform';
+export * from '@esta-utils/get-platform';
 
 // namespace / default export
 export { agUtils };

@@ -1,5 +1,5 @@
-// src: helper/configs/__tests__/ToolConfigManager.spec.ts
-// @(#) : 設定管理クラスの機能テスト
+// src: __tests__/getPlatform.spec.ts
+// @(#) : プラットフォーム判定機能のテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
