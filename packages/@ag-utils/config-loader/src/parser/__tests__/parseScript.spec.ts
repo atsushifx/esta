@@ -14,33 +14,33 @@ import { defineConfig, parseScript } from '../parseScript';
 
 describe('parseScript', () => {
   describe('空または無効な入力が与えられた場合', () => {
-    it('undefinedが与えられると空オブジェクトを返すべき', () => {
-      const result = parseScript(undefined);
+    it('undefinedが与えられると空オブジェクトを返すべき', async () => {
+      const result = await parseScript(undefined);
       expect(result).toEqual({});
     });
 
-    it('空文字列が与えられると空オブジェクトを返すべき', () => {
-      const result = parseScript('');
+    it('空文字列が与えられると空オブジェクトを返すべき', async () => {
+      const result = await parseScript('');
       expect(result).toEqual({});
     });
 
-    it('無効な構文が与えられると空オブジェクトを返すべき', () => {
-      const result = parseScript('invalid syntax');
+    it('無効な構文が与えられると空オブジェクトを返すべき', async () => {
+      const result = await parseScript('invalid syntax');
       expect(result).toEqual({});
     });
   });
 
   describe('export default形式の設定が与えられた場合', () => {
-    it('export defaultでシンプルなオブジェクトを正しく解析すべき', () => {
+    it('export defaultでシンプルなオブジェクトを正しく解析すべき', async () => {
       const jsContent = 'export default { key1: "value1", key2: 123 }';
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         key1: 'value1',
         key2: 123,
       });
     });
 
-    it('export defaultでネストしたオブジェクトを正しく解析すべき', () => {
+    it('export defaultでネストしたオブジェクトを正しく解析すべき', async () => {
       const jsContent = `export default {
         database: {
           host: "localhost",
@@ -51,7 +51,7 @@ describe('parseScript', () => {
           }
         }
       }`;
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         database: {
           host: 'localhost',
@@ -64,14 +64,14 @@ describe('parseScript', () => {
       });
     });
 
-    it('export defaultで配列を含む設定を正しく解析すべき', () => {
+    it('export defaultで配列を含む設定を正しく解析すべき', async () => {
       const jsContent = `export default {
         servers: ["web1", "web2"],
         ports: [80, 443],
         enabled: true,
         timeout: null
       }`;
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         servers: ['web1', 'web2'],
         ports: [80, 443],
@@ -80,9 +80,9 @@ describe('parseScript', () => {
       });
     });
 
-    it('export defaultでdefineConfigを包んだ設定を正しく解析すべき', () => {
+    it('export defaultでdefineConfigを包んだ設定を正しく解析すべき', async () => {
       const jsContent = 'export default defineConfig({ key1: "value1", key2: 123 })';
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         key1: 'value1',
         key2: 123,
@@ -91,16 +91,16 @@ describe('parseScript', () => {
   });
 
   describe('defineConfig形式の設定が与えられた場合', () => {
-    it('defineConfigでシンプルなオブジェクトを正しく解析すべき', () => {
+    it('defineConfigでシンプルなオブジェクトを正しく解析すべき', async () => {
       const jsContent = 'defineConfig({ key1: "value1", key2: 123 })';
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         key1: 'value1',
         key2: 123,
       });
     });
 
-    it('defineConfigでネストしたオブジェクトを正しく解析すべき', () => {
+    it('defineConfigでネストしたオブジェクトを正しく解析すべき', async () => {
       const jsContent = `defineConfig({
         database: {
           host: "localhost",
@@ -111,7 +111,7 @@ describe('parseScript', () => {
           }
         }
       })`;
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         database: {
           host: 'localhost',
@@ -124,14 +124,14 @@ describe('parseScript', () => {
       });
     });
 
-    it('defineConfigで配列と混合型を正しく解析すべき', () => {
+    it('defineConfigで配列と混合型を正しく解析すべき', async () => {
       const jsContent = `defineConfig({
         servers: ["web1", "web2"],
         ports: [80, 443],
         enabled: true,
         timeout: null
       })`;
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         servers: ['web1', 'web2'],
         ports: [80, 443],
@@ -140,14 +140,14 @@ describe('parseScript', () => {
       });
     });
 
-    it('defineConfigでオブジェクトの配列を正しく解析すべき', () => {
+    it('defineConfigでオブジェクトの配列を正しく解析すべき', async () => {
       const jsContent = `defineConfig({
         plugins: [
           { name: "plugin1", enabled: true },
           { name: "plugin2", enabled: false }
         ]
       })`;
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         plugins: [
           { name: 'plugin1', enabled: true },
@@ -158,16 +158,16 @@ describe('parseScript', () => {
   });
 
   describe('生のオブジェクトリテラル形式の設定が与えられた場合', () => {
-    it('シンプルなオブジェクトリテラルを正しく解析すべき', () => {
+    it('シンプルなオブジェクトリテラルを正しく解析すべき', async () => {
       const jsContent = '{ key1: "value1", key2: 123 }';
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         key1: 'value1',
         key2: 123,
       });
     });
 
-    it('ネストしたオブジェクトリテラルを正しく解析すべき', () => {
+    it('ネストしたオブジェクトリテラルを正しく解析すべき', async () => {
       const jsContent = `{
         api: {
           baseUrl: "https://api.example.com",
@@ -178,7 +178,7 @@ describe('parseScript', () => {
           }
         }
       }`;
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         api: {
           baseUrl: 'https://api.example.com',
@@ -191,7 +191,7 @@ describe('parseScript', () => {
       });
     });
 
-    it('配列を含むオブジェクトリテラルを正しく解析すべき', () => {
+    it('配列を含むオブジェクトリテラルを正しく解析すべき', async () => {
       const jsContent = `{
         environments: ["development", "staging", "production"],
         features: {
@@ -203,7 +203,7 @@ describe('parseScript', () => {
           }
         }
       }`;
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         environments: ['development', 'staging', 'production'],
         features: {
@@ -217,7 +217,7 @@ describe('parseScript', () => {
       });
     });
 
-    it('複雑なオブジェクトリテラルを正しく解析すべき', () => {
+    it('複雑なオブジェクトリテラルを正しく解析すべき', async () => {
       const jsContent = `{
         tasks: [
           {
@@ -236,7 +236,7 @@ describe('parseScript', () => {
           retries: 3
         }
       }`;
-      const result = parseScript(jsContent);
+      const result = await parseScript(jsContent);
       expect(result).toEqual({
         tasks: [
           {
