@@ -1,4 +1,4 @@
-// src:// ./src/utils/commandExist.ts
+// src: ./src/commandExist.ts
 // @(#) : コマンドの存在を確認するユーティリティ
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>

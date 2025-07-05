@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // import
-import { agUtils as commandUtils } from '@ag-utils/command-utils';
+import { estaUtils as commandUtils } from '@esta-utils/command-utils';
 import { agUtils as getPlatform } from '@esta-utils/get-platform';
 
 const agUtils = {
@@ -17,7 +17,7 @@ const agUtils = {
 
 // --- export
 // named export
-export * from '@ag-utils/command-utils';
+export * from '@esta-utils/command-utils';
 export * from '@esta-utils/get-platform';
 
 // namespace / default export
