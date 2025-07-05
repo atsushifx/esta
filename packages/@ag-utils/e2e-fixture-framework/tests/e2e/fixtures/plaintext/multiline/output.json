@@ -1,4 +1,0 @@
-{
-  "type": "plaintext",
-  "expected": "Line 1\nLine 2\nLine 3\n\nLine 5 after empty line"
-}
