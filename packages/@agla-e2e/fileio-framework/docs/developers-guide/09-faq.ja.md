@@ -1,6 +1,6 @@
 ---
 title: よくある質問（FAQ）
-description: ESTA E2Eテストフレームワークに関するよくある質問とその回答をまとめています。
+description: AgE2eFileIOFrameworkに関するよくある質問とその回答をまとめています。
 sidebar_position: 9
 ---
 

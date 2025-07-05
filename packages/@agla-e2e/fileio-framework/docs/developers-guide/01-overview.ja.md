@@ -1,6 +1,6 @@
 ---
 title: AgE2eFileIOFramework 入門ガイド
-description: ESTAのE2Eテストフレームワークの核となるAgE2eFileIOFrameworkの基本構造と役割を解説します。
+description: 設定ファイル操作をテストするためのE2Eフレームワークの基本構造と役割を解説します。
 sidebar_position: 1
 ---
 
@@ -8,7 +8,7 @@ sidebar_position: 1
 
 ## 1. はじめに
 
-ESTAのE2Eテストフレームワークの核となるのが `AgE2eFileIOFramework` です。
+`AgE2eFileIOFramework` は、設定ファイル操作をテストするためのE2Eフレームワークです。
 これは、テストでよく使うファイル入出力操作を簡単に行うためのクラスで、テストの自動化を強力にサポートします。
 
 ---
@@ -16,7 +16,7 @@ ESTAのE2Eテストフレームワークの核となるのが `AgE2eFileIOFramew
 ## 2. Hello, World的なテストサンプル
 
 ```typescript
-import { AgE2eFileIOFramework } from '@ag-utils/e2e-framework/src/AgE2eFileIoFramework';
+import { AgE2eFileIOFramework } from '@agla-e2e/fileio-framework/src/AgE2eFileIoFramework';
 import { describe, expect, it } from 'vitest';
 
 describe('AgE2eFileIOFrameworkの基本動作確認', () => {
@@ -24,7 +24,7 @@ describe('AgE2eFileIOFrameworkの基本動作確認', () => {
 
   it('テスト用ファイルを作成して内容を確認できる', async () => {
     const testFilePath = './temp/test-file.txt';
-    const testContent = 'Hello ESTA E2E Framework!';
+    const testContent = 'Hello AgE2eFileIOFramework!';
 
     // ファイル書き込み
     await framework.writeFile(testFilePath, testContent);
@@ -65,13 +65,13 @@ Vitestなどのテストランナーと組み合わせることで、フレー�
 
 ## 4. まとめ
 
-- `AgE2eFileIOFramework` はE2Eテストでのファイル操作をシンプルにする核のクラスです。
+- `AgE2eFileIOFramework` は設定ファイル操作をテストするためのE2Eフレームワークの核のクラスです。
 - これを使うことでテストコードが読みやすく、保守しやすくなります。
 - Hello, World的なサンプルからはじめて、徐々に複雑なケースをテストできるよう拡張していきましょう。
 
 ---
 
-このガイドを理解してもらえれば、E2Eテストフレームワークの全体像と基本の使い方がつかめるはずです
+このガイドを理解してもらえれば、AgE2eFileIOFrameworkの全体像と基本の使い方がつかめるはずです
 
 ---
 

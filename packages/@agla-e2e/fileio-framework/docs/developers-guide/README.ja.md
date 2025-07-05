@@ -1,13 +1,13 @@
 ---
-title: ESTA E2Eテストフレームワーク 開発者ガイド
-description: ESTAプロジェクトのE2Eテストフレームワークの使い方と開発者向けガイドです。
-slug: /e2e-framework/
+title: AgE2eFileIOFramework 開発者ガイド
+description: 設定ファイル操作をテストするためのE2Eフレームワークの使い方と開発者向けガイドです。
+slug: /fileio-framework/
 sidebar_position: 0
 ---
 
-## ESTA E2Eテストフレームワーク 開発者ガイド
+## AgE2eFileIOFramework 開発者ガイド
 
-このドキュメントは、ESTAプロジェクトのE2Eテストフレームワークの利用・開発に関わる方向けのガイドです。
+このドキュメントは、設定ファイル操作をテストするためのE2Eフレームワークの利用・開発に関わる方向けのガイドです。
 テストの基本から応用、よくある質問まで体系的にまとめています。
 
 ---
@@ -22,7 +22,7 @@ sidebar_position: 0
 
 ---
 
-このドキュメントを参考に、E2Eテストフレームワークの理解と活用を進めてください。
+このドキュメントを参考に、AgE2eFileIOFrameworkの理解と活用を進めてください。
 何か質問や改善点があれば、IssueやPRでお知らせください。
 
 よろしくお願いいたします。

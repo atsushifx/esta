@@ -16,8 +16,8 @@ import { TEstaSearchConfigFileType } from '@shared/types/common.types';
 import { loadConfig } from '@/loadConfig';
 
 // test framework
-import { agE2ETestFramework } from '@ag-utils/e2e-framework';
-import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '@ag-utils/e2e-framework';
+import { agE2ETestFramework } from '@agla-e2e/fileio-framework';
+import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '@agla-e2e/fileio-framework';
 
 // Helper function to wrap loadConfig for executeTest
 const loadConfigWrapper = async <T = object>(...args: unknown[]): Promise<T> => {
