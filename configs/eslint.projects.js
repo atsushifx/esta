@@ -12,7 +12,6 @@ export default [
   './packages/@ag-utils/command-utils/tsconfig.json',
   './packages/@ag-utils/config-loader/tsconfig.json',
   './packages/@ag-utils/common/tsconfig.json',
-  './packages/@ag-utils/text-parser/tsconfig.json',
   './packages/@ag-system/ag-logger/tsconfig.json',
   './packages/@ag-actions/tool-installer/tsconfig.json',
   './packages/@agla-e2e/fileio-framework/tsconfig.json',
