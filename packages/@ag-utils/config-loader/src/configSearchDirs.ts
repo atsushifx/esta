@@ -1,4 +1,4 @@
-// src: ./utils/configSearchDirs.ts
+// src: ./configSearchDirs.ts
 // @(#) : 設定ファイル検索用ディレクトリリスト作成
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
