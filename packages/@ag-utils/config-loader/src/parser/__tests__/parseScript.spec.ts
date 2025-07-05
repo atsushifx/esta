@@ -30,9 +30,9 @@ describe('parseScript', () => {
     });
   });
 
-  describe('シンプルな設定が与えられた場合', () => {
-    it('シンプルなオブジェクトリテラルを正しく解析すべき', () => {
-      const jsContent = '{ key1: "value1", key2: 123 }';
+  describe('export default形式の設定が与えられた場合', () => {
+    it('export defaultでシンプルなオブジェクトを正しく解析すべき', () => {
+      const jsContent = 'export default { key1: "value1", key2: 123 }';
       const result = parseScript(jsContent);
       expect(result).toEqual({
         key1: 'value1',
@@ -40,8 +40,48 @@ describe('parseScript', () => {
       });
     });
 
-    it('defineConfigで包まれた設定を正しく解析すべき', () => {
-      const jsContent = 'defineConfig({ key1: "value1", key2: 123 })';
+    it('export defaultでネストしたオブジェクトを正しく解析すべき', () => {
+      const jsContent = `export default {
+        database: {
+          host: "localhost",
+          port: 5432,
+          credentials: {
+            username: "admin",
+            password: "secret"
+          }
+        }
+      }`;
+      const result = parseScript(jsContent);
+      expect(result).toEqual({
+        database: {
+          host: 'localhost',
+          port: 5432,
+          credentials: {
+            username: 'admin',
+            password: 'secret',
+          },
+        },
+      });
+    });
+
+    it('export defaultで配列を含む設定を正しく解析すべき', () => {
+      const jsContent = `export default {
+        servers: ["web1", "web2"],
+        ports: [80, 443],
+        enabled: true,
+        timeout: null
+      }`;
+      const result = parseScript(jsContent);
+      expect(result).toEqual({
+        servers: ['web1', 'web2'],
+        ports: [80, 443],
+        enabled: true,
+        timeout: null,
+      });
+    });
+
+    it('export defaultでdefineConfigを包んだ設定を正しく解析すべき', () => {
+      const jsContent = 'export default defineConfig({ key1: "value1", key2: 123 })';
       const result = parseScript(jsContent);
       expect(result).toEqual({
         key1: 'value1',
@@ -50,8 +90,17 @@ describe('parseScript', () => {
     });
   });
 
-  describe('複雑な設定が与えられた場合', () => {
-    it('ネストしたオブジェクトを正しく解析すべき', () => {
+  describe('defineConfig形式の設定が与えられた場合', () => {
+    it('defineConfigでシンプルなオブジェクトを正しく解析すべき', () => {
+      const jsContent = 'defineConfig({ key1: "value1", key2: 123 })';
+      const result = parseScript(jsContent);
+      expect(result).toEqual({
+        key1: 'value1',
+        key2: 123,
+      });
+    });
+
+    it('defineConfigでネストしたオブジェクトを正しく解析すべき', () => {
       const jsContent = `defineConfig({
         database: {
           host: "localhost",
@@ -75,7 +124,7 @@ describe('parseScript', () => {
       });
     });
 
-    it('配列と混合型を正しく解析すべき', () => {
+    it('defineConfigで配列と混合型を正しく解析すべき', () => {
       const jsContent = `defineConfig({
         servers: ["web1", "web2"],
         ports: [80, 443],
@@ -91,7 +140,7 @@ describe('parseScript', () => {
       });
     });
 
-    it('オブジェクトの配列を正しく解析すべき', () => {
+    it('defineConfigでオブジェクトの配列を正しく解析すべき', () => {
       const jsContent = `defineConfig({
         plugins: [
           { name: "plugin1", enabled: true },
@@ -104,6 +153,107 @@ describe('parseScript', () => {
           { name: 'plugin1', enabled: true },
           { name: 'plugin2', enabled: false },
         ],
+      });
+    });
+  });
+
+  describe('生のオブジェクトリテラル形式の設定が与えられた場合', () => {
+    it('シンプルなオブジェクトリテラルを正しく解析すべき', () => {
+      const jsContent = '{ key1: "value1", key2: 123 }';
+      const result = parseScript(jsContent);
+      expect(result).toEqual({
+        key1: 'value1',
+        key2: 123,
+      });
+    });
+
+    it('ネストしたオブジェクトリテラルを正しく解析すべき', () => {
+      const jsContent = `{
+        api: {
+          baseUrl: "https://api.example.com",
+          version: "v1",
+          auth: {
+            type: "bearer",
+            token: "secret-token"
+          }
+        }
+      }`;
+      const result = parseScript(jsContent);
+      expect(result).toEqual({
+        api: {
+          baseUrl: 'https://api.example.com',
+          version: 'v1',
+          auth: {
+            type: 'bearer',
+            token: 'secret-token',
+          },
+        },
+      });
+    });
+
+    it('配列を含むオブジェクトリテラルを正しく解析すべき', () => {
+      const jsContent = `{
+        environments: ["development", "staging", "production"],
+        features: {
+          logging: true,
+          metrics: false,
+          cache: {
+            enabled: true,
+            ttl: 3600
+          }
+        }
+      }`;
+      const result = parseScript(jsContent);
+      expect(result).toEqual({
+        environments: ['development', 'staging', 'production'],
+        features: {
+          logging: true,
+          metrics: false,
+          cache: {
+            enabled: true,
+            ttl: 3600,
+          },
+        },
+      });
+    });
+
+    it('複雑なオブジェクトリテラルを正しく解析すべき', () => {
+      const jsContent = `{
+        tasks: [
+          {
+            name: "build",
+            commands: ["npm run build", "npm run test"],
+            parallel: false
+          },
+          {
+            name: "deploy",
+            commands: ["docker build .", "docker push"],
+            parallel: true
+          }
+        ],
+        config: {
+          timeout: 300,
+          retries: 3
+        }
+      }`;
+      const result = parseScript(jsContent);
+      expect(result).toEqual({
+        tasks: [
+          {
+            name: 'build',
+            commands: ['npm run build', 'npm run test'],
+            parallel: false,
+          },
+          {
+            name: 'deploy',
+            commands: ['docker build .', 'docker push'],
+            parallel: true,
+          },
+        ],
+        config: {
+          timeout: 300,
+          retries: 3,
+        },
       });
     });
   });
@@ -125,6 +275,23 @@ describe('defineConfig', () => {
       };
       const config: TestConfig = { name: 'test', version: 1 };
       const result = defineConfig(config);
+      expect(result).toEqual(config);
+    });
+
+    it('ネストした設定オブジェクトを正しく処理すべき', () => {
+      const config = {
+        app: {
+          name: 'my-app',
+          version: '1.0.0',
+          features: ['auth', 'logging', 'metrics'],
+        },
+        database: {
+          host: 'localhost',
+          port: 5432,
+        },
+      };
+      const result = defineConfig(config);
+      expect(result).toBe(config);
       expect(result).toEqual(config);
     });
   });
