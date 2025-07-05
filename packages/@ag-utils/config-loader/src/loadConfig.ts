@@ -15,7 +15,7 @@ import { TEstaSearchConfigFileType } from '@shared/types/common.types';
 
 // modules
 import { findConfigFile } from './findConfigFile';
-import { parseConfig } from './parser/parseConfig';
+import { parseConfig } from './parseConfig';
 
 export const loadConfig = <T = object>(
   basename: string,

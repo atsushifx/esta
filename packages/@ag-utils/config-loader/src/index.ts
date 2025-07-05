@@ -14,4 +14,4 @@ export * from '@shared/types';
 // modules
 export * from './findConfigFile';
 export * from './loadConfig';
-export * from './parser/parseConfig';
+export * from './parseConfig';

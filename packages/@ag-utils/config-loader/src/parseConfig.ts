@@ -1,4 +1,4 @@
-// src: ./parser/parseConfig.ts
+// src: ./parseConfig.ts
 // 設定データ解析ルーター
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -14,7 +14,9 @@ import {
 } from '@shared/types/configFile.types';
 
 // parser
-import { parseJsoncConfig, parseTSConfig, parseYamlConfig } from './parseWithModule';
+import { parseJsonc } from './parser/parseJsonc';
+import { parseScript } from './parser/parseScript';
+import { parseYaml } from './parser/parseYaml';
 
 export const parseConfig = <T = object>(extension: string, raw: string | undefined): T => {
   const normalizedExt = extension.replace(/^\./, '').toLowerCase() as TEstaSupportedExtension;
@@ -22,12 +24,14 @@ export const parseConfig = <T = object>(extension: string, raw: string | undefin
 
   switch (fileType) {
     case TEstaConfigFileType.JSON:
-      return parseJsoncConfig<T>(raw);
+      return parseJsonc<T>(raw);
     case TEstaConfigFileType.YAML:
-      return parseYamlConfig<T>(raw);
+      return parseYaml<T>(raw);
     case TEstaConfigFileType.SCRIPT:
-      return parseTSConfig<T>(raw);
+      return parseScript<T>(raw);
     default:
       return {} as T;
   }
 };
+
+export default parseConfig;

@@ -70,3 +70,5 @@ export const configSearchDirs = (appConfig: string, searchType: TEstaSearchConfi
 
   return uniqDirs(dirs);
 };
+
+export default configSearchDirs;

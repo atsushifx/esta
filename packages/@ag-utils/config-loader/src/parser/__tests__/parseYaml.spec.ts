@@ -1,5 +1,5 @@
-// src: ./utils/__tests__/parseYamlConfig.spec.ts
-// YAML設定データ解析ユーティリティのユニットテスト
+// src: ./parser/__tests__/parseYaml.spec.ts
+// parseYaml関数のBDDテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -9,44 +9,43 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 
-// test unit
-import { parseYamlConfig } from '../parseWithModule';
+// test target
+import { parseYaml } from '../parseYaml';
 
-// testMain
-describe('parseYamlConfig', () => {
-  describe('handle empty or invalid input', () => {
-    it('returns empty object for undefined input', () => {
-      const result = parseYamlConfig(undefined);
+describe('parseYaml', () => {
+  describe('空または無効な入力が与えられた場合', () => {
+    it('undefinedが与えられると空オブジェクトを返すべき', () => {
+      const result = parseYaml(undefined);
       expect(result).toEqual({});
     });
 
-    it('returns empty object for empty string', () => {
-      const result = parseYamlConfig('');
+    it('空文字列が与えられると空オブジェクトを返すべき', () => {
+      const result = parseYaml('');
       expect(result).toEqual({});
     });
   });
 
-  describe('parse simple YAML', () => {
-    it('parses simple key-value pairs', () => {
+  describe('シンプルなYAMLが与えられた場合', () => {
+    it('シンプルなkey-valueペアを正しく解析すべき', () => {
       const yamlContent = `
 key1: value1
 key2: value2
 `;
-      const result = parseYamlConfig(yamlContent);
+      const result = parseYaml(yamlContent);
       expect(result).toEqual({
         key1: 'value1',
         key2: 'value2',
       });
     });
 
-    it('parses different data types', () => {
+    it('異なるデータ型を正しく解析すべき', () => {
       const yamlContent = `
 string: hello
 number: 123
 boolean: true
 null_value: null
 `;
-      const result = parseYamlConfig(yamlContent);
+      const result = parseYaml(yamlContent);
       expect(result).toEqual({
         string: 'hello',
         number: 123,
@@ -56,8 +55,8 @@ null_value: null
     });
   });
 
-  describe('parse arrays', () => {
-    it('parses array values', () => {
+  describe('配列が与えられた場合', () => {
+    it('配列値を正しく解析すべき', () => {
       const yamlContent = `
 items:
   - item1
@@ -65,7 +64,7 @@ items:
   - item3
 numbers: [1, 2, 3]
 `;
-      const result = parseYamlConfig(yamlContent);
+      const result = parseYaml(yamlContent);
       expect(result).toEqual({
         items: ['item1', 'item2', 'item3'],
         numbers: [1, 2, 3],
@@ -73,8 +72,8 @@ numbers: [1, 2, 3]
     });
   });
 
-  describe('parse nested objects', () => {
-    it('parses nested objects', () => {
+  describe('ネストしたオブジェクトが与えられた場合', () => {
+    it('ネストしたオブジェクトを正しく解析すべき', () => {
       const yamlContent = `
 database:
   host: localhost
@@ -83,7 +82,7 @@ database:
     username: admin
     password: secret
 `;
-      const result = parseYamlConfig(yamlContent);
+      const result = parseYaml(yamlContent);
       expect(result).toEqual({
         database: {
           host: 'localhost',
@@ -97,8 +96,8 @@ database:
     });
   });
 
-  describe('parse complex structures', () => {
-    it('parses mixed arrays and objects', () => {
+  describe('複雑な構造が与えられた場合', () => {
+    it('配列とオブジェクトの混合構造を正しく解析すべき', () => {
       const yamlContent = `
 servers:
   - name: web1
@@ -108,7 +107,7 @@ servers:
     host: 192.168.1.2
     ports: [80, 443]
 `;
-      const result = parseYamlConfig(yamlContent);
+      const result = parseYaml(yamlContent);
       expect(result).toEqual({
         servers: [
           {
