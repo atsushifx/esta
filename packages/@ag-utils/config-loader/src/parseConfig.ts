@@ -19,6 +19,22 @@ import { parseScript } from './parser/parseScript';
 import { parseYaml } from './parser/parseYaml';
 
 /**
+ * ファイル拡張子を正規化します（先頭のドット除去、小文字化）
+ *
+ * @param extension ファイル拡張子（.json, .yaml, .ts など）
+ * @returns 正規化された拡張子
+ *
+ * @example
+ * ```typescript
+ * const ext1 = normalizeExtension('.JSON'); // 'json'
+ * const ext2 = normalizeExtension('yaml'); // 'yaml'
+ * ```
+ */
+export const normalizeExtension = (extension: string): TEstaSupportedExtension => {
+  return extension.replace(/^\./, '').toLowerCase() as TEstaSupportedExtension;
+};
+
+/**
  * ファイル拡張子に基づいて設定データを適切なパーサーで解析します
  *
  * @template T 解析結果の型
@@ -39,7 +55,7 @@ import { parseYaml } from './parser/parseYaml';
  * ```
  */
 export const parseConfig = async <T = object>(extension: string, raw: string | undefined): Promise<T> => {
-  const normalizedExt = extension.replace(/^\./, '').toLowerCase() as TEstaSupportedExtension;
+  const normalizedExt = normalizeExtension(extension);
   const fileType = EstaExtensionToFileTypeMap[normalizedExt];
 
   switch (fileType) {

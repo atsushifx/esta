@@ -29,6 +29,13 @@ import { join } from 'path';
  */
 export const defineConfig = <T extends object>(config: T): T => config;
 
+/**
+ * tsxを使用してTypeScriptファイルを実行し、JSON出力を解析します
+ *
+ * @template T 解析結果の型
+ * @param filePath 実行するTypeScriptファイルのパス
+ * @returns 実行結果のPromise
+ */
 const executeScriptViaTsx = async <T>(filePath: string): Promise<T> => {
   return new Promise((resolve, reject) => {
     const child = spawn('tsx', [filePath], {
@@ -66,12 +73,23 @@ const executeScriptViaTsx = async <T>(filePath: string): Promise<T> => {
   });
 };
 
-const executeScriptViaTempFile = async <T>(code: string): Promise<T> => {
-  const tempFilePath = join(tmpdir(), `config-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.ts`);
+/**
+ * 一意な一時ファイルパスを生成します
+ *
+ * @returns 一時ファイルパス
+ */
+const createTempFilePath = (): string => {
+  return join(tmpdir(), `config-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.ts`);
+};
 
-  try {
-    // TypeScriptファイルとして保存し、結果をJSON出力するラッパーを追加
-    const wrappedCode = `
+/**
+ * スクリプトコードを実行可能な形式にラップします
+ *
+ * @param code 元のスクリプトコード
+ * @returns ラップされたコード
+ */
+const wrapScriptCode = (code: string): string => {
+  return `
 // defineConfig関数を定義
 const defineConfig = <T extends object>(config: T): T => config;
 
@@ -80,6 +98,20 @@ ${code}
 // 設定結果をJSON形式で出力
 console.log(JSON.stringify(config));
 `;
+};
+
+/**
+ * 一時ファイルを作成してスクリプトを実行します
+ *
+ * @template T 解析結果の型
+ * @param code 実行するスクリプトコード
+ * @returns 実行結果
+ */
+const executeScriptViaTempFile = async <T>(code: string): Promise<T> => {
+  const tempFilePath = createTempFilePath();
+
+  try {
+    const wrappedCode = wrapScriptCode(code);
     writeFileSync(tempFilePath, wrappedCode);
 
     return await executeScriptViaTsx<T>(tempFilePath);
@@ -119,29 +151,49 @@ console.log(JSON.stringify(config));
  * const config3 = await parseScript('{ debug: true }');
  * ```
  */
+/**
+ * スクリプトコードを設定オブジェクト代入形式に正規化します
+ *
+ * @param code 元のスクリプトコード
+ * @returns 正規化されたコード、またはサポートされていない場合はnull
+ *
+ * @example
+ * ```typescript
+ * normalizeScriptCode('export default { name: "test" }'); // 'const config = { name: "test" }'
+ * normalizeScriptCode('defineConfig({ port: 3000 })'); // 'const config = defineConfig({ port: 3000 })'
+ * ```
+ */
+const normalizeScriptCode = (code: string): string | null => {
+  const trimmedCode = code.trim();
+
+  // export default 形式をhandle
+  if (trimmedCode.startsWith('export default')) {
+    return trimmedCode.replace(/^export\s+default\s+/, 'const config = ');
+  } // defineConfig形式をhandle
+  else if (trimmedCode.includes('defineConfig(')) {
+    return `const config = ${trimmedCode}`;
+  } // シンプルなオブジェクトリテラル形式をhandle
+  else if (trimmedCode.startsWith('{') && trimmedCode.endsWith('}')) {
+    return `const config = ${trimmedCode}`;
+  }
+
+  // その他の形式はサポートしない
+  return null;
+};
+
 export const parseScript = async <T = object>(raw: string | undefined): Promise<T> => {
   if (!raw) {
     return {} as T;
   }
 
   try {
-    let code = raw.trim();
+    const normalizedCode = normalizeScriptCode(raw);
 
-    // export default 形式をhandle
-    if (code.startsWith('export default')) {
-      code = code.replace(/^export\s+default\s+/, 'const config = ');
-    } // defineConfig形式をhandle
-    else if (code.includes('defineConfig(')) {
-      code = `const config = ${code}`;
-    } // シンプルなオブジェクトリテラル形式をhandle
-    else if (code.startsWith('{') && code.endsWith('}')) {
-      code = `const config = ${code}`;
-    } else {
-      // その他の形式はサポートしない
+    if (!normalizedCode) {
       return {} as T;
     }
 
-    return await executeScriptViaTempFile<T>(code);
+    return await executeScriptViaTempFile<T>(normalizedCode);
   } catch {
     return {} as T;
   }
