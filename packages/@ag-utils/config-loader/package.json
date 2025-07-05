@@ -45,7 +45,9 @@
     "pnpm": ">=10",
     "node": ">=20"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@ag-utils/e2e-framework": "workspace:*"
+  },
   "dependencies": {
     "@ag-utils/common": "workspace:*",
     "comment-json": "^4.2.5",

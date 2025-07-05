@@ -16,20 +16,30 @@ import { TEstaSearchConfigFileType } from '@shared/types/common.types';
 import { loadConfig } from '@/loadConfig';
 
 // test framework
-import { type ConfigFileSpec, testFramework, type TestScenario } from './FileIoFramework';
+import { agE2ETestFramework } from '@ag-utils/e2e-framework';
+import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '@ag-utils/e2e-framework';
+
+// Helper function to wrap loadConfig for executeTest
+const loadConfigWrapper = <T = object>(...args: unknown[]): T => {
+  return loadConfig<T>(
+    args[0] as string,
+    args[1] as string,
+    args[2] as TEstaSearchConfigFileType | undefined,
+  );
+};
 
 describe('loadConfig E2E', () => {
   it('loads JSON config file', () => {
     const configData = { name: 'Test App', version: '1.0.0', debug: true };
-    const configFiles: ConfigFileSpec[] = [
+    const configFiles: AgE2eConfigFileSpec[] = [
       { filename: 'myapp.json', content: configData, format: 'json' },
     ];
 
-    const result = testFramework.executeTest(
+    const result = agE2ETestFramework.executeTest(
       'json-test',
       'testApp',
       configFiles,
-      loadConfig<typeof configData>,
+      loadConfigWrapper<typeof configData>,
       'myapp',
       'testApp',
     );
@@ -46,15 +56,15 @@ features:
   - auth
   - logging
 `;
-    const configFiles: ConfigFileSpec[] = [
+    const configFiles: AgE2eConfigFileSpec[] = [
       { filename: 'myapp.yaml', content: yamlContent, format: 'yaml' },
     ];
 
-    const result = testFramework.executeTest(
+    const result = agE2ETestFramework.executeTest(
       'yaml-test',
       'testApp',
       configFiles,
-      loadConfig,
+      loadConfigWrapper,
       'myapp',
       'testApp',
     );
@@ -76,15 +86,15 @@ features:
      for debug flag */
   "debug": true
 }`;
-    const configFiles: ConfigFileSpec[] = [
-      { filename: 'myapp.jsonc', content: jsoncContent, format: 'jsonc' },
+    const configFiles: AgE2eConfigFileSpec[] = [
+      { filename: 'myapp.jsonc', content: jsoncContent, format: 'json' },
     ];
 
-    const result = testFramework.executeTest(
+    const result = agE2ETestFramework.executeTest(
       'jsonc-test',
       'testApp',
       configFiles,
-      loadConfig,
+      loadConfigWrapper,
       'myapp',
       'testApp',
     );
@@ -106,15 +116,15 @@ features:
     port: 5432
   }
 };`;
-    const configFiles: ConfigFileSpec[] = [
-      { filename: 'myapp.ts', content: tsContent, format: 'ts' },
+    const configFiles: AgE2eConfigFileSpec[] = [
+      { filename: 'myapp.ts', content: tsContent, format: 'typescript' },
     ];
 
-    const result = testFramework.executeTest(
+    const result = agE2ETestFramework.executeTest(
       'ts-test',
       'testApp',
       configFiles,
-      loadConfig,
+      loadConfigWrapper,
       'myapp',
       'testApp',
     );
@@ -132,15 +142,15 @@ features:
 
   it('loads config with dot prefix', () => {
     const configData = { hidden: true, name: 'Hidden Config' };
-    const configFiles: ConfigFileSpec[] = [
+    const configFiles: AgE2eConfigFileSpec[] = [
       { filename: '.myapp.json', content: configData, format: 'json' },
     ];
 
-    const result = testFramework.executeTest(
+    const result = agE2ETestFramework.executeTest(
       'dot-prefix-test',
       'testApp',
       configFiles,
-      loadConfig,
+      loadConfigWrapper,
       'myapp',
       'testApp',
     );
@@ -151,16 +161,16 @@ features:
   it('prioritizes files without dot prefix over files with dot prefix', () => {
     const normalConfigData = { priority: 'normal', name: 'Normal Config' };
     const hiddenConfigData = { priority: 'hidden', name: 'Hidden Config' };
-    const configFiles: ConfigFileSpec[] = [
+    const configFiles: AgE2eConfigFileSpec[] = [
       { filename: 'myapp.json', content: normalConfigData, format: 'json' },
       { filename: '.myapp.json', content: hiddenConfigData, format: 'json' },
     ];
 
-    const result = testFramework.executeTest(
+    const result = agE2ETestFramework.executeTest(
       'priority-test',
       'testApp',
       configFiles,
-      loadConfig,
+      loadConfigWrapper,
       'myapp',
       'testApp',
     );
@@ -169,14 +179,14 @@ features:
   });
 
   it('throws error when config file not found', () => {
-    const configFiles: ConfigFileSpec[] = [];
+    const configFiles: AgE2eConfigFileSpec[] = [];
 
     expect(() => {
-      testFramework.executeTest(
+      agE2ETestFramework.executeTest(
         'not-found-test',
         'testApp',
         configFiles,
-        loadConfig,
+        loadConfigWrapper,
         'nonexistent',
         'testApp',
       );
@@ -185,15 +195,15 @@ features:
 
   it('uses current working directory as default', () => {
     const configData = { test: true };
-    const configFiles: ConfigFileSpec[] = [
+    const configFiles: AgE2eConfigFileSpec[] = [
       { filename: 'testConfig.json', content: configData, format: 'json' },
     ];
 
-    const result = testFramework.executeTest(
+    const result = agE2ETestFramework.executeTest(
       'cwd-test',
       'testConfig',
       configFiles,
-      loadConfig,
+      loadConfigWrapper,
       'testConfig',
       'testConfig',
     );
@@ -204,15 +214,15 @@ features:
   describe('TEstaSearchConfigFileType tests', () => {
     it('loads config with USER search type (default)', () => {
       const configData = { type: 'user', name: 'User Config' };
-      const configFiles: ConfigFileSpec[] = [
+      const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'userApp.json', content: configData, format: 'json' },
       ];
 
-      const result = testFramework.executeTest(
+      const result = agE2ETestFramework.executeTest(
         'user-type-test',
         'testApp',
         configFiles,
-        loadConfig,
+        loadConfigWrapper,
         'userApp',
         'testApp',
         TEstaSearchConfigFileType.USER,
@@ -223,15 +233,15 @@ features:
 
     it('loads config with SYSTEM search type', () => {
       const configData = { type: 'system', name: 'System Config' };
-      const configFiles: ConfigFileSpec[] = [
+      const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'systemApp.json', content: configData, format: 'json' },
       ];
 
-      const result = testFramework.executeTest(
+      const result = agE2ETestFramework.executeTest(
         'system-type-test',
         'testApp',
         configFiles,
-        loadConfig,
+        loadConfigWrapper,
         'systemApp',
         'testApp',
         TEstaSearchConfigFileType.SYSTEM,
@@ -242,15 +252,15 @@ features:
 
     it('defaults to USER search type when not specified', () => {
       const configData = { type: 'default', name: 'Default Config' };
-      const configFiles: ConfigFileSpec[] = [
+      const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'defaultApp.json', content: configData, format: 'json' },
       ];
 
-      const result = testFramework.executeTest(
+      const result = agE2ETestFramework.executeTest(
         'default-type-test',
         'testApp',
         configFiles,
-        loadConfig,
+        loadConfigWrapper,
         'defaultApp',
         'testApp',
       );
@@ -261,7 +271,7 @@ features:
 
   describe('Parameterized tests example', () => {
     it('runs multiple config format tests', () => {
-      const scenarios: TestScenario[] = [
+      const scenarios: AgE2eTestScenario[] = [
         {
           description: 'JSON format',
           configFiles: [{ filename: 'app.json', content: { format: 'json' }, format: 'json' }],
@@ -276,11 +286,11 @@ features:
         },
       ];
 
-      const results = testFramework.runParameterizedTests(
+      const results = agE2ETestFramework.runParameterizedTests(
         'multi-format-test',
         'testApp',
         scenarios,
-        loadConfig,
+        loadConfigWrapper,
       );
 
       results.forEach(({ scenario, result }) => {
