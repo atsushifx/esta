@@ -1,5 +1,5 @@
 // src: index.ts
-// @(#) : @ag-utils: common entry point
+// @(#) : @esta-utils/utils: unified entry point for @esta-utils packages
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //

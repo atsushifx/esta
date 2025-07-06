@@ -11,7 +11,7 @@ import type { AgActionInstallerExecutor, AgActionInstallerType, AgActionInstallO
 
 export class HandleInstaller {
   constructor(
-    private readonly executors: Record<AgActionInstallerType, AgActionInstallerExecutor>,
+    private readonly executors: Partial<Record<AgActionInstallerType, AgActionInstallerExecutor>>,
   ) {}
 
   async handle(type: AgActionInstallerType, options: AgActionInstallOptions): Promise<boolean> {

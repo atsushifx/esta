@@ -13,7 +13,7 @@ import process from 'process';
 // --- internal libs
 import { TEstaSearchConfigFileType } from '@shared/types/common.types';
 
-import { getDelimiter } from '@ag-utils/common';
+import { getDelimiter } from '@esta-utils/get-platform';
 // --- types
 
 // functions

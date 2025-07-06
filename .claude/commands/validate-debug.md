@@ -21,10 +21,15 @@ Comprehensive validation and debugging workflow for the E2E framework.
 
 ## Phase 4: Content Validation
 
-- Run `pnpm run check:spells "**/*.ts"` - Spell checking
+- Run `pnpm run check:spells "**/*.ts" "**/*.json"` - spell checking
 - If fails: List misspelled words, suggest corrections, check if they should be added to dictionary
 
-## Phase 5: Formatting
+## Phase 5: Filename Validation
+
+- Run `pnpm run lint:filenames` - Filename lint
+- If fails: List misspelled words, suggest corrections, check if they should be added to dictionary
+
+## Phase 6: Formatting
 
 - Run `pnpm run check:dprint` - Code formatting validation
 - If fails: Auto-run `pnpm run format:dprint`, then re-check

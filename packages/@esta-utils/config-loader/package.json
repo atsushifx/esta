@@ -49,7 +49,7 @@
     "@agla-e2e/fileio-framework": "workspace:*"
   },
   "dependencies": {
-    "@ag-utils/common": "workspace:*",
+    "@esta-utils/get-platform": "workspace:*",
     "comment-json": "^4.2.5",
     "tsx": "^4.20.3",
     "yaml": "^2.8.0"
