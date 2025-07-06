@@ -7,13 +7,18 @@
 // https://opensource.org/licenses/MIT
 
 export default [
+  // for OSS Utils
   './packages/@agla-e2e/fileio-framework/tsconfig.json',
   './packages/@agla-utils/ag-logger/tsconfig.json',
+  // common definition
   './shared/common/tsconfig.json',
+  // utils
   './packages/@esta-utils/utils/tsconfig.json',
   './packages/@esta-utils/command-utils/tsconfig.json',
   './packages/@esta-utils/get-platform/tsconfig.json',
   './packages/@esta-utils/config-loader/tsconfig.json',
+  // gha modules
   './packages/@ag-actions/tool-installer/tsconfig.json',
+  // main
   './tsconfig.json',
 ];

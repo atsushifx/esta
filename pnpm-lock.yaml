@@ -79,7 +79,7 @@ importers:
         version: 2.0.2
       '@ag-system/ag-logger':
         specifier: workspace:*
-        version: link:../../@ag-system/ag-logger
+        version: link:../../@agla-utils/ag-logger
       '@esta-utils/command-utils':
         specifier: workspace:*
         version: link:../../@esta-utils/command-utils
@@ -92,8 +92,6 @@ importers:
       comment-json:
         specifier: ^4.2.5
         version: 4.2.5
-
-  packages/@ag-system/ag-logger: {}
 
   packages/@agla-e2e/fileio-framework: {}
 
