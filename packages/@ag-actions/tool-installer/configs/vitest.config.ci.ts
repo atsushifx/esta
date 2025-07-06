@@ -36,7 +36,12 @@ export default mergeConfig(baseConfig, {
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '../src'),
-      '@shared': path.resolve(MonorepoRoot, 'shared/common'),
+      '@shared/types': path.resolve(__dirname, '../shared/types'),
+      '@shared/constants': path.resolve(MonorepoRoot, 'shared/common/constants'),
+      '@shared': path.resolve(__dirname, '../shared'),
+      '@ag-utils/common': path.resolve(MonorepoRoot, 'packages/@ag-utils/common/src'),
+      '@ag-utils/command-utils': path.resolve(MonorepoRoot, 'packages/@ag-utils/command-utils/src'),
+      '@esta-utils/get-platform': path.resolve(MonorepoRoot, 'packages/@esta-utils/get-platform/src'),
     },
   },
 });

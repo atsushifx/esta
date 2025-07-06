@@ -80,6 +80,9 @@ importers:
       '@ag-system/ag-logger':
         specifier: workspace:*
         version: link:../../@ag-system/ag-logger
+      '@ag-utils/command-utils':
+        specifier: workspace:*
+        version: link:../../@ag-utils/command-utils
       '@ag-utils/common':
         specifier: workspace:*
         version: link:../../@ag-utils/common
