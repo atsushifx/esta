@@ -97,6 +97,8 @@ importers:
 
   packages/@agla-e2e/fileio-framework: {}
 
+  packages/@agla-utils/ag-logger: {}
+
   packages/@esta-utils/command-utils:
     dependencies:
       '@esta-utils/get-platform':

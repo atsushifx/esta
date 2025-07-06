@@ -2,17 +2,25 @@
 
 Comprehensive validation and debugging workflow for the E2E framework.
 
-## Phase 1: Testing
+## Phase 1: Code Quality
 
-- Run `pnpm run test:develop` - Execute development tests
-- Run `pnpm run test:ci` - Execute CI/CD tests
-- If fails: Read test output, identify failing tests, analyze error messages, check for common issues (imports, types, async/await, mocking), suggest specific fixes
+### Phase 1-1: lint-all & debug
 
-## Phase 2: Code Quality
+- Run `pnpm run lint-all` - ESLint code analysis (all-packages)
+- Run `pnpm run lint-all:types` - Types ESLint code analysis (all-packages)
+- If fails: Parse ESLint output, categorize errors (syntax, style, best practices), auto-fix fixable issues with `--fix`, report remaining issues with explanations
+
+### Phase 1-2: lint & debug
 
 - Run `pnpm run lint` - ESLint code analysis
 - Run `pnpm run lint:types` - TypeScript ESLint analysis
 - If fails: Parse ESLint output, categorize errors (syntax, style, best practices), auto-fix fixable issues with `--fix`, report remaining issues with explanations
+
+## Phase 2: Testing
+
+- Run `pnpm run test:develop` - Execute development tests
+- Run `pnpm run test:ci` - Execute CI/CD tests
+- If fails: Read test output, identify failing tests, analyze error messages, check for common issues (imports, types, async/await, mocking), suggest specific fixes
 
 ## Phase 3: Type Checking
 
