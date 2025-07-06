@@ -4,15 +4,17 @@ Comprehensive validation and debugging workflow for the E2E framework.
 
 ## Phase 1: Code Quality
 
-### Phase 1-1: lint-all & debug
+### Phase 1-2: Code Quality (ESTA Root)
 
-- Run `pnpm run lint-all` - ESLint code analysis (all-packages)
-- Run `pnpm run lint-all:types` - Types ESLint code analysis (all-packages)
+- Run `pnpm run lint-all` - ESLint code analysis
+- If fails: Parse ESLint output, categorize errors (syntax, style, best practices), auto-fix fixable issues with `--fix`, report remaining issues with explanations
+- Run `pnpm run lint-all:types` - TypeScript ESLint analysis
 - If fails: Parse ESLint output, categorize errors (syntax, style, best practices), auto-fix fixable issues with `--fix`, report remaining issues with explanations
 
-### Phase 1-2: lint & debug
+### Phase 1-2: Code Quality
 
 - Run `pnpm run lint` - ESLint code analysis
+- If fails: Parse ESLint output, categorize errors (syntax, style, best practices), auto-fix fixable issues with `--fix`, report remaining issues with explanations
 - Run `pnpm run lint:types` - TypeScript ESLint analysis
 - If fails: Parse ESLint output, categorize errors (syntax, style, best practices), auto-fix fixable issues with `--fix`, report remaining issues with explanations
 
