@@ -1,5 +1,5 @@
 {
-  "name": "@ag-system/ag-logger",
+  "name": "@agla-utils/ag-logger",
   "private": true,
   "version": "0.1.0",
   "description": "Abstract logger system with various implementations.",
