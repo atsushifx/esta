@@ -17,7 +17,7 @@ import { describe, expect, it } from 'vitest';
 import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/types';
 
 // internal libs
-import { commandExist } from '@ag-utils/command-utils';
+import { commandExist } from '@esta-utils/command-utils';
 
 // test unit
 import { EgetInitializer } from '../../src/installer/executor/EgetInitializer';

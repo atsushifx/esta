@@ -40,7 +40,7 @@ export default mergeConfig(baseConfig, {
       '@shared/constants': path.resolve(MonorepoRoot, 'shared/common/constants'),
       '@shared': path.resolve(__dirname, '../shared'),
       '@ag-utils/common': path.resolve(MonorepoRoot, 'packages/@ag-utils/common/src'),
-      '@ag-utils/command-utils': path.resolve(MonorepoRoot, 'packages/@ag-utils/command-utils/src'),
+      '@esta-utils/command-utils': path.resolve(MonorepoRoot, 'packages/@esta-utils/command-utils/src'),
       '@esta-utils/get-platform': path.resolve(MonorepoRoot, 'packages/@esta-utils/get-platform/src'),
     },
   },
