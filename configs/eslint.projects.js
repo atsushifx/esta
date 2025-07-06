@@ -8,10 +8,10 @@
 
 export default [
   './shared/common/tsconfig.json',
-  './packages/@ag-utils/config-loader/tsconfig.json',
   './packages/@ag-utils/common/tsconfig.json',
   './packages/@esta-utils/command-utils/tsconfig.json',
   './packages/@esta-utils/get-platform/tsconfig.json',
+  './packages/@esta-utils/config-loader/tsconfig.json',
   './packages/@ag-system/ag-logger/tsconfig.json',
   './packages/@ag-actions/tool-installer/tsconfig.json',
   './packages/@agla-e2e/fileio-framework/tsconfig.json',

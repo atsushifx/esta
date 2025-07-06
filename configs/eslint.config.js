@@ -54,6 +54,11 @@ export default [
           tsconfigRootDir: rootDir,
           project: projectPaths,
           noWarnOnMultipleProjects: true,
+          alwaysTryTypes: true,
+        },
+        node: {
+          extensions: ['.js', '.jsx', '.ts', '.tsx'],
+          moduleDirectory: ['node_modules', 'src/'],
         },
       },
     },
