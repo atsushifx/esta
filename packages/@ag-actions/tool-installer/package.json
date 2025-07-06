@@ -50,7 +50,7 @@
     "@actions/io": "^1.1.3",
     "@actions/tool-cache": "^2.0.2",
     "@shared": "workspace:*",
-    "@ag-utils/common": "workspace:*",
+    "@esta-utils/get-platform": "workspace:*",
     "@esta-utils/command-utils": "workspace:*",
     "@ag-system/ag-logger": "workspace:*",
     "comment-json": "^4.2.5"

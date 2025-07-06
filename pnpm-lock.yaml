@@ -80,12 +80,12 @@ importers:
       '@ag-system/ag-logger':
         specifier: workspace:*
         version: link:../../@ag-system/ag-logger
-      '@ag-utils/common':
-        specifier: workspace:*
-        version: link:../../@ag-utils/common
       '@esta-utils/command-utils':
         specifier: workspace:*
         version: link:../../@esta-utils/command-utils
+      '@esta-utils/get-platform':
+        specifier: workspace:*
+        version: link:../../@esta-utils/get-platform
       '@shared':
         specifier: workspace:*
         version: link:../../../shared/common
@@ -94,15 +94,6 @@ importers:
         version: 4.2.5
 
   packages/@ag-system/ag-logger: {}
-
-  packages/@ag-utils/common:
-    dependencies:
-      '@esta-utils/command-utils':
-        specifier: workspace:*
-        version: link:../../@esta-utils/command-utils
-      '@esta-utils/get-platform':
-        specifier: workspace:*
-        version: link:../../@esta-utils/get-platform
 
   packages/@agla-e2e/fileio-framework: {}
 
@@ -114,9 +105,9 @@ importers:
 
   packages/@esta-utils/config-loader:
     dependencies:
-      '@ag-utils/common':
+      '@esta-utils/get-platform':
         specifier: workspace:*
-        version: link:../../@ag-utils/common
+        version: link:../get-platform
       comment-json:
         specifier: ^4.2.5
         version: 4.2.5
@@ -132,6 +123,15 @@ importers:
         version: link:../../@agla-e2e/fileio-framework
 
   packages/@esta-utils/get-platform: {}
+
+  packages/@esta-utils/utils:
+    dependencies:
+      '@esta-utils/command-utils':
+        specifier: workspace:*
+        version: link:../command-utils
+      '@esta-utils/get-platform':
+        specifier: workspace:*
+        version: link:../get-platform
 
   shared/common: {}
 

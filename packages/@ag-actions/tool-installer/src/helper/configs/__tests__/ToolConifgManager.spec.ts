@@ -48,10 +48,10 @@ describe('ToolConfigManager', () => {
   it('get config from ToolConfigManager', () => {
     const config = manager.getToolConfig('gitleaks') as AgActionEgetToolConfig;
     expect(config).toBeDefined();
-    expect(config?.tool).toBe('gitleaks');
-    expect(config?.installer).toBe('eget');
-    expect(config?.package).toBe('gitleaks/gitleaks');
-    expect(config?.options).toBeUndefined();
+    expect(config.tool).toBe('gitleaks');
+    expect(config.installer).toBe('eget');
+    expect(config.package).toBe('gitleaks/gitleaks');
+    expect(config.options).toBeUndefined();
   });
 
   it('set config to ToolConfigManager', () => {

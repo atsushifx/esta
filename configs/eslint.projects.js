@@ -8,7 +8,7 @@
 
 export default [
   './shared/common/tsconfig.json',
-  './packages/@ag-utils/common/tsconfig.json',
+  './packages/@esta-utils/utils/tsconfig.json',
   './packages/@esta-utils/command-utils/tsconfig.json',
   './packages/@esta-utils/get-platform/tsconfig.json',
   './packages/@esta-utils/config-loader/tsconfig.json',

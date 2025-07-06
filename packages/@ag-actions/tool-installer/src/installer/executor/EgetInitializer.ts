@@ -17,8 +17,8 @@ import { promisify } from 'util';
 import { AgActions_DEFAULT_TEMP_DIR, AgDir_WINGET_INSTALL_DIR } from '@shared/constants';
 import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/types';
 
-import { getPlatform } from '@ag-utils/common';
-import { commandExist } from '@ag-utils/common';
+import { commandExist } from '@esta-utils/command-utils';
+import { getPlatform, PlatformType } from '@esta-utils/get-platform';
 // constants
 
 // internal libs
@@ -44,7 +44,7 @@ export class EgetInitializer implements AgActionInstallerExecutor {
 
     try {
       const platform = getPlatform();
-      if (platform === 'windows') {
+      if (platform === PlatformType.WINDOWS) {
         await this.installWindows(options, installDir);
       } else {
         await this.installLinux(options, installDir);

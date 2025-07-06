@@ -13,7 +13,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 
 import { TEstaSearchConfigFileType } from '@shared/types/common.types';
 
-import { getDelimiter } from '@ag-utils/common';
+import { getDelimiter } from '@esta-utils/get-platform';
 // vitest
 
 // os モジュールをモック

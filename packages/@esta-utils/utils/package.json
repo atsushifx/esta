@@ -1,8 +1,8 @@
 {
-  "name": "@ag-utils/common",
+  "name": "@esta-utils/utils",
   "private": true,
   "version": "0.0.0",
-  "description": "Cross-platform Node.js utility to detect runtime platform.",
+  "description": "Unified entry point for @esta-utils packages providing platform detection and command utilities.",
   "author": "atsushifx <https://github.com/atsushifx>",
   "license": "MIT",
   "type": "module",

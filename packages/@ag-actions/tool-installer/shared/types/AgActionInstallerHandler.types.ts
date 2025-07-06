@@ -21,7 +21,9 @@ export type AgActionInstallerExecutor = {
   execute(options: AgActionInstallOptions): Promise<boolean>;
 };
 
-export type AgActionInstallerExecutorsMap = Record<
-  AgActionInstallerType,
-  AgActionInstallerExecutor
+export type AgActionInstallerExecutorsMap = Partial<
+  Record<
+    AgActionInstallerType,
+    AgActionInstallerExecutor
+  >
 >;
