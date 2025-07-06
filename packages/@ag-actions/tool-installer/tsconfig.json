@@ -25,7 +25,14 @@
     "rootDir": ".",
     // alias
     "baseUrl": ".",
-    // "paths": {    },
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@shared/*": [
+        "shared/*"
+      ]
+    },
     // types
     // "typesRoots": [    ],
     // cache
