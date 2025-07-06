@@ -6,8 +6,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import * as agUtils from './commandExist';
+import * as estaUtils from './commandExist';
 
 // --- export
 export * from './commandExist';
-export { agUtils };
+export { estaUtils };

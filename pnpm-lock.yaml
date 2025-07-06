@@ -95,17 +95,11 @@ importers:
 
   packages/@ag-system/ag-logger: {}
 
-  packages/@ag-utils/command-utils:
-    dependencies:
-      '@esta-utils/get-platform':
-        specifier: workspace:*
-        version: link:../../@esta-utils/get-platform
-
   packages/@ag-utils/common:
     dependencies:
-      '@ag-utils/command-utils':
+      '@esta-utils/command-utils':
         specifier: workspace:*
-        version: link:../command-utils
+        version: link:../../@esta-utils/command-utils
       '@esta-utils/get-platform':
         specifier: workspace:*
         version: link:../../@esta-utils/get-platform
@@ -130,6 +124,12 @@ importers:
         version: link:../../@agla-e2e/fileio-framework
 
   packages/@agla-e2e/fileio-framework: {}
+
+  packages/@esta-utils/command-utils:
+    dependencies:
+      '@esta-utils/get-platform':
+        specifier: workspace:*
+        version: link:../get-platform
 
   packages/@esta-utils/get-platform: {}
 

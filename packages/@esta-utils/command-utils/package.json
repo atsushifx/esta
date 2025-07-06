@@ -1,5 +1,5 @@
 {
-  "name": "@ag-utils/command-utils",
+  "name": "@esta-utils/command-utils",
   "private": true,
   "version": "0.0.0",
   "description": "command-utils: command executor and other utilities",
