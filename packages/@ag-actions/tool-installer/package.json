@@ -51,6 +51,7 @@
     "@actions/tool-cache": "^2.0.2",
     "@shared": "workspace:*",
     "@ag-utils/common": "workspace:*",
+    "@ag-utils/command-utils": "workspace:*",
     "@ag-system/ag-logger": "workspace:*",
     "comment-json": "^4.2.5"
   },

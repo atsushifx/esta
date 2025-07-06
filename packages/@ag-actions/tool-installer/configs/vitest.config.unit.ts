@@ -36,7 +36,9 @@ export default mergeConfig(baseConfig, {
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '../src'),
-      '@shared': path.resolve(MonorepoRoot, 'shared/common'),
+      '@shared/types': path.resolve(__dirname, '../shared/types'),
+      '@shared/constants': path.resolve(MonorepoRoot, 'shared/common/constants'),
+      '@shared': path.resolve(__dirname, '../shared'),
     },
   },
 });
