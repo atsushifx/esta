@@ -1,0 +1,83 @@
+# src: .gitignore
+#
+## @(#) : gitignore for monorepo sub repository
+#
+# @version  1.0.0
+# @author   Furukawa, Atsushi <atsushifx@aglabo.com>
+# @since    2025-04-11
+# @license	MIT
+#
+# @description<<
+#
+# Git ignore rules for textlint plugin development.
+# Includes common Node.js patterns and workspace-specific overrides.
+#
+#<<
+
+## ─── General (logs, patches) ───────────────────────────────
+*.log*
+*.diff
+*.patch
+
+## ─── Editor (VSCode) ──────────────────────────────────────
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+!.vscode/cspell*
+
+.history/
+
+## ─── Node.js / JS project ignores ─────────────────────────
+# gibo: Node.gitignore
+logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Diagnostic reports
+report.*.json
+
+# Runtime files
+pids
+*.pid
+*.seed
+*.pid.lock
+
+## ─── TypeScript artifacts ────────────────────────────────
+*.tsbuildinfo
+
+## ─── Build outputs ───────────────────────────────────────
+dist/
+lib/
+module/
+
+
+## ─── Cache
+.cache/
+.rpt2_cache/
+.rts2_cache_*/
+.parcel-cache
+.vitest
+
+## --- temp
+temp/*
+tmp/*
+
+## ─── Lint and test caches ────────────────────────────────
+*cache
+.eslintcache
+.stylelintcache
+
+## ─── Others ───────────────────────────────────────────
+node_modules/
+*.tgz
+
+.env
+.env.*.local
+.tools
+
