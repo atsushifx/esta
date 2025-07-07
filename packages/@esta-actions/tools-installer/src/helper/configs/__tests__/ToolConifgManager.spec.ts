@@ -10,9 +10,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 // constants
-import { AgActionInstallerType } from '@shared/types';
+import { AgActionInstallerType } from '../../../../shared/types';
 // types
-import type { AgActionEgetToolConfig } from '@shared/types';
+import type { AgActionEgetToolConfig } from '../../../../shared/types';
 
 // test unit
 import { ToolConfigManager } from '../ToolConfigManager.class';
