@@ -8,9 +8,11 @@
 
 // import
 import { estaUtils as commandUtils } from '@esta-utils/command-utils';
-import { agUtils as getPlatform } from '@esta-utils/get-platform';
+import configLoader from '@esta-utils/config-loader';
+import { estaUtils as getPlatform } from '@esta-utils/get-platform';
 
-const agUtils = {
+const estaUtils = {
+  configLoader,
   ...getPlatform,
   ...commandUtils,
 };
@@ -21,4 +23,5 @@ export * from '@esta-utils/command-utils';
 export * from '@esta-utils/get-platform';
 
 // namespace / default export
-export { agUtils };
+export { estaUtils };
+export default estaUtils;

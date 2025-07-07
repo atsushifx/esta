@@ -11,3 +11,6 @@ import * as estaUtils from './commandExist';
 // --- export
 export * from './commandExist';
 export { estaUtils };
+
+// default
+export default estaUtils;
