@@ -1,1 +1,0 @@
-This test should be ignored because the directory starts with #

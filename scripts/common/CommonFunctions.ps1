@@ -1,7 +1,7 @@
-# src: /scripts/common/CommonFunctions.ps1
-# @(#) : 共通関数ライブラリ
+# src: scripts/common/CommonFunctions.ps1
+# @(#) : common function library
 #
-# Copyright (c) 2025 Furukawa Atsushi <atsushifx@gmail.com>
+# Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 #
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT

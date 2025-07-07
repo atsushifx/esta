@@ -1,7 +1,7 @@
-// src: /shared/constants/defaults.ts
-// @(#) : デフォルト値関連の定数
+// src: shared/common/constants/defaults.ts
+// @(#) : default value constants
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

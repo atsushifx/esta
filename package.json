@@ -1,5 +1,6 @@
 {
-  "name": "setup-tool-with-eget",
+  "name": "esta",
+  "_comment": "@(#) : monorepo for GitHub Actions CLI tool installer",
   "private": true,
   "version": "0.1.0",
   "description": "GitHub Action to install CLI tools via eget (monorepo package)",
@@ -48,12 +49,14 @@
     "lint": "pnpm -r run lint",
     "lint:types": "pnpm -r run lint:types",
     "lint:fix": "echo 'skip where project root'",
-    "lint-all": "pnpm exec eslint --config ./configs/eslint.config.js --cache --cache-location .cache/eslint-cache/esLintCache",
-    "lint-all:types": "pnpm exec eslint --config ./configs/eslint.config.typed.js  --cache --cache-location .cache/eslint-cache/esLintCache",
+    "lint-all": "pnpm exec eslint --config ./configs/eslint.config.all.js --cache --cache-location .cache/eslint-cache/esLintCache",
+    "lint-all:types": "pnpm exec eslint --config ./configs/eslint.config.all.typed.js  --cache --cache-location .cache/eslint-cache/esLintCache",
     "lint:filenames": "pnpm exec ls-lint --config ./configs/ls-lint.yaml ",
     "lint:text": "textlint --config ./configs/textlintrc.yaml --cache --cache-location .cache/textlint-cache/textlintCache ",
     "lint:markdown": "markdownlint-cli2 --config ./configs/.markdownlint.yaml ",
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*",
+    "test:develop": "pnpm -r run test:develop",
+    "test:ci": "pnpm -r run test:ci",
     "test:gha": "pnpm exec vitest run --config ./configs/vitest.config.gha.ts"
   }
 }

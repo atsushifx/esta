@@ -1,7 +1,7 @@
-// src: ./configs/vitest.config.ci.ts
-// @(#) : vitest config for e2e test
+// src: configs/vitest.config.gha.ts
+// @(#) : vitest configuration for GitHub Actions testing
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

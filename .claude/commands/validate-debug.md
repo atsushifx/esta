@@ -2,17 +2,27 @@
 
 Comprehensive validation and debugging workflow for the E2E framework.
 
-## Phase 1: Testing
+## Phase 1: Code Quality
+
+### Phase 1-2: Code Quality (ESTA Root)
+
+- Run `pnpm run lint-all` - ESLint code analysis
+- If fails: Parse ESLint output, categorize errors (syntax, style, best practices), auto-fix fixable issues with `--fix`, report remaining issues with explanations
+- Run `pnpm run lint-all:types` - TypeScript ESLint analysis
+- If fails: Parse ESLint output, categorize errors (syntax, style, best practices), auto-fix fixable issues with `--fix`, report remaining issues with explanations
+
+### Phase 1-2: Code Quality
+
+- Run `pnpm run lint` - ESLint code analysis
+- If fails: Parse ESLint output, categorize errors (syntax, style, best practices), auto-fix fixable issues with `--fix`, report remaining issues with explanations
+- Run `pnpm run lint:types` - TypeScript ESLint analysis
+- If fails: Parse ESLint output, categorize errors (syntax, style, best practices), auto-fix fixable issues with `--fix`, report remaining issues with explanations
+
+## Phase 2: Testing
 
 - Run `pnpm run test:develop` - Execute development tests
 - Run `pnpm run test:ci` - Execute CI/CD tests
 - If fails: Read test output, identify failing tests, analyze error messages, check for common issues (imports, types, async/await, mocking), suggest specific fixes
-
-## Phase 2: Code Quality
-
-- Run `pnpm run lint` - ESLint code analysis
-- Run `pnpm run lint:types` - TypeScript ESLint analysis
-- If fails: Parse ESLint output, categorize errors (syntax, style, best practices), auto-fix fixable issues with `--fix`, report remaining issues with explanations
 
 ## Phase 3: Type Checking
 
@@ -21,10 +31,15 @@ Comprehensive validation and debugging workflow for the E2E framework.
 
 ## Phase 4: Content Validation
 
-- Run `pnpm run check:spells "**/*.ts"` - Spell checking
+- Run `pnpm run check:spells "**/*.ts" "**/*.json"` - spell checking
 - If fails: List misspelled words, suggest corrections, check if they should be added to dictionary
 
-## Phase 5: Formatting
+## Phase 5: Filename Validation
+
+- Run `pnpm run lint:filenames` - Filename lint
+- If fails: List misspelled words, suggest corrections, check if they should be added to dictionary
+
+## Phase 6: Formatting
 
 - Run `pnpm run check:dprint` - Code formatting validation
 - If fails: Auto-run `pnpm run format:dprint`, then re-check

@@ -1,7 +1,7 @@
-# src: /src/run-scripts-tests.ps1
-# @(#) : powershell pester test runner
+# src: scripts/run-tests.ps1
+# @(#) : PowerShell Pester test runner
 #
-# Copyright (c) 2025 Furukawa Atsushi <atsushifx@gmail.com>
+# Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 # Released under MIT License.
 
 <#

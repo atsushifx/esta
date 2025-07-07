@@ -1,7 +1,7 @@
-# src: ./codegpt.config.yaml
-# @(#) : CodeGPT config for commit message
+# src: ./configs/codegpt.config.yaml
+# @(#) : CodeGPT configuration for commit message generation
 #
-# Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+# Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 #
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
