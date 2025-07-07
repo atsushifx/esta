@@ -48,5 +48,7 @@
   },
   "dependencies": {
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@shared/constants": "workspace:*"
+  }
 }

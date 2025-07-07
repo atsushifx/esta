@@ -6,4 +6,5 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-export {};
+// types
+export * from '../shared/types/feature-flags';
