@@ -18,7 +18,7 @@ export default [
   './packages/@esta-utils/get-platform/tsconfig.json',
   './packages/@esta-utils/config-loader/tsconfig.json',
   // gha modules
-  './packages/@ag-actions/tool-installer/tsconfig.json',
+  './packages/@esta-actions/tools-installer/tsconfig.json',
   // main
   './tsconfig.json',
 ];
