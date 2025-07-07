@@ -30,7 +30,7 @@
     "format:dprint": "dprint fmt",
     "check:dprint": "dprint check",
     "check:types": "tsc --noEmit --incremental",
-    "check:spells": "pnpm exec cspell --config .vscode/cspell.json --cache --cache-location ../../../.cache/cspell/cSpellCache",
+    "check:spells": "cspell --config .vscode/cspell.json --cache --cache-location ../../../.cache/cspell/cSpellCache",
     "lint": "pnpm exec eslint --config ./configs/eslint.config.js --cache --cache-location ../../../.cache/eslint-cache/esLintCache ",
     "lint:types": "pnpm exec eslint --config ./configs/eslint.config.typed.js --cache --cache-location ../../../.cache/eslint-cache/esLintCache",
     "lint:all": "pnpm run lint && pnpm run lint:types",
