@@ -20,7 +20,7 @@ set -euCo pipefail
 
 ##  Constants
 readonly REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
-readonly CONFIG_DIR="${REPO_ROOT}/shared/configs"
+readonly CONFIG_DIR="${REPO_ROOT}/base/configs"
 readonly SCRIPT_SYNC="${REPO_ROOT}/scripts/sync-package-scripts.ts"
 
 ## Global Flags

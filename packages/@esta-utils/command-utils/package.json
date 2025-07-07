@@ -49,6 +49,5 @@
   "dependencies": {
     "@esta-utils/get-platform": "workspace:*"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

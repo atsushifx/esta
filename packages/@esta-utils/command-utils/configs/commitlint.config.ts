@@ -10,7 +10,7 @@
 import type { UserConfig } from '@commitlint/types';
 
 // import base Config
-import { default as baseConfig } from '../../../../shared/configs/commitlint.config.base.js';
+import { default as baseConfig } from '../../../../base/configs/commitlint.config.base.js';
 
 const config: UserConfig = {
   ...baseConfig,

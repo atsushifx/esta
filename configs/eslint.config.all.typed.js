@@ -18,7 +18,7 @@ import tsparser from '@typescript-eslint/parser';
 
 import projectPaths from './eslint.projects.js';
 // common rules
-import typedRules from '../shared/configs/eslint.rules.typed.js';
+import typedRules from '../base/configs/eslint.rules.typed.js';
 
 // directories
 const __dirname = dirname(fileURLToPath(import.meta.url));

@@ -47,6 +47,5 @@
     "node": ">=20"
   },
   "devDependencies": {},
-  "dependencies": {
-  }
+  "dependencies": {}
 }

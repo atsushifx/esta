@@ -10,7 +10,7 @@
 import tsparser from '@typescript-eslint/parser';
 
 // libs
-import baseConfig from '../../../../shared/configs/eslint.config.typed.base.js';
+import baseConfig from '../../../../base/configs/eslint.config.typed.base.js';
 
 // import form common base config
 

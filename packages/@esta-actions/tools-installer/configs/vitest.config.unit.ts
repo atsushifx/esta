@@ -19,7 +19,7 @@ const MonorepoRoot = path.resolve(__dirname, '../../../../');
 import { mergeConfig } from 'vitest/config';
 
 // user common config
-import baseConfig from '../../../../shared/configs/vitest.config.base';
+import baseConfig from '../../../../base/configs/vitest.config.base';
 
 // config
 export default mergeConfig(baseConfig, {
