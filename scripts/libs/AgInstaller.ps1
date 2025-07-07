@@ -1,7 +1,7 @@
-# src: /scripts/libs/AgInstaller.ps1
-# @(#) : パッケージインストーラーライブラリ
+# src: scripts/libs/AgInstaller.ps1
+# @(#) : package installer library
 #
-# Copyright (c) 2025 Furukawa Atsushi <atsushifx@gmail.com>
+# Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 # Released under the MIT License.
 
 <#

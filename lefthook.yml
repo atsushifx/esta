@@ -1,7 +1,7 @@
-# src: ./shared/configs/lefthook.base.yml
-# @(#) : lefthook 基本設定
+# src: ./lefthook.yml
+# @(#) : lefthook configuration for git hooks
 #
-# Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+# Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 #
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT

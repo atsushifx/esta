@@ -1,7 +1,7 @@
-// src: shared/src/types/index.ts
-// @(#) : 型用バレルファイル
+// src: shared/common/types/index.ts
+// @(#) : types barrel file
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

@@ -1,7 +1,7 @@
-// src: index.ts
+// src: packages/@esta-utils/command-utils/src/index.ts
 // @(#) : Entry point for the package
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

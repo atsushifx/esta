@@ -1,7 +1,7 @@
-// src: /shared/configs/eslint.config.base.js
-// @(#) : ESLint flat base config : project easy-setup-tools
+// src: ./shared/configs/eslint.config.base.js
+// @(#) : base ESLint flat configuration for all packages
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

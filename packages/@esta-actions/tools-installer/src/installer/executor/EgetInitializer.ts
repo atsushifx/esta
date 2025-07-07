@@ -1,7 +1,7 @@
 // src: ./src/installer/executor/EgetInitializer.ts
-// @(#) : eGetをインストールするExecutor
+// @(#) : eget CLI tool initialization executor
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
@@ -65,7 +65,7 @@ export class EgetInitializer implements AgActionInstallerExecutor {
       `winget install --id=ZacharyYedidia.Eget --accept-package-agreements --accept-source-agreements --location ${tmpInstallDir} --force`;
     await run(installCommand);
 
-    // copy eget form alias to install directory
+    // copy eget from alias to install directory
     const alias = path.join(AgDir_WINGET_INSTALL_DIR, 'eget.exe');
     const targetPath = join(installDir, 'eget.exe');
     await copyFile(alias, targetPath);

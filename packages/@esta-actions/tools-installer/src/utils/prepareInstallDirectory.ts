@@ -1,7 +1,7 @@
-// src: /src/installer/prepareInstallDirectory.ts
-// @(#) : インストール用ディレクトリ初期設定
+// src: ./src/utils/prepareInstallDirectory.ts
+// @(#) : GitHub Actions installation directory preparation utility
 //
-// Copyright (c) 2025 Furukawa Atsushi <atsushifx@gmail.com>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

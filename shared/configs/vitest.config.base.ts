@@ -1,7 +1,7 @@
-// src: /shared/configs/vitest.config.base.ts
-// @(#) : vitest config for textlint filter rule plugin
+// src: shared/configs/vitest.config.base.ts
+// @(#) : vitest base configuration
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

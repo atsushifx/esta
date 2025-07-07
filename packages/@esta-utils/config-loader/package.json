@@ -1,5 +1,6 @@
 {
   "name": "@esta-utils/config-loader",
+  "_comment": "@(#) : universal configuration file loader supporting JSON, YAML, JS/TS",
   "private": true,
   "version": "0.0.0",
   "description": "Universal configuration file loader and manager utilities.",

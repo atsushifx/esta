@@ -1,5 +1,6 @@
 {
   "name": "@agla-utils/ag-logger",
+  "_comment": "@(#) : structured logging framework with multiple output formats",
   "private": true,
   "version": "0.1.0",
   "description": "Abstract logger system with various implementations.",

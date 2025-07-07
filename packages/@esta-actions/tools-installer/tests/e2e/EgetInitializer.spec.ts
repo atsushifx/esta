@@ -1,7 +1,7 @@
-// src: tests/e2e/EgetInitializer.spec.ts
-// @(#) : eget インストールテスト: egetを実際にインストールできるかのテスト
+// src: ./tests/e2e/EgetInitializer.spec.ts
+// @(#) : eget installation E2E tests
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

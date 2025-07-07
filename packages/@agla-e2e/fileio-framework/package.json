@@ -1,5 +1,6 @@
 {
   "name": "@agla-e2e/fileio-framework",
+  "_comment": "@(#) @agla-e2e/fileio-framework: E2E testing framework for file I/O operations",
   "private": true,
   "version": "0.1.0",
   "description": "E2E framework for testing configuration file operations.",

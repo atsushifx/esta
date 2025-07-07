@@ -1,5 +1,6 @@
 {
   "name": "@esta-actions/tools-installer",
+  "_comment": "@(#) : universal tool installer framework for GitHub Actions",
   "private": true,
   "version": "0.1.0",
   "description": "Universal tool installer framework for GitHub Actions (eget-based).",

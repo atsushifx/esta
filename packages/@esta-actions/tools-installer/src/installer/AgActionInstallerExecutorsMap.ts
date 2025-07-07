@@ -1,7 +1,7 @@
-// src/installer/AgActionExecutorsMap.ts
-// @(#) : ハンドラー用ExecutorMap
+// src: ./src/installer/AgActionInstallerExecutorsMap.ts
+// @(#) : executor map for installer handlers
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

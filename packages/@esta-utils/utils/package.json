@@ -1,5 +1,6 @@
 {
   "name": "@esta-utils/utils",
+  "_comment": "@(#) @esta-utils/utils: common utilities shared across packages",
   "private": true,
   "version": "0.0.0",
   "description": "Unified entry point for @esta-utils packages providing platform detection and command utilities.",

@@ -1,7 +1,7 @@
-// src: helper/configs/__tests__/ToolConfigManager.spec.ts
-// @(#) : 設定管理クラスの機能テスト
+// src: ./src/helper/configs/__tests__/ToolConfigManager.spec.ts
+// @(#) : tool configuration manager class unit tests
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

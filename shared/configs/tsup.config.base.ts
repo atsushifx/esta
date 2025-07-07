@@ -1,7 +1,7 @@
-// src: /shared/tsup.config.base.ts
-// @(#) : tsup 基本設定
+// src: shared/configs/tsup.config.base.ts
+// @(#) : tsup base configuration
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

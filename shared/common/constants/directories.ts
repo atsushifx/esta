@@ -1,7 +1,7 @@
-// src: ./src/shared/constants/directories.ts
-// @(#) : パス、ディレクトリ関連の定数
+// src: shared/common/constants/directories.ts
+// @(#) : path and directory constants
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

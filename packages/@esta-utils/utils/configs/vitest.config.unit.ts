@@ -1,7 +1,7 @@
-// src: ./configs/vitest.config.unit.ts
+// src: packages/@esta-utils/utils/configs/vitest.config.unit.ts
 // @(#) : vitest config for unit test
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

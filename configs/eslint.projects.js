@@ -1,7 +1,7 @@
-// src: /sha red/configs/eslint.projects.js
-// @(#) : eslint project path list
+// src: ./configs/eslint.projects.js
+// @(#) : ESLint project path configuration list
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

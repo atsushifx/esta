@@ -1,11 +1,10 @@
-// src: /src/installer/__tests__/prepareInstallDirectory.spec.ts
-// @(#) : eget インストールも樹0る用テスト
+// src: ./src/utils/__tests__/prepareInstallDirectory.spec.ts
+// @(#) : installation directory preparation utility unit tests
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
-// tests/installer/prepareInstallDirectory.spec.ts
 
 // libs
 import * as fs from 'fs/promises';

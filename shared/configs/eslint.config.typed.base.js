@@ -1,7 +1,7 @@
-// src: /shared/configs/eslint.config.typed.base.js
-// @(#) : ESLint flat config for check TypeScript types.
+// src: shared/configs/eslint.config.typed.base.js
+// @(#) : ESLint flat config for TypeScript type checking
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

@@ -1,7 +1,7 @@
-# src: /scripts/install-doc-tools.ps1
-# @(#) : ドキュメントルールインストールスクリプト
+# src: scripts/install-doc-tools.ps1
+# @(#) : documentation tools installation script
 #
-# Copyright (c) 2025 Furukawa Atsushi <atsushifx@gmail.com>
+# Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 # Released under the MIT License.
 
 <#

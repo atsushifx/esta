@@ -1,7 +1,7 @@
-// src: /src/installer/AgActionHandleInstaller.class.ts
-// @(#) : インストーラーハンドラーの実装
+// src: ./src/installer/AgActionHandleInstaller.class.ts
+// @(#) : installer handler class for managing different executor types
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
