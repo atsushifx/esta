@@ -28,7 +28,6 @@ const rootDir = path.resolve(__dirname, '..');
 export default [
   {
     files: [
-      'shared/common/**/*.ts',
       'packages/**/*.ts',
     ],
     ignores: [

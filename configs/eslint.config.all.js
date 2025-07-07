@@ -30,7 +30,6 @@ export default [
   // source code settings
   {
     files: [
-      'shared/common/**/*.ts',
       'packages/**/*.ts',
     ],
     ignores: [

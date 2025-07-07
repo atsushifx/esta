@@ -10,8 +10,6 @@ export default [
   // for OSS Utils
   './packages/@agla-e2e/fileio-framework/tsconfig.json',
   './packages/@agla-utils/ag-logger/tsconfig.json',
-  // common definition
-  './shared/common/tsconfig.json',
   // shared packages
   './shared/packages/constants/tsconfig.json',
   './shared/packages/types/tsconfig.json',

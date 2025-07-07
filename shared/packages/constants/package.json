@@ -7,23 +7,13 @@
   "author": "atsushifx <https://github.com/atsushifx>",
   "license": "MIT",
   "type": "module",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "./module/index.js",
+  "types": "./module/index.d.ts",
   "exports": {
     ".": {
-      "types": "./lib/index.d.ts",
-      "import": "./lib/index.js",
-      "require": "./lib/index.js"
-    },
-    "./constants": {
-      "types": "./lib/constants/index.d.ts",
-      "import": "./lib/constants/index.js",
-      "require": "./lib/constants/index.js"
-    },
-    "./types": {
-      "types": "./lib/types/index.d.ts",
-      "import": "./lib/types/index.js",
-      "require": "./lib/types/index.js"
+      "types": "./module/index.d.ts",
+      "import": "./module/index.js",
+      "require": "./lib/index.cjs"
     }
   },
   "scripts": {
