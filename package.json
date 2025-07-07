@@ -16,27 +16,6 @@
     "monorepo"
   ],
   "packageManager": "pnpm@10.12.4",
-  "devDependencies": {
-    "@commitlint/config-conventional": "^19.8.1",
-    "@commitlint/types": "^19.8.1",
-    "@eslint/js": "^9.30.1",
-    "@ls-lint/ls-lint": "^2.3.1",
-    "@secretlint/secretlint-rule-preset-recommend": "^9.3.4",
-    "@textlint/types": "^14.8.4",
-    "@types/node": "^22.16.0",
-    "@typescript-eslint/eslint-plugin": "^8.35.1",
-    "@typescript-eslint/parser": "^8.35.1",
-    "cspell": "^8.19.4",
-    "eslint": "^9.30.1",
-    "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-import": "^2.32.0",
-    "rimraf": "^6.0.1",
-    "tsup": "^8.5.0",
-    "tsx": "^4.20.3",
-    "typescript": "^5.8.3",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4"
-  },
   "scripts": {
     "build": "pnpm -r run build",
     "build:esm": "pnpm -r run build:esm",
@@ -45,7 +24,7 @@
     "format:dprint": "dprint fmt",
     "check:dprint": "dprint check",
     "check:types": "pnpm -r run check:types",
-    "check:spells": "pnpm exec cspell  --config .vscode/cspell.json --cache --cache-location .cache/cspell/cSpellCache",
+    "check:spells": "cspell  --config .vscode/cspell.json --cache --cache-location .cache/cspell/cSpellCache",
     "lint": "pnpm -r run lint",
     "lint:types": "pnpm -r run lint:types",
     "lint:fix": "echo 'skip where project root'",
@@ -57,6 +36,28 @@
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*",
     "test:develop": "pnpm -r run test:develop",
     "test:ci": "pnpm -r run test:ci",
-    "test:gha": "pnpm exec vitest run --config ./configs/vitest.config.gha.ts"
+    "test:gha": "pnpm exec vitest run --config ./configs/vitest.config.gha.ts",
+    "sync:configs": "bash scripts/sync-configs.sh"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@commitlint/config-conventional": "^19.8.1",
+    "@commitlint/types": "^19.8.1",
+    "@eslint/js": "^9.30.1",
+    "@ls-lint/ls-lint": "^2.3.1",
+    "@secretlint/secretlint-rule-preset-recommend": "^9.3.4",
+    "@textlint/types": "^14.8.4",
+    "@types/node": "^22.16.0",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
+    "eslint": "^9.30.1",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
   }
 }

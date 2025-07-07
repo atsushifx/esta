@@ -18,7 +18,7 @@ import tsparser from '@typescript-eslint/parser';
 
 import projectPaths from './eslint.projects.js';
 // common rules
-import typedRules from '../shared/configs/eslint.rules.typed.js';
+import typedRules from '../base/configs/eslint.rules.typed.js';
 
 // directories
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -28,7 +28,6 @@ const rootDir = path.resolve(__dirname, '..');
 export default [
   {
     files: [
-      'shared/**/*.ts',
       'packages/**/*.ts',
     ],
     ignores: [
@@ -37,6 +36,8 @@ export default [
       '**/dist/**',
       '**/node_modules/**',
       '**/.cache/**',
+      '**/configs/**',
+      'shared/packages/**',
     ],
     plugins: {
       '@typescript-eslint': tseslint,

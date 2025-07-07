@@ -1,5 +1,5 @@
-// src: shared/common/configs/tsup.config.module.ts
-// @(#) : tsup config for ESM module
+// src: shared/common/configs/tsup.config.ts
+// @(#) : tsup config for CommonJS module
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -10,22 +10,19 @@
 import { defineConfig } from 'tsup';
 
 // user config
-import { baseConfig } from '../../../shared/configs/tsup.config.base';
+import { baseConfig } from '../../../../base/configs/tsup.config.base';
 
-// configs
 export default defineConfig({
   ...baseConfig,
 
   // entry points
   entry: {
-    'index': './index.ts',
-    'constants/index': './constants/index.ts',
-    'types/index': './types/index.ts',
+    'index': './base/index.ts',
   },
 
-  // sub-packages definition
-  format: ['esm'],
-  outDir: 'module', // for ESM
+  // sub packages definition
+  format: ['cjs'],
+  outDir: 'lib', // for CJS
   // tsconfig
   tsconfig: './tsconfig.json',
 });

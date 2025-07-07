@@ -14,7 +14,7 @@ import { promisify } from 'util';
 import { describe, expect, it } from 'vitest';
 
 // constants
-import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/types';
+import type { AgActionInstallerExecutor, AgActionInstallOptions } from '../../shared/types';
 
 // internal libs
 import { commandExist } from '@esta-utils/command-utils';

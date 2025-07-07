@@ -26,7 +26,7 @@ function resolvePaths(targetDir: string, repoRoot: string): {
 } {
   return {
     targetPkgPath: path.resolve(targetDir, TARGET_PACKAGE_FILE),
-    baseScriptsPath: path.resolve(repoRoot, 'shared/configs', BASE_SCRIPTS_FILE),
+    baseScriptsPath: path.resolve(repoRoot, 'base/configs', BASE_SCRIPTS_FILE),
   };
 }
 

@@ -7,9 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 // constants
-import { AgActionInstallerType } from '@shared/types';
+import { AgActionInstallerType } from '../../shared/types';
 // executor
-import type { AgActionInstallerExecutorsMap } from '@shared/types';
+import type { AgActionInstallerExecutorsMap } from '../../shared/types';
 
 import EgetInitializer from './executor/EgetInitializer';
 import NullExecutor from './executor/NullExecutor';

@@ -1,35 +1,27 @@
-// src: shared/common/configs/eslint.config.typed.js
-// @(#) : ESLint flat config for type check
+// src: shared/common/configs/eslint.config.js
+// @(#) : ESLint flat config for TypeScript workspace
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// parser
-import tsparser from '@typescript-eslint/parser';
+// libs
 
 // import form common base config
-import baseConfig from '../../../shared/configs/eslint.config.typed.base.js';
+import baseConfig from '../../../../base/configs/eslint.config.base.js';
 
+// settings
 export default [
   ...baseConfig,
 
-  // --- source codes settings
+  // source code settings
   {
     files: [
       'index.ts',
       'constants/**/*.ts',
       'types/**/*.ts',
     ],
-    languageOptions: {
-      parser: tsparser,
-      parserOptions: {
-        project: ['./tsconfig.json'],
-        tsconfigRootDir: '.',
-        sourceType: 'module',
-      },
-    },
     settings: {
       'import/resolver': {
         typescript: {

@@ -17,7 +17,7 @@ import tsparser from '@typescript-eslint/parser';
 // projects
 import projectPaths from './eslint.projects.js';
 // base Config
-import baseConfig from '../shared/configs/eslint.config.base.js';
+import baseConfig from '../base/configs/eslint.config.base.js';
 
 // set __dirname for ESM
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -30,7 +30,6 @@ export default [
   // source code settings
   {
     files: [
-      'shared/**/*.ts',
       'packages/**/*.ts',
     ],
     ignores: [
@@ -40,6 +39,7 @@ export default [
       '**/node_modules/**',
       '**/.cache/**',
       '**/configs/**',
+      'shared/packages/**',
     ],
     languageOptions: {
       parser: tsparser,

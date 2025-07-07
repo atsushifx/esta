@@ -9,7 +9,7 @@
 // libs
 
 // import form common base config
-import baseConfig from '../../../shared/configs/eslint.config.base.js';
+import baseConfig from '../../../../base/configs/eslint.config.base.js';
 
 // settings
 export default [

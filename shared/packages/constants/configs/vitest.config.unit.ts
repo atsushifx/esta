@@ -17,7 +17,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import { mergeConfig } from 'vitest/config';
 
 // user common config
-import baseConfig from '../../../shared/configs/vitest.config.base';
+import baseConfig from '../../../../base/configs/vitest.config.base';
 
 // config
 export default mergeConfig(baseConfig, {

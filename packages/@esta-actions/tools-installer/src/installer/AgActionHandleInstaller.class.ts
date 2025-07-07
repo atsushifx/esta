@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgActionInstallerExecutor, AgActionInstallerType, AgActionInstallOptions } from '@shared/types';
+import type { AgActionInstallerExecutor, AgActionInstallerType, AgActionInstallOptions } from '../../shared/types';
 
 export class HandleInstaller {
   constructor(

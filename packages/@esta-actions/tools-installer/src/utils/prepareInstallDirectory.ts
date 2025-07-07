@@ -22,25 +22,25 @@ import { AgActions_DEFAULT_INSTALL_DIR } from '@shared/constants';
 export const prepareInstallDirectory = async (
   installDir?: string,
 ): Promise<string> => {
-  installDir ??= AgActions_DEFAULT_INSTALL_DIR;
+  const finalInstallDir = installDir ?? AgActions_DEFAULT_INSTALL_DIR;
 
   try {
-    await mkdir(installDir, { recursive: true });
+    await mkdir(finalInstallDir, { recursive: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    core.setFailed(`Failed to create directory: "${installDir}": ${message}`);
+    core.setFailed(`Failed to create directory: "${finalInstallDir}": ${message}`);
     throw err;
   }
 
   try {
-    core.addPath(installDir);
+    core.addPath(finalInstallDir);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    core.setFailed(`Failed to add "${installDir}" to PATH: ${message}`);
+    core.setFailed(`Failed to add "${finalInstallDir}" to PATH: ${message}`);
     throw err;
   }
 
-  core.info(`Added ${installDir} to PATH`);
-  return installDir;
+  core.info(`Added ${finalInstallDir} to PATH`);
+  return finalInstallDir;
 };
 export default prepareInstallDirectory;

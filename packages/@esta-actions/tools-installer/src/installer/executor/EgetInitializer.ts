@@ -15,7 +15,7 @@ import { promisify } from 'util';
 
 // internal libs
 import { AgActions_DEFAULT_TEMP_DIR, AgDir_WINGET_INSTALL_DIR } from '@shared/constants';
-import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/types';
+import type { AgActionInstallerExecutor, AgActionInstallOptions } from '../../../shared/types';
 
 import { commandExist } from '@esta-utils/command-utils';
 import { getPlatform, PlatformType } from '@esta-utils/get-platform';

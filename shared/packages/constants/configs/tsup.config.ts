@@ -10,16 +10,14 @@
 import { defineConfig } from 'tsup';
 
 // user config
-import { baseConfig } from '../../../shared/configs/tsup.config.base';
+import { baseConfig } from '../../../../base/configs/tsup.config.base';
 
 export default defineConfig({
   ...baseConfig,
 
   // entry points
   entry: {
-    'index': './index.ts',
-    'constants/index': './constants/index.ts',
-    'types/index': './types/index.ts',
+    'index': './base/index.ts',
   },
 
   // sub packages definition

@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/types';
+import type { AgActionInstallerExecutor, AgActionInstallOptions } from '../../../shared/types';
 
 export class NullExecutor implements AgActionInstallerExecutor {
   public async execute(_options: AgActionInstallOptions): Promise<boolean> {

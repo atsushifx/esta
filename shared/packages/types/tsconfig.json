@@ -6,11 +6,9 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 {
-  "extends": "../../shared/configs/tsconfig.base.json",
+  "extends": "../../../base/configs/tsconfig.base.json",
   "include": [
-    "index.ts",
-    "constants/**/*.ts",
-    "types/**/*.ts"
+    "base/**/*.ts"
   ],
   "exclude": [
     ".git",

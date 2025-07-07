@@ -7,5 +7,6 @@
 // https://opensource.org/licenses/MIT
 
 // exports
+export * from './common';
 export * from './defaults';
 export * from './directories';
