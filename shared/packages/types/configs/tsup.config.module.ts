@@ -18,7 +18,7 @@ export default defineConfig({
 
   // entry points
   entry: {
-    'index': './src/index.ts',
+    'index': './base/index.ts',
   },
 
   // sub-packages definition
