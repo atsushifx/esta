@@ -1,7 +1,7 @@
-// src/installer/executor/NotSupportExecutor.ts
-// @(#) : 未対応のExecutor
+// src: ./src/installer/executor/NullExecutor.ts
+// @(#) : null executor for unsupported installer types
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
@@ -10,7 +10,7 @@ import type { AgActionInstallerExecutor, AgActionInstallOptions } from '@shared/
 
 export class NullExecutor implements AgActionInstallerExecutor {
   public async execute(_options: AgActionInstallOptions): Promise<boolean> {
-    console.warn('Thins installer type is not supported yet.');
+    console.warn('This installer type is not supported yet.');
     return false;
   }
 }

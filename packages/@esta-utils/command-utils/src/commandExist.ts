@@ -1,7 +1,7 @@
-// src: ./src/commandExist.ts
-// @(#) : コマンドの存在を確認するユーティリティ
+// src: packages/@esta-utils/command-utils/src/commandExist.ts
+// @(#) : command existence checking utility
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

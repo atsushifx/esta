@@ -1,5 +1,6 @@
 {
   "name": "@esta-utils/command-utils",
+  "_comment": "@(#) @esta-utils/command-utils: command existence checking utilities",
   "private": true,
   "version": "0.0.0",
   "description": "command-utils: command executor and other utilities",

@@ -1,5 +1,6 @@
 {
   "name": "esta",
+  "_comment": "@(#) : monorepo for GitHub Actions CLI tool installer",
   "private": true,
   "version": "0.1.0",
   "description": "GitHub Action to install CLI tools via eget (monorepo package)",

@@ -1,7 +1,7 @@
-// src: /src/shared/types/AgActionsCommon.types.ts
-// @(#) : 共通の型定義
+// src: ./shared/types/AgActionCommon.types.ts
+// @(#) : GitHub Actions common type definitions
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

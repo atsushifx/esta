@@ -1,7 +1,7 @@
-// src: configs/eslint.config.typed.js
-// @(#) : eslint float config for type check
+// src: packages/@esta-utils/utils/configs/eslint.config.typed.js
+// @(#) : ESLint flat config for type check
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

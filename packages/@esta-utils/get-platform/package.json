@@ -1,5 +1,6 @@
 {
   "name": "@esta-utils/get-platform",
+  "_comment": "@(#) @esta-utils/get-platform: platform detection utilities for cross-platform compatibility",
   "private": true,
   "version": "0.0.2",
   "description": "Platform detection utility for cross-platform applications.",

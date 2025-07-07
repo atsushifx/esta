@@ -1,7 +1,7 @@
-// src: /shared/configs/eslint.rules.typed.js
-// @(#) : ESLint rules for type check
+// src: shared/configs/eslint.rules.typed.js
+// @(#) : ESLint rules for TypeScript type checking
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT

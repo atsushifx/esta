@@ -1,7 +1,7 @@
-# src: /scripts/install-dev-tools.ps1
-# @(#) : 開発ツールインストールスクリプト
+# src: scripts/install-dev-tools.ps1
+# @(#) : development tools installation script
 #
-# Copyright (c) 2025 Furukawa Atsushi <atsushifx@gmail.com>
+# Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 # Released under the MIT License.
 
 <#

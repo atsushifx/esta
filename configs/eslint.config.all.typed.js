@@ -1,7 +1,7 @@
-// src: /configs/eslint.config.typed.js
-// @(#) : eslint float config for type check
+// src: ./configs/eslint.config.all.typed.js
+// @(#) : ESLint typed configuration for TypeScript type checking
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
