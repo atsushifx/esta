@@ -66,7 +66,11 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.16.0)(tsx@4.20.3)(yaml@2.8.0)
 
-  packages/@ag-actions/tool-installer:
+  packages/@agla-e2e/fileio-framework: {}
+
+  packages/@agla-utils/ag-logger: {}
+
+  packages/@esta-actions/tools-installer:
     dependencies:
       '@actions/core':
         specifier: ^1.11.1
@@ -92,10 +96,6 @@ importers:
       comment-json:
         specifier: ^4.2.5
         version: 4.2.5
-
-  packages/@agla-e2e/fileio-framework: {}
-
-  packages/@agla-utils/ag-logger: {}
 
   packages/@esta-utils/command-utils:
     dependencies:
