@@ -10,7 +10,7 @@
 import { getDelimiter, getPlatform, PlatformType } from './getPlatform';
 
 // namespace
-const agUtils = {
+const estaUtils = {
   getPlatform,
   getDelimiter,
   PlatformType,
@@ -19,4 +19,4 @@ const agUtils = {
 // --- export
 // named export
 export * from './getPlatform';
-export { agUtils };
+export { estaUtils };

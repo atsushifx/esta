@@ -52,7 +52,7 @@
     "@shared": "workspace:*",
     "@esta-utils/get-platform": "workspace:*",
     "@esta-utils/command-utils": "workspace:*",
-    "@ag-system/ag-logger": "workspace:*",
+    "@agla-utils/ag-logger": "workspace:*",
     "comment-json": "^4.2.5"
   },
   "devDependencies": {}

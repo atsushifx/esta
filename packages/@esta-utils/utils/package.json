@@ -47,7 +47,8 @@
   },
   "dependencies": {
     "@esta-utils/get-platform": "workspace:*",
-    "@esta-utils/command-utils": "workspace:*"
+    "@esta-utils/command-utils": "workspace:*",
+    "@esta-utils/config-loader": "workspace:*"
   },
   "devDependencies": {}
 }
