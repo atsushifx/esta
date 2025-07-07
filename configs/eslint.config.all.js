@@ -30,7 +30,7 @@ export default [
   // source code settings
   {
     files: [
-      'shared/**/*.ts',
+      'shared/common/**/*.ts',
       'packages/**/*.ts',
     ],
     ignores: [
@@ -40,6 +40,7 @@ export default [
       '**/node_modules/**',
       '**/.cache/**',
       '**/configs/**',
+      'shared/packages/**',
     ],
     languageOptions: {
       parser: tsparser,
@@ -61,6 +62,11 @@ export default [
           moduleDirectory: ['node_modules', 'src/'],
         },
       },
+    },
+    rules: {
+      'import/no-unresolved': ['error', {
+        ignore: ['^@shared/'],
+      }],
     },
   },
 ];

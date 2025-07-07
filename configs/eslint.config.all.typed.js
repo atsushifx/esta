@@ -28,7 +28,7 @@ const rootDir = path.resolve(__dirname, '..');
 export default [
   {
     files: [
-      'shared/**/*.ts',
+      'shared/common/**/*.ts',
       'packages/**/*.ts',
     ],
     ignores: [
@@ -37,6 +37,8 @@ export default [
       '**/dist/**',
       '**/node_modules/**',
       '**/.cache/**',
+      '**/configs/**',
+      'shared/packages/**',
     ],
     plugins: {
       '@typescript-eslint': tseslint,

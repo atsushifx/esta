@@ -12,6 +12,9 @@ export default [
   './packages/@agla-utils/ag-logger/tsconfig.json',
   // common definition
   './shared/common/tsconfig.json',
+  // shared packages
+  './shared/packages/constants/tsconfig.json',
+  './shared/packages/types/tsconfig.json',
   // utils
   './packages/@esta-utils/utils/tsconfig.json',
   './packages/@esta-utils/command-utils/tsconfig.json',

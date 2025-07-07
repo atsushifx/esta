@@ -28,9 +28,6 @@
     "paths": {
       "@/*": [
         "src/*"
-      ],
-      "@shared/*": [
-        "shared/*"
       ]
     },
     // types
