@@ -7,4 +7,11 @@
 // https://opensource.org/licenses/MIT
 
 // types
-export * from '../shared/types/feature-flags';
+export * from '../shared/types/featureFlags';
+
+// functions
+import { estaFeatures, initEstaFeatures } from './initFeatureFlags';
+export { estaFeatures, initEstaFeatures };
+
+// default
+export default estaFeatures;

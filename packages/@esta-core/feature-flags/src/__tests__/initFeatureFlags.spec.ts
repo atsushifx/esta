@@ -13,8 +13,30 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TEstaExecutionMode } from '../../shared/types/featureFlags';
 import { defaultFeatures, estaFeatures, getExecutionModeFromEnvironment, initEstaFeatures } from '../initFeatureFlags';
 
+/**
+ * @fileoverview 機能フラグモジュールのテストスイート
+ *
+ * このファイルは@esta-core/feature-flagsパッケージの機能フラグシステムの
+ * 動作を検証するテストケースを含んでいます。
+ */
+
+/**
+ * 機能フラグモジュール全体のテストスイート
+ *
+ * 環境検出機能と機能フラグの状態管理機能をテストします。
+ */
 describe('Feature Flags Module', () => {
+  /**
+   * 環境検出機能のテストスイート
+   *
+   * 実行環境の自動判定とデフォルト値の設定に関するテストを行います。
+   */
   describe('Environment Detection', () => {
+    /**
+     * getExecutionModeFromEnvironment関数のテストスイート
+     *
+     * 環境変数GITHUB_ACTIONSの値に基づいて実行モードを正しく判定することを検証します。
+     */
     describe('getExecutionModeFromEnvironment', () => {
       beforeEach(() => {
         vi.restoreAllMocks();
@@ -39,6 +61,12 @@ describe('Feature Flags Module', () => {
       });
     });
 
+    /**
+     * defaultFeatures定数のテストスイート
+     *
+     * モジュールインポート時に環境に応じて自動設定される
+     * デフォルト機能フラグの動作を検証します。
+     */
     describe('defaultFeatures', () => {
       it('should be automatically set based on environment on import', () => {
         // defaultFeaturesは環境に応じて設定される不変の初期値
@@ -47,7 +75,17 @@ describe('Feature Flags Module', () => {
     });
   });
 
+  /**
+   * 機能フラグ状態管理のテストスイート
+   *
+   * 実行時の機能フラグ状態の管理と更新機能をテストします。
+   */
   describe('Feature Flag State Management', () => {
+    /**
+     * estaFeatures変数のテストスイート
+     *
+     * 実行時に変更可能な機能フラグ状態の基本的な動作を検証します。
+     */
     describe('estaFeatures', () => {
       it('should be independent from defaultFeatures', () => {
         // defaultFeaturesとestaFeaturesは独立している
@@ -55,7 +93,17 @@ describe('Feature Flags Module', () => {
       });
     });
 
+    /**
+     * initEstaFeatures関数のテストスイート
+     *
+     * 機能フラグの初期化処理とパラメータによる制御を検証します。
+     */
     describe('initEstaFeatures', () => {
+      /**
+       * 明示的なパラメータ指定時の動作テスト
+       *
+       * executionModeパラメータが指定された場合の動作を検証します。
+       */
       describe('with explicit parameter', () => {
         it('should override executionMode when parameter is specified', () => {
           // パラメータでCLIを指定してinitEstaFeaturesを実行
@@ -67,6 +115,11 @@ describe('Feature Flags Module', () => {
         });
       });
 
+      /**
+       * パラメータ未指定時の動作テスト
+       *
+       * executionModeパラメータが省略された場合の動作を検証します。
+       */
       describe('without parameter', () => {
         it('should use defaultFeatures when no parameter is specified', () => {
           // initEstaFeaturesを実行（パラメータなし）
@@ -78,6 +131,11 @@ describe('Feature Flags Module', () => {
         });
       });
 
+      /**
+       * 実行モード切り替え機能のテスト
+       *
+       * 異なる実行モード間での動的な切り替えが正しく動作することを検証します。
+       */
       describe('mode switching', () => {
         it('should be able to switch between different modes', () => {
           // GITHUB_ACTIONSモードに設定
