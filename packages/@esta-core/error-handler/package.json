@@ -1,5 +1,5 @@
 {
-  "name": "@esta-core/feature-flags",
+  "name": "@esta-core/error-handler",
   "_comment": "@(#) @esta-core: ESTA Feature Flags",
   "private": true,
   "version": "0.0.0",
@@ -47,8 +47,8 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@agla-utils/ag-logger": "workspace:*"
   },
   "devDependencies": {
-    "@shared/constants": "workspace:*"
   }
 }
