@@ -13,6 +13,8 @@ export default [
   // shared packages
   './shared/packages/constants/tsconfig.json',
   './shared/packages/types/tsconfig.json',
+  // esta-core
+  'packages/@esta-core/feature-flags/tsconfig.json',
   // utils
   './packages/@esta-utils/utils/tsconfig.json',
   './packages/@esta-utils/command-utils/tsconfig.json',

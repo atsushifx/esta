@@ -1,5 +1,5 @@
 {
-  "name": "@esta-utils/utils",
+  "name": "@esta-core/feature-flags",
   "_comment": "@(#) @esta-core: ESTA Feature Flags",
   "private": true,
   "version": "0.0.0",

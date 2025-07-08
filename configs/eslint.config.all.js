@@ -31,6 +31,7 @@ export default [
   {
     files: [
       'packages/**/*.ts',
+      'shared/packages/**/*.ts',
     ],
     ignores: [
       '**/lib/**',
@@ -39,7 +40,6 @@ export default [
       '**/node_modules/**',
       '**/.cache/**',
       '**/configs/**',
-      'shared/packages/**',
     ],
     languageOptions: {
       parser: tsparser,
