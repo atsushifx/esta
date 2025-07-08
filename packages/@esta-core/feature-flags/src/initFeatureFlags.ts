@@ -10,7 +10,7 @@ import type { TEstaFeatureFlags } from '../shared/types/featureFlags';
 import { TEstaExecutionMode } from '../shared/types/featureFlags';
 
 // 環境判定ロジック
-const getExecutionModeFromEnvironment = (): TEstaExecutionMode => {
+export const getExecutionModeFromEnvironment = (): TEstaExecutionMode => {
   return process.env.GITHUB_ACTIONS === 'true' ? TEstaExecutionMode.GITHUB_ACTIONS : TEstaExecutionMode.CLI;
 };
 
