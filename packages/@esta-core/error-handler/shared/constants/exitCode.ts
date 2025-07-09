@@ -22,3 +22,20 @@ export const ExitCode = {
 } as const;
 
 export type TExitCode = typeof ExitCode[keyof typeof ExitCode];
+
+/**
+ * 終了コードに対応するエラーメッセージ定義
+ */
+export const ExitCodeErrorMessage = {
+  // 標準終了コード (0-1)
+  [ExitCode.SUCCESS]: 'Operation completed successfully',
+  [ExitCode.EXEC_FAILURE]: 'General execution failure',
+
+  // @esta-core独自の終了コード (11-99)
+  [ExitCode.CONFIG_NOT_FOUND]: 'Configuration file not found',
+  [ExitCode.COMMAND_EXECUTION_ERROR]: 'Command execution failed',
+  [ExitCode.INVALID_ARGS]: 'Invalid command line arguments',
+  [ExitCode.VALIDATION_FAILED]: 'Input validation failed',
+  [ExitCode.FILE_IO_ERROR]: 'File I/O operation failed',
+  [ExitCode.INTERNAL_LOGIC_ERROR]: 'Internal logic error occurred',
+} as const;
