@@ -32,7 +32,7 @@
 
 ### 2.2 終了コード概要
 
-詳細は [Exit Code 仕様書](./exit-code.md) を参照。
+詳細は [Exit Code 仕様書](../detailed-design/exit-code.md) を参照。
 
 | ExitCode       | 数値 | 説明                       |
 | -------------- | ---- | -------------------------- |
