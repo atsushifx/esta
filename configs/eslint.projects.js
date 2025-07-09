@@ -15,6 +15,7 @@ export default [
   './shared/packages/types/tsconfig.json',
   // esta-core
   'packages/@esta-core/feature-flags/tsconfig.json',
+  'packages/@esta-core/error-handler/tsconfig.json',
   // utils
   './packages/@esta-utils/utils/tsconfig.json',
   './packages/@esta-utils/command-utils/tsconfig.json',
