@@ -19,6 +19,7 @@ export const ExitCode = {
   VALIDATION_FAILED: 14,
   FILE_IO_ERROR: 15,
   INTERNAL_LOGIC_ERROR: 16,
+  UNKNOWN_ERROR: 99,
 } as const;
 
 export type TExitCode = typeof ExitCode[keyof typeof ExitCode];
@@ -38,4 +39,5 @@ export const ExitCodeErrorMessage = {
   [ExitCode.VALIDATION_FAILED]: 'Input validation failed',
   [ExitCode.FILE_IO_ERROR]: 'File I/O operation failed',
   [ExitCode.INTERNAL_LOGIC_ERROR]: 'Internal logic error occurred',
+  [ExitCode.UNKNOWN_ERROR]: 'Unknown error (exit code: ##)',
 } as const;

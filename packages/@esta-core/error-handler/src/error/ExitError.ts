@@ -10,7 +10,6 @@ export class ExitError extends Error {
     this.code = code;
     this.fatal = fatal;
     Object.setPrototypeOf(this, new.target.prototype);
-
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, ExitError);
     }
