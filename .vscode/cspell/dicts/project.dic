@@ -6,6 +6,7 @@ DEVMODE
 dotenvx
 eget
 ESM
+GHA
 jsonlint
 LOCALAPPDATA
 mdast
@@ -16,3 +17,4 @@ supplypike
 tsup
 userid
 Yedidia
+GHAexecutor
