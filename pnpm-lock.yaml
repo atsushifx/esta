@@ -97,6 +97,12 @@ importers:
         specifier: ^4.2.5
         version: 4.2.5
 
+  packages/@esta-core/error-handler:
+    dependencies:
+      '@agla-utils/ag-logger':
+        specifier: workspace:*
+        version: link:../../@agla-utils/ag-logger
+
   packages/@esta-core/feature-flags:
     devDependencies:
       '@shared/constants':
