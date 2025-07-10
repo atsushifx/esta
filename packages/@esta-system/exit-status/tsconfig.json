@@ -1,0 +1,42 @@
+// src: ./tsconfig.json
+// @(#) : typescript compile settings
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+{
+  "extends": "../../../base/configs/tsconfig.base.json",
+  "include": [
+    "src/**/*.ts",
+    "shared/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": [
+    ".git",
+    "lib",
+    "module",
+    "node_modules",
+    ".cache",
+    "temp"
+  ],
+  "compilerOptions": {
+    // directories
+    "outDir": "lib",
+    "rootDir": "./",
+    // alias
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "src/*",
+        "shared/*"
+      ],
+      "@shared/*": [
+        "shared/*"
+      ]
+    },
+    // types
+    // cache
+    "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"
+  }
+}

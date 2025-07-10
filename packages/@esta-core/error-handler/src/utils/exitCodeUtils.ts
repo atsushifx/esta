@@ -17,7 +17,6 @@ import { ExitCode, ExitCodeErrorMessage } from '@shared/constants/exitCode';
  * @returns エラーメッセージ
  */
 export const getExitCodeMessage = (code: TExitCode): string => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return ExitCodeErrorMessage[code] ?? ExitCodeErrorMessage[ExitCode.UNKNOWN_ERROR];
 };
 
