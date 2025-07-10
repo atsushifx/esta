@@ -23,7 +23,7 @@ import { PLATFORM_TYPE } from '@shared/types';
 import { clearPlatformCache, getPlatform } from '@/getPlatform';
 
 // テスト用ヘルパー: 型安全性を保ちながら無効な値をテストする
-const testInvalidPlatform = (invalidValue: string, strict = true) => {
+const testInvalidPlatform = (invalidValue: string, strict = true): string => {
   return getPlatform(invalidValue as TPlatformKey | 'unknown', strict);
 };
 
