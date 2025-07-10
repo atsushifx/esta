@@ -9,3 +9,4 @@ export type { TExitCode } from '@shared/constants/exitCode';
 export { ExitError } from './error/ExitError';
 export { errorExit } from './errorExit';
 export { fatalExit } from './fatalExit';
+export { handleExitError } from './handleExitError';
