@@ -1,4 +1,4 @@
-# @ag-utils/get-platform
+# @esta-utils/get-platform
 
 ---
 
@@ -12,11 +12,11 @@ Windows/Linux/macOS判定・PATH区切り記号取得・型安全なenum/判定�
 ## インストール
 
 ```sh
-pnpm add @ag-utils/get-platform
+pnpm add @esta-utils/get-platform
 # または
-yarn add @ag-utils/get-platform
+yarn add @esta-utils/get-platform
 # または
-npm install @ag-utils/get-platform
+npm install @esta-utils/get-platform
 ```
 
 ---
@@ -24,22 +24,32 @@ npm install @ag-utils/get-platform
 ## 主なエクスポート
 
 - `getPlatform()` — 現在のプラットフォーム名を型安全なenumで取得
-- `PlatformType` — 判定用enum型 (`WINDOWS`/`LINUX`/`MACOS`/`UNKNOWN`)
+- `PLATFORM_TYPE` — 判定用enum型 (`WINDOWS`/`LINUX`/`MACOS`/`UNKNOWN`)
 - `getDelimiter()` — PATH区切り記号を返す（Windowsは`;`、他は`:`）
 - 判定関数：`isWindows()` / `isLinux()` / `isMacOS()`
-- まとめて使う場合：`agUtils`ネームスペースオブジェクト
+- キャッシュ管理：`clearPlatformCache()` — プラットフォーム情報キャッシュをクリア
+- まとめて使う場合：`estaUtils`ネームスペースオブジェクト
 
 ---
 
 ## 使い方
 
 ```typescript
-import { agUtils, getDelimiter, getPlatform, isWindows, PlatformType } from '@ag-utils/get-platform';
+import {
+  clearPlatformCache,
+  estaUtils,
+  getDelimiter,
+  getPlatform,
+  isLinux,
+  isMacOS,
+  isWindows,
+  PLATFORM_TYPE,
+} from '@esta-utils/get-platform';
 
 // OS種別を取得
-const platform = getPlatform(); // PlatformType.WINDOWS | .LINUX | .MACOS | .UNKNOWN
+const platform = getPlatform(); // PLATFORM_TYPE.WINDOWS | .LINUX | .MACOS | .UNKNOWN
 
-if (platform === PlatformType.WINDOWS) {
+if (platform === PLATFORM_TYPE.WINDOWS) {
   // Windows固有処理
 }
 
@@ -51,19 +61,89 @@ if (isLinux()) {
 // PATH区切り記号取得
 const delimiter = getDelimiter(); // ";" or ":"
 
-// agUtilsネームスペースからまとめて利用
-const pt: agUtils.PlatformType = agUtils.getPlatform();
-if (agUtils.isMacOS()) {
-  // macOS固有処理
+// estaUtilsネームスペースからまとめて利用
+const pt = estaUtils.getPlatform();
+if (estaUtils.isWindows()) {
+  // Windows固有処理
 }
+
+// キャッシュクリア（主にテスト用）
+clearPlatformCache();
 ```
 
 ---
 
-## 型安全・拡張性
+## API仕様
 
-- 型エラー防止のため、enum（PlatformType）/判定関数/ネームスペースobjectの三段構成
-- `strict`オプションで、想定外OSの時に例外スローまたはundefined返却を選択可能
+### 関数シグネチャ
+
+```typescript
+// メイン関数
+export const getPlatform: (
+  platform?: TPlatformKey | 'unknown' | '',
+  strict?: boolean,
+) => PLATFORM_TYPE;
+
+// 個別判定関数
+export const isWindows: () => boolean;
+export const isLinux: () => boolean;
+export const isMacOS: () => boolean;
+
+// ユーティリティ関数
+export const getDelimiter: () => string;
+export const clearPlatformCache: () => void;
+```
+
+### パラメータ
+
+- `platform` (省略可能): プラットフォーム文字列。空文字列の場合は`os.platform()`を使用
+- `strict` (省略可能): 未サポートプラットフォームでエラーをスローするか（デフォルト: `true`）
+
+---
+
+## 型定義
+
+### PLATFORM_TYPE
+
+```typescript
+enum PLATFORM_TYPE {
+  WINDOWS = 'windows',
+  LINUX = 'linux',
+  MACOS = 'macos',
+  UNKNOWN = '', // falsy値
+}
+```
+
+### 関連型
+
+```typescript
+// プラットフォームキーの型
+export type TPlatformKey = 'win32' | 'linux' | 'darwin' | 'unknown';
+
+// サポートされているプラットフォームの型
+export type TSupportedPlatform = PLATFORM_TYPE;
+```
+
+---
+
+## 特徴
+
+### パフォーマンス最適化
+
+- プラットフォーム情報をキャッシュして重複する`os.platform()`呼び出しを防止
+- 初回実行後は即座に結果を返却
+
+### 型安全性
+
+- 全て文字列ベースのenum設計
+- 詳細な型定義によるコンパイル時エラー検出
+- TypeScript strict modeに完全対応
+
+### 拡張性
+
+- 設定ベースのプラットフォーム定義
+- 新しいプラットフォーム対応の容易さ
+- モジュール化された構造
 
 ---
 

@@ -23,10 +23,19 @@
   "compilerOptions": {
     // directories
     "outDir": "lib",
-    "rootDir": "./src",
+    "rootDir": "./",
     // alias definitions
     "baseUrl": "./",
-    // "paths": {},
+    "paths": {
+      "@/*": [
+        "src/*",
+        "src/*/index"
+      ],
+      "@shared/*": [
+        "shared/*",
+        "shared/*/index"
+      ]
+    },
     // types
     // typesRoots: [    ],
     // cache
