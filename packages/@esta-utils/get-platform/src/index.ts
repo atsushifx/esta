@@ -7,8 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // import all
-import { PLATFORM_TYPE } from '../shared/types';
-import { getDelimiter, getPlatform } from './getPlatform';
+import { getDelimiter, getPlatform } from '@/getPlatform';
+import { PLATFORM_TYPE } from '@shared/types';
 
 // namespace
 const estaUtils = {
@@ -19,7 +19,7 @@ const estaUtils = {
 
 // --- export
 // named export
-export * from '../shared/constants';
-export * from '../shared/types';
-export * from './getPlatform';
+export * from '@/getPlatform';
+export * from '@shared/constants';
+export * from '@shared/types';
 export { estaUtils };

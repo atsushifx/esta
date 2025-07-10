@@ -9,9 +9,15 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // constants
-import { PLATFORM_TYPE } from '../../shared/types';
+import type { TPlatformKey } from '@shared/constants';
+import { PLATFORM_TYPE } from '@shared/types';
 // test target
-import { getPlatform } from '../getPlatform';
+import { getPlatform } from '@/getPlatform';
+
+// テスト用ヘルパー: 型安全性を保ちながら無効な値をテストする
+const testInvalidPlatform = (invalidValue: string, strict = true) => {
+  return getPlatform(invalidValue as TPlatformKey | 'unknown', strict);
+};
 
 /**
  * getPlatform関数のコアプラットフォーム検出テスト
@@ -49,16 +55,16 @@ describe('getPlatform - Core Platform Detection', () => {
    */
   describe('Error Handling', () => {
     it('throws for unsupported platforms by default (strict=true)', () => {
-      expect(() => getPlatform('unsupported')).toThrow(/Unsupported platform/);
+      expect(() => testInvalidPlatform('unsupported')).toThrow(/Unsupported platform/);
     });
 
     it('returns UNKNOWN for unsupported platforms with strict=false', () => {
-      expect(getPlatform('unsupported', false)).toBe(PLATFORM_TYPE.UNKNOWN);
+      expect(testInvalidPlatform('unsupported', false)).toBe(PLATFORM_TYPE.UNKNOWN);
     });
 
     it('handles empty string input', () => {
-      expect(() => getPlatform('')).toThrow(/Unsupported platform/);
-      expect(getPlatform('', false)).toBe(PLATFORM_TYPE.UNKNOWN);
+      expect(() => testInvalidPlatform('')).toThrow(/Unsupported platform/);
+      expect(testInvalidPlatform('', false)).toBe(PLATFORM_TYPE.UNKNOWN);
     });
   });
 
@@ -70,9 +76,9 @@ describe('getPlatform - Core Platform Detection', () => {
    */
   describe('Case Sensitivity', () => {
     it('handles case sensitivity correctly', () => {
-      expect(() => getPlatform('WIN32')).toThrow(/Unsupported platform/);
-      expect(() => getPlatform('Linux')).toThrow(/Unsupported platform/);
-      expect(() => getPlatform('Darwin')).toThrow(/Unsupported platform/);
+      expect(() => testInvalidPlatform('WIN32')).toThrow(/Unsupported platform/);
+      expect(() => testInvalidPlatform('Linux')).toThrow(/Unsupported platform/);
+      expect(() => testInvalidPlatform('Darwin')).toThrow(/Unsupported platform/);
     });
   });
 
@@ -83,6 +89,10 @@ describe('getPlatform - Core Platform Detection', () => {
     it('uses os.platform() when no platform argument provided', () => {
       const result = getPlatform();
       expect(Object.values(PLATFORM_TYPE)).toContain(result);
+    });
+
+    it('uses strict=true by default', () => {
+      expect(() => testInvalidPlatform('unsupported')).toThrow(/Unsupported platform/);
     });
   });
 });

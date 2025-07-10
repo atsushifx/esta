@@ -9,7 +9,7 @@
 // vitest
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 // test target
-import { isLinux, isMacOS, isWindows } from '../getPlatform';
+import { isLinux, isMacOS, isWindows } from '@/getPlatform';
 
 /**
  * プラットフォーム判定関数のテスト

@@ -9,9 +9,10 @@
 // lib
 import * as os from 'os';
 // constants
-import { PATH_DELIMITER, PLATFORM_MAP } from '../shared/constants';
+import { PATH_DELIMITER, PLATFORM_MAP } from '@shared/constants';
+import { PLATFORM_TYPE } from '@shared/types';
 // types
-import { PLATFORM_TYPE } from '../shared/types';
+import type { TPlatformKey } from '@shared/constants';
 
 /**
  * 現在のOSの正規化されたプラットフォーム名を返す
@@ -22,20 +23,17 @@ import { PLATFORM_TYPE } from '../shared/types';
  * @throws プラットフォームが未サポートで `strict` が `true` の場合
  */
 export const getPlatform = (
-  platform: string = os.platform(),
+  platform: TPlatformKey | 'unknown' = os.platform() as TPlatformKey,
   strict: boolean = true,
 ): PLATFORM_TYPE => {
-  const platformKey = platform as keyof typeof PLATFORM_MAP;
-  const mappedPlatform = PLATFORM_MAP[platformKey];
+  const platformKey = (platform in PLATFORM_MAP ? platform : 'unknown') as TPlatformKey | 'unknown';
+  const result = PLATFORM_MAP[platformKey];
 
-  if (mappedPlatform) {
-    return mappedPlatform as PLATFORM_TYPE;
-  }
-
-  if (strict) {
+  if (strict && result === PLATFORM_TYPE.UNKNOWN) {
     throw new Error(`Unsupported platform: ${platform}`);
   }
-  return PLATFORM_TYPE.UNKNOWN;
+
+  return result;
 };
 
 /**

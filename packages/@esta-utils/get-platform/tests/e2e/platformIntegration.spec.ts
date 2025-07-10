@@ -9,7 +9,7 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // types
-import { PLATFORM_TYPE } from '../../shared/types';
+import { PLATFORM_TYPE } from '@shared/types';
 // test target
 import {
   estaUtils,
@@ -18,15 +18,15 @@ import {
   isLinux,
   isMacOS,
   isWindows,
-} from '../../src/index';
+} from '@/index';
 
 describe('Platform Detection Integration', () => {
   describe('Cross-Function Consistency', () => {
     it('platform checkers match getPlatform results', () => {
       const testScenarios = [
-        { osPlatform: 'win32', expectedType: PLATFORM_TYPE.WINDOWS },
-        { osPlatform: 'linux', expectedType: PLATFORM_TYPE.LINUX },
-        { osPlatform: 'darwin', expectedType: PLATFORM_TYPE.MACOS },
+        { osPlatform: 'win32' as const, expectedType: PLATFORM_TYPE.WINDOWS },
+        { osPlatform: 'linux' as const, expectedType: PLATFORM_TYPE.LINUX },
+        { osPlatform: 'darwin' as const, expectedType: PLATFORM_TYPE.MACOS },
       ];
 
       testScenarios.forEach(({ osPlatform, expectedType }) => {
