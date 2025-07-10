@@ -18,7 +18,7 @@ import { AgActions_DEFAULT_TEMP_DIR, AgDir_WINGET_INSTALL_DIR } from '@shared/co
 import type { AgActionInstallerExecutor, AgActionInstallOptions } from '../../../shared/types';
 
 import { commandExist } from '@esta-utils/command-utils';
-import { getPlatform, PlatformType } from '@esta-utils/get-platform';
+import { isWindows } from '@esta-utils/get-platform';
 // constants
 
 // internal libs
@@ -43,8 +43,7 @@ export class EgetInitializer implements AgActionInstallerExecutor {
     }
 
     try {
-      const platform = getPlatform();
-      if (platform === PlatformType.WINDOWS) {
+      if (isWindows()) {
         await this.installWindows(options, installDir);
       } else {
         await this.installLinux(options, installDir);
