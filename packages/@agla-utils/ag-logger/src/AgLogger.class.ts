@@ -28,6 +28,7 @@ export class AgLogger {
   private static _instance: AgLogger | undefined;
   private static _logLevel: AgLogLevel = AgLogLevelCode.OFF;
   private _loggerManager: AgLoggerManager;
+  private _verbose: boolean = false;
 
   private constructor() {
     this._loggerManager = AgLoggerManager.getInstance();
@@ -88,6 +89,19 @@ export class AgLogger {
    */
   getLogLevel(): AgLogLevel {
     return AgLogger._logLevel;
+  }
+
+  /**
+   * Sets or gets the verbose flag.
+   *
+   * @param value - The verbose setting. If undefined, returns current value without setting.
+   * @returns The current verbose setting.
+   */
+  setVerbose(value?: boolean): boolean {
+    if (value !== undefined) {
+      this._verbose = value;
+    }
+    return this._verbose;
   }
 
   /**
@@ -165,6 +179,13 @@ export class AgLogger {
   /** General log method logging at INFO level. */
   log(...args: unknown[]): void {
     this.logWithLevel(AgLogLevelCode.INFO, ...args);
+  }
+
+  /** Verbose log method that only outputs when verbose flag is true. */
+  verbose(...args: unknown[]): void {
+    if (this._verbose) {
+      this.log(...args);
+    }
   }
 }
 
