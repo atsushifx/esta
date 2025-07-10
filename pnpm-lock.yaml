@@ -81,9 +81,9 @@ importers:
       '@agla-utils/ag-logger':
         specifier: workspace:*
         version: link:../../@agla-utils/ag-logger
-      '@esta-utils/command-utils':
+      '@esta-utils/command-runner':
         specifier: workspace:*
-        version: link:../../@esta-utils/command-utils
+        version: link:../../@esta-utils/command-runner
       '@esta-utils/get-platform':
         specifier: workspace:*
         version: link:../../@esta-utils/get-platform
@@ -121,7 +121,7 @@ importers:
         specifier: workspace:*
         version: link:../../@esta-core/error-handler
 
-  packages/@esta-utils/command-utils:
+  packages/@esta-utils/command-runner:
     dependencies:
       '@esta-utils/get-platform':
         specifier: workspace:*
@@ -150,9 +150,9 @@ importers:
 
   packages/@esta-utils/utils:
     dependencies:
-      '@esta-utils/command-utils':
+      '@esta-utils/command-runner':
         specifier: workspace:*
-        version: link:../command-utils
+        version: link:../command-runner
       '@esta-utils/config-loader':
         specifier: workspace:*
         version: link:../config-loader

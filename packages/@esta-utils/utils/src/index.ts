@@ -7,19 +7,19 @@
 // https://opensource.org/licenses/MIT
 
 // import
-import { estaUtils as commandUtils } from '@esta-utils/command-utils';
+import { estaUtils as commandRunner } from '@esta-utils/command-runner';
 import configLoader from '@esta-utils/config-loader';
 import { estaUtils as getPlatform } from '@esta-utils/get-platform';
 
 const estaUtils = {
   configLoader,
   ...getPlatform,
-  ...commandUtils,
+  ...commandRunner,
 };
 
 // --- export
 // named export
-export * from '@esta-utils/command-utils';
+export * from '@esta-utils/command-runner';
 export * from '@esta-utils/get-platform';
 
 // namespace / default export
