@@ -24,6 +24,8 @@ Comprehensive validation and debugging workflow for the E2E framework.
 - Run `pnpm run test:ci` - Execute CI/CD tests
 - If fails: Read test output, identify failing tests, analyze error messages, check for common issues (imports, types, async/await, mocking), suggest specific fixes
 
+**Note**: `/shared/` packages (constants and type definitions only) are expected to have missing node_modules and no test files. This is normal and should not be reported as errors.
+
 ## Phase 3: Type Checking
 
 - Run `pnpm run check:types` - TypeScript compiler validation
@@ -31,7 +33,7 @@ Comprehensive validation and debugging workflow for the E2E framework.
 
 ## Phase 4: Content Validation
 
-- Run `pnpm run check:spells "**/*.ts" "**/*.json"` - spell checking
+- Run `pnpm run check:spells "**/*.{js,ts,json,md}"` - spell checking
 - If fails: List misspelled words, suggest corrections, check if they should be added to dictionary
 
 ## Phase 5: Filename Validation
