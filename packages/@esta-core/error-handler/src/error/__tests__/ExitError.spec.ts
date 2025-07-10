@@ -1,5 +1,16 @@
+// src: ./error/__tests__/ExitError.spec.ts
+// @(#): ExitErrorクラスのユニットテスト
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// constants
 import { ExitCode } from '@shared/constants/exitCode';
+// test framework
 import { describe, expect, it } from 'vitest';
+// test target
 import { ExitError } from '../ExitError';
 
 describe('ExitError', () => {

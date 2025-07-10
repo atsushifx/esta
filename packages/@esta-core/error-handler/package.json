@@ -47,7 +47,9 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@agla-utils/ag-logger": "workspace:*"
+    "@actions/core": "^1.11.1",
+    "@agla-utils/ag-logger": "workspace:*",
+    "@esta-core/feature-flags": "workspace:*"
   },
   "devDependencies": {
   }

@@ -1,229 +1,339 @@
 <!--
   src: docs/specs/error-handler-specs.md
-
   Copyright (c) 2025 atsushifx
   This software is released under the MIT License.
   https://opensource.org/licenses/MIT
 -->
 
-# 📘 エラーハンドリング統一仕様書（@esta-core/error-handler）
+---
+title: 📘 エラーハンドリング統一仕様書（@esta-core/error-handler）
+version: 1.1.0
+created: 2025-07-09
+updated: 2025-07-10
+authors:
+  - 🧠 つむぎ（設計統一・exec 分離提案）
+  - 🧁 小紅（例示＆分岐設計）
+  - ⚙️ エルファ（FeatureFlag 実装＆fatal 設計）
+---
 
-## 1. 概要
+## 概要
 
-全体のエラーハンドリング方針を統一するため、以下の要素を導入します。
+GitHub Actions と CLI の統一されたエラーハンドリングを提供するパッケージです。
 
-- `fatalExit()` - 即時終了を意味する例外スロー関数（ExitError + fatal）
-- `errorExit()` - 通常の制御可能なエラー例外スロー関数
-- `ExitError` - 終了コード・重大性を持つ例外クラス
-- `execErrorExit()` - ExitError を受けて適切に終了処理を行う共通関数
-- `CLIexecutor` - CLI 用のエラーハンドラー
-- `GHAexecutor` - GitHub Actions 用のエラーハンドラー
+### 主要機能
+
+- **ExitError クラス** - 終了コードと致命性フラグを持つ統一エラー
+- **errorExit 関数** - 非致命的エラー終了（ログ記録 + ExitError スロー）
+- **fatalExit 関数** - 致命的エラー終了（ログ記録 + 致命的 ExitError スロー）
+- **handleExitError 関数** - ExitError を適切に処理する共通ハンドラ
+- **統一された終了コード** - POSIX準拠の終了コード体系
 
 ---
 
-## 2. 基本方針
+## パッケージ情報
 
-### 2.1 エラー分類
-
-| エラー種別     | 説明                        | 使用関数      |
-| -------------- | --------------------------- | ------------- |
-| 致命的エラー   | 即時中断すべき重大な異常    | `fatalExit()` |
-| 制御可能エラー | catchで処理可能な業務エラー | `errorExit()` |
-
-### 2.2 終了コード概要
-
-詳細は [Exit Code 仕様書](../detailed-design/exit-code.md) を参照。
-
-| ExitCode       | 数値 | 説明                       |
-| -------------- | ---- | -------------------------- |
-| `SUCCESS`      | 0    | 正常終了                   |
-| `EXEC_FAILURE` | 1    | 未捕捉例外等による失敗終了 |
+- **パッケージ名**: `@esta-core/error-handler`
+- **バージョン**: 0.0.0
+- **ライセンス**: MIT
+- **依存関係**:
+  - `@actions/core` - GitHub Actions統合
+  - `@agla-utils/ag-logger` - ログ機能
+  - `@esta-core/feature-flags` - 実行環境判定
 
 ---
 
-## 3. ExitError クラス
+## 基本方針
 
-```ts
+### エラー分類
+
+| エラー種別     | 説明                        | 使用関数      | 特徴                          |
+| -------------- | --------------------------- | ------------- | ----------------------------- |
+| 致命的エラー   | 即時中断すべき重大な異常    | `fatalExit()` | fatal=true, ログレベル=FATAL  |
+| 制御可能エラー | catchで処理可能な業務エラー | `errorExit()` | fatal=false, ログレベル=ERROR |
+
+### 終了コード体系
+
+詳細は [Exit Code 仕様書](../detailed-design/exit-codes.md) を参照。
+
+| ExitCode                  | 数値 | 説明                       |
+| ------------------------- | ---- | -------------------------- |
+| `SUCCESS`                 | 0    | 正常終了                   |
+| `EXEC_FAILURE`            | 1    | 一般的な実行失敗           |
+| `CONFIG_NOT_FOUND`        | 11   | 設定ファイルが見つからない |
+| `COMMAND_EXECUTION_ERROR` | 12   | コマンド実行エラー         |
+| `INVALID_ARGS`            | 13   | 無効な引数                 |
+| `VALIDATION_FAILED`       | 14   | バリデーション失敗         |
+| `FILE_IO_ERROR`           | 15   | ファイルI/Oエラー          |
+| `INTERNAL_LOGIC_ERROR`    | 16   | 内部ロジックエラー         |
+| `UNKNOWN_ERROR`           | 99   | 未定義のエラー             |
+
+---
+
+## API仕様
+
+### ExitError クラス
+
+統一されたエラー処理のためのカスタムエラークラス。
+
+```typescript
 export class ExitError extends Error {
-  code: number;
-  fatal: boolean;
+  readonly code: TExitCode;
+  readonly fatal: boolean;
 
-  constructor(code: number, message: string, fatal = false) {
-    super(message);
-    this.name = 'ExitError';
-    this.code = code;
-    this.fatal = fatal;
-    Object.setPrototypeOf(this, new.target.prototype);
-    Error.captureStackTrace?.(this, ExitError);
-  }
-
-  isFatal(): boolean {
-    return this.fatal;
-  }
+  constructor(code: TExitCode, message: string, fatal = false);
+  isFatal(): boolean;
 }
 ```
 
----
+**プロパティ:**
 
-## 4. fatalExit 関数（throw型）
+- `code`: 終了コード（readonly）
+- `fatal`: 致命的エラーフラグ（readonly）
 
-```ts
-import { ExitError } from './ExitError';
+**メソッド:**
 
-export const fatalExit = (message: string, code: number = 1): never => {
-  throw new ExitError(code, message, true);
-};
-```
+- `isFatal()`: 致命的エラーかどうかを判定
 
----
+### errorExit 関数
 
-## 5. errorExit 関数（通常エラー）
+非致命的エラーでアプリケーションを終了します。
 
-```ts
-export const errorExit = (code: number, message: string): never => {
+```typescript
+export const errorExit = (
+  code: TExitCode,
+  message: string,
+): never => {
+  const logger = getLogger();
+  const formattedMessage = formatErrorMessage('ERROR', code, message);
+  logger.error(formattedMessage);
   throw new ExitError(code, message);
 };
 ```
 
----
+**パラメータ:**
 
-## 6. execErrorExit 関数（終了処理の共通化）
+- `code`: 終了コード
+- `message`: エラーメッセージ
 
-```ts
-import * as core from '@actions/core';
-import { FeatureFlags } from '../config/FeatureFlags';
-import { ExitCode } from '../shared/constants/exitCode';
-import { ExitError } from './ExitError';
+**動作:**
 
-export const execErrorExit = (err: ExitError): void => {
+1. ログメッセージをフォーマット
+2. ERRORレベルでログ記録
+3. ExitError（fatal=false）をスロー
+
+### fatalExit 関数
+
+致命的エラーでアプリケーションを終了します。
+
+```typescript
+export const fatalExit = (
+  message: string,
+  code: TExitCode = ExitCode.EXEC_FAILURE,
+): never => {
+  const logger = getLogger();
+  const formattedMessage = formatErrorMessage('FATAL', code, message);
+  logger.fatal(formattedMessage);
+  throw new ExitError(code, message, true);
+};
+```
+
+**パラメータ:**
+
+- `message`: エラーメッセージ
+- `code`: 終了コード（デフォルト: EXEC_FAILURE）
+
+**動作:**
+
+1. ログメッセージをフォーマット
+2. FATALレベルでログ記録
+3. ExitError（fatal=true）をスロー
+
+### handleExitError 関数
+
+ExitErrorを適切に処理して終了します。
+
+```typescript
+export const handleExitError = (err: ExitError): void => {
   const prefix = err.isFatal() ? 'FATAL' : 'ERROR';
   const message = `[${prefix} ${err.code}] ${err.message}`;
 
-  if (FeatureFlags.isGitHubActions) {
+  if (estaFeatures.executionMode === TEstaExecutionMode.GITHUB_ACTIONS) {
     core.setFailed(message);
   } else {
-    console.error(message);
     process.exit(err.code);
   }
 };
 ```
 
-- `ExitError` の内容に応じて GHA or CLI で適切に終了処理を行う
-- executor 側の catch 節を簡素化できる
+**パラメータ:**
+
+- `err`: 処理するExitErrorインスタンス
+
+**動作:**
+
+- GitHub Actions環境: `core.setFailed()`でエラー報告
+- CLI環境: `process.exit()`で終了
 
 ---
 
-## 7. CLIexecutor
+## 内部実装
 
-```ts
-export async function CLIexecutor(main: (argv: string[]) => Promise<ExitCode | void>) {
-  try {
-    const code = await main(process.argv.slice(2));
-    process.exit(code ?? ExitCode.SUCCESS);
-  } catch (err) {
-    if (err instanceof ExitError) {
-      execErrorExit(err);
-    } else {
-      console.error(`[WARN] Unhandled error: ${String(err)}`);
-    }
-  }
-}
+### ユーティリティ関数
+
+#### formatErrorMessage
+
+統一されたエラーメッセージフォーマットを作成します。
+
+```typescript
+export const formatErrorMessage = (
+  logLevel: 'ERROR' | 'FATAL',
+  code: TExitCode,
+  userMessage: string,
+): string => {
+  const caller = getCaller();
+  const systemMessage = getExitCodeMessage(code);
+  return `[${logLevel}(${code})] ${systemMessage}: ${userMessage} in ${caller}`;
+};
+```
+
+**フォーマット例:**
+
+```
+[ERROR(13)] Invalid command line arguments: 引数が必要です in main
+[FATAL(11)] Configuration file not found: CONFIG_PATHが未設定です in validateConfig
+```
+
+#### getExitCodeMessage
+
+終了コードに対応するシステムメッセージを取得します。
+
+```typescript
+export const getExitCodeMessage = (code: TExitCode): string => {
+  return ExitCodeErrorMessage[code] ?? ExitCodeErrorMessage[ExitCode.UNKNOWN_ERROR];
+};
+```
+
+### 呼び出し元情報の取得
+
+スタックトレースを解析して呼び出し元の情報を取得し、デバッグを支援します。
+
+---
+
+## ファイル構成
+
+```
+packages/@esta-core/error-handler/
+├── package.json
+├── src/
+│   ├── index.ts                    # エクスポート定義
+│   ├── errorExit.ts                # 非致命的エラー終了
+│   ├── fatalExit.ts                # 致命的エラー終了
+│   ├── handleExitError.ts          # ExitErrorハンドラ
+│   ├── error/
+│   │   ├── ExitError.ts            # ExitErrorクラス
+│   │   └── __tests__/
+│   │       └── ExitError.spec.ts
+│   ├── utils/
+│   │   └── exitCodeUtils.ts        # ユーティリティ関数
+│   └── __tests__/
+│       ├── errorExit.spec.ts
+│       ├── fatalExit.spec.ts
+│       └── handleExitError.spec.ts
+├── shared/
+│   └── constants/
+│       └── exitCode.ts             # 終了コード定義
+└── tests/
+    └── e2e/
+        ├── errorExit.spec.ts
+        └── fatalExit.spec.ts
 ```
 
 ---
 
-## 8. GHAexecutor
+## 使用例
 
-```ts
-export async function GHAexecutor(main: () => Promise<ExitCode | void>) {
-  try {
-    const result = await main();
-    if (result && result !== ExitCode.SUCCESS) {
-      execErrorExit(new ExitError(result, 'GitHub Action failed'));
-    }
-  } catch (err) {
-    if (err instanceof ExitError) {
-      execErrorExit(err);
-    } else {
-      console.error(`[WARN] Unhandled error: ${String(err)}`);
-    }
-  }
-}
-```
+### CLIアプリでの使用
 
----
-
-## 9. ファイル構成
-
-```bash
-src/
-├── system/
-│   ├── fatalExit.ts
-│   ├── errorExit.ts
-│   ├── ExitError.ts
-│   └── execErrorExit.ts   # ← 新設
-├── executors/
-│   ├── CLIexecutor.ts
-│   └── GHAexecutor.ts
-shared/
-└── constants/
-    └── exitCode.ts
-```
-
----
-
-## 10. 使用例
-
-### 10.1 CLIアプリ
-
-```ts
-import { CLIexecutor, errorExit, ExitCode } from '@esta-core/error-handler';
+```typescript
+import { errorExit, ExitCode } from '@esta-core/error-handler';
 
 const main = async (argv: string[]) => {
   if (!argv.length) {
     errorExit(ExitCode.INVALID_ARGS, '引数が必要です');
   }
+  // 処理続行
   return ExitCode.SUCCESS;
 };
 
-CLIexecutor(main);
+// エラーハンドリング
+try {
+  const result = await main(process.argv.slice(2));
+  process.exit(result);
+} catch (error) {
+  if (error instanceof ExitError) {
+    handleExitError(error);
+  } else {
+    console.error('Unexpected error:', error);
+    process.exit(ExitCode.UNKNOWN_ERROR);
+  }
+}
 ```
 
----
+### GitHub Actionsでの使用
 
-### 10.2 GitHub Actions
-
-```ts
-import { ExitCode, fatalExit, GHAexecutor } from '@esta-core/error-handler';
+```typescript
+import { ExitCode, fatalExit, handleExitError } from '@esta-core/error-handler';
 
 const main = async () => {
   if (!process.env.CONFIG_PATH) {
     fatalExit('CONFIG_PATHが未設定です', ExitCode.CONFIG_NOT_FOUND);
   }
+  // 処理続行
   return ExitCode.SUCCESS;
 };
 
-GHAexecutor(main);
+// GitHub Actions統合
+try {
+  await main();
+} catch (error) {
+  if (error instanceof ExitError) {
+    handleExitError(error);
+  } else {
+    core.setFailed(`Unexpected error: ${error}`);
+  }
+}
+```
+
+### エラーの段階的処理
+
+```typescript
+import { errorExit, ExitCode, fatalExit } from '@esta-core/error-handler';
+
+const processFile = async (filePath: string) => {
+  // 設定ファイルの検証（回復可能）
+  if (!fs.existsSync(filePath)) {
+    errorExit(ExitCode.CONFIG_NOT_FOUND, `設定ファイルが見つかりません: ${filePath}`);
+  }
+
+  // 重要なリソースの検証（回復不可能）
+  if (!process.env.REQUIRED_TOKEN) {
+    fatalExit('必須のトークンが設定されていません', ExitCode.VALIDATION_FAILED);
+  }
+};
 ```
 
 ---
 
-## 11. 今後の拡張
+## テスト構成
 
-| 検討項目       | 内容                                |
-| -------------- | ----------------------------------- |
-| ログ統合       | `Logger.logFatal()` 対応予定        |
-| グローバル管理 | `updateErrorLevel()` 方式の導入検討 |
-| メトリクス連携 | Sentryや監視ツールとの統合支援      |
+### 単体テスト
 
----
+- **ExitError.spec.ts**: ExitErrorクラスのテスト
+- **errorExit.spec.ts**: errorExit関数のテスト
+- **fatalExit.spec.ts**: fatalExit関数のテスト
+- **handleExitError.spec.ts**: handleExitError関数のテスト
 
-**バージョン**: 1.0.2
-**作成日**: 2025年7月9日
-**作成者**:
+### E2Eテスト
 
-<!-- textlint-disable -->
-
-- 🧠 つむぎ（設計統一・exec 分離提案）
-- 🧁 小紅（例示＆分岐設計）
-- ⚙️ エルファ（FeatureFlag 実装＆fatal 設計）
+- **errorExit.spec.ts**: errorExit関数の統合テスト
+- **fatalExit.spec.ts**: fatalExit関数の統合テスト
