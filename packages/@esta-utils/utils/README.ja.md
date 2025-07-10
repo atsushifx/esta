@@ -25,10 +25,23 @@ npm install @esta-utils/utils
 
 ### プラットフォーム判定機能（@esta-utils/get-platform）
 
-- `getPlatform()` — 現在のプラットフォーム名を型安全なenumで取得
-- `PlatformType` — 判定用enum型 (`WINDOWS`/`LINUX`/`MACOS`/`UNKNOWN`)
-- `getDelimiter()` — PATH区切り記号を返す（Windowsは`;`、他は`:`）
-- 判定関数：`isWindows()` / `isLinux()` / `isMacOS()`
+- `getPlatform()`
+  現在のOS種別を `PLATFORM_TYPE` enumで返します。
+
+- `PLATFORM_TYPE`
+  判定結果：`WINDOWS` / `LINUX` / `MACOS` / `UNKNOWN`
+
+- `getDelimiter()`
+  PATH区切り記号（Windows: `";"`、その他: `":"`）を返します。
+
+- `isWindows()` / `isLinux()` / `isMacOS()`
+  対応するOSかを判定するブール関数。
+
+- `clearPlatformCache()`
+  キャッシュされたOS判定結果をクリアします。
+
+- `estaUtils`
+  上記すべての関数をまとめたネームスペースオブジェクト。
 
 ### コマンドユーティリティ機能（@esta-utils/command-utils）
 
