@@ -7,12 +7,20 @@
 // https://opensource.org/licenses/MIT
 
 // vitest
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// osモジュール全体をモック
+vi.mock('os', () => ({
+  platform: vi.fn(),
+}));
+
+// lib
+import * as os from 'os';
 // constants
 import type { TPlatformKey } from '@shared/constants';
 import { PLATFORM_TYPE } from '@shared/types';
 // test target
-import { getPlatform } from '@/getPlatform';
+import { clearPlatformCache, getPlatform } from '@/getPlatform';
 
 // テスト用ヘルパー: 型安全性を保ちながら無効な値をテストする
 const testInvalidPlatform = (invalidValue: string, strict = true) => {
@@ -27,6 +35,14 @@ const testInvalidPlatform = (invalidValue: string, strict = true) => {
  * デフォルト引数の動作を検証します。
  */
 describe('getPlatform - Core Platform Detection', () => {
+  beforeEach(() => {
+    clearPlatformCache();
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   /**
    * プラットフォームマッピングのテスト
    *
@@ -62,9 +78,15 @@ describe('getPlatform - Core Platform Detection', () => {
       expect(testInvalidPlatform('unsupported', false)).toBe(PLATFORM_TYPE.UNKNOWN);
     });
 
-    it('handles empty string input', () => {
-      expect(() => testInvalidPlatform('')).toThrow(/Unsupported platform/);
-      expect(testInvalidPlatform('', false)).toBe(PLATFORM_TYPE.UNKNOWN);
+    it('handles empty string input as os.platform()', () => {
+      // os.platform()をモック
+      const mockPlatform = vi.mocked(os.platform);
+      mockPlatform.mockReturnValue('darwin');
+
+      const result = testInvalidPlatform('');
+      expect(result).toBe(PLATFORM_TYPE.MACOS);
+      const resultNonStrict = testInvalidPlatform('', false);
+      expect(resultNonStrict).toBe(PLATFORM_TYPE.MACOS);
     });
   });
 
@@ -87,8 +109,57 @@ describe('getPlatform - Core Platform Detection', () => {
    */
   describe('Default Arguments', () => {
     it('uses os.platform() when no platform argument provided', () => {
+      // os.platform()をモック
+      const mockPlatform = vi.mocked(os.platform);
+      mockPlatform.mockReturnValue('win32');
+
       const result = getPlatform();
-      expect(Object.values(PLATFORM_TYPE)).toContain(result);
+      expect(result).toBe(PLATFORM_TYPE.WINDOWS);
+      expect(mockPlatform).toHaveBeenCalled();
+    });
+  });
+
+  /**
+   * キャッシュ機能のテスト
+   */
+  describe('Cache Functionality', () => {
+    it('uses os.platform() result when called with empty string', () => {
+      // os.platform()をモック
+      const mockPlatform = vi.mocked(os.platform);
+      mockPlatform.mockReturnValue('linux');
+
+      const result = getPlatform('');
+      expect(result).toBe(PLATFORM_TYPE.LINUX);
+    });
+
+    it('caches result and calls os.platform() only once', () => {
+      // os.platform()をモック
+      const mockPlatform = vi.mocked(os.platform);
+      mockPlatform.mockReturnValue('win32');
+
+      // 空文字列で最初の呼び出し
+      const result1 = getPlatform('');
+      expect(result1).toBe(PLATFORM_TYPE.WINDOWS);
+      expect(mockPlatform).toHaveBeenCalledTimes(1);
+
+      // 間に明示的なプラットフォーム指定を挟む（os.platform()は呼ばれない）
+      const darwinResult = getPlatform('darwin');
+      expect(darwinResult).toBe(PLATFORM_TYPE.MACOS);
+      expect(mockPlatform).toHaveBeenCalledTimes(1); // 1回のまま
+
+      // 空文字列で2回目の呼び出し - キャッシュされているので同じ結果、os.platform()は呼ばれない
+      const result2 = getPlatform('');
+      expect(result2).toBe(PLATFORM_TYPE.WINDOWS);
+      expect(mockPlatform).toHaveBeenCalledTimes(1); // 1回のまま
+
+      // 3回目の空文字列呼び出しもキャッシュが使われる
+      const result3 = getPlatform('');
+      expect(result3).toBe(PLATFORM_TYPE.WINDOWS);
+      expect(mockPlatform).toHaveBeenCalledTimes(1); // 1回のまま
+
+      // 結果の一貫性確認
+      expect(result1).toBe(result2);
+      expect(result2).toBe(result3);
     });
 
     it('uses strict=true by default', () => {

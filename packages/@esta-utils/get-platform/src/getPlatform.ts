@@ -14,18 +14,31 @@ import { PLATFORM_TYPE } from '@shared/types';
 // types
 import type { TPlatformKey } from '@shared/constants';
 
+// キャッシュ用の変数
+let platformCache: PLATFORM_TYPE | undefined;
+
 /**
  * 現在のOSの正規化されたプラットフォーム名を返す
  *
- * @param platform - 正規化するプラットフォーム文字列（デフォルトは `os.platform()` の値）
+ * @param platform - 正規化するプラットフォーム文字列（デフォルトは空文字列、空文字列の場合は `os.platform()` の値を使用）
  * @param strict - 未サポートプラットフォームでエラーを投げるかどうか（デフォルトは `true`）
  * @returns 正規化されたプラットフォーム名または `PLATFORM_TYPE.UNKNOWN`
  * @throws プラットフォームが未サポートで `strict` が `true` の場合
  */
 export const getPlatform = (
-  platform: TPlatformKey | 'unknown' = os.platform() as TPlatformKey,
+  platform: TPlatformKey | 'unknown' | '' = '',
   strict: boolean = true,
 ): PLATFORM_TYPE => {
+  const isEmptyString = platform === '';
+
+  // 空文字列の場合はキャッシュがあればそれを使用、なければos.platform()を使用
+  if (isEmptyString) {
+    if (platformCache !== undefined) {
+      return platformCache;
+    }
+    platform = os.platform() as TPlatformKey;
+  }
+
   const platformKey = (platform in PLATFORM_MAP ? platform : 'unknown') as TPlatformKey | 'unknown';
   const result = PLATFORM_MAP[platformKey];
 
@@ -33,7 +46,19 @@ export const getPlatform = (
     throw new Error(`Unsupported platform: ${platform}`);
   }
 
+  // 空文字列から取得した場合はキャッシュに保存
+  if (isEmptyString) {
+    platformCache = result;
+  }
+
   return result;
+};
+
+/**
+ * プラットフォームキャッシュをクリアする（主にテスト用）
+ */
+export const clearPlatformCache = (): void => {
+  platformCache = undefined;
 };
 
 /**
