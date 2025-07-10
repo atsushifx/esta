@@ -1,12 +1,36 @@
+// src: ./fatalExit.ts
+// @(#): 致命的エラー終了関数
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// libs
 import { getLogger } from '@agla-utils/ag-logger';
-import { ExitCode, type TExitCode } from '@shared/constants/exitCode';
-import { ExitCodeErrorMessage } from '@shared/constants/exitCode';
+// constants
+import { ExitCode, ExitCodeErrorMessage } from '@shared/constants/exitCode';
+// types
+import type { TExitCode } from '@shared/constants/exitCode';
+// classes
 import { ExitError } from './error/ExitError';
 
+/**
+ * 終了コードに対応するエラーメッセージを取得
+ * @param code 終了コード
+ * @returns エラーメッセージ
+ */
 const getExitCodeMessage = (code: TExitCode): string => {
   return ExitCodeErrorMessage[code] || ExitCodeErrorMessage[ExitCode.UNKNOWN_ERROR].replace('##', code.toString());
 };
 
+/**
+ * 致命的エラーでアプリケーションを終了
+ * エラーをログに記録して致命的ExitErrorをスロー
+ * @param message エラーメッセージ
+ * @param code 終了コード（デフォルト: ExitCode.EXEC_FAILURE）
+ * @throws ExitError 常に致命的ExitErrorをスロー
+ */
 export const fatalExit = (
   message: string,
   code: TExitCode = ExitCode.EXEC_FAILURE,

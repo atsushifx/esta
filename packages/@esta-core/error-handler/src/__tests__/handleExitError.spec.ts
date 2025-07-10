@@ -1,6 +1,20 @@
+// src: ./__tests__/handleExitError.spec.ts
+// @(#): handleExitError関数のユニットテスト
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// constants
 import { ExitCode } from '@shared/constants/exitCode';
+// test framework
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+// classes
 import { ExitError } from '../error/ExitError';
+
+// test target
+// handleExitError関数は動的インポートでテスト内で読み込む
 
 describe('handleExitError', () => {
   const mockSetFailed = vi.fn();

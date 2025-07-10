@@ -1,6 +1,18 @@
+// src: ./__tests__/fatalExit.spec.ts
+// @(#): fatalExit関数のユニットテスト
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// constants
 import { ExitCode } from '@shared/constants/exitCode';
+// test framework
 import { describe, expect, it } from 'vitest';
+// classes
 import { ExitError } from '../error/ExitError';
+// test target
 import { fatalExit } from '../fatalExit';
 
 describe('fatalExit', () => {
