@@ -9,20 +9,13 @@
 // libs
 import { getLogger } from '@agla-utils/ag-logger';
 // constants
-import { ExitCode, ExitCodeErrorMessage } from '@shared/constants/exitCode';
+import { ExitCode } from '@shared/constants/exitCode';
 // types
 import type { TExitCode } from '@shared/constants/exitCode';
 // classes
 import { ExitError } from './error/ExitError';
-
-/**
- * 終了コードに対応するエラーメッセージを取得
- * @param code 終了コード
- * @returns エラーメッセージ
- */
-const getExitCodeMessage = (code: TExitCode): string => {
-  return ExitCodeErrorMessage[code] || ExitCodeErrorMessage[ExitCode.UNKNOWN_ERROR].replace('##', code.toString());
-};
+// utils
+import { formatErrorMessage } from './utils/exitCodeUtils';
 
 /**
  * 致命的エラーでアプリケーションを終了
@@ -36,7 +29,7 @@ export const fatalExit = (
   code: TExitCode = ExitCode.EXEC_FAILURE,
 ): never => {
   const logger = getLogger();
-  const defaultMessage = getExitCodeMessage(code);
-  logger.fatal(`${defaultMessage}: ${message}`);
+  const formattedMessage = formatErrorMessage('FATAL', code, message);
+  logger.fatal(formattedMessage);
   throw new ExitError(code, message, true);
 };

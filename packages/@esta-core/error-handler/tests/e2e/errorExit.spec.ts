@@ -33,9 +33,10 @@ describe('errorExit E2E Tests', () => {
 
       expect(() => errorExit(testCode, testMessage)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.ERROR)).toContain(
-        '[ERROR] Invalid command line arguments: Invalid argument provided',
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.ERROR);
+      expect(logMessage).toContain('[ERROR(13)] Invalid command line arguments: Invalid argument provided in');
+      // 実際の呼び出し元の関数名またはファイル名が含まれることを確認
+      expect(logMessage).toMatch(/in \w+/);
 
       try {
         errorExit(testCode, testMessage);
@@ -53,9 +54,9 @@ describe('errorExit E2E Tests', () => {
 
       expect(() => errorExit(testCode, testMessage)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.ERROR)).toContain(
-        '[ERROR] Unknown error (exit code: 999): Unknown error scenario',
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.ERROR);
+      expect(logMessage).toContain('[ERROR(999)] Unknown error: Unknown error scenario in');
+      expect(logMessage).toMatch(/in \w+/);
 
       try {
         errorExit(testCode, testMessage);
@@ -80,9 +81,9 @@ describe('errorExit E2E Tests', () => {
 
       const errorMessages = mockLogger.getMessages(AgLogLevelCode.ERROR);
       expect(errorMessages).toHaveLength(3);
-      expect(errorMessages[0]).toContain('[ERROR] Invalid command line arguments: First error');
-      expect(errorMessages[1]).toContain('[ERROR] General execution failure: Second error');
-      expect(errorMessages[2]).toContain('[ERROR] File I/O operation failed: Third error');
+      expect(errorMessages[0]).toContain('[ERROR(13)] Invalid command line arguments: First error in');
+      expect(errorMessages[1]).toContain('[ERROR(1)] General execution failure: Second error in');
+      expect(errorMessages[2]).toContain('[ERROR(15)] File I/O operation failed: Third error in');
     });
 
     it('空のメッセージでも正常に動作する', () => {
@@ -91,7 +92,9 @@ describe('errorExit E2E Tests', () => {
 
       expect(() => errorExit(testCode, testMessage)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.ERROR)).toContain('[ERROR] Invalid command line arguments:');
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.ERROR);
+      expect(logMessage).toContain('[ERROR(13)] Invalid command line arguments:');
+      expect(logMessage).toMatch(/in \w+/);
     });
 
     it('長いメッセージでも正常に動作する', () => {
@@ -100,9 +103,9 @@ describe('errorExit E2E Tests', () => {
 
       expect(() => errorExit(testCode, testMessage)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.ERROR)).toContain(
-        `[ERROR] General execution failure: ${testMessage}`,
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.ERROR);
+      expect(logMessage).toContain(`[ERROR(1)] General execution failure: ${testMessage} in`);
+      expect(logMessage).toMatch(/in \w+/);
     });
   });
 
@@ -113,9 +116,9 @@ describe('errorExit E2E Tests', () => {
 
       expect(() => errorExit(testCode, testMessage)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.ERROR)).toContain(
-        '[ERROR] Invalid command line arguments: Test message',
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.ERROR);
+      expect(logMessage).toContain('[ERROR(13)] Invalid command line arguments: Test message in');
+      expect(logMessage).toMatch(/in \w+/);
     });
 
     it('logger.errorが正しいフォーマットで呼び出される', () => {
@@ -124,9 +127,9 @@ describe('errorExit E2E Tests', () => {
 
       expect(() => errorExit(testCode, testMessage)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.ERROR)).toContain(
-        '[ERROR] File I/O operation failed: config.json not found',
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.ERROR);
+      expect(logMessage).toContain('[ERROR(15)] File I/O operation failed: config.json not found in');
+      expect(logMessage).toMatch(/in \w+/);
     });
   });
 });

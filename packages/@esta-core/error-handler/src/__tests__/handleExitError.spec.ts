@@ -10,14 +10,21 @@
 import { ExitCode } from '@shared/constants/exitCode';
 // test framework
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+// modules
+import { initEstaFeatures, TEstaExecutionMode } from '@esta-core/feature-flags';
 // classes
 import { ExitError } from '../error/ExitError';
 
+// Mock @actions/core
+vi.mock('@actions/core', () => ({
+  setFailed: vi.fn(),
+}));
+
 // test target
-// handleExitError関数は動的インポートでテスト内で読み込む
+import { handleExitError } from '../handleExitError';
 
 describe('handleExitError', () => {
-  const mockSetFailed = vi.fn();
+  const mockProcessExit = vi.fn() as unknown as (code?: string | number | null | undefined) => never;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -29,37 +36,68 @@ describe('handleExitError', () => {
 
   describe('GitHub Actions environment', () => {
     beforeEach(() => {
-      // Mock modules for GitHub Actions environment
-      vi.doMock('@actions/core', () => ({
-        setFailed: mockSetFailed,
-      }));
-      vi.doMock('@esta-core/feature-flags', () => ({
-        estaFeatures: {
-          executionMode: 'GHA',
-        },
-        TEstaExecutionMode: {
-          GITHUB_ACTIONS: 'GHA',
-          CLI: 'CLI',
-        },
-      }));
+      // Set GitHub Actions execution mode
+      initEstaFeatures(TEstaExecutionMode.GITHUB_ACTIONS);
     });
 
     it('should call core.setFailed for non-fatal error', async () => {
-      const { handleExitError } = await import('../handleExitError');
       const error = new ExitError(ExitCode.INVALID_ARGS, 'Test error message', false);
+      const core = await import('@actions/core');
 
       handleExitError(error);
 
-      expect(mockSetFailed).toHaveBeenCalledWith('[ERROR 13] Test error message');
+      expect(core.setFailed).toHaveBeenCalledWith('[ERROR 13] Test error message');
     });
 
     it('should call core.setFailed for fatal error', async () => {
-      const { handleExitError } = await import('../handleExitError');
       const error = new ExitError(ExitCode.EXEC_FAILURE, 'Fatal error', true);
+      const core = await import('@actions/core');
 
       handleExitError(error);
 
-      expect(mockSetFailed).toHaveBeenCalledWith('[FATAL 1] Fatal error');
+      expect(core.setFailed).toHaveBeenCalledWith('[FATAL 1] Fatal error');
+    });
+  });
+
+  describe('CLI environment', () => {
+    beforeEach(() => {
+      // Set CLI execution mode
+      initEstaFeatures(TEstaExecutionMode.CLI);
+
+      // Mock process.exit
+      vi.spyOn(process, 'exit').mockImplementation(mockProcessExit);
+    });
+
+    it('should call process.exit for non-fatal error', () => {
+      const error = new ExitError(ExitCode.INVALID_ARGS, 'CLI error message', false);
+
+      handleExitError(error);
+
+      expect(mockProcessExit).toHaveBeenCalledWith(ExitCode.INVALID_ARGS);
+    });
+
+    it('should call process.exit for fatal error', () => {
+      const error = new ExitError(ExitCode.EXEC_FAILURE, 'Fatal CLI error', true);
+
+      handleExitError(error);
+
+      expect(mockProcessExit).toHaveBeenCalledWith(ExitCode.EXEC_FAILURE);
+    });
+
+    it('should call process.exit with correct code for SUCCESS', () => {
+      const error = new ExitError(ExitCode.SUCCESS, 'Success message', false);
+
+      handleExitError(error);
+
+      expect(mockProcessExit).toHaveBeenCalledWith(ExitCode.SUCCESS);
+    });
+
+    it('should call process.exit with correct code for UNKNOWN_ERROR', () => {
+      const error = new ExitError(ExitCode.UNKNOWN_ERROR, 'Unknown error', true);
+
+      handleExitError(error);
+
+      expect(mockProcessExit).toHaveBeenCalledWith(ExitCode.UNKNOWN_ERROR);
     });
   });
 });

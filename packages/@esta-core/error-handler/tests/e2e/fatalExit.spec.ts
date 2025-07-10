@@ -32,9 +32,9 @@ describe('fatalExit E2E Tests', () => {
 
       expect(() => fatalExit(testMessage)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.FATAL)).toContain(
-        '[FATAL] General execution failure: Critical system failure',
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
+      expect(logMessage).toContain('[FATAL(1)] General execution failure: Critical system failure in');
+      expect(logMessage).toMatch(/in \w+/);
 
       try {
         fatalExit(testMessage);
@@ -52,9 +52,9 @@ describe('fatalExit E2E Tests', () => {
 
       expect(() => fatalExit(testMessage, testCode)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.FATAL)).toContain(
-        '[FATAL] Invalid command line arguments: Invalid configuration file',
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
+      expect(logMessage).toContain('[FATAL(13)] Invalid command line arguments: Invalid configuration file in');
+      expect(logMessage).toMatch(/in \w+/);
 
       try {
         fatalExit(testMessage, testCode);
@@ -72,9 +72,9 @@ describe('fatalExit E2E Tests', () => {
 
       expect(() => fatalExit(testMessage, testCode)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.FATAL)).toContain(
-        '[FATAL] Unknown error (exit code: 999): Unknown critical error',
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
+      expect(logMessage).toContain('[FATAL(999)] Unknown error: Unknown critical error in');
+      expect(logMessage).toMatch(/in \w+/);
 
       try {
         fatalExit(testMessage, testCode);
@@ -99,9 +99,9 @@ describe('fatalExit E2E Tests', () => {
 
       const fatalMessages = mockLogger.getMessages(AgLogLevelCode.FATAL);
       expect(fatalMessages).toHaveLength(3);
-      expect(fatalMessages[0]).toContain('[FATAL] Invalid command line arguments: First fatal error');
-      expect(fatalMessages[1]).toContain('[FATAL] General execution failure: Second fatal error');
-      expect(fatalMessages[2]).toContain('[FATAL] File I/O operation failed: Third fatal error');
+      expect(fatalMessages[0]).toContain('[FATAL(13)] Invalid command line arguments: First fatal error in');
+      expect(fatalMessages[1]).toContain('[FATAL(1)] General execution failure: Second fatal error in');
+      expect(fatalMessages[2]).toContain('[FATAL(15)] File I/O operation failed: Third fatal error in');
     });
 
     it('空のメッセージでも正常に動作する', () => {
@@ -109,7 +109,9 @@ describe('fatalExit E2E Tests', () => {
 
       expect(() => fatalExit(testMessage)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.FATAL)).toContain('[FATAL] General execution failure:');
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
+      expect(logMessage).toContain('[FATAL(1)] General execution failure:');
+      expect(logMessage).toMatch(/in \w+/);
     });
 
     it('長いメッセージでも正常に動作する', () => {
@@ -118,9 +120,9 @@ describe('fatalExit E2E Tests', () => {
 
       expect(() => fatalExit(testMessage, testCode)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.FATAL)).toContain(
-        `[FATAL] General execution failure: ${testMessage}`,
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
+      expect(logMessage).toContain(`[FATAL(1)] General execution failure: ${testMessage} in`);
+      expect(logMessage).toMatch(/in \w+/);
     });
   });
 
@@ -130,9 +132,9 @@ describe('fatalExit E2E Tests', () => {
 
       expect(() => fatalExit(testMessage)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.FATAL)).toContain(
-        '[FATAL] General execution failure: Test fatal message',
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
+      expect(logMessage).toContain('[FATAL(1)] General execution failure: Test fatal message in');
+      expect(logMessage).toMatch(/in \w+/);
     });
 
     it('logger.fatalが正しいフォーマットで呼び出される', () => {
@@ -140,9 +142,9 @@ describe('fatalExit E2E Tests', () => {
 
       expect(() => fatalExit(testMessage)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.FATAL)).toContain(
-        '[FATAL] General execution failure: critical-config.json not found',
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
+      expect(logMessage).toContain('[FATAL(1)] General execution failure: critical-config.json not found in');
+      expect(logMessage).toMatch(/in \w+/);
     });
   });
 
@@ -162,9 +164,9 @@ describe('fatalExit E2E Tests', () => {
 
       expect(() => fatalExit(testMessage)).toThrow(ExitError);
 
-      expect(mockLogger.getLastMessage(AgLogLevelCode.FATAL)).toContain(
-        '[FATAL] General execution failure: Test fatal message',
-      );
+      const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
+      expect(logMessage).toContain('[FATAL(1)] General execution failure: Test fatal message in');
+      expect(logMessage).toMatch(/in \w+/);
     });
   });
 });

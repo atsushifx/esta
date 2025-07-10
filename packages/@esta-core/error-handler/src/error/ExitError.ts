@@ -29,9 +29,9 @@ export class ExitError extends Error {
     this.code = code;
     this.fatal = fatal;
     Object.setPrototypeOf(this, new.target.prototype);
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, ExitError);
-    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    Error.captureStackTrace?.(this, ExitError);
   }
 
   /**

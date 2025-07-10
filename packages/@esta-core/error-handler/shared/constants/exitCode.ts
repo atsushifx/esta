@@ -39,5 +39,5 @@ export const ExitCodeErrorMessage = {
   [ExitCode.VALIDATION_FAILED]: 'Input validation failed',
   [ExitCode.FILE_IO_ERROR]: 'File I/O operation failed',
   [ExitCode.INTERNAL_LOGIC_ERROR]: 'Internal logic error occurred',
-  [ExitCode.UNKNOWN_ERROR]: 'Unknown error (exit code: ##)',
+  [ExitCode.UNKNOWN_ERROR]: 'Unknown error',
 } as const;
