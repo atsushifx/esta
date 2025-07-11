@@ -8,8 +8,9 @@
 
 import { getPlatform } from '@esta-utils/get-platform';
 import type { PLATFORM_TYPE } from '@esta-utils/get-platform';
-import { PLATFORM_SHELL_MAP } from '@shared/constants';
+import { ExitCode } from '@shared/constants';
 import { spawn } from 'child_process';
+import { PLATFORM_SHELL_MAP } from '../shared/constants';
 
 /**
  * 引数を適切にエスケープしてコマンドラインを作成する
@@ -43,11 +44,11 @@ export const runCommand = (
     const cmd = spawn(shellConfig.shell, [shellConfig.option, commandWithArgs], { stdio: 'ignore' });
 
     cmd.on('close', (code) => {
-      resolve(code ?? 1);
+      resolve(code ?? ExitCode.EXEC_FAILURE);
     });
 
     cmd.on('error', () => {
-      resolve(1);
+      resolve(ExitCode.EXEC_FAILURE);
     });
   });
 

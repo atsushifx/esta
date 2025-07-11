@@ -47,7 +47,9 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@shared/constants": "workspace:*",
     "@esta-utils/get-platform": "workspace:*"
   },
-  "devDependencies": {}
+  "devDependencies": {
+  }
 }

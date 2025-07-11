@@ -25,9 +25,6 @@
     "rootDir": ".",
     // alias
     "baseUrl": "./",
-    "paths": {
-      "@shared/*": ["shared/*"]
-    },
     // types
     // cache
     "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"
