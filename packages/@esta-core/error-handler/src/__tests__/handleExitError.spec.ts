@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // constants
-import { ExitCode } from '@shared/constants/exitCode';
+import { ExitCode } from '@shared/constants';
 // test framework
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // modules

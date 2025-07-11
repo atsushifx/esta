@@ -7,9 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { TExitCode } from '@shared/constants/exitCode';
+import type { TExitCode } from '@shared/constants';
 // constants
-import { ExitCode, ExitCodeErrorMessage } from '@shared/constants/exitCode';
+import { ExitCode, ExitCodeErrorMessage } from '@shared/constants';
 
 /**
  * 終了コードに対応するエラーメッセージを取得
