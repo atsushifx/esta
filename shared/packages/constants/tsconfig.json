@@ -20,7 +20,7 @@
   "compilerOptions": {
     // directories
     // "outDir": "lib",
-    "rootDir": ".",
+    "rootDir": "./",
     "baseUrl": "./",
     // "paths": {},
     // types
