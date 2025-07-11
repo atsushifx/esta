@@ -7,10 +7,10 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from '@shared/types/AgLogger.interface';
-import type { AgLogLevel } from '@shared/types/AgLogger.types';
+import type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from '../shared/types/AgLogger.interface';
+import type { AgLogLevel } from '../shared/types/AgLogger.types';
 // code
-import { AgLogLevelCode } from '@shared/types/AgLogger.types';
+import { AgLogLevelCode } from '../shared/types/AgLogger.types';
 
 // plugins
 import { NullFormat } from '@/plugins/format/NullFormat';

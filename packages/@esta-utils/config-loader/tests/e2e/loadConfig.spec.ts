@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 
 // types
-import { TEstaSearchConfigFileType } from '@shared/types/common.types';
+import { TEstaSearchConfigFileType } from '../../shared/types/common.types';
 
 // test unit
 import { loadConfig } from '@/loadConfig';

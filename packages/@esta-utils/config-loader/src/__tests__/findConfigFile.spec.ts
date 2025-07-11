@@ -13,7 +13,7 @@ import process from 'process';
 // vitest
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { TEstaSearchConfigFileType } from '@shared/types/common.types';
+import { TEstaSearchConfigFileType } from '../../shared/types/common.types';
 
 // test unit
 

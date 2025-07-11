@@ -11,7 +11,7 @@ import process from 'process';
 
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { TEstaSearchConfigFileType } from '@shared/types/common.types';
+import { TEstaSearchConfigFileType } from '../../shared/types/common.types';
 
 import { getDelimiter } from '@esta-utils/get-platform';
 // vitest

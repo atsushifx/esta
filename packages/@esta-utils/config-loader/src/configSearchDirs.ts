@@ -11,7 +11,7 @@ import * as os from 'os';
 import process from 'process';
 
 // --- internal libs
-import { TEstaSearchConfigFileType } from '@shared/types/common.types';
+import { TEstaSearchConfigFileType } from '../shared/types/common.types';
 
 import { getDelimiter } from '@esta-utils/get-platform';
 // --- types

@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { PLATFORM_TYPE } from '@shared/types';
+import { PLATFORM_TYPE } from '../types';
 
 /**
  * Node.js os.platform()の値とPLATFORM_TYPEのマッピング

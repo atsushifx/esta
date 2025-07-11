@@ -7,8 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgLogLevel } from '@shared/types';
-import { AgLogLevelCode } from '@shared/types';
+import type { AgLogLevel } from '../../../shared/types';
+import { AgLogLevelCode } from '../../../shared/types';
 
 /**
  * Mock logger for E2E testing that captures log messages in arrays.

@@ -10,7 +10,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // constants
-import { AgLogLevelCode } from '@shared/types';
+import { AgLogLevelCode } from '../../shared/types';
 
 // test target
 import { AgLogger } from '../AgLogger.class';

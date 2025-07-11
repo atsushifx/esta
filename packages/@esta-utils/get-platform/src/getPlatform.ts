@@ -9,10 +9,10 @@
 // lib
 import * as os from 'os';
 // constants
-import { PATH_DELIMITER, PLATFORM_MAP } from '@shared/constants';
-import { PLATFORM_TYPE } from '@shared/types';
+import { PATH_DELIMITER, PLATFORM_MAP } from '../shared/constants';
+import { PLATFORM_TYPE } from '../shared/types';
 // types
-import type { TPlatformKey } from '@shared/constants';
+import type { TPlatformKey } from '../shared/constants';
 
 // キャッシュ用の変数
 let platformCache: PLATFORM_TYPE | undefined;

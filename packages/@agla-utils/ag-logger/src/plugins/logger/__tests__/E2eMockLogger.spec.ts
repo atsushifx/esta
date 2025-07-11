@@ -10,7 +10,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 // types
-import { AgLogLevelCode } from '@shared/types';
+import { AgLogLevelCode } from '../../../../shared/types';
 
 // test target
 import { E2eMockLogger } from '../E2eMockLogger';

@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgLoggerFunction } from '@shared/types/AgLogger.interface';
+import type { AgLoggerFunction } from '../../../shared/types/AgLogger.interface';
 
 /**
  * Null logger function that performs no operations.

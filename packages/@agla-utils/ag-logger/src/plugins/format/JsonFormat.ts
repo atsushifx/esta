@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgLogMessage } from '@shared/types';
+import type { AgLogMessage } from '../../../shared/types';
 
 // utilities
 import { AgLoggerGetLabel } from '../../utils/AgLoggerHelpers';

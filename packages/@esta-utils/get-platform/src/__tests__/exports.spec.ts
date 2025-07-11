@@ -9,9 +9,9 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // constants
-import { PATH_DELIMITER, PLATFORM_MAP } from '@shared/constants';
+import { PATH_DELIMITER, PLATFORM_MAP } from '../../shared/constants';
 // types
-import { PLATFORM_TYPE } from '@shared/types';
+import { PLATFORM_TYPE } from '../../shared/types';
 // test target
 import {
   getDelimiter,

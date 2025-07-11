@@ -11,7 +11,7 @@ import {
   EstaExtensionToFileTypeMap,
   TEstaConfigFileType,
   type TEstaSupportedExtension,
-} from '@shared/types/configFile.types';
+} from '../shared/types/configFile.types';
 
 // parser
 import { parseJsonc } from './parser/parseJsonc';

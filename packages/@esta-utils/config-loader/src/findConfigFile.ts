@@ -10,8 +10,8 @@ import * as fs from 'fs';
 import { resolve } from 'path';
 
 // types
-import type { TEstaSearchConfigFileType } from '@shared/types/common.types';
-import { EstaSupportedExtensions } from '@shared/types/configFile.types';
+import type { TEstaSearchConfigFileType } from '../shared/types/common.types';
+import { EstaSupportedExtensions } from '../shared/types/configFile.types';
 
 // modules
 import { configSearchDirs } from './configSearchDirs';
