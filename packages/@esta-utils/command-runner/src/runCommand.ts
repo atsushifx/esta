@@ -8,8 +8,9 @@
 
 import { getPlatform } from '@esta-utils/get-platform';
 import type { PLATFORM_TYPE } from '@esta-utils/get-platform';
+import { ExitCode } from '@shared/constants';
 import { spawn } from 'child_process';
-import { ExitCode, PLATFORM_SHELL_MAP } from '../shared/constants';
+import { PLATFORM_SHELL_MAP } from '../shared/constants/shell';
 
 /**
  * 引数を適切にエスケープしてコマンドラインを作成する

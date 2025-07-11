@@ -13,6 +13,7 @@ import { type ChildProcess, spawn } from 'child_process';
 import { EventEmitter } from 'events';
 // internal modules
 import { getPlatform, PLATFORM_TYPE } from '@esta-utils/get-platform';
+import { ExitCode } from '@shared/constants';
 // test target
 import { runCommand } from '../runCommand';
 
@@ -45,11 +46,11 @@ describe('runCommand', () => {
       const promise = runCommand('echo');
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`echo`'], { stdio: 'ignore' });
     });
 
@@ -57,11 +58,11 @@ describe('runCommand', () => {
       const promise = runCommand('echo', ['hello']);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`echo "hello"`'], { stdio: 'ignore' });
     });
 
@@ -69,11 +70,11 @@ describe('runCommand', () => {
       const promise = runCommand('ls', ['-la', '/tmp']);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`ls "-la" "/tmp"`'], { stdio: 'ignore' });
     });
 
@@ -81,11 +82,11 @@ describe('runCommand', () => {
       const promise = runCommand('pwd', []);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`pwd`'], { stdio: 'ignore' });
     });
 
@@ -93,11 +94,11 @@ describe('runCommand', () => {
       const promise = runCommand('pwd');
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`pwd`'], { stdio: 'ignore' });
     });
   });
@@ -109,11 +110,11 @@ describe('runCommand', () => {
       const promise = runCommand('dir', ['C:\\'], PLATFORM_TYPE.WINDOWS);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', '`dir "C:\\"`'], { stdio: 'ignore' });
     });
 
@@ -121,11 +122,11 @@ describe('runCommand', () => {
       const promise = runCommand('ls', ['-la'], PLATFORM_TYPE.LINUX);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`ls "-la"`'], { stdio: 'ignore' });
     });
 
@@ -133,11 +134,11 @@ describe('runCommand', () => {
       const promise = runCommand('ls', ['-la'], PLATFORM_TYPE.MACOS);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`ls "-la"`'], { stdio: 'ignore' });
     });
 
@@ -145,11 +146,11 @@ describe('runCommand', () => {
       const promise = runCommand('ls', ['-la'], PLATFORM_TYPE.UNKNOWN);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`ls "-la"`'], { stdio: 'ignore' });
     });
 
@@ -159,11 +160,11 @@ describe('runCommand', () => {
       const promise = runCommand('echo', ['test']);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockGetPlatform).toHaveBeenCalled();
       expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', '`echo "test"`'], { stdio: 'ignore' });
     });
@@ -178,22 +179,22 @@ describe('runCommand', () => {
       const promise = runCommand('echo', ['success']);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
     });
 
     it('should return non-zero exit code on command failure', async () => {
       const promise = runCommand('false');
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 1);
+        mockProcess.emit('close', ExitCode.EXEC_FAILURE);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(1);
+      expect(result).toBe(ExitCode.EXEC_FAILURE);
     });
 
     it('should return 1 when exit code is null', async () => {
@@ -204,7 +205,7 @@ describe('runCommand', () => {
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(1);
+      expect(result).toBe(ExitCode.EXEC_FAILURE);
     });
 
     it('should return 1 on spawn error', async () => {
@@ -215,11 +216,11 @@ describe('runCommand', () => {
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(1);
+      expect(result).toBe(ExitCode.EXEC_FAILURE);
     });
 
     it('should handle various exit codes', async () => {
-      const testCases = [0, 1, 2, 127, 255];
+      const testCases = [ExitCode.SUCCESS, ExitCode.EXEC_FAILURE, 2, 127, 255];
 
       for (const exitCode of testCases) {
         const promise = runCommand('exit', [exitCode.toString()]);
@@ -243,33 +244,33 @@ describe('runCommand', () => {
       const promise = runCommand('echo', ['hello']);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
     });
 
     it('should work with custom timeout', async () => {
       const promise = runCommand('echo', ['hello'], PLATFORM_TYPE.LINUX, 5000);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
     });
 
     it('should work with timeout disabled', async () => {
       const promise = runCommand('echo', ['hello'], PLATFORM_TYPE.LINUX, 0);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
     });
   });
 
@@ -282,11 +283,11 @@ describe('runCommand', () => {
       const promise = runCommand('');
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 1);
+        mockProcess.emit('close', ExitCode.EXEC_FAILURE);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(1);
+      expect(result).toBe(ExitCode.EXEC_FAILURE);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '``'], { stdio: 'ignore' });
     });
 
@@ -294,11 +295,11 @@ describe('runCommand', () => {
       const promise = runCommand('my command', ['with', 'args']);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`my command "with" "args"`'], { stdio: 'ignore' });
     });
 
@@ -306,11 +307,11 @@ describe('runCommand', () => {
       const promise = runCommand('echo', ['hello world', 'test args']);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`echo "hello world" "test args"`'], { stdio: 'ignore' });
     });
 
@@ -318,11 +319,11 @@ describe('runCommand', () => {
       const promise = runCommand('echo', ['$HOME', '&&', 'echo', 'test']);
 
       globalThis.setTimeout(() => {
-        mockProcess.emit('close', 0);
+        mockProcess.emit('close', ExitCode.SUCCESS);
       }, 10);
 
       const result = await promise;
-      expect(result).toBe(0);
+      expect(result).toBe(ExitCode.SUCCESS);
       expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`echo "$HOME" "&&" "echo" "test"`'], { stdio: 'ignore' });
     });
   });
