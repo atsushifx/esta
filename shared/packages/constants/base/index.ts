@@ -10,3 +10,4 @@
 export * from './common';
 export * from './defaults';
 export * from './directories';
+export * from './exit-code';
