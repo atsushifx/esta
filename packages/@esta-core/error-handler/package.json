@@ -49,7 +49,8 @@
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@agla-utils/ag-logger": "workspace:*",
-    "@esta-core/feature-flags": "workspace:*"
+    "@esta-core/feature-flags": "workspace:*",
+    "@shared/constants": "workspace:*"
   },
   "devDependencies": {
   }
