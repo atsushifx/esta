@@ -24,8 +24,10 @@
     "outDir": "lib",
     "rootDir": ".",
     // alias
-    "baseUrl": "./src",
-    // "paths": {},
+    "baseUrl": "./",
+    "paths": {
+      "@shared/*": ["shared/*"]
+    },
     // types
     // cache
     "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"

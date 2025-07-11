@@ -6,46 +6,16 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// libs
-
-// main
-import { spawn } from 'child_process';
-
-import { getPlatform } from '@esta-utils/get-platform';
-
-const existWhenWindows = (command: string): Promise<boolean> =>
-  new Promise((resolve) => {
-    const cmd = spawn('cmd', ['/c', `where ${command}`], { stdio: 'ignore' });
-
-    cmd.on('close', (code) => {
-      resolve(code === 0);
-    });
-
-    cmd.on('error', () => {
-      resolve(false);
-    });
-  });
-
-const existWhenLinux = (command: string): Promise<boolean> =>
-  new Promise((resolve) => {
-    const cmd = spawn('sh', ['-c', `command -v ${command}`], { stdio: 'ignore' });
-
-    cmd.on('close', (code) => {
-      resolve(code === 0);
-    });
-
-    cmd.on('error', () => {
-      resolve(false);
-    });
-  });
+import { getPlatform, PLATFORM_TYPE } from '@esta-utils/get-platform';
+import { runCommand } from './runCommand';
 
 export const commandExist = async (command: string): Promise<boolean> => {
   const platform = getPlatform();
-  if (platform === 'windows') {
-    return existWhenWindows(command);
-  } else {
-    return existWhenLinux(command);
-  }
+  const checkCommand = platform === PLATFORM_TYPE.WINDOWS ? 'where' : 'command';
+  const checkArgs = platform === PLATFORM_TYPE.WINDOWS ? [command] : ['-v', command];
+
+  const exitCode = await runCommand(checkCommand, checkArgs, platform);
+  return exitCode === 0;
 };
 
 export default commandExist;

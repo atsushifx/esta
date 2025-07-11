@@ -10,6 +10,7 @@ import * as estaUtils from './commandExist';
 
 // --- export
 export * from './commandExist';
+export * from './runCommand';
 export { estaUtils };
 
 // default
