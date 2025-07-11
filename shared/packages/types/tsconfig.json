@@ -15,7 +15,8 @@
     "lib",
     "module",
     "node_modules",
-    ".cache"
+    ".cache",
+    "temp"
   ],
   "compilerOptions": {
     // directories

@@ -17,7 +17,8 @@
     "lib",
     "module",
     "node_modules",
-    ".cache"
+    ".cache",
+    "temp"
   ],
   "compilerOptions": {
     // directories
@@ -25,7 +26,11 @@
     "rootDir": "./src",
     // alias
     "baseUrl": "./",
-    // "paths": {},
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
     // types
     // cache
     "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"

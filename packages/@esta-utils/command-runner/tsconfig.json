@@ -17,15 +17,16 @@
     "lib",
     "module",
     "node_modules",
-    ".cache"
+    ".cache",
+    "temp"
   ],
   "compilerOptions": {
     // directories
     "outDir": "lib",
     "rootDir": ".",
     "paths": {
-      "@": [
-        "./src/"
+      "@/*": [
+        "./src/*"
       ]
     },
     // alias
