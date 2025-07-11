@@ -51,7 +51,7 @@ describe('commandExist', () => {
 
       const result = await promise;
       expect(result).toBe(true);
-      expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', 'where node'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', '`where "node"`'], { stdio: 'ignore' });
     });
 
     it('should return false when command does not exist on Windows', async () => {
@@ -64,7 +64,7 @@ describe('commandExist', () => {
 
       const result = await promise;
       expect(result).toBe(false);
-      expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', 'where nonexistent-command'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', '`where "nonexistent-command"`'], { stdio: 'ignore' });
     });
 
     it('should return false when spawn error occurs on Windows', async () => {
@@ -95,7 +95,7 @@ describe('commandExist', () => {
 
       const result = await promise;
       expect(result).toBe(true);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'command -v ls'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`command "-v" "ls"`'], { stdio: 'ignore' });
     });
 
     it('should return false when command does not exist on Linux', async () => {
@@ -108,7 +108,7 @@ describe('commandExist', () => {
 
       const result = await promise;
       expect(result).toBe(false);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'command -v nonexistent-command'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`command "-v" "nonexistent-command"`'], { stdio: 'ignore' });
     });
 
     it('should return false when spawn error occurs on Linux', async () => {
@@ -135,7 +135,7 @@ describe('commandExist', () => {
 
       const result = await promise;
       expect(result).toBe(true);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'command -v ls'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`command "-v" "ls"`'], { stdio: 'ignore' });
     });
   });
 
@@ -151,7 +151,7 @@ describe('commandExist', () => {
 
       const result = await promise;
       expect(result).toBe(false);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'command -v '], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`command "-v" ""`'], { stdio: 'ignore' });
     });
 
     it('should handle commands with spaces', async () => {
@@ -165,7 +165,7 @@ describe('commandExist', () => {
 
       const result = await promise;
       expect(result).toBe(true);
-      expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', 'where my command'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', '`where "my command"`'], { stdio: 'ignore' });
     });
 
     it('should handle unknown platform as Linux', async () => {
@@ -179,7 +179,7 @@ describe('commandExist', () => {
 
       const result = await promise;
       expect(result).toBe(true);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'command -v ls'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`command "-v" "ls"`'], { stdio: 'ignore' });
     });
   });
 });

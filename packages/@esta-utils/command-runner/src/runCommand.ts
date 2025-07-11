@@ -12,6 +12,20 @@ import { PLATFORM_SHELL_MAP } from '@shared/constants';
 import { spawn } from 'child_process';
 
 /**
+ * 引数を適切にエスケープしてコマンドラインを作成する
+ * @param command - 実行するコマンド名
+ * @param args - コマンドの引数配列
+ * @returns エスケープされたコマンドライン文字列
+ */
+export const createCommandLine = (command: string, args: string[]): string => {
+  const quotedArgs = args.map((arg) => `"${arg}"`);
+  const commandLine = [command, ...quotedArgs].join(' ');
+
+  // 安全のためコマンドライン全体をバッククォートで囲む
+  return `\`${commandLine}\``;
+};
+
+/**
  * プラットフォームに応じてコマンドを実行する
  * @param command - 実行するコマンド名
  * @param args - コマンドの引数配列
@@ -25,7 +39,7 @@ export const runCommand = (
 ): Promise<number> =>
   new Promise((resolve) => {
     const shellConfig = PLATFORM_SHELL_MAP[platform];
-    const commandWithArgs = [command, ...args].join(' ');
+    const commandWithArgs = createCommandLine(command, args);
     const cmd = spawn(shellConfig.shell, [shellConfig.option, commandWithArgs], { stdio: 'ignore' });
 
     cmd.on('close', (code) => {

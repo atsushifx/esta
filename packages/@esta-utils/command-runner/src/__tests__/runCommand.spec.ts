@@ -50,7 +50,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'echo'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`echo`'], { stdio: 'ignore' });
     });
 
     it('should execute command with single argument', async () => {
@@ -62,7 +62,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'echo hello'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`echo "hello"`'], { stdio: 'ignore' });
     });
 
     it('should execute command with multiple arguments', async () => {
@@ -74,7 +74,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'ls -la /tmp'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`ls "-la" "/tmp"`'], { stdio: 'ignore' });
     });
 
     it('should handle empty arguments array', async () => {
@@ -86,7 +86,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'pwd'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`pwd`'], { stdio: 'ignore' });
     });
 
     it('should use default empty arguments when not provided', async () => {
@@ -98,7 +98,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'pwd'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`pwd`'], { stdio: 'ignore' });
     });
   });
 
@@ -114,7 +114,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', 'dir C:\\'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', '`dir "C:\\"`'], { stdio: 'ignore' });
     });
 
     it('should use sh -c on Linux', async () => {
@@ -126,7 +126,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'ls -la'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`ls "-la"`'], { stdio: 'ignore' });
     });
 
     it('should use sh -c on macOS', async () => {
@@ -138,7 +138,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'ls -la'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`ls "-la"`'], { stdio: 'ignore' });
     });
 
     it('should use sh -c on unknown platform', async () => {
@@ -150,7 +150,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'ls -la'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`ls "-la"`'], { stdio: 'ignore' });
     });
 
     it('should auto-detect platform when not specified', async () => {
@@ -165,7 +165,7 @@ describe('runCommand', () => {
       const result = await promise;
       expect(result).toBe(0);
       expect(mockGetPlatform).toHaveBeenCalled();
-      expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', 'echo test'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('cmd', ['/c', '`echo "test"`'], { stdio: 'ignore' });
     });
   });
 
@@ -248,7 +248,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(1);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', ''], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '``'], { stdio: 'ignore' });
     });
 
     it('should handle commands with spaces', async () => {
@@ -260,7 +260,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'my command with args'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`my command "with" "args"`'], { stdio: 'ignore' });
     });
 
     it('should handle arguments with spaces', async () => {
@@ -272,7 +272,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'echo hello world test args'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`echo "hello world" "test args"`'], { stdio: 'ignore' });
     });
 
     it('should handle special characters in arguments', async () => {
@@ -284,7 +284,7 @@ describe('runCommand', () => {
 
       const result = await promise;
       expect(result).toBe(0);
-      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', 'echo $HOME && echo test'], { stdio: 'ignore' });
+      expect(mockSpawn).toHaveBeenCalledWith('sh', ['-c', '`echo "$HOME" "&&" "echo" "test"`'], { stdio: 'ignore' });
     });
   });
 });
