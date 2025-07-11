@@ -9,9 +9,9 @@
 // libs
 import { getLogger } from '@agla-utils/ag-logger';
 // constants
-import { ExitCode } from '@shared/constants/exitCode';
+import { ExitCode } from '@shared/constants';
 // types
-import type { TExitCode } from '@shared/constants/exitCode';
+import type { TExitCode } from '@shared/constants';
 // classes
 import { ExitError } from './error/ExitError';
 // utils

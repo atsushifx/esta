@@ -1,6 +1,6 @@
 import { AgLogLevelCode, E2eMockLogger, getLogger, PlainFormat } from '@agla-utils/ag-logger';
-import { ExitCode } from '@shared/constants/exitCode';
-import type { TExitCode } from '@shared/constants/exitCode';
+import { ExitCode } from '@shared/constants';
+import type { TExitCode } from '@shared/constants';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { ExitError } from '../../src/error/ExitError';
 import { errorExit } from '../../src/errorExit';

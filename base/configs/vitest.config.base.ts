@@ -7,10 +7,12 @@
 // https://opensource.org/licenses/MIT
 
 // vitest
+import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
 
 // configs
 export default defineConfig({
+  plugins: [tsconfigPaths()],
   test: {
     globals: true,
     environment: 'node',

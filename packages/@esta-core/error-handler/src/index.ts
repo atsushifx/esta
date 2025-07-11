@@ -7,9 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 // constants
-export { ExitCode } from '@shared/constants/exitCode';
+export { ExitCode } from '@shared/constants';
 // types
-export type { TExitCode } from '@shared/constants/exitCode';
+export type { TExitCode } from '@shared/constants';
 // classes
 export { ExitError } from './error/ExitError';
 // functions

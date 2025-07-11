@@ -1,4 +1,7 @@
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// src: shared/packages/constants/base/exitCode.ts
+// @(#) : POSIX準拠の終了コード定義
+//
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
