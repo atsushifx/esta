@@ -1,5 +1,5 @@
-// src: ./configs/vitest.config.unit.ts
-// @(#) : vitest config for unit test
+// src: ./configs/vitest.config.ci.ts
+// @(#) : vitest config for integration test
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -28,7 +28,7 @@ export default mergeConfig(baseConfig, {
       'tests/**/*.spec.ts',
     ],
     caches: {
-      dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/ci'),
+      dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/ci/'),
     },
   },
   resolve: {
