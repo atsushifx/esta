@@ -9,7 +9,7 @@
 import { getPlatform } from '@esta-utils/get-platform';
 import type { PLATFORM_TYPE } from '@esta-utils/get-platform';
 import { spawn } from 'child_process';
-import { PLATFORM_SHELL_MAP } from '../shared/constants';
+import { ExitCode, PLATFORM_SHELL_MAP } from '../shared/constants';
 
 /**
  * 引数を適切にエスケープしてコマンドラインを作成する
@@ -57,17 +57,17 @@ export const runCommand = (
     };
 
     cmd.on('close', (code) => {
-      resolveOnce(code ?? 1);
+      resolveOnce(code ?? ExitCode.EXEC_FAILURE);
     });
 
     cmd.on('error', () => {
-      resolveOnce(1);
+      resolveOnce(ExitCode.EXEC_FAILURE);
     });
 
     if (timeoutMs > 0) {
       timeoutHandle = setTimeout(() => {
         cmd.kill('SIGTERM');
-        resolveOnce(124); // POSIX timeout exit code
+        resolveOnce(ExitCode.TIMEOUT);
       }, timeoutMs);
     }
   });
