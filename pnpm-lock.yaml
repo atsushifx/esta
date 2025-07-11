@@ -126,6 +126,9 @@ importers:
       '@esta-utils/get-platform':
         specifier: workspace:*
         version: link:../get-platform
+      '@shared/constants':
+        specifier: workspace:*
+        version: link:../../../shared/packages/constants
 
   packages/@esta-utils/config-loader:
     dependencies:
