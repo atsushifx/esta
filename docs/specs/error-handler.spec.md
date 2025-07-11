@@ -7,13 +7,17 @@
 
 ---
 title: 📘 エラーハンドリング統一仕様書（@esta-core/error-handler）
-version: 1.1.0
+version: 1.2.0
 created: 2025-07-09
-updated: 2025-07-10
+updated: 2025-07-11
 authors:
   - 🧠 つむぎ（設計統一・exec 分離提案）
   - 🧁 小紅（例示＆分岐設計）
   - ⚙️ エルファ（FeatureFlag 実装＆fatal 設計）
+changes:
+  - ExitCode定数を共通定数(@shared/constants/exitCode)に移動
+  - POSIX準拠の終了コード体系を統一
+  - ExitCodeErrorMessage定数を追加
 ---
 
 ## 概要
@@ -39,6 +43,7 @@ GitHub Actions と CLI の統一されたエラーハンドリングを提供す
   - `@actions/core` - GitHub Actions統合
   - `@agla-utils/ag-logger` - ログ機能
   - `@esta-core/feature-flags` - 実行環境判定
+  - `@shared/constants` - 共通定数（ExitCode等）
 
 ---
 
@@ -53,19 +58,26 @@ GitHub Actions と CLI の統一されたエラーハンドリングを提供す
 
 ### 終了コード体系
 
+**共通定数の場所**: `@shared/constants`
+
 詳細は [Exit Code 仕様書](../detailed-design/exit-codes.md) を参照。
 
-| ExitCode                  | 数値 | 説明                       |
-| ------------------------- | ---- | -------------------------- |
-| `SUCCESS`                 | 0    | 正常終了                   |
-| `EXEC_FAILURE`            | 1    | 一般的な実行失敗           |
-| `CONFIG_NOT_FOUND`        | 11   | 設定ファイルが見つからない |
-| `COMMAND_EXECUTION_ERROR` | 12   | コマンド実行エラー         |
-| `INVALID_ARGS`            | 13   | 無効な引数                 |
-| `VALIDATION_FAILED`       | 14   | バリデーション失敗         |
-| `FILE_IO_ERROR`           | 15   | ファイルI/Oエラー          |
-| `INTERNAL_LOGIC_ERROR`    | 16   | 内部ロジックエラー         |
-| `UNKNOWN_ERROR`           | 99   | 未定義のエラー             |
+| ExitCode                  | 数値 | 説明                       | エラーメッセージ                 |
+| ------------------------- | ---- | -------------------------- | -------------------------------- |
+| `SUCCESS`                 | 0    | 正常終了                   | Operation completed successfully |
+| `EXEC_FAILURE`            | 1    | 一般的な実行失敗           | General execution failure        |
+| `CONFIG_NOT_FOUND`        | 11   | 設定ファイルが見つからない | Configuration file not found     |
+| `COMMAND_EXECUTION_ERROR` | 12   | コマンド実行エラー         | Command execution failed         |
+| `INVALID_ARGS`            | 13   | 無効な引数                 | Invalid command line arguments   |
+| `VALIDATION_FAILED`       | 14   | バリデーション失敗         | Input validation failed          |
+| `FILE_IO_ERROR`           | 15   | ファイルI/Oエラー          | File I/O operation failed        |
+| `INTERNAL_LOGIC_ERROR`    | 16   | 内部ロジックエラー         | Internal logic error occurred    |
+| `UNKNOWN_ERROR`           | 99   | 未定義のエラー             | Unknown error                    |
+
+**定数の定義場所**:
+
+- **共通定数**: `@shared/constants` - POSIX準拠の統一定義
+- **インポート**: `import { ExitCode } from '@shared/constants'` で使用
 
 ---
 
@@ -213,6 +225,8 @@ export const getExitCodeMessage = (code: TExitCode): string => {
 };
 ```
 
+**注意**: `ExitCodeErrorMessage` は `@shared/constants` から提供されます。
+
 ### 呼び出し元情報の取得
 
 スタックトレースを解析して呼び出し元の情報を取得し、デバッグを支援します。
@@ -239,9 +253,6 @@ packages/@esta-core/error-handler/
 │       ├── errorExit.spec.ts
 │       ├── fatalExit.spec.ts
 │       └── handleExitError.spec.ts
-├── shared/
-│   └── constants/
-│       └── exitCode.ts             # 終了コード定義
 └── tests/
     └── e2e/
         ├── errorExit.spec.ts
@@ -255,7 +266,8 @@ packages/@esta-core/error-handler/
 ### CLIアプリでの使用
 
 ```typescript
-import { errorExit, ExitCode } from '@esta-core/error-handler';
+import { errorExit, ExitError, handleExitError } from '@esta-core/error-handler';
+import { ExitCode } from '@shared/constants';
 
 const main = async (argv: string[]) => {
   if (!argv.length) {
@@ -282,7 +294,8 @@ try {
 ### GitHub Actionsでの使用
 
 ```typescript
-import { ExitCode, fatalExit, handleExitError } from '@esta-core/error-handler';
+import { ExitError, fatalExit, handleExitError } from '@esta-core/error-handler';
+import { ExitCode } from '@shared/constants';
 
 const main = async () => {
   if (!process.env.CONFIG_PATH) {
@@ -307,7 +320,8 @@ try {
 ### エラーの段階的処理
 
 ```typescript
-import { errorExit, ExitCode, fatalExit } from '@esta-core/error-handler';
+import { errorExit, fatalExit } from '@esta-core/error-handler';
+import { ExitCode } from '@shared/constants';
 
 const processFile = async (filePath: string) => {
   // 設定ファイルの検証（回復可能）
