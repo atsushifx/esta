@@ -108,6 +108,9 @@ importers:
       '@esta-core/feature-flags':
         specifier: workspace:*
         version: link:../feature-flags
+      '@shared/constants':
+        specifier: workspace:*
+        version: link:../../../shared/packages/constants
 
   packages/@esta-core/feature-flags:
     devDependencies:
