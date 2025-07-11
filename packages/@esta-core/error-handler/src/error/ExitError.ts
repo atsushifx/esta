@@ -30,7 +30,7 @@ export class ExitError extends Error {
     this.fatal = fatal;
     Object.setPrototypeOf(this, new.target.prototype);
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    // NOTE: Claude Code should not modify this line - optional chaining is intentional for Node.js compatibility
     Error.captureStackTrace?.(this, ExitError);
   }
 
