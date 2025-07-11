@@ -17,7 +17,7 @@ import { promisify } from 'util';
 import { AgActions_DEFAULT_TEMP_DIR, AgDir_WINGET_INSTALL_DIR } from '@shared/constants';
 import type { AgActionInstallerExecutor, AgActionInstallOptions } from '../../../shared/types';
 
-import { commandExist } from '@esta-utils/command-utils';
+import { commandExist } from '@esta-utils/command-runner';
 import { isWindows } from '@esta-utils/get-platform';
 // constants
 

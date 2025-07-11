@@ -47,6 +47,8 @@ export default [
         __dirname: 'readonly',
         __filename: 'readonly',
         NodeJS: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
       },
     },
     plugins: {

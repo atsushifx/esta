@@ -23,6 +23,9 @@ export const ExitCode = {
   FILE_IO_ERROR: 15,
   INTERNAL_LOGIC_ERROR: 16,
   UNKNOWN_ERROR: 99,
+
+  // システム終了コード (124)
+  TIMEOUT: 124,
 } as const;
 
 export type TExitCode = typeof ExitCode[keyof typeof ExitCode];
@@ -43,4 +46,7 @@ export const ExitCodeErrorMessage = {
   [ExitCode.FILE_IO_ERROR]: 'File I/O operation failed',
   [ExitCode.INTERNAL_LOGIC_ERROR]: 'Internal logic error occurred',
   [ExitCode.UNKNOWN_ERROR]: 'Unknown error',
+
+  // システム終了コード (124)
+  [ExitCode.TIMEOUT]: 'Command execution timed out',
 } as const;

@@ -26,6 +26,9 @@ export default mergeConfig(baseConfig, {
       // CI Tests
       'tests/**/*.test.ts',
       'tests/**/*.spec.ts',
+      // Example E2E Tests
+      'example/e2e/**/*.test.ts',
+      'example/e2e/**/*.spec.ts',
     ],
     caches: {
       dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/ci/'),
@@ -34,6 +37,7 @@ export default mergeConfig(baseConfig, {
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '../src'),
+      '@shared': path.resolve(__dirname, '../shared'),
     },
   },
 });
