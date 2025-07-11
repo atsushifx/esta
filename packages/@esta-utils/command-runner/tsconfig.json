@@ -23,6 +23,11 @@
     // directories
     "outDir": "lib",
     "rootDir": ".",
+    "paths": {
+      "@": [
+        "./src/"
+      ]
+    },
     // alias
     "baseUrl": "./",
     // types
