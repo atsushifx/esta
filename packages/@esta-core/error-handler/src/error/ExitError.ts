@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { TExitCode } from '@shared/constants/exitCode';
+import type { TExitCode } from '@shared/constants';
 
 /**
  * 終了コードと致命的フラグを持つカスタムエラークラス
