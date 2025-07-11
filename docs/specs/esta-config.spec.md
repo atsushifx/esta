@@ -13,19 +13,14 @@
 
 ### 1.1 課題と解決策
 
-**現在の課題:**
-
-- CLI ツールと GitHub Actions で設定解析ロジックが重複
-- 設定の不整合により動作が異なる
-- テストが困難
-
-**解決策:**
-
-- GitHub Actions 用途に特化したシンプルな設計
-- 4つの設定コンポーネントによるモジュラー設計
-- 統一されたスキーマと検証ロジック
-
----
+- 現在の課題:
+  - CLI ツールと GitHub Actions で設定解析ロジックが重複
+  - 設定の不整合により動作が異なる
+  - テストが困難
+- 解決策:
+  - GitHub Actions 用途に特化したシンプルな設計
+  - 4つの設定コンポーネントによるモジュラー設計
+  - 統一されたスキーマと検証ロジック
 
 ## 2. アーキテクチャ設計
 
@@ -33,10 +28,12 @@
 
 ```bash
 @esta-core/esta-config
-├── UserConfig          # ユーザー設定管理
+├── EstaConfig          # ユーザー設定管理
 ├── ExecutionConfig     # 実行時設定管理
 ├── FeatureFlagConfig   # 機能フラグ管理
-└── RootConfig          # 統合設定管理
+└── 共通モジュール        # 設定読み込み・アクセサ機能
+    ├── ConfigLoader    # 設定ファイル読み込み
+    └── ConfigAccessor  # 設定値アクセス
 ```
 
 ### 2.2 設定ファイル階層
@@ -52,12 +49,13 @@
 
 ## 3. 設定コンポーネント仕様
 
-### 3.1 UserConfig
+### 3.1 EstaConfig
 
 ユーザーの永続的な設定を管理します。**GitHub Actions用途に特化**してシンプルに。
 
 ```typescript
-export interface UserConfig {
+export class EstaConfig {
+  // プロパティ
   installDir?: string;
   tempDir?: string;
   toolsConfig?: string;
@@ -67,6 +65,14 @@ export interface UserConfig {
     quiet?: boolean;
     timeout?: number;
   };
+
+  // 静的メソッド
+  static async load(options?: ConfigLoadOptions): Promise<EstaConfig>;
+
+  // インスタンスメソッド
+  get<T>(path: string): T | undefined;
+  has(path: string): boolean;
+  validate(): ValidationResult;
 }
 ```
 
@@ -76,12 +82,12 @@ export interface UserConfig {
 {
   "installDir": ".tools/bin",
   "tempDir": ".esta/temp",
-  "toolsConfig": "./tools.config.json",
+  "toolsConfig": "./esta/tools.config.js"
   "logLevel": "info",
   "defaults": {
     "version": "latest",
     "quiet": false,
-    "timeout": 30
+    "timeout": 30_000
   }
 }
 ```
@@ -91,7 +97,8 @@ export interface UserConfig {
 CLI と GitHub Actions で共有される実行時設定を管理します。
 
 ```typescript
-export interface ExecutionConfig {
+export class ExecutionConfig {
+  // プロパティ
   verbose?: boolean;
   dryRun?: boolean;
   quiet?: boolean;
@@ -99,6 +106,14 @@ export interface ExecutionConfig {
   parallel?: boolean;
   maxRetries?: number;
   timeout?: number;
+
+  // 静的メソッド
+  static async load(options?: ConfigLoadOptions): Promise<ExecutionConfig>;
+
+  // インスタンスメソッド
+  get<T>(path: string): T | undefined;
+  has(path: string): boolean;
+  validate(): ValidationResult;
 }
 ```
 
@@ -121,10 +136,19 @@ export interface ExecutionConfig {
 実験的機能の有効/無効を管理します。
 
 ```typescript
-export interface FeatureFlagConfig {
+export class FeatureFlagConfig {
+  // プロパティ
   experimentalEget?: boolean;
   scriptBasedInstaller?: boolean;
   configValidation?: boolean;
+
+  // 静的メソッド
+  static async load(options?: ConfigLoadOptions): Promise<FeatureFlagConfig>;
+
+  // インスタンスメソッド
+  get<T>(path: string): T | undefined;
+  has(path: string): boolean;
+  validate(): ValidationResult;
 }
 ```
 
@@ -140,20 +164,28 @@ export interface FeatureFlagConfig {
 }
 ```
 
-### 3.4 RootConfig
+### 3.4 共通モジュール
 
-すべての設定を統合管理します。
+設定読み込みとアクセサ機能を提供します。各設定クラスはこれらのモジュールに処理を委譲します。
 
 ```typescript
-export interface RootConfig {
-  user: UserConfig;
-  execution: ExecutionConfig;
-  featureFlags: FeatureFlagConfig;
-  _metadata?: {
-    configPath?: string;
-    loadedAt?: Date;
-    sources?: string[];
-  };
+// 設定読み込みモジュール
+export class ConfigLoader {
+  static async load<T>(configName: string, options?: ConfigLoadOptions): Promise<T>;
+  static merge<T>(...configs: Partial<T>[]): T;
+}
+
+// 設定アクセサモジュール
+export class ConfigAccessor {
+  static get<T>(config: any, path: string): T | undefined;
+  static has(config: any, path: string): boolean;
+  static validate(config: any, schema: any): ValidationResult;
+}
+
+// 設定読み込みオプション
+export interface ConfigLoadOptions {
+  configPath?: string;
+  validate?: boolean;
 }
 ```
 
@@ -161,63 +193,74 @@ export interface RootConfig {
 
 ## 4. API設計
 
-### 4.1 設定ローダー
+### 4.1 設定クラスの実装パターン
 
-> 注意:
-> 設定ファイルの読み込みは既存の `@esta-utils/config-loader` を使用します。
+各設定クラスは以下のパターンで実装されます。
 
 ```typescript
-// 既存のconfig-loaderを使用
-import { loadConfig } from '@esta-utils/config-loader';
+export class EstaConfig {
+  // プロパティ（設定値）
+  installDir?: string;
+  tempDir?: string;
+  toolsConfig?: string;
+  logLevel?: 'debug' | 'info' | 'warn' | 'error';
 
-export class ConfigLoader {
-  /**
-   * 設定ファイルを読み込みRootConfigを生成
-   */
-  static async load(options?: ConfigLoadOptions): Promise<RootConfig>;
+  // 静的メソッド（設定読み込み）
+  static async load(options?: ConfigLoadOptions): Promise<EstaConfig> {
+    // ConfigLoaderモジュールに委譲
+    return ConfigLoader.load<EstaConfig>('esta', options);
+  }
 
-  /**
-   * 複数の設定ソースをマージ
-   */
-  static merge(...configs: Partial<RootConfig>[]): RootConfig;
-}
+  // インスタンスメソッド（アクセサ）
+  get<T>(path: string): T | undefined {
+    // ConfigAccessorモジュールに委譲
+    return ConfigAccessor.get<T>(this, path);
+  }
 
-export interface ConfigLoadOptions {
-  configPath?: string;
-  validate?: boolean;
+  has(path: string): boolean {
+    // ConfigAccessorモジュールに委譲
+    return ConfigAccessor.has(this, path);
+  }
+
+  validate(): ValidationResult {
+    // ConfigAccessorモジュールに委譲
+    return ConfigAccessor.validate(this, EstaConfigSchema);
+  }
 }
 ```
 
-### 4.2 設定アクセサー
+### 4.2 共通モジュールの実装
 
 ```typescript
+// 設定読み込みモジュール
+export class ConfigLoader {
+  static async load<T>(configName: string, options?: ConfigLoadOptions): Promise<T> {
+    // @esta-utils/config-loaderを使用
+    const configData = await loadConfig([configName], options?.configPath);
+    return configData as T;
+  }
+
+  static merge<T>(...configs: Partial<T>[]): T {
+    // オブジェクトマージ処理
+    return Object.assign({}, ...configs) as T;
+  }
+}
+
+// 設定アクセサモジュール
 export class ConfigAccessor {
-  constructor(private config: RootConfig) {}
+  static get<T>(config: any, path: string): T | undefined {
+    // ドット記法でのプロパティアクセス
+    return path.split('.').reduce((obj, key) => obj?.[key], config);
+  }
 
-  /**
-   * ドット記法で設定値にアクセス
-   */
-  get<T>(path: string): T | undefined;
+  static has(config: any, path: string): boolean {
+    return ConfigAccessor.get(config, path) !== undefined;
+  }
 
-  /**
-   * 設定値の存在確認
-   */
-  has(path: string): boolean;
-
-  /**
-   * 設定値の設定
-   */
-  set<T>(path: string, value: T): void;
-
-  /**
-   * 設定のマージ
-   */
-  merge(partial: Partial<RootConfig>): void;
-
-  /**
-   * 設定の検証
-   */
-  validate(): ValidationResult;
+  static validate(config: any, schema: any): ValidationResult {
+    // valibotによる検証
+    return { valid: true, errors: [], warnings: [] };
+  }
 }
 ```
 
@@ -228,15 +271,47 @@ export class ConfigAccessor {
 ### 5.1 基本的な使用
 
 ```typescript
-import { ConfigAccessor, ConfigLoader } from '@esta-core/esta-config';
+import { EstaConfig, ExecutionConfig, FeatureFlagConfig } from '@esta-core/esta-config';
 
-// 設定の読み込み
-const config = await ConfigLoader.load();
-const accessor = new ConfigAccessor(config);
+// 各設定の読み込み
+const estaConfig = await EstaConfig.load();
+const execConfig = await ExecutionConfig.load();
+const featureFlags = await FeatureFlagConfig.load();
 
 // 設定値の取得
-const installDir = accessor.get<string>('user.installDir');
-const logLevel = accessor.get<string>('user.logLevel');
+console.log(estaConfig.installDir);
+console.log(estaConfig.get<string>('logLevel'));
+console.log(execConfig.verbose);
+console.log(featureFlags.experimentalEget);
+
+// 設定の存在確認
+if (estaConfig.has('toolsConfig')) {
+  console.log('ツール設定ファイルが指定されています');
+}
+```
+
+### 5.2 GitHub Actions での使用
+
+```typescript
+import * as core from '@actions/core';
+import { EstaConfig, ExecutionConfig } from '@esta-core/esta-config';
+
+async function runAction() {
+  // 設定の読み込み
+  const estaConfig = await EstaConfig.load();
+  const execConfig = await ExecutionConfig.load();
+
+  // GitHub Actions の入力で設定を上書き
+  if (core.getInput('verbose') === 'true') {
+    execConfig.verbose = true;
+  }
+  if (core.getInput('log-level')) {
+    estaConfig.logLevel = core.getInput('log-level') as any;
+  }
+
+  // アクションの実行
+  await runActionLogic(estaConfig, execConfig);
+}
 ```
 
 ---
@@ -247,21 +322,25 @@ const logLevel = accessor.get<string>('user.logLevel');
 
 <!-- textlint-disable ja-technical-writing/max-comma -->
 
-- 拡張子なしファイル（`.estarc`）の検索
-- 複数の拡張子 (`.json`, `.jsonc`, `.yaml`, `.yml`, `.js`, `.ts)
+- 複数の拡張子 (`.json`, `.jsonc`, `.yaml`, `.yml`, `.js`, `.ts`)
 - サブディレクトリ（`.config/`）の自動検索
+- 指定されたディレクトリ内での検索
 
 <!-- textlint-enable -->
 
 **検索パターン例:**
 
 ```bash
-.estarc
-.estarc.json
 esta.config.json
+esta.config.yaml
 .config/esta.json
 .config/esta.config.json
 ```
+
+**検索範囲:**
+
+- カレントディレクトリ（またはオプションで指定されたディレクトリ）
+- 明示的に指定されたパス
 
 ---
 
@@ -272,11 +351,11 @@ esta.config.json
 ```typescript
 import * as v from 'valibot';
 
-const UserConfigSchema = v.object({
+const EstaConfigSchema = v.object({
   installDir: v.optional(v.string()),
   tempDir: v.optional(v.string()),
   toolsConfig: v.optional(v.string()),
-  logLevel: v.optional(v.pickList('debug', 'info', 'warn', 'error'])),
+  logLevel: v.optional(v.picklist(['debug', 'info', 'warn', 'error'])),
   defaults: v.optional(v.object({
     version: v.optional(v.string()),
     quiet: v.optional(v.boolean()),
@@ -300,11 +379,8 @@ const FeatureFlagConfigSchema = v.object({
   configValidation: v.optional(v.boolean()),
 });
 
-const RootConfigSchema = v.object({
-  user: UserConfigSchema,
-  execution: ExecutionConfigSchema,
-  featureFlags: FeatureFlagConfigSchema,
-});
+// 各設定クラスで個別に検証を実行
+// 統合されたRootConfigSchemaは不要
 ```
 
 ---
@@ -370,11 +446,10 @@ tempDir?: string;
 
 ### 9.1 Phase 1: 基本実装
 
-- [ ] UserConfig の実装（シンプル版）
+- [ ] EstaConfig の実装（シンプル版）
 - [ ] ExecutionConfig の実装
 - [ ] FeatureFlagConfig の実装
-- [ ] RootConfig の実装
-- [ ] ConfigLoader の基本機能
+- [ ] 共通モジュール（ConfigLoader/ConfigAccessor）の実装
 
 ### 9.2 Phase 2: GitHub Actions特化
 
@@ -392,6 +467,6 @@ tempDir?: string;
 ---
 
 **作成日**: 2025年7月11日
-**バージョン**: 1.3.1（GitHub Actions 特化版）
+**バージョン**: 1.3.5（GitHub Actions 特化版）
 **作成者**: atsushifx
 **参照**: [GitHub Issue #88](https://github.com/atsushifx/esta/issues/88)
