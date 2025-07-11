@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 
 // types
-import { TEstaSearchConfigFileType } from '../../shared/types/common.types';
+import { TSearchConfigFileType } from '../../shared/types/searchFileType.types';
 
 // test unit
 import { loadConfig } from '@/loadConfig';
@@ -24,7 +24,7 @@ const loadConfigWrapper = async <T = object>(...args: unknown[]): Promise<T> => 
   return await loadConfig<T>(
     args[0] as string,
     args[1] as string,
-    args[2] as TEstaSearchConfigFileType | undefined,
+    args[2] as TSearchConfigFileType | undefined,
   );
 };
 
@@ -225,7 +225,7 @@ features:
         loadConfigWrapper,
         'userApp',
         'testApp',
-        TEstaSearchConfigFileType.USER,
+        TSearchConfigFileType.USER,
       );
 
       expect(result).toEqual(configData);
@@ -244,7 +244,7 @@ features:
         loadConfigWrapper,
         'systemApp',
         'testApp',
-        TEstaSearchConfigFileType.SYSTEM,
+        TSearchConfigFileType.SYSTEM,
       );
 
       expect(result).toEqual(configData);

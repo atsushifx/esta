@@ -10,8 +10,8 @@ import * as fs from 'fs';
 import { resolve } from 'path';
 
 // types
-import type { TEstaSearchConfigFileType } from '../shared/types/common.types';
-import { EstaSupportedExtensions } from '../shared/types/configFile.types';
+import { EstaSupportedExtensions } from '../../shared/types/configFile.types';
+import type { TSearchConfigFileType } from '../../shared/types/searchFileType.types';
 
 // modules
 import { configSearchDirs } from './configSearchDirs';
@@ -44,18 +44,18 @@ const PREFIXES = ['', '.'] as const;
  * @example
  * ```typescript
  * // 設定ファイルを検索
- * const configPath = findConfigFile(['myapp'], './config', TEstaSearchConfigFileType.USER);
+ * const configPath = findConfigFile(['myapp'], './config', TSearchConfigFileType.USER);
  * // -> ./config/myapp.json (存在する場合)
  *
  * // 複数のベース名で検索
- * const configPath = findConfigFile(['vite', 'rollup'], process.cwd(), TEstaSearchConfigFileType.USER);
+ * const configPath = findConfigFile(['vite', 'rollup'], process.cwd(), TSearchConfigFileType.USER);
  * // -> vite.config.ts または rollup.config.js など
  * ```
  */
 export const findConfigFile = (
   baseNames: readonly string[],
   dirName: string,
-  searchType: TEstaSearchConfigFileType,
+  searchType: TSearchConfigFileType,
 ): string => {
   const searchDirs = configSearchDirs(dirName, searchType);
   const configFilesList = searchDirs.flatMap((dir) =>

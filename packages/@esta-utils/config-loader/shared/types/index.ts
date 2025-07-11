@@ -6,5 +6,5 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-export * from './common.types';
 export * from './configFile.types';
+export * from './searchFileType.types';

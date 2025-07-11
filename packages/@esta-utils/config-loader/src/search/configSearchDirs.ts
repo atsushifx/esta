@@ -11,13 +11,13 @@ import * as os from 'os';
 import process from 'process';
 
 // --- internal libs
-import { TEstaSearchConfigFileType } from '../shared/types/common.types';
+import { TSearchConfigFileType } from '../../shared/types/searchFileType.types';
 
 import { getDelimiter } from '@esta-utils/get-platform';
 // --- types
 
 // functions
-export const configSearchDirs = (appConfig: string, searchType: TEstaSearchConfigFileType): string[] => {
+export const configSearchDirs = (appConfig: string, searchType: TSearchConfigFileType): string[] => {
   const dirs: string[] = [];
 
   const configDirsSystem = (appConfig: string): string[] => {
@@ -56,7 +56,7 @@ export const configSearchDirs = (appConfig: string, searchType: TEstaSearchConfi
     return dirs;
   };
 
-  if (searchType === TEstaSearchConfigFileType.SYSTEM) {
+  if (searchType === TSearchConfigFileType.SYSTEM) {
     dirs.push(...configDirsSystem(appConfig));
   } else {
     dirs.push(...configDirsUser(appConfig));

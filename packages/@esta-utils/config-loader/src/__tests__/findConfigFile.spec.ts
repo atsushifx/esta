@@ -13,11 +13,11 @@ import process from 'process';
 // vitest
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { TEstaSearchConfigFileType } from '../../shared/types/common.types';
+import { TSearchConfigFileType } from '../../shared/types/searchFileType.types';
 
 // test unit
 
-import { findConfigFile } from '../findConfigFile';
+import { findConfigFile } from '../search/findConfigFile';
 
 // --- types
 import type { PathLike } from 'fs';
@@ -62,7 +62,7 @@ describe('findConfigFile', () => {
   it('finds app.config.json in configs without dot prefix', () => {
     expectedConfigFile = path.resolve('/etc/xdg/testerApp/app.config.json');
 
-    const result = findConfigFile(BASE_NAMES, DIR_NAME, TEstaSearchConfigFileType.SYSTEM);
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.SYSTEM);
     expect(result).toBe(expectedConfigFile);
   });
 
@@ -70,7 +70,7 @@ describe('findConfigFile', () => {
     process.env.XDG_CONFIG_HOME = MOCK_HOME + '/.config';
     expectedConfigFile = path.resolve(MOCK_HOME + '/.config/' + DIR_NAME + '/.app.config.yaml');
 
-    const result = findConfigFile(BASE_NAMES, DIR_NAME, TEstaSearchConfigFileType.USER);
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.USER);
     expect(result).toBe(expectedConfigFile);
   });
 
@@ -80,7 +80,7 @@ describe('findConfigFile', () => {
     // so existsSync always returns false and we get an exception.
     expectedConfigFile = path.resolve(MOCK_HOME + '/configs/app.config');
 
-    expect(() => findConfigFile(BASE_NAMES, DIR_NAME, TEstaSearchConfigFileType.USER))
+    expect(() => findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.USER))
       .toThrow('Config file not found.');
   });
 });

@@ -9,14 +9,14 @@
 export * from '../shared/types';
 
 // modules
-export * from './findConfigFile';
 export * from './loadConfig';
 export * from './parseConfig';
+export * from './search/findConfigFile';
 
 // functions
-import { findConfigFile } from './findConfigFile';
 import { loadConfig } from './loadConfig';
 import { normalizeExtension, parseConfig } from './parseConfig';
+import { findConfigFile } from './search/findConfigFile';
 
 // types
 

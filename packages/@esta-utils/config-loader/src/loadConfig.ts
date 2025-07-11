@@ -11,11 +11,11 @@ import * as fs from 'fs';
 import { extname } from 'path';
 
 // types
-import { TEstaSearchConfigFileType } from '../shared/types/common.types';
+import { TSearchConfigFileType } from '../shared/types/searchFileType.types';
 
 // modules
-import { findConfigFile } from './findConfigFile';
 import { parseConfig } from './parseConfig';
+import { findConfigFile } from './search/findConfigFile';
 
 /**
  * 設定ファイルを読み込み、解析して設定オブジェクトを返します
@@ -46,7 +46,7 @@ import { parseConfig } from './parseConfig';
 export const loadConfig = async <T = object>(
   basename: string,
   dirName: string = process.cwd(),
-  searchType: TEstaSearchConfigFileType = TEstaSearchConfigFileType.USER,
+  searchType: TSearchConfigFileType = TSearchConfigFileType.USER,
 ): Promise<T> => {
   const configFilePath = findConfigFile([basename], dirName, searchType);
   const rawContent = fs.readFileSync(configFilePath, 'utf-8');

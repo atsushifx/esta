@@ -1,5 +1,5 @@
-// src: /shared/types/common.types.ts :
-// @(#) : common types definition
+// src: /shared/types/searchFileType.types.ts :
+// @(#) : search file type definition
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -7,7 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // Search Config File Type
-export enum TEstaSearchConfigFileType {
+export enum TSearchConfigFileType {
+  PROJECT = 'project',
   USER = 'user',
   SYSTEM = 'system',
 }

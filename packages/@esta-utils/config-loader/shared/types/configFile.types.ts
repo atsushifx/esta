@@ -19,6 +19,7 @@ export enum TEstaConfigFileType {
  * 拡張子から設定ファイル種別へのマッピング
  */
 export const EstaExtensionToFileTypeMap = {
+  '': TEstaConfigFileType.JSON,
   'json': TEstaConfigFileType.JSON,
   'jsonc': TEstaConfigFileType.JSON,
   'yml': TEstaConfigFileType.YAML,
