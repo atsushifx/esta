@@ -7,7 +7,6 @@
 // https://opensource.org/licenses/MIT
 
 import { getPlatform, PLATFORM_TYPE } from '@esta-utils/get-platform';
-import { ExitCode } from '@shared/constants';
 import { runCommand } from './runCommand';
 
 export const commandExist = async (command: string): Promise<boolean> => {
@@ -16,7 +15,7 @@ export const commandExist = async (command: string): Promise<boolean> => {
   const checkArgs = platform === PLATFORM_TYPE.WINDOWS ? [command] : ['-v', command];
 
   const exitCode = await runCommand(checkCommand, checkArgs, platform);
-  return exitCode === ExitCode.SUCCESS;
+  return exitCode === 0;
 };
 
 export default commandExist;

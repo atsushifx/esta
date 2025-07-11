@@ -197,7 +197,7 @@ describe('runCommand', () => {
     });
 
     it('should return 1 when exit code is null', async () => {
-      const promise = runCommand('echo', ['test']);
+      const promise = runCommand('echo', ['test'], PLATFORM_TYPE.LINUX, 0);
 
       globalThis.setTimeout(() => {
         mockProcess.emit('close', null);
@@ -208,7 +208,7 @@ describe('runCommand', () => {
     });
 
     it('should return 1 on spawn error', async () => {
-      const promise = runCommand('nonexistent-command');
+      const promise = runCommand('nonexistent-command', [], PLATFORM_TYPE.LINUX, 0);
 
       globalThis.setTimeout(() => {
         mockProcess.emit('error', new Error('spawn error'));
@@ -231,6 +231,45 @@ describe('runCommand', () => {
         const result = await promise;
         expect(result).toBe(exitCode);
       }
+    });
+  });
+
+  describe('timeout functionality', () => {
+    beforeEach(() => {
+      mockGetPlatform.mockReturnValue(PLATFORM_TYPE.LINUX);
+    });
+
+    it('should work with default timeout', async () => {
+      const promise = runCommand('echo', ['hello']);
+
+      globalThis.setTimeout(() => {
+        mockProcess.emit('close', 0);
+      }, 10);
+
+      const result = await promise;
+      expect(result).toBe(0);
+    });
+
+    it('should work with custom timeout', async () => {
+      const promise = runCommand('echo', ['hello'], PLATFORM_TYPE.LINUX, 5000);
+
+      globalThis.setTimeout(() => {
+        mockProcess.emit('close', 0);
+      }, 10);
+
+      const result = await promise;
+      expect(result).toBe(0);
+    });
+
+    it('should work with timeout disabled', async () => {
+      const promise = runCommand('echo', ['hello'], PLATFORM_TYPE.LINUX, 0);
+
+      globalThis.setTimeout(() => {
+        mockProcess.emit('close', 0);
+      }, 10);
+
+      const result = await promise;
+      expect(result).toBe(0);
     });
   });
 
