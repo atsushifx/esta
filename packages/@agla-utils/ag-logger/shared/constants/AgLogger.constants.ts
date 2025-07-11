@@ -7,9 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgLogLevel } from '@shared/types/AgLogger.types';
+import type { AgLogLevel } from '../types/AgLogger.types';
 // code
-import { AgLogLevelCode } from '@shared/types/AgLogger.types';
+import { AgLogLevelCode } from '../types/AgLogger.types';
 
 /**
  * Mapping of `AgLogLevel` numeric codes to their string label names.

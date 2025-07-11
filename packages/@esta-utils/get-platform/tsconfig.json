@@ -18,7 +18,8 @@
     "lib",
     "module",
     "node_modules",
-    ".cache"
+    ".cache",
+    "temp"
   ],
   "compilerOptions": {
     // directories
@@ -28,12 +29,7 @@
     "baseUrl": "./",
     "paths": {
       "@/*": [
-        "src/*",
-        "src/*/index"
-      ],
-      "@shared/*": [
-        "shared/*",
-        "shared/*/index"
+        "./src/*"
       ]
     },
     // types

@@ -8,9 +8,9 @@
 
 // --- modules
 // constants
-import { AgLogLevelCode } from '@shared/types';
+import { AgLogLevelCode } from '../../../shared/types';
 // types
-import type { AgLoggerFunction, AgLoggerMap } from '@shared/types/AgLogger.interface';
+import type { AgLoggerFunction, AgLoggerMap } from '../../../shared/types/AgLogger.interface';
 
 // logger if log level is OFF
 import { NullLogger } from './NullLogger';

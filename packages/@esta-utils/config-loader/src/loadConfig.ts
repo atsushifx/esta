@@ -11,7 +11,7 @@ import * as fs from 'fs';
 import { extname } from 'path';
 
 // types
-import { TEstaSearchConfigFileType } from '@shared/types/common.types';
+import { TEstaSearchConfigFileType } from '../shared/types/common.types';
 
 // modules
 import { findConfigFile } from './findConfigFile';

@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgFormatFunction, AgLogMessage } from '@shared/types';
+import type { AgFormatFunction, AgLogMessage } from '../../../shared/types';
 
 /**
  * Null formatter that always returns an empty string,

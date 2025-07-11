@@ -28,13 +28,12 @@ export default mergeConfig(baseConfig, {
       'src/**/*.spec.ts',
     ],
     caches: {
-      dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/unit'),
+      dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/unit/'),
     },
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '../src'),
-      '@shared': path.resolve(__dirname, '../shared'),
     },
   },
 });

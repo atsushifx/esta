@@ -16,7 +16,7 @@
  */
 
 // types
-export { AgLogLevel, AgLogLevelCode } from '@shared/types';
+export { AgLogLevel, AgLogLevelCode } from '../shared/types';
 
 // logger main
 export { AgLogger, getLogger } from './AgLogger.class';

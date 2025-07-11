@@ -1,4 +1,4 @@
-// src: packages/@esta-utils/utils/configs/vitest.config.unit.ts
+// src: ./configs/vitest.config.unit.ts
 // @(#) : vitest config for unit test
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
@@ -28,7 +28,7 @@ export default mergeConfig(baseConfig, {
       'src/**/*.spec.ts',
     ],
     caches: {
-      dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/unit'),
+      dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/unit/'),
     },
   },
   resolve: {

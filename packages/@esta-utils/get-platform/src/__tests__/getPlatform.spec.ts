@@ -17,8 +17,8 @@ vi.mock('os', () => ({
 // lib
 import * as os from 'os';
 // constants
-import type { TPlatformKey } from '@shared/constants';
-import { PLATFORM_TYPE } from '@shared/types';
+import type { TPlatformKey } from '../../shared/constants';
+import { PLATFORM_TYPE } from '../../shared/types';
 // test target
 import { clearPlatformCache, getPlatform } from '@/getPlatform';
 

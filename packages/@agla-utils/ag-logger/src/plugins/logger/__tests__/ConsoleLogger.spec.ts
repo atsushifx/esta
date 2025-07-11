@@ -10,7 +10,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // constants
-import { AgLogLevelCode } from '@shared/types';
+import { AgLogLevelCode } from '../../../../shared/types';
 
 // test subject
 import { ConsoleLogger, ConsoleLoggerMap } from '../ConsoleLogger';

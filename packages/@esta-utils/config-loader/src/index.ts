@@ -5,11 +5,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// constants
-export * from '@shared/constants';
-
 // types
-export * from '@shared/types';
+export * from '../shared/types';
 
 // modules
 export * from './findConfigFile';
@@ -24,7 +21,7 @@ import { normalizeExtension, parseConfig } from './parseConfig';
 // types
 
 // constants
-import { EstaExtensionToFileTypeMap, EstaSupportedExtensions } from '@shared/types';
+import { EstaExtensionToFileTypeMap, EstaSupportedExtensions } from '../shared/types';
 
 // default export
 const configLoader = {

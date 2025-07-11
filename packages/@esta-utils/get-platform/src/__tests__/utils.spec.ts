@@ -9,7 +9,7 @@
 // vitest
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 // constants
-import { PATH_DELIMITER } from '@shared/constants';
+import { PATH_DELIMITER } from '../../shared/constants';
 // test target
 import { getDelimiter } from '@/getPlatform';
 

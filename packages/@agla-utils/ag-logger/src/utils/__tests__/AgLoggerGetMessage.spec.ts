@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 
 // constants
-import { AgLogLevelCode } from '@shared/types/AgLogger.types';
+import { AgLogLevelCode } from '../../../shared/types/AgLogger.types';
 
 // test target
 import { AgLoggerGetMessage } from '../AgLoggerGetMessage';

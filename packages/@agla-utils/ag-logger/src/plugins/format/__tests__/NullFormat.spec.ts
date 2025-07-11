@@ -10,9 +10,9 @@
 import { describe, expect, it } from 'vitest';
 
 // constants
-import { AgLogLevelCode } from '@shared/types';
+import { AgLogLevelCode } from '../../../../shared/types';
 // types
-import type { AgLogMessage } from '@shared/types';
+import type { AgLogMessage } from '../../../../shared/types';
 
 // subject under test
 import { NullFormat } from '../NullFormat';

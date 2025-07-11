@@ -9,7 +9,7 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // types
-import { PLATFORM_TYPE } from '@shared/types';
+import { PLATFORM_TYPE } from '../../shared/types';
 // test target
 import {
   estaUtils,

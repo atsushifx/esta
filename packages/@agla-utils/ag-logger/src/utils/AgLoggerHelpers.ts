@@ -7,9 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 // constants
-import { AgLogLevelLabels } from '@shared/constants/AgLogger.constants';
+import { AgLogLevelLabels } from '../../shared/constants/AgLogger.constants';
 // types
-import type { AgLogLevel } from '@shared/types';
+import type { AgLogLevel } from '../../shared/types';
 
 /**
  * Returns the uppercase string label corresponding to a given log level code.

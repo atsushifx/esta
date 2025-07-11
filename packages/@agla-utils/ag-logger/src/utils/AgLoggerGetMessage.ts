@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import type { AgLogLevel, AgLogMessage } from '@shared/types/AgLogger.types';
+import type { AgLogLevel, AgLogMessage } from '../../shared/types/AgLogger.types';
 
 /**
  * Parses log arguments into a structured log message object.
