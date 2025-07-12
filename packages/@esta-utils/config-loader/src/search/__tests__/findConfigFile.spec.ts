@@ -13,11 +13,11 @@ import process from 'process';
 // vitest
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { TSearchConfigFileType } from '../../shared/types/searchFileType.types';
+import { TSearchConfigFileType } from '../../../shared/types/searchFileType.types';
 
 // test unit
 
-import { findConfigFile } from '../search/findConfigFile';
+import { findConfigFile } from '../findConfigFile';
 
 // --- types
 import type { PathLike } from 'fs';

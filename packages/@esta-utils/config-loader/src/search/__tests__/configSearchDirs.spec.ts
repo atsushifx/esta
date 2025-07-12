@@ -11,7 +11,7 @@ import process from 'process';
 
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { TSearchConfigFileType } from '../../shared/types/searchFileType.types';
+import { TSearchConfigFileType } from '../../../shared/types/searchFileType.types';
 
 import { getDelimiter } from '@esta-utils/get-platform';
 // vitest
@@ -23,7 +23,7 @@ vi.mock('os', () => ({
 }));
 
 // test unit
-import { configSearchDirs } from '../search/configSearchDirs';
+import { configSearchDirs } from '../configSearchDirs';
 
 let ORIGINAL_ENV: NodeJS.ProcessEnv;
 const MOCK_HOME = '/mock/home';
