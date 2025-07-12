@@ -60,7 +60,12 @@ export const findConfigFile = (
   const searchDirs = configSearchDirs(dirName, searchType);
   const configFilesList = searchDirs.flatMap((dir) =>
     baseNames.flatMap((base) =>
-      PREFIXES.flatMap((pref) => EstaSupportedExtensions.map((ext) => resolve(dir, `${pref}${base}.${ext}`)))
+      PREFIXES.flatMap((pref) =>
+        EstaSupportedExtensions.map((ext) => {
+          const filename = ext ? `${pref}${base}.${ext}` : `${pref}${base}`;
+          return resolve(dir, filename);
+        })
+      )
     )
   );
   const found = configFilesList.find((file) => fs.existsSync(file));

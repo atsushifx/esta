@@ -33,6 +33,37 @@ beforeAll(() => {
 });
 
 // test main
+describe('configSearchDirs - Project', () => {
+  it('includes project root directory', () => {
+    const dirs = configSearchDirs('appConfig', TSearchConfigFileType.PROJECT);
+    expect(dirs).toContain('.');
+  });
+
+  it('includes app-specific directory', () => {
+    const dirs = configSearchDirs('appConfig', TSearchConfigFileType.PROJECT);
+    expect(dirs).toContain('./.appConfig');
+  });
+
+  it('includes .config directory', () => {
+    const dirs = configSearchDirs('appConfig', TSearchConfigFileType.PROJECT);
+    expect(dirs).toContain('./.config');
+  });
+
+  it('includes .config/appName directory', () => {
+    const dirs = configSearchDirs('appConfig', TSearchConfigFileType.PROJECT);
+    expect(dirs).toContain('./.config/appConfig');
+  });
+
+  it('returns all expected project directories', () => {
+    const dirs = configSearchDirs('myapp', TSearchConfigFileType.PROJECT);
+    const expectedDirs = ['.', './.myapp', './.config', './.config/myapp'];
+
+    expectedDirs.forEach((expectedDir) => {
+      expect(dirs).toContain(expectedDir);
+    });
+  });
+});
+
 describe('configSearchDirs - System', () => {
   beforeEach(() => {
     delete process.env.XDG_CONFIG_HOME;

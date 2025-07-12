@@ -53,7 +53,7 @@ afterAll(() => {
 });
 
 // test main
-describe('findConfigFile', () => {
+describe('findConfigFile - Basic functionality', () => {
   // config Files
   const BASE_NAMES = ['app.config'];
   const DIR_NAME = 'testerApp';
@@ -74,11 +74,58 @@ describe('findConfigFile', () => {
     expect(result).toBe(expectedConfigFile);
   });
 
-  it('throws when only the extension-less .config file would match', () => {
-    // Even if we set the “expected” path to the plain .config file,
-    // none of the generated candidates include an extension-less name,
-    // so existsSync always returns false and we get an exception.
-    expectedConfigFile = path.resolve(MOCK_HOME + '/configs/app.config');
+  it('finds project config file in current directory', () => {
+    expectedConfigFile = path.resolve('./app.config.json');
+
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.PROJECT);
+    expect(result).toBe(expectedConfigFile);
+  });
+
+  it('finds project config file in .config directory', () => {
+    expectedConfigFile = path.resolve('./.config/app.config.ts');
+
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.PROJECT);
+    expect(result).toBe(expectedConfigFile);
+  });
+});
+
+describe('findConfigFile - Extension-less files', () => {
+  const BASE_NAMES = ['app.config'];
+  const DIR_NAME = 'testerApp';
+
+  it('finds extension-less config file', () => {
+    process.env.XDG_CONFIG_HOME = MOCK_HOME + '/.config';
+    expectedConfigFile = path.resolve(MOCK_HOME + '/.config/' + DIR_NAME + '/app.config');
+
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.USER);
+    expect(result).toBe(expectedConfigFile);
+  });
+
+  it('finds dotfile extension-less config file', () => {
+    process.env.XDG_CONFIG_HOME = MOCK_HOME + '/.config';
+    expectedConfigFile = path.resolve(MOCK_HOME + '/.config/' + DIR_NAME + '/.app.config');
+
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.USER);
+    expect(result).toBe(expectedConfigFile);
+  });
+
+  it('prioritizes files with extensions over extension-less files', () => {
+    process.env.XDG_CONFIG_HOME = MOCK_HOME + '/.config';
+    // Set up to find the .json file first (higher priority)
+    expectedConfigFile = path.resolve(MOCK_HOME + '/.config/' + DIR_NAME + '/app.config.json');
+
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.USER);
+    expect(result).toBe(expectedConfigFile);
+  });
+});
+
+describe('findConfigFile - Error cases', () => {
+  const BASE_NAMES = ['app.config'];
+  const DIR_NAME = 'testerApp';
+
+  it('throws when config file not found', () => {
+    // Set expectedConfigFile to a non-matching path
+    expectedConfigFile = '/non/existent/path';
 
     expect(() => findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.USER))
       .toThrow('Config file not found.');
