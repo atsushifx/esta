@@ -21,16 +21,19 @@ import { findConfigFile } from './search/findConfigFile';
  * 設定ファイルを読み込み、解析して設定オブジェクトを返します
  *
  * @template T 設定オブジェクトの型
- * @param basename 設定ファイルのベース名（拡張子なし）
+ * @param baseNames 設定ファイルのベース名（拡張子なし）または複数のベース名の配列
  * @param dirName 検索開始ディレクトリ（デフォルト: process.cwd()）
- * @param searchType 検索タイプ（USER または SYSTEM、デフォルト: USER）
+ * @param searchType 検索タイプ（PROJECT、USER、または SYSTEM、デフォルト: USER）
  * @returns 解析された設定オブジェクト
  * @throws 設定ファイルが見つからない場合にエラーをスロー
  *
  * @example
  * ```typescript
- * // JSON設定ファイルを読み込み
+ * // 単一の設定ファイルを読み込み
  * const config = await loadConfig('myapp'); // myapp.json を検索
+ *
+ * // 複数の設定ファイルから検索（優先順位順）
+ * const config = await loadConfig(['estarc', 'esta.config']); // estarc.json → esta.config.json の順で検索
  *
  * // 型安全な設定読み込み
  * interface AppConfig {
@@ -44,11 +47,12 @@ import { findConfigFile } from './search/findConfigFile';
  * ```
  */
 export const loadConfig = async <T = object>(
-  basename: string,
+  baseNames: string | readonly string[],
   dirName: string = process.cwd(),
   searchType: TSearchConfigFileType = TSearchConfigFileType.USER,
 ): Promise<T> => {
-  const configFilePath = findConfigFile([basename], dirName, searchType);
+  const baseNameArray = Array.isArray(baseNames) ? baseNames : [baseNames];
+  const configFilePath = findConfigFile(baseNameArray, dirName, searchType);
   const rawContent = fs.readFileSync(configFilePath, 'utf-8');
   const extension = extname(configFilePath);
 

@@ -119,6 +119,56 @@ describe('findConfigFile - Extension-less files', () => {
   });
 });
 
+describe('findConfigFile - Multiple config files', () => {
+  const BASE_NAMES = ['estarc', 'esta.config'];
+  const DIR_NAME = 'testerApp';
+
+  it('finds first available config file (estarc.json)', () => {
+    process.env.XDG_CONFIG_HOME = MOCK_HOME + '/.config';
+    expectedConfigFile = path.resolve(MOCK_HOME + '/.config/' + DIR_NAME + '/estarc.json');
+
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.USER);
+    expect(result).toBe(expectedConfigFile);
+  });
+
+  it('finds second config file when first is not available (esta.config.yaml)', () => {
+    process.env.XDG_CONFIG_HOME = MOCK_HOME + '/.config';
+    expectedConfigFile = path.resolve(MOCK_HOME + '/.config/' + DIR_NAME + '/esta.config.yaml');
+
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.USER);
+    expect(result).toBe(expectedConfigFile);
+  });
+
+  it('prioritizes estarc over esta.config in same directory', () => {
+    expectedConfigFile = path.resolve('./estarc.ts');
+
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.PROJECT);
+    expect(result).toBe(expectedConfigFile);
+  });
+
+  it('finds dotfile version of first config (.estarc.json)', () => {
+    process.env.XDG_CONFIG_HOME = MOCK_HOME + '/.config';
+    expectedConfigFile = path.resolve(MOCK_HOME + '/.config/' + DIR_NAME + '/.estarc.json');
+
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.USER);
+    expect(result).toBe(expectedConfigFile);
+  });
+
+  it('finds extension-less first config file (estarc)', () => {
+    expectedConfigFile = path.resolve('./estarc');
+
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.PROJECT);
+    expect(result).toBe(expectedConfigFile);
+  });
+
+  it('falls back to second config when first config not found', () => {
+    expectedConfigFile = path.resolve('./.config/esta.config.js');
+
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.PROJECT);
+    expect(result).toBe(expectedConfigFile);
+  });
+});
+
 describe('findConfigFile - Error cases', () => {
   const BASE_NAMES = ['app.config'];
   const DIR_NAME = 'testerApp';

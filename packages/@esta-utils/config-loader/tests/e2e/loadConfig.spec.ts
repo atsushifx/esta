@@ -22,7 +22,7 @@ import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '@agla-e2e/fileio-fr
 // Helper function to wrap loadConfig for executeTest
 const loadConfigWrapper = async <T = object>(...args: unknown[]): Promise<T> => {
   return await loadConfig<T>(
-    args[0] as string,
+    args[0] as string | readonly string[],
     args[1] as string,
     args[2] as TSearchConfigFileType | undefined,
   );
@@ -296,6 +296,140 @@ features:
       for (const { scenario, result } of results) {
         expect(await result).toEqual(scenario.expectedResult);
       }
+    });
+  });
+
+  describe('Multiple config files priority', () => {
+    it('loads estarc config file when available', async () => {
+      const configData = { source: 'estarc', priority: 1 };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'estarc.json', content: configData, format: 'json' },
+      ];
+
+      const result = await agE2ETestFramework.executeTest(
+        'multi-config-estarc-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        'estarc',
+        'testApp',
+        TSearchConfigFileType.USER,
+      );
+
+      expect(result).toEqual(configData);
+    });
+
+    it('loads esta.config when available', async () => {
+      const configData = { source: 'esta.config', priority: 2 };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'esta.config.yaml', content: configData, format: 'json' },
+      ];
+
+      const result = await agE2ETestFramework.executeTest(
+        'multi-config-esta-config-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        'esta.config',
+        'testApp',
+        TSearchConfigFileType.USER,
+      );
+
+      expect(result).toEqual(configData);
+    });
+
+    it('loads first available config file from multiple options using array syntax', async () => {
+      const configData = { source: 'estarc', priority: 1 };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'estarc.json', content: configData, format: 'json' },
+      ];
+
+      const result = await agE2ETestFramework.executeTest(
+        'multi-config-array-first-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        ['estarc', 'esta.config'], // Pass array as first argument
+        'testApp',
+        TSearchConfigFileType.USER,
+      );
+
+      expect(result).toEqual(configData);
+    });
+
+    it('falls back to second config file when first is not available using array syntax', async () => {
+      const configData = { source: 'esta.config', priority: 2 };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'esta.config.yaml', content: configData, format: 'json' },
+      ];
+
+      const result = await agE2ETestFramework.executeTest(
+        'multi-config-array-fallback-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        ['estarc', 'esta.config'], // Pass array, should fallback to esta.config
+        'testApp',
+        TSearchConfigFileType.USER,
+      );
+
+      expect(result).toEqual(configData);
+    });
+
+    it('prioritizes first config file when multiple are available using array syntax', async () => {
+      const estarcData = { source: 'estarc', priority: 1 };
+      const estaConfigData = { source: 'esta.config', priority: 2 };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'estarc.json', content: estarcData, format: 'json' },
+        { filename: 'esta.config.json', content: estaConfigData, format: 'json' },
+      ];
+
+      const result = await agE2ETestFramework.executeTest(
+        'multi-config-array-priority-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        ['estarc', 'esta.config'], // Should load estarc first
+        'testApp',
+        TSearchConfigFileType.USER,
+      );
+
+      expect(result).toEqual(estarcData); // Should get estarc data, not esta.config
+    });
+
+    it('demonstrates priority by loading estarc over esta.config when both exist', async () => {
+      const estarcData = { source: 'estarc', priority: 1 };
+      const estaConfigData = { source: 'esta.config', priority: 2 };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'estarc.json', content: estarcData, format: 'json' },
+        { filename: 'esta.config.json', content: estaConfigData, format: 'json' },
+      ];
+
+      // Load estarc first
+      const estarcResult = await agE2ETestFramework.executeTest(
+        'multi-config-priority-estarc-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        'estarc',
+        'testApp',
+        TSearchConfigFileType.USER,
+      );
+
+      expect(estarcResult).toEqual(estarcData);
+
+      // Load esta.config second to show both are available
+      const estaConfigResult = await agE2ETestFramework.executeTest(
+        'multi-config-priority-esta-config-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        'esta.config',
+        'testApp',
+        TSearchConfigFileType.USER,
+      );
+
+      expect(estaConfigResult).toEqual(estaConfigData);
     });
   });
 });
