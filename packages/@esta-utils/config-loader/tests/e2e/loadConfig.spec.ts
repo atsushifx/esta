@@ -20,7 +20,7 @@ import { agE2ETestFramework } from '@agla-e2e/fileio-framework';
 import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '@agla-e2e/fileio-framework';
 
 // Helper function to wrap loadConfig for executeTest (object API)
-const loadConfigWrapper = async <T = object>(...args: unknown[]): Promise<T> => {
+const loadConfigWrapper = async <T = object>(...args: unknown[]): Promise<T | null> => {
   return await loadConfig<T>({
     baseNames: args[0] as string | readonly string[],
     appName: args[1] as string,
@@ -45,6 +45,7 @@ describe('loadConfig E2E', () => {
         'testApp',
       );
 
+      expect(result).not.toBeNull();
       expect(result).toEqual(configData);
     });
 

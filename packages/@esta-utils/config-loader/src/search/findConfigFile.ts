@@ -31,8 +31,7 @@ const PREFIXES = ['', '.'] as const;
  * @param baseNames 検索する設定ファイルのベース名配列
  * @param dirName 検索開始ディレクトリ
  * @param searchType 検索タイプ（USER または SYSTEM）
- * @returns 最初に見つかった設定ファイルの絶対パス
- * @throws 設定ファイルが見つからない場合にエラーをスロー
+ * @returns 最初に見つかった設定ファイルの絶対パス、見つからない場合はnull
  *
  * @description
  * 以下の優先順位で検索を行います：
@@ -56,7 +55,7 @@ export const findConfigFile = (
   baseNames: readonly string[],
   dirName: string,
   searchType: TSearchConfigFileType,
-): string => {
+): string | null => {
   const searchDirs = configSearchDirs(dirName, searchType);
   const configFilesList = searchDirs.flatMap((dir) =>
     baseNames.flatMap((base) =>
@@ -70,11 +69,7 @@ export const findConfigFile = (
   );
   const found = configFilesList.find((file) => fs.existsSync(file));
 
-  if (!found) {
-    throw new Error('Config file not found.');
-  }
-
-  return found;
+  return found || null;
 };
 
 export default findConfigFile;

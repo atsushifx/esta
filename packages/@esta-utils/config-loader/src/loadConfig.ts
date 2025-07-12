@@ -34,8 +34,7 @@ import { findConfigFile } from './search/findConfigFile';
  *
  * @template T 設定オブジェクトの型
  * @param options 設定オプション
- * @returns 解析された設定オブジェクト
- * @throws 設定ファイルが見つからない場合にエラーをスロー
+ * @returns 解析された設定オブジェクト、設定ファイルが見つからない場合はnull
  *
  * @example
  * ```typescript
@@ -64,7 +63,7 @@ import { findConfigFile } from './search/findConfigFile';
  *
  * ```
  */
-export const loadConfig = async <T = object>(options: LoadConfigOptions): Promise<T> => {
+export const loadConfig = async <T = object>(options: LoadConfigOptions): Promise<T | null> => {
   const actualOptions: Required<LoadConfigOptions> = {
     baseNames: options.baseNames,
     appName: options.appName ?? process.cwd(),
@@ -73,6 +72,11 @@ export const loadConfig = async <T = object>(options: LoadConfigOptions): Promis
 
   const baseNameArray = Array.isArray(actualOptions.baseNames) ? actualOptions.baseNames : [actualOptions.baseNames];
   const configFilePath = findConfigFile(baseNameArray, actualOptions.appName, actualOptions.searchType);
+
+  if (configFilePath === null) {
+    return null;
+  }
+
   const rawContent = fs.readFileSync(configFilePath, 'utf-8');
   const extension = extname(configFilePath);
 
