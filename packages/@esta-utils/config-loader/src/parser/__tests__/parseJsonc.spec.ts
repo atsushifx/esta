@@ -12,7 +12,21 @@ import { describe, expect, it } from 'vitest';
 // test target
 import { parseJsonc } from '../parseJsonc';
 
+/**
+ * @fileoverview parseJsonc関数の包括的ユニットテスト
+ *
+ * このテストスイートは、JSONC（コメント付きJSON）解析関数の
+ * 正常ケース、エラーケース、特殊ケースを網羅的にテストします。
+ *
+ * @module parseJsonc.spec
+ */
 describe('parseJsonc', () => {
+  /**
+   * @description 不正なJSON入力のエラーハンドリングテスト
+   *
+   * 様々な不正なJSON形式（空文字列、単一値、YAML形式など）に対して
+   * 適切なエラーハンドリングが行われることを検証します。
+   */
   describe('不正なJSONが与えられた場合', () => {
     it('空文字列を与えると空オブジェクトを返すべき', () => {
       const configRaw = '';
@@ -56,6 +70,12 @@ describe('parseJsonc', () => {
     });
   });
 
+  /**
+   * @description 有効なJSON形式の正常解析テスト
+   *
+   * 標準的なJSON形式（文字列、数値、ブール値など）の
+   * 正しい解析動作を検証します。
+   */
   describe('有効なJSONが与えられた場合', () => {
     it('文字列値を正しく解析すべき', () => {
       const configRaw = '{ "key": "123" }';
@@ -83,6 +103,12 @@ describe('parseJsonc', () => {
     });
   });
 
+  /**
+   * @description 特殊値の解析テスト
+   *
+   * null、空文字列、undefinedなどの特殊な値に対する
+   * 正しい処理を検証します。
+   */
   describe('特殊な値が与えられた場合', () => {
     it('null値を正しく解析すべき', () => {
       const configRaw = '{ "key": null }';
@@ -103,6 +129,12 @@ describe('parseJsonc', () => {
     });
   });
 
+  /**
+   * @description 複数プロパティと配列の解析テスト
+   *
+   * 複数のkey-valueペアや配列を含むJSONの
+   * 正しい解析動作を検証します。
+   */
   describe('複数の値が与えられた場合', () => {
     it('複数のkey-valueペアを正しく解析すべき', () => {
       const configRaw = '{ "key1": "value1", "key2": "value2" }';
@@ -117,6 +149,12 @@ describe('parseJsonc', () => {
     });
   });
 
+  /**
+   * @description ネストした構造の解析テスト
+   *
+   * オブジェクトのネスト、オブジェクトの配列などの
+   * 複雑な構造の正しい解析動作を検証します。
+   */
   describe('ネストしたオブジェクトが与えられた場合', () => {
     it('配列とオブジェクトの組み合わせを正しく解析すべき', () => {
       const configRaw = '{ "key1": [1, 2, 3], "key2": { "key3": "value3" } }';
@@ -133,6 +171,12 @@ describe('parseJsonc', () => {
     });
   });
 
+  /**
+   * @description JSONC特有のコメント機能のテスト
+   *
+   * 行末コメント、複数行コメントなどのJSONC特有の機能を
+   * 正しく処理してJSONとして解析できることを検証します。
+   */
   describe('コメント付きJSONが与えられた場合', () => {
     it('行末コメントを無視して正しく解析すべき', () => {
       const configRaw = '{ "key1": [1, 2, 3], "key2": { "key3": "value3" } } // comment';

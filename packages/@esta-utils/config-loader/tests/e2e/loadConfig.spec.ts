@@ -28,7 +28,21 @@ const loadConfigWrapper = async <T = object>(...args: unknown[]): Promise<T | nu
   });
 };
 
+/**
+ * @fileoverview loadConfig関数の包括的E2Eテスト
+ *
+ * このテストスイートは、実際のファイルシステムを使用してloadConfig関数の
+ * 終端間の統合テストを実行し、様々な設定ファイル形式とシナリオを検証します。
+ *
+ * @module loadConfig.e2e.spec
+ */
 describe('loadConfig E2E', () => {
+  /**
+   * @description サポートされている設定ファイル形式の読み込みテスト
+   *
+   * JSON、YAML、JSONC、TypeScriptなどの各ファイル形式での
+   * 実際のファイル読み込みと解析動作を検証します。
+   */
   describe('設定ファイル形式別の読み込み', () => {
     it('JSON設定ファイルを正しく読み込むべき', async () => {
       const configData = { name: 'Test App', version: '1.0.0', debug: true };
@@ -143,6 +157,12 @@ features:
     });
   });
 
+  /**
+   * @description ファイル検索ロジックと優先度テスト
+   *
+   * ドットプレフィックス付きファイルの検索や複数ファイルが存在する場合の
+   * 優先度処理の正しい動作を検証します。
+   */
   describe('ファイル検索とプライオリティ', () => {
     it('ドットプレフィックス付き設定ファイルを正しく読み込むべき', async () => {
       const configData = { hidden: true, name: 'Hidden Config' };
@@ -183,6 +203,12 @@ features:
     });
   });
 
+  /**
+   * @description E2Eレベルのエラーハンドリングと基本動作テスト
+   *
+   * ファイルが見つからない場合のエラー処理やデフォルト動作の
+   * 終端間テストを実行します。
+   */
   describe('エラーハンドリングと基本動作', () => {
     it('設定ファイルが見つからない場合はエラーを投げるべき', async () => {
       const configFiles: AgE2eConfigFileSpec[] = [];
@@ -218,6 +244,12 @@ features:
     });
   });
 
+  /**
+   * @description 検索タイプ別の設定ファイル検索テスト
+   *
+   * USER、SYSTEM、PROJECTなどの異なる検索タイプでの
+   * 設定ファイル検索と読み込み動作を検証します。
+   */
   describe('検索タイプ別の設定読み込み', () => {
     it('USER検索タイプで設定を読み込むべき（デフォルト）', async () => {
       const configData = { type: 'user', name: 'User Config' };
@@ -276,6 +308,12 @@ features:
     });
   });
 
+  /**
+   * @description パラメータ化テストフレームワークの使用例
+   *
+   * agE2ETestFrameworkのrunParameterizedTests機能を使用した
+   * 複数シナリオの一括テスト実行の例を示します。
+   */
   describe('パラメータ化テストの例', () => {
     it('複数の設定形式テストを実行すべき', async () => {
       const scenarios: AgE2eTestScenario[] = [
@@ -306,6 +344,12 @@ features:
     });
   });
 
+  /**
+   * @description 複数設定ファイルが存在する場合の優先順位テスト
+   *
+   * 複数の設定ファイルが同時に存在する場合の読み込み優先度や
+   * 配列構文でのフォールバック動作を検証します。
+   */
   describe('複数設定ファイルの優先順位', () => {
     it('利用可能な場合はestarc設定ファイルを読み込むべき', async () => {
       const configData = { source: 'estarc', priority: 1 };
@@ -440,6 +484,12 @@ features:
     });
   });
 
+  /**
+   * @description 新しいオブジェクト形式APIの統合テスト
+   *
+   * 新しいオブジェクト形式のloadConfig APIを使用した場合の
+   * E2Eレベルでの動作検証を行います。
+   */
   describe('新しいオブジェクト形式API', () => {
     it('オブジェクト形式でJSON設定ファイルを正しく読み込むべき', async () => {
       const configData = { name: 'Object API Test', version: '2.0.0', objectApi: true };

@@ -30,11 +30,25 @@ const mockReadFileSync = vi.mocked(fs.readFileSync);
 const { findConfigFile } = await import('../search/findConfigFile');
 const mockFindConfigFile = vi.mocked(findConfigFile);
 
+/**
+ * @fileoverview loadConfig関数のエラーハンドリングユニットテスト
+ *
+ * このテストスイートは、loadConfig関数の様々なエラーケースでの動作を検証し、
+ * 適切なExitErrorとエラーコードが投げられることを確認します。
+ *
+ * @module loadConfig.illegal_config.spec
+ */
 describe('loadConfig - エラーハンドリング', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  /**
+   * @description ファイル I/O エラーのハンドリングテスト
+   *
+   * ファイルシステム関連のエラー（ENOENT、EACCESなど）が
+   * FILE_IO_ERRORとして適切に処理されることを検証します。
+   */
   describe('ファイル I/O エラー', () => {
     it('ファイルが存在しない場合にFILE_IO_ERRORをthrowすべき', async () => {
       const testPath = '/test/config.json';
@@ -109,6 +123,12 @@ describe('loadConfig - エラーハンドリング', () => {
     });
   });
 
+  /**
+   * @description 設定ファイルパースエラーのハンドリングテスト
+   *
+   * 不正なJSON、YAML、TypeScriptスクリプトなどの解析エラーが
+   * CONFIG_ERRORとして適切に処理されることを検証します。
+   */
   describe('設定パースエラー', () => {
     it('不正なJSONの場合にCONFIG_ERRORをthrowすべき', async () => {
       const testPath = '/test/config.json';
@@ -183,6 +203,12 @@ describe('loadConfig - エラーハンドリング', () => {
     });
   });
 
+  /**
+   * @description 不明なエラーのハンドリングテスト
+   *
+   * Errorオブジェクトではない例外や予期しないエラーが
+   * UNKNOWN_ERRORとして適切に処理されることを検証します。
+   */
   describe('不明なエラー', () => {
     it('予期しないエラーの場合にUNKNOWN_ERRORをthrowすべき', async () => {
       const testPath = '/test/config.json';
@@ -205,6 +231,12 @@ describe('loadConfig - エラーハンドリング', () => {
     });
   });
 
+  /**
+   * @description 設定ファイルが見つからない場合の動作テスト
+   *
+   * 設定ファイルが存在しない場合に、エラーを投げずに
+   * nullを返す正常な動作を検証します。
+   */
   describe('設定ファイルが見つからない場合', () => {
     it('設定ファイルが見つからない場合はnullを返すべき', async () => {
       mockFindConfigFile.mockReturnValue(null);

@@ -38,6 +38,8 @@ import { findConfigFile } from './search/findConfigFile';
  *
  * @param error 判定対象のエラー
  * @returns ファイル I/O エラーの場合は true
+ *
+ * @throws なし
  */
 const isFileIOError = (error: Error): boolean => {
   const nodeError = error as NodeJS.ErrnoException;
@@ -66,6 +68,10 @@ const isFileIOError = (error: Error): boolean => {
  * @template T 設定オブジェクトの型
  * @param options 設定オプション
  * @returns 解析された設定オブジェクト、設定ファイルが見つからない場合はnull
+ *
+ * @throws {ExitError} ファイル I/O エラーが発生した場合（エラーコード: FILE_IO_ERROR）
+ * @throws {ExitError} 設定ファイルの解析に失敗した場合（エラーコード: CONFIG_ERROR）
+ * @throws {ExitError} 不明なエラーが発生した場合（エラーコード: UNKNOWN_ERROR）
  *
  * @example
  * ```typescript
