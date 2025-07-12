@@ -10,6 +10,10 @@
 import * as fs from 'fs';
 import { extname } from 'path';
 
+// error handling
+import { ExitError } from '@esta-core/error-handler';
+import { ExitCode } from '@shared/constants';
+
 // types
 import { TSearchConfigFileType } from '../shared/types/searchFileType.types';
 
@@ -28,6 +32,33 @@ export type LoadConfigOptions = {
 // modules
 import { parseConfig } from './parseConfig';
 import { findConfigFile } from './search/findConfigFile';
+
+/**
+ * エラーがファイル I/O エラーかどうかを判定します
+ *
+ * @param error 判定対象のエラー
+ * @returns ファイル I/O エラーの場合は true
+ */
+const isFileIOError = (error: Error): boolean => {
+  const nodeError = error as NodeJS.ErrnoException;
+
+  // Node.js のファイル I/O エラーコード
+  const fileIOErrorCodes = [
+    'ENOENT', // ファイルまたはディレクトリが存在しない
+    'EACCES', // アクセス権限エラー
+    'EPERM', // 操作が許可されていない
+    'EISDIR', // ディレクトリに対する不正な操作
+    'ENOTDIR', // ディレクトリではない
+    'EMFILE', // ファイルハンドル上限
+    'ENFILE', // システムファイルテーブル満杯
+    'ENOSPC', // デバイス容量不足
+    'EROFS', // 読み取り専用ファイルシステム
+    'ELOOP', // シンボリックリンクのループ
+    'ENAMETOOLONG', // ファイル名が長すぎる
+  ];
+
+  return nodeError.code !== undefined && fileIOErrorCodes.includes(nodeError.code);
+};
 
 /**
  * 設定ファイルを読み込み、解析して設定オブジェクトを返します
@@ -77,10 +108,26 @@ export const loadConfig = async <T = object>(options: LoadConfigOptions): Promis
     return null;
   }
 
-  const rawContent = fs.readFileSync(configFilePath, 'utf-8');
-  const extension = extname(configFilePath);
+  try {
+    const rawContent = fs.readFileSync(configFilePath, 'utf-8');
+    const extension = extname(configFilePath);
 
-  return await parseConfig<T>(extension, rawContent);
+    return await parseConfig<T>(extension, rawContent);
+  } catch (error) {
+    if (error instanceof Error) {
+      // ファイル I/O エラーの検出
+      if (isFileIOError(error)) {
+        throw new ExitError(
+          ExitCode.FILE_IO_ERROR,
+          `File I/O error accessing config file '${configFilePath}': ${error.message}`,
+        );
+      }
+      // その他のエラーは設定エラーとして扱う
+      throw new ExitError(ExitCode.CONFIG_ERROR, `Failed to parse config file '${configFilePath}': ${error.message}`);
+    }
+    // 不明なエラー
+    throw new ExitError(ExitCode.UNKNOWN_ERROR, `Unknown error occurred while loading config file '${configFilePath}'`);
+  }
 };
 
 export default loadConfig;

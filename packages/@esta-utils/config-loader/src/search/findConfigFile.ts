@@ -69,7 +69,7 @@ export const findConfigFile = (
   );
   const found = configFilesList.find((file) => fs.existsSync(file));
 
-  return found || null;
+  return found ?? null;
 };
 
 export default findConfigFile;

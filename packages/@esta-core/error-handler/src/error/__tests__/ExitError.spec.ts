@@ -20,8 +20,8 @@ describe('ExitError', () => {
   });
 
   it('should have code property with correct value', () => {
-    const error = new ExitError(ExitCode.CONFIG_NOT_FOUND, 'test message');
-    expect(error.code).toBe(ExitCode.CONFIG_NOT_FOUND);
+    const error = new ExitError(ExitCode.CONFIG_ERROR, 'test message');
+    expect(error.code).toBe(ExitCode.CONFIG_ERROR);
   });
 
   it('should have isFatal method that returns false by default', () => {
