@@ -1,5 +1,5 @@
-// src: ./helper/configs/__tests__/configSearchDirs.spec.ts
-// @(#) : 設定ファイル検索用ディレクトリリストのユニットテスト
+// src: ./search/__tests__/configSearchDirs.spec.ts
+// 設定ファイル検索用ディレクトリリストのユニットテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //

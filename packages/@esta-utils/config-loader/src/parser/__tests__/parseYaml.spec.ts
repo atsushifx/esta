@@ -1,5 +1,5 @@
 // src: ./parser/__tests__/parseYaml.spec.ts
-// parseYaml関数のBDDテスト
+// YAML設定ファイル解析のユニットテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //

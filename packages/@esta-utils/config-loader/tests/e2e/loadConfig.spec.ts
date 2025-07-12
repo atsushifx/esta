@@ -1,5 +1,5 @@
-// src: ./__tests__/loadConfig.spec.ts
-// @(#): loadConfig E2E テスト
+// src: ./tests/e2e/loadConfig.spec.ts
+// 設定ファイル読み込みのE2Eテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -19,13 +19,13 @@ import { loadConfig } from '@/loadConfig';
 import { agE2ETestFramework } from '@agla-e2e/fileio-framework';
 import type { AgE2eConfigFileSpec, AgE2eTestScenario } from '@agla-e2e/fileio-framework';
 
-// Helper function to wrap loadConfig for executeTest
+// Helper function to wrap loadConfig for executeTest (object API)
 const loadConfigWrapper = async <T = object>(...args: unknown[]): Promise<T> => {
-  return await loadConfig<T>(
-    args[0] as string | readonly string[],
-    args[1] as string,
-    args[2] as TSearchConfigFileType | undefined,
-  );
+  return await loadConfig<T>({
+    baseNames: args[0] as string | readonly string[],
+    appName: args[1] as string,
+    searchType: args[2] as TSearchConfigFileType | undefined,
+  });
 };
 
 describe('loadConfig E2E', () => {
@@ -436,6 +436,65 @@ features:
       );
 
       expect(estaConfigResult).toEqual(estaConfigData);
+    });
+  });
+
+  describe('新しいオブジェクト形式API', () => {
+    it('オブジェクト形式でJSON設定ファイルを正しく読み込むべき', async () => {
+      const configData = { name: 'Object API Test', version: '2.0.0', objectApi: true };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'objectTest.json', content: configData, format: 'json' },
+      ];
+
+      const result = await agE2ETestFramework.executeTest(
+        'object-api-json-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper<typeof configData>,
+        'objectTest',
+        'testApp',
+        TSearchConfigFileType.USER,
+      );
+
+      expect(result).toEqual(configData);
+    });
+
+    it('オブジェクト形式で複数ベース名をサポートすべき', async () => {
+      const configData = { source: 'primary', priority: 1 };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'primary.json', content: configData, format: 'json' },
+      ];
+
+      const result = await agE2ETestFramework.executeTest(
+        'object-api-multi-base-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        ['secondary', 'primary'], // Should find primary
+        'testApp',
+        TSearchConfigFileType.USER,
+      );
+
+      expect(result).toEqual(configData);
+    });
+
+    it('オブジェクト形式で検索タイプを指定できるべき', async () => {
+      const configData = { search: 'user', scope: 'user-specific' };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'userTest.json', content: configData, format: 'json' },
+      ];
+
+      const result = await agE2ETestFramework.executeTest(
+        'object-api-search-type-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        'userTest',
+        'testApp',
+        TSearchConfigFileType.USER,
+      );
+
+      expect(result).toEqual(configData);
     });
   });
 });

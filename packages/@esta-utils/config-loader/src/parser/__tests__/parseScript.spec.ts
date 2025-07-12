@@ -1,5 +1,5 @@
 // src: ./parser/__tests__/parseScript.spec.ts
-// parseScript関数のBDDテスト
+// JavaScript/TypeScript設定ファイル解析のユニットテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //

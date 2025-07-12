@@ -1,5 +1,5 @@
-// src: ./helper/configs/__tests__/findConfigFile.spec.ts
-// @(#) : 設定ファイル探索ユーティリティ（prefix/extension 固定版）
+// src: ./search/__tests__/findConfigFile.spec.ts
+// 設定ファイル探索ユーティリティのユニットテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //

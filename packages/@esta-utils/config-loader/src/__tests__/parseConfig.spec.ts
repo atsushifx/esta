@@ -1,5 +1,5 @@
-// src: /__tests__/parseConfig.spec.ts
-// モジュール設定データ解析ユーティリティのユニットテスト
+// src: ./__tests__/parseConfig.spec.ts
+// 設定データ解析ルーターのユニットテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
