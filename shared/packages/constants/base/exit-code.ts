@@ -16,7 +16,7 @@ export const ExitCode = {
   EXEC_FAILURE: 1,
 
   // @esta-core独自の終了コード (11-99)
-  CONFIG_NOT_FOUND: 11,
+  CONFIG_ERROR: 11,
   COMMAND_EXECUTION_ERROR: 12,
   INVALID_ARGS: 13,
   VALIDATION_FAILED: 14,
@@ -39,7 +39,7 @@ export const ExitCodeErrorMessage = {
   [ExitCode.EXEC_FAILURE]: 'General execution failure',
 
   // @esta-core独自の終了コード (11-99)
-  [ExitCode.CONFIG_NOT_FOUND]: 'Configuration file not found',
+  [ExitCode.CONFIG_ERROR]: 'Configuration Error',
   [ExitCode.COMMAND_EXECUTION_ERROR]: 'Command execution failed',
   [ExitCode.INVALID_ARGS]: 'Invalid command line arguments',
   [ExitCode.VALIDATION_FAILED]: 'Input validation failed',
