@@ -24,9 +24,8 @@ describe('parseScript', () => {
       expect(result).toEqual({});
     });
 
-    it('無効な構文が与えられると空オブジェクトを返すべき', async () => {
-      const result = await parseScript('invalid syntax');
-      expect(result).toEqual({});
+    it('無効な構文が与えられるとエラーをスローすべき', async () => {
+      await expect(parseScript('invalid syntax')).rejects.toThrow(/unsupported.*format/i);
     });
   });
 

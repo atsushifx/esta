@@ -186,15 +186,13 @@ export const parseScript = async <T = object>(raw: string | undefined): Promise<
     return {} as T;
   }
 
-  try {
-    const normalizedCode = normalizeScriptCode(raw);
+  const normalizedCode = normalizeScriptCode(raw);
 
-    if (!normalizedCode) {
-      return {} as T;
-    }
-
-    return await executeScriptViaTempFile<T>(normalizedCode);
-  } catch {
-    return {} as T;
+  if (!normalizedCode) {
+    throw new Error(
+      'Unsupported script format. Only export default, defineConfig(), and object literal formats are supported.',
+    );
   }
+
+  return await executeScriptViaTempFile<T>(normalizedCode);
 };
