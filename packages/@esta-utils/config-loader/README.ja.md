@@ -23,7 +23,7 @@ tags:
 - 柔軟な検索: 複数のベース名や検索タイプ (`USER`、`SYSTEM`、`PROJECT`) をサポート
 - ドットファイル対応: `.config` などのドットプレフィックス付きファイルの自動検出
 - 優先順位制御: 複数の設定ファイルがある場合の読み込み優先順位
-- エラーハンドリング: 詳細なエラー情報とトラブルシューティング機能
+- エラーハンドリング: ExitError による構造化されたエラー情報とエラーコード
 
 <!-- textlint-enable -->
 
@@ -65,13 +65,22 @@ yarn add @esta-utils/config-loader
 ```typescript
 import { loadConfig } from '@esta-utils/config-loader';
 
-// リターン値: Promise<{ [key: string]: any }>
-const config = await loadConfig({
-  baseNames: 'myapp',
-  appName: 'myapp',
-});
+try {
+  const config = await loadConfig({
+    baseNames: 'myapp',
+    appName: 'myapp',
+  });
 
-console.log(config);
+  if (config === null) {
+    console.log('設定ファイルが見つかりません');
+    // デフォルト設定を使用
+  } else {
+    console.log(config);
+  }
+} catch (error: any) {
+  // ExitError のハンドリング
+  console.error('設定読み込みエラー:', error.message);
+}
 ```
 
 #### 4.2 型安全な設定読み込み
@@ -87,24 +96,50 @@ interface AppConfig {
   };
 }
 
-const config = await loadConfig<AppConfig>({
-  baseNames: 'myapp',
-  appName: 'myapp',
-});
+try {
+  const config = await loadConfig<AppConfig>({
+    baseNames: 'myapp',
+    appName: 'myapp',
+  });
 
-// configは型安全にアクセス可能
-console.log(config.name); // string
-console.log(config.debug); // boolean
+  if (config === null) {
+    // デフォルト設定を使用
+    const defaultConfig: AppConfig = {
+      name: 'Default App',
+      version: '1.0.0',
+      debug: false,
+    };
+    // configは型安全にアクセス可能
+    console.log(defaultConfig.name); // string
+    console.log(defaultConfig.debug); // boolean
+  } else {
+    // configは型安全にアクセス可能
+    console.log(config.name); // string
+    console.log(config.debug); // boolean
+  }
+} catch (error: any) {
+  console.error('設定読み込みエラー:', error.code, error.message);
+}
 ```
 
 #### 4.3 複数のベース名での検索
 
 ```typescript
 // 優先順位: estarc → esta.config の順で検索
-const config = await loadConfig({
-  baseNames: ['estarc', 'esta.config'],
-  appName: 'myapp',
-});
+try {
+  const config = await loadConfig({
+    baseNames: ['estarc', 'esta.config'],
+    appName: 'myapp',
+  });
+
+  if (config === null) {
+    console.log('どの設定ファイルも見つかりません');
+  } else {
+    console.log('設定を読み込みました:', config);
+  }
+} catch (error: any) {
+  console.error('設定読み込みエラー:', error.code, error.message);
+}
 ```
 
 ### 5. 設定ファイル例
@@ -246,7 +281,10 @@ const projectConfig = await loadConfig({
 
 **例外**:
 
-- 設定ファイルが見つからない場合、`Error`をスロー
+- ファイル I/O エラーが発生した場合: `ExitError` (エラーコード: `FILE_IO_ERROR`)
+- 設定ファイルの解析に失敗した場合: `ExitError` (エラーコード: `CONFIG_ERROR`)
+- 不明なエラーが発生した場合: `ExitError` (エラーコード: `UNKNOWN_ERROR`)
+- 設定ファイルが見つからない場合: `null` を返す（エラーは投げない）
 
 #### `parseConfig<T>(extension: string, content: string): Promise<T>`
 
@@ -262,7 +300,12 @@ const projectConfig = await loadConfig({
 
 - `Promise<T>`: 解析された設定オブジェクト
 
-#### `findConfigFile(baseNames: string[], appName: string, searchType: TSearchConfigFileType): string`
+**例外**:
+
+- サポートされていないスクリプト形式の場合: `Error`
+- スクリプト実行に失敗した場合: `Error`
+
+#### `findConfigFile(baseNames: string[], appName: string, searchType: TSearchConfigFileType): string | null`
 
 設定ファイルのパスを検索します。
 
@@ -274,37 +317,105 @@ const projectConfig = await loadConfig({
 
 **リターン値**:
 
-- `string`: 見つかった設定ファイルのパス
+- `string | null`: 見つかった設定ファイルのパス、見つからない場合は `null`
 
 ### 8. エラーハンドリング
 
-#### 一般的なエラーパターン
+`@esta-utils/config-loader` は、`ExitError` を使用して構造化されたエラー情報を提供します。
+
+#### 8.1 エラーの種類
+
+| エラーコード    | 説明                      | 例                                       |
+| --------------- | ------------------------- | ---------------------------------------- |
+| `FILE_IO_ERROR` | ファイル I/O 関連のエラー | ファイルが存在しない、アクセス権限エラー |
+| `CONFIG_ERROR`  | 設定ファイル解析エラー    | 不正なJSON、YAML構文エラー               |
+| `UNKNOWN_ERROR` | 予期しないエラー          | その他の不明なエラー                     |
+
+#### 8.2 ExitError の構造
 
 ```typescript
+interface ExitError extends Error {
+  code: string; // エラーコード（FILE_IO_ERROR, CONFIG_ERROR, など）
+  message: string; // 詳細なエラーメッセージ
+}
+```
+
+#### 8.3 一般的なエラーハンドリングパターン
+
+```typescript
+import { loadConfig } from '@esta-utils/config-loader';
+import { ExitCode } from '@shared/constants';
+
 try {
   const config = await loadConfig({
     baseNames: 'myapp',
     appName: 'myapp',
   });
-} catch (error) {
-  if (error.message.includes('Config file not found')) {
-    console.error('設定ファイルが見つかりません');
+
+  if (config === null) {
+    console.log('設定ファイルが見つかりません。デフォルト設定を使用します。');
     // デフォルト設定を使用
     const defaultConfig = { name: 'Default App', debug: false };
+    return defaultConfig;
+  }
+
+  return config;
+} catch (error: any) {
+  if (error.code === ExitCode.FILE_IO_ERROR) {
+    console.error('ファイル I/O エラー:', error.message);
+    // ファイルアクセス権限やディスク容量を確認
+  } else if (error.code === ExitCode.CONFIG_ERROR) {
+    console.error('設定ファイル解析エラー:', error.message);
+    // 設定ファイルの構文を確認
+  } else if (error.code === ExitCode.UNKNOWN_ERROR) {
+    console.error('不明なエラー:', error.message);
+    // ログに記録し、開発者に報告
   } else {
-    console.error('設定ファイルの読み込みエラー:', error.message);
+    console.error('予期しないエラー:', error.message);
+  }
+
+  // エラー時のフォールバック処理
+  throw error;
+}
+```
+
+#### 8.4 ファイル I/O エラーの詳細
+
+```typescript
+try {
+  const config = await loadConfig({ baseNames: 'myapp', appName: 'myapp' });
+} catch (error: any) {
+  if (error.code === ExitCode.FILE_IO_ERROR) {
+    // Node.js の errno による詳細判定
+    if (error.message.includes('ENOENT')) {
+      console.error('ファイルまたはディレクトリが存在しません');
+    } else if (error.message.includes('EACCES')) {
+      console.error('ファイルアクセス権限がありません');
+    } else if (error.message.includes('ENOSPC')) {
+      console.error('ディスク容量が不足しています');
+    }
   }
 }
 ```
 
-#### 設定ファイル形式エラー
+#### 8.5 設定ファイル形式エラー
 
 ```typescript
 try {
   const config = await parseConfig('.json', invalidJsonContent);
-} catch (error) {
-  console.error('JSON解析エラー:', error.message);
-  // 構文エラーの詳細情報を取得
+} catch (error: any) {
+  if (error.code === ExitCode.CONFIG_ERROR) {
+    console.error('設定ファイル解析エラー:', error.message);
+
+    // ファイル形式別の対処法
+    if (error.message.includes('JSON')) {
+      console.log('JSON構文を確認してください（末尾のカンマ、クォートの対応など）');
+    } else if (error.message.includes('YAML')) {
+      console.log('YAMLインデントを確認してください（スペースとタブの混在を避ける）');
+    } else if (error.message.includes('script')) {
+      console.log('JavaScript/TypeScriptの構文とexport文を確認してください');
+    }
+  }
 }
 ```
 
@@ -312,48 +423,75 @@ try {
 
 #### 9.1 設定ファイルが見つからない
 
-```bash
-Error: Config file not found.
+`loadConfig` は設定ファイルが見つからない場合、エラーを投げずに `null` を返します。
+
+```typescript
+const config = await loadConfig({ baseNames: 'myapp', appName: 'myapp' });
+
+if (config === null) {
+  console.log('設定ファイルが見つかりません');
+  // デフォルト設定を使用するか、エラーハンドリングを実行
+}
 ```
 
-**解決方法:**
+**確認事項:**
 
 - ファイル名とパスを確認
 - `appName`が正しく設定されているか確認
 - 検索タイプが適切か確認
 
-#### 9.2 JSON構文エラー
+#### 9.2 JSON構文エラー（CONFIG_ERROR）
 
-```bash
-Error: Unexpected token } in JSON
+```typescript
+// ExitError with code: CONFIG_ERROR
+// message: "Failed to parse config file '/path/to/config.json': Unexpected token } in JSON"
 ```
 
 **解決方法:**
 
 - JSON 構文を確認（末尾のカンマ、クォートの対応など）
 - JSONC ファイルの場合は`.jsonc`拡張子を使用
+- エラーメッセージから具体的な構文エラー箇所を特定
 
-#### 9.3 YAML解析エラー
+#### 9.3 YAML解析エラー（CONFIG_ERROR）
 
-```bash
-Error: bad indentation of a mapping entry
+```typescript
+// ExitError with code: CONFIG_ERROR
+// message: "Failed to parse config file '/path/to/config.yaml': bad indentation of a mapping entry"
 ```
 
 **解決方法:**
 
 - YAML インデントを確認（スペースとタブの混在を避ける）
 - 文字列に特殊文字がある場合はクォートで囲む
+- YAML構文チェッカーでファイルを検証
 
-#### 9.4 TypeScript/JavaScript実行エラー
+#### 9.4 TypeScript/JavaScript実行エラー（CONFIG_ERROR）
 
-```bash
-Error: Cannot resolve module
+```typescript
+// ExitError with code: CONFIG_ERROR
+// message: "Failed to parse config file '/path/to/config.ts': tsx execution failed: Cannot resolve module"
 ```
 
 **解決方法:**
 
 - 必要な依存関係がインストールされているか確認
 - モジュールパスが正しいか確認
+- TypeScript設定ファイル（tsconfig.json）を確認
+- サポートされているスクリプト形式（export default、defineConfig、オブジェクトリテラル）を使用
+
+#### 9.5 ファイルアクセス権限エラー（FILE_IO_ERROR）
+
+```typescript
+// ExitError with code: FILE_IO_ERROR
+// message: "File I/O error accessing config file '/path/to/config.json': EACCES: permission denied"
+```
+
+**解決方法:**
+
+- ファイルまたはディレクトリの読み取り権限を確認
+- 実行ユーザーに適切な権限を付与
+- ファイルパスが正しいか確認
 
 ### 10. デバッグ
 

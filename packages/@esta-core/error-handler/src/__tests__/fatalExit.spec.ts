@@ -33,11 +33,11 @@ describe('fatalExit', () => {
 
   it('should throw ExitError with fatal=true and custom code', () => {
     try {
-      fatalExit('config not found', ExitCode.CONFIG_NOT_FOUND);
+      fatalExit('config not found', ExitCode.CONFIG_ERROR);
     } catch (error) {
       expect(error).toBeInstanceOf(ExitError);
       expect((error as ExitError).isFatal()).toBe(true);
-      expect((error as ExitError).code).toBe(ExitCode.CONFIG_NOT_FOUND);
+      expect((error as ExitError).code).toBe(ExitCode.CONFIG_ERROR);
       expect((error as ExitError).message).toBe('config not found');
     }
   });

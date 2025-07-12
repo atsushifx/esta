@@ -12,7 +12,21 @@ import { describe, expect, it } from 'vitest';
 // test target
 import { parseConfig } from '../parseConfig';
 
+/**
+ * @fileoverview parseConfig関数の包括的ユニットテスト
+ *
+ * このテストスイートは、設定データ解析ルーターであるparseConfig関数の
+ * 全ての機能とエラーハンドリングを検証します。
+ *
+ * @module parseConfig.spec
+ */
 describe('parseConfig', () => {
+  /**
+   * @description 基本的な設定ファイル形式の解析機能をテスト
+   *
+   * サポートされている各ファイル形式（JSON、JSONC、YAML、YML、TypeScript、JavaScript）
+   * の正常な解析動作を検証します。
+   */
   describe('基本的な設定形式の解析', () => {
     it('JSON設定を正しく解析すべき', async () => {
       const raw = '{"test": "value"}';
@@ -51,6 +65,12 @@ describe('parseConfig', () => {
     });
   });
 
+  /**
+   * @description エラーハンドリングと境界条件のテスト
+   *
+   * 未知の拡張子、大文字小文字の処理、undefined入力など
+   * 特殊なケースでの動作を検証します。
+   */
   describe('エラーハンドリングと特殊ケース', () => {
     it('未知の拡張子の場合は空オブジェクトを返すべき', async () => {
       const raw = 'some content';
@@ -70,6 +90,12 @@ describe('parseConfig', () => {
     });
   });
 
+  /**
+   * @description TypeScriptジェネリック型の型安全性テスト
+   *
+   * ジェネリック型パラメータを使用した型安全な設定読み込みと
+   * 各ファイル形式での型保持機能を検証します。
+   */
   describe('型安全性とジェネリック対応', () => {
     it('ジェネリック型でJSON設定を正しく解析すべき', async () => {
       type TestConfig = {

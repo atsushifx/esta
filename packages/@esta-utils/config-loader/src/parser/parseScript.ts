@@ -35,6 +35,10 @@ export const defineConfig = <T extends object>(config: T): T => config;
  * @template T 解析結果の型
  * @param filePath 実行するTypeScriptファイルのパス
  * @returns 実行結果のPromise
+ *
+ * @throws {Error} JSON解析に失敗した場合
+ * @throws {Error} tsx実行に失敗した場合
+ * @throws {Error} プロセス実行エラーが発生した場合
  */
 const executeScriptViaTsx = async <T>(filePath: string): Promise<T> => {
   return new Promise((resolve, reject) => {
@@ -106,6 +110,8 @@ console.log(JSON.stringify(config));
  * @template T 解析結果の型
  * @param code 実行するスクリプトコード
  * @returns 実行結果
+ *
+ * @throws {Error} スクリプト実行に失敗した場合
  */
 const executeScriptViaTempFile = async <T>(code: string): Promise<T> => {
   const tempFilePath = createTempFilePath();
@@ -124,33 +130,6 @@ const executeScriptViaTempFile = async <T>(code: string): Promise<T> => {
   }
 };
 
-/**
- * JavaScript/TypeScript設定ファイルの内容を解析して設定オブジェクトを返します
- *
- * @template T 解析結果の型
- * @param raw 解析対象の JavaScript/TypeScript コード文字列
- * @returns 解析された設定オブジェクト
- *
- * @description
- * 以下の形式をサポートします：
- * - `export default { ... }` - ES6 エクスポート形式
- * - `defineConfig({ ... })` - 型安全な設定定義
- * - `{ ... }` - オブジェクトリテラル形式
- *
- * 安全性のため、tsx を使用してコードを実行し、`new Function()` は使用しません。
- *
- * @example
- * ```typescript
- * // export default形式
- * const config1 = await parseScript('export default { name: "app" }');
- *
- * // defineConfig形式
- * const config2 = await parseScript('defineConfig({ port: 3000 })');
- *
- * // オブジェクトリテラル形式
- * const config3 = await parseScript('{ debug: true }');
- * ```
- */
 /**
  * スクリプトコードを設定オブジェクト代入形式に正規化します
  *
@@ -181,20 +160,28 @@ const normalizeScriptCode = (code: string): string | null => {
   return null;
 };
 
+/**
+ * JavaScript/TypeScript設定ファイルの内容を解析して設定オブジェクトを返します
+ *
+ * @template T 解析結果の型
+ * @param raw 解析対象の JavaScript/TypeScript コード文字列
+ * @returns 解析された設定オブジェクト
+ *
+ * @throws {Error} サポートされていないスクリプト形式の場合
+ * @throws {Error} スクリプト実行に失敗した場合
+ */
 export const parseScript = async <T = object>(raw: string | undefined): Promise<T> => {
   if (!raw) {
     return {} as T;
   }
 
-  try {
-    const normalizedCode = normalizeScriptCode(raw);
+  const normalizedCode = normalizeScriptCode(raw);
 
-    if (!normalizedCode) {
-      return {} as T;
-    }
-
-    return await executeScriptViaTempFile<T>(normalizedCode);
-  } catch {
-    return {} as T;
+  if (!normalizedCode) {
+    throw new Error(
+      'Unsupported script format. Only export default, defineConfig(), and object literal formats are supported.',
+    );
   }
+
+  return await executeScriptViaTempFile<T>(normalizedCode);
 };

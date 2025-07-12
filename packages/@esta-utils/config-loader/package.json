@@ -50,7 +50,9 @@
     "@agla-e2e/fileio-framework": "workspace:*"
   },
   "dependencies": {
+    "@esta-core/error-handler": "workspace:*",
     "@esta-utils/get-platform": "workspace:*",
+    "@shared/constants": "workspace:*",
     "comment-json": "^4.2.5",
     "tsx": "^4.20.3",
     "yaml": "^2.8.0"

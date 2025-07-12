@@ -173,11 +173,11 @@ describe('findConfigFile - Error cases', () => {
   const BASE_NAMES = ['app.config'];
   const DIR_NAME = 'testerApp';
 
-  it('throws when config file not found', () => {
+  it('returns null when config file not found', () => {
     // Set expectedConfigFile to a non-matching path
     expectedConfigFile = '/non/existent/path';
 
-    expect(() => findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.USER))
-      .toThrow('Config file not found.');
+    const result = findConfigFile(BASE_NAMES, DIR_NAME, TSearchConfigFileType.USER);
+    expect(result).toBeNull();
   });
 });

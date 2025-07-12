@@ -135,9 +135,15 @@ importers:
 
   packages/@esta-utils/config-loader:
     dependencies:
+      '@esta-core/error-handler':
+        specifier: workspace:*
+        version: link:../../@esta-core/error-handler
       '@esta-utils/get-platform':
         specifier: workspace:*
         version: link:../get-platform
+      '@shared/constants':
+        specifier: workspace:*
+        version: link:../../../shared/packages/constants
       comment-json:
         specifier: ^4.2.5
         version: 4.2.5
