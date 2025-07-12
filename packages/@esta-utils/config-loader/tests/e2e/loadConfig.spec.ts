@@ -29,26 +29,27 @@ const loadConfigWrapper = async <T = object>(...args: unknown[]): Promise<T> => 
 };
 
 describe('loadConfig E2E', () => {
-  it('loads JSON config file', async () => {
-    const configData = { name: 'Test App', version: '1.0.0', debug: true };
-    const configFiles: AgE2eConfigFileSpec[] = [
-      { filename: 'myapp.json', content: configData, format: 'json' },
-    ];
+  describe('設定ファイル形式別の読み込み', () => {
+    it('JSON設定ファイルを正しく読み込むべき', async () => {
+      const configData = { name: 'Test App', version: '1.0.0', debug: true };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'myapp.json', content: configData, format: 'json' },
+      ];
 
-    const result = await agE2ETestFramework.executeTest(
-      'json-test',
-      'testApp',
-      configFiles,
-      loadConfigWrapper<typeof configData>,
-      'myapp',
-      'testApp',
-    );
+      const result = await agE2ETestFramework.executeTest(
+        'json-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper<typeof configData>,
+        'myapp',
+        'testApp',
+      );
 
-    expect(result).toEqual(configData);
-  });
+      expect(result).toEqual(configData);
+    });
 
-  it('loads YAML config file', async () => {
-    const yamlContent = `
+    it('YAML設定ファイルを正しく読み込むべき', async () => {
+      const yamlContent = `
 name: Test App
 version: 1.0.0
 debug: true
@@ -56,29 +57,29 @@ features:
   - auth
   - logging
 `;
-    const configFiles: AgE2eConfigFileSpec[] = [
-      { filename: 'myapp.yaml', content: yamlContent, format: 'yaml' },
-    ];
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'myapp.yaml', content: yamlContent, format: 'yaml' },
+      ];
 
-    const result = await agE2ETestFramework.executeTest(
-      'yaml-test',
-      'testApp',
-      configFiles,
-      loadConfigWrapper,
-      'myapp',
-      'testApp',
-    );
+      const result = await agE2ETestFramework.executeTest(
+        'yaml-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        'myapp',
+        'testApp',
+      );
 
-    expect(result).toEqual({
-      name: 'Test App',
-      version: '1.0.0',
-      debug: true,
-      features: ['auth', 'logging'],
+      expect(result).toEqual({
+        name: 'Test App',
+        version: '1.0.0',
+        debug: true,
+        features: ['auth', 'logging'],
+      });
     });
-  });
 
-  it('loads JSONC config file with comments', async () => {
-    const jsoncContent = `{
+    it('コメント付きJSONC設定ファイルを正しく読み込むべき', async () => {
+      const jsoncContent = `{
   // Application configuration
   "name": "Test App",
   "version": "1.0.0",
@@ -86,28 +87,28 @@ features:
      for debug flag */
   "debug": true
 }`;
-    const configFiles: AgE2eConfigFileSpec[] = [
-      { filename: 'myapp.jsonc', content: jsoncContent, format: 'json' },
-    ];
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'myapp.jsonc', content: jsoncContent, format: 'json' },
+      ];
 
-    const result = await agE2ETestFramework.executeTest(
-      'jsonc-test',
-      'testApp',
-      configFiles,
-      loadConfigWrapper,
-      'myapp',
-      'testApp',
-    );
+      const result = await agE2ETestFramework.executeTest(
+        'jsonc-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        'myapp',
+        'testApp',
+      );
 
-    expect(result).toEqual({
-      name: 'Test App',
-      version: '1.0.0',
-      debug: true,
+      expect(result).toEqual({
+        name: 'Test App',
+        version: '1.0.0',
+        debug: true,
+      });
     });
-  });
 
-  it('loads TypeScript config file', async () => {
-    const tsContent = `export default {
+    it('TypeScript設定ファイルを正しく読み込むべき', async () => {
+      const tsContent = `export default {
   name: 'Test App',
   version: '1.0.0',
   debug: true,
@@ -116,103 +117,108 @@ features:
     port: 5432
   }
 };`;
-    const configFiles: AgE2eConfigFileSpec[] = [
-      { filename: 'myapp.ts', content: tsContent, format: 'typescript' },
-    ];
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'myapp.ts', content: tsContent, format: 'typescript' },
+      ];
 
-    const result = await agE2ETestFramework.executeTest(
-      'ts-test',
-      'testApp',
-      configFiles,
-      loadConfigWrapper,
-      'myapp',
-      'testApp',
-    );
-
-    expect(result).toEqual({
-      name: 'Test App',
-      version: '1.0.0',
-      debug: true,
-      database: {
-        host: 'localhost',
-        port: 5432,
-      },
-    });
-  });
-
-  it('loads config with dot prefix', async () => {
-    const configData = { hidden: true, name: 'Hidden Config' };
-    const configFiles: AgE2eConfigFileSpec[] = [
-      { filename: '.myapp.json', content: configData, format: 'json' },
-    ];
-
-    const result = await agE2ETestFramework.executeTest(
-      'dot-prefix-test',
-      'testApp',
-      configFiles,
-      loadConfigWrapper,
-      'myapp',
-      'testApp',
-    );
-
-    expect(result).toEqual(configData);
-  });
-
-  it('prioritizes files without dot prefix over files with dot prefix', async () => {
-    const normalConfigData = { priority: 'normal', name: 'Normal Config' };
-    const hiddenConfigData = { priority: 'hidden', name: 'Hidden Config' };
-    const configFiles: AgE2eConfigFileSpec[] = [
-      { filename: 'myapp.json', content: normalConfigData, format: 'json' },
-      { filename: '.myapp.json', content: hiddenConfigData, format: 'json' },
-    ];
-
-    const result = await agE2ETestFramework.executeTest(
-      'priority-test',
-      'testApp',
-      configFiles,
-      loadConfigWrapper,
-      'myapp',
-      'testApp',
-    );
-
-    expect(result).toEqual(normalConfigData);
-  });
-
-  it('throws error when config file not found', async () => {
-    const configFiles: AgE2eConfigFileSpec[] = [];
-
-    await expect(async () => {
-      await agE2ETestFramework.executeTest(
-        'not-found-test',
+      const result = await agE2ETestFramework.executeTest(
+        'ts-test',
         'testApp',
         configFiles,
         loadConfigWrapper,
-        'nonexistent',
+        'myapp',
         'testApp',
       );
-    }).rejects.toThrow('Config file not found.');
+
+      expect(result).toEqual({
+        name: 'Test App',
+        version: '1.0.0',
+        debug: true,
+        database: {
+          host: 'localhost',
+          port: 5432,
+        },
+      });
+    });
   });
 
-  it('uses current working directory as default', async () => {
-    const configData = { test: true };
-    const configFiles: AgE2eConfigFileSpec[] = [
-      { filename: 'testConfig.json', content: configData, format: 'json' },
-    ];
+  describe('ファイル検索とプライオリティ', () => {
+    it('ドットプレフィックス付き設定ファイルを正しく読み込むべき', async () => {
+      const configData = { hidden: true, name: 'Hidden Config' };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: '.myapp.json', content: configData, format: 'json' },
+      ];
 
-    const result = await agE2ETestFramework.executeTest(
-      'cwd-test',
-      'testConfig',
-      configFiles,
-      loadConfigWrapper,
-      'testConfig',
-      'testConfig',
-    );
+      const result = await agE2ETestFramework.executeTest(
+        'dot-prefix-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        'myapp',
+        'testApp',
+      );
 
-    expect(result).toEqual(configData);
+      expect(result).toEqual(configData);
+    });
+
+    it('ドットプレフィックスなしのファイルを優先すべき', async () => {
+      const normalConfigData = { priority: 'normal', name: 'Normal Config' };
+      const hiddenConfigData = { priority: 'hidden', name: 'Hidden Config' };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'myapp.json', content: normalConfigData, format: 'json' },
+        { filename: '.myapp.json', content: hiddenConfigData, format: 'json' },
+      ];
+
+      const result = await agE2ETestFramework.executeTest(
+        'priority-test',
+        'testApp',
+        configFiles,
+        loadConfigWrapper,
+        'myapp',
+        'testApp',
+      );
+
+      expect(result).toEqual(normalConfigData);
+    });
   });
 
-  describe('TEstaSearchConfigFileType tests', () => {
-    it('loads config with USER search type (default)', async () => {
+  describe('エラーハンドリングと基本動作', () => {
+    it('設定ファイルが見つからない場合はエラーを投げるべき', async () => {
+      const configFiles: AgE2eConfigFileSpec[] = [];
+
+      await expect(async () => {
+        await agE2ETestFramework.executeTest(
+          'not-found-test',
+          'testApp',
+          configFiles,
+          loadConfigWrapper,
+          'nonexistent',
+          'testApp',
+        );
+      }).rejects.toThrow('Config file not found.');
+    });
+
+    it('現在のワーキングディレクトリをデフォルトとして使用すべき', async () => {
+      const configData = { test: true };
+      const configFiles: AgE2eConfigFileSpec[] = [
+        { filename: 'testConfig.json', content: configData, format: 'json' },
+      ];
+
+      const result = await agE2ETestFramework.executeTest(
+        'cwd-test',
+        'testConfig',
+        configFiles,
+        loadConfigWrapper,
+        'testConfig',
+        'testConfig',
+      );
+
+      expect(result).toEqual(configData);
+    });
+  });
+
+  describe('検索タイプ別の設定読み込み', () => {
+    it('USER検索タイプで設定を読み込むべき（デフォルト）', async () => {
       const configData = { type: 'user', name: 'User Config' };
       const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'userApp.json', content: configData, format: 'json' },
@@ -231,7 +237,7 @@ features:
       expect(result).toEqual(configData);
     });
 
-    it('loads config with SYSTEM search type', async () => {
+    it('SYSTEM検索タイプで設定を読み込むべき', async () => {
       const configData = { type: 'system', name: 'System Config' };
       const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'systemApp.json', content: configData, format: 'json' },
@@ -250,7 +256,7 @@ features:
       expect(result).toEqual(configData);
     });
 
-    it('defaults to USER search type when not specified', async () => {
+    it('検索タイプが指定されていない場合はUSERタイプをデフォルトとすべき', async () => {
       const configData = { type: 'default', name: 'Default Config' };
       const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'defaultApp.json', content: configData, format: 'json' },
@@ -269,8 +275,8 @@ features:
     });
   });
 
-  describe('Parameterized tests example', () => {
-    it('runs multiple config format tests', async () => {
+  describe('パラメータ化テストの例', () => {
+    it('複数の設定形式テストを実行すべき', async () => {
       const scenarios: AgE2eTestScenario[] = [
         {
           description: 'JSON format',
@@ -299,8 +305,8 @@ features:
     });
   });
 
-  describe('Multiple config files priority', () => {
-    it('loads estarc config file when available', async () => {
+  describe('複数設定ファイルの優先順位', () => {
+    it('利用可能な場合はestarc設定ファイルを読み込むべき', async () => {
       const configData = { source: 'estarc', priority: 1 };
       const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'estarc.json', content: configData, format: 'json' },
@@ -319,7 +325,7 @@ features:
       expect(result).toEqual(configData);
     });
 
-    it('loads esta.config when available', async () => {
+    it('利用可能な場合はesta.config設定ファイルを読み込むべき', async () => {
       const configData = { source: 'esta.config', priority: 2 };
       const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'esta.config.yaml', content: configData, format: 'json' },
@@ -338,7 +344,7 @@ features:
       expect(result).toEqual(configData);
     });
 
-    it('loads first available config file from multiple options using array syntax', async () => {
+    it('配列構文を使用して複数オプションから最初の利用可能な設定ファイルを読み込むべき', async () => {
       const configData = { source: 'estarc', priority: 1 };
       const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'estarc.json', content: configData, format: 'json' },
@@ -357,7 +363,7 @@ features:
       expect(result).toEqual(configData);
     });
 
-    it('falls back to second config file when first is not available using array syntax', async () => {
+    it('配列構文で最初のファイルが利用できない場合は2番目の設定ファイルにフォールバックすべき', async () => {
       const configData = { source: 'esta.config', priority: 2 };
       const configFiles: AgE2eConfigFileSpec[] = [
         { filename: 'esta.config.yaml', content: configData, format: 'json' },
@@ -376,7 +382,7 @@ features:
       expect(result).toEqual(configData);
     });
 
-    it('prioritizes first config file when multiple are available using array syntax', async () => {
+    it('配列構文で複数のファイルが利用可能な場合は最初の設定ファイルを優先すべき', async () => {
       const estarcData = { source: 'estarc', priority: 1 };
       const estaConfigData = { source: 'esta.config', priority: 2 };
       const configFiles: AgE2eConfigFileSpec[] = [
@@ -397,7 +403,7 @@ features:
       expect(result).toEqual(estarcData); // Should get estarc data, not esta.config
     });
 
-    it('demonstrates priority by loading estarc over esta.config when both exist', async () => {
+    it('両方存在する場合はesta.configよりもestarcを優先することを実証すべき', async () => {
       const estarcData = { source: 'estarc', priority: 1 };
       const estaConfigData = { source: 'esta.config', priority: 2 };
       const configFiles: AgE2eConfigFileSpec[] = [
