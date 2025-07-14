@@ -4,7 +4,11 @@ aquasec
 casey
 DEVMODE
 dotenvx
+EACCES
 eget
+ENOENT
+ENOSPC
+errno
 ESM
 estarc
 GHA
