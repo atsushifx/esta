@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest';
 // test target
 import { getPlatform } from '@/getPlatform';
 // constants
+import type { TPlatformKey } from '../../shared/constants';
 import { PLATFORM_TYPE } from '../../shared/types';
 
 /**
@@ -21,16 +22,16 @@ import { PLATFORM_TYPE } from '../../shared/types';
  * process.platformをモックして異なるプラットフォームでの動作を確認します。
  */
 describe('Platform Checker Functions', () => {
-  const isWindows = (platform?: string): boolean => {
-    return getPlatform(platform as string) === PLATFORM_TYPE.WINDOWS;
+  const isWindows = (platform?: TPlatformKey | 'unknown' | ''): boolean => {
+    return getPlatform(platform) === PLATFORM_TYPE.WINDOWS;
   };
 
-  const isLinux = (platform?: string): boolean => {
-    return getPlatform(platform as string) === PLATFORM_TYPE.LINUX;
+  const isLinux = (platform?: TPlatformKey | 'unknown' | ''): boolean => {
+    return getPlatform(platform) === PLATFORM_TYPE.LINUX;
   };
 
-  const isMacOS = (platform?: string): boolean => {
-    return getPlatform(platform as string) === PLATFORM_TYPE.MACOS;
+  const isMacOS = (platform?: TPlatformKey | 'unknown' | ''): boolean => {
+    return getPlatform(platform) === PLATFORM_TYPE.MACOS;
   };
 
   /**
@@ -42,7 +43,7 @@ describe('Platform Checker Functions', () => {
     });
 
     it('returns false for non-Windows platforms', () => {
-      const nonWindowsPlatforms = ['linux', 'darwin'];
+      const nonWindowsPlatforms: (TPlatformKey)[] = ['linux', 'darwin'];
 
       nonWindowsPlatforms.forEach((platform) => {
         expect(isWindows(platform)).toBe(false);
@@ -59,7 +60,7 @@ describe('Platform Checker Functions', () => {
     });
 
     it('returns false for non-Linux platforms', () => {
-      const nonLinuxPlatforms = ['win32', 'darwin'];
+      const nonLinuxPlatforms: (TPlatformKey)[] = ['win32', 'darwin'];
 
       nonLinuxPlatforms.forEach((platform) => {
         expect(isLinux(platform)).toBe(false);
@@ -76,7 +77,7 @@ describe('Platform Checker Functions', () => {
     });
 
     it('returns false for non-macOS platforms', () => {
-      const nonMacOSPlatforms = ['win32', 'linux'];
+      const nonMacOSPlatforms: (TPlatformKey)[] = ['win32', 'linux'];
 
       nonMacOSPlatforms.forEach((platform) => {
         expect(isMacOS(platform)).toBe(false);
@@ -89,9 +90,10 @@ describe('Platform Checker Functions', () => {
    */
   describe('Error Handling', () => {
     it('throws for unsupported platforms', () => {
-      expect(() => isWindows('freebsd')).toThrow(/Unsupported platform/);
-      expect(() => isLinux('freebsd')).toThrow(/Unsupported platform/);
-      expect(() => isMacOS('freebsd')).toThrow(/Unsupported platform/);
+      const unsupportedPlatform = 'freebsd' as TPlatformKey;
+      expect(() => isWindows(unsupportedPlatform)).toThrow(/Unsupported platform/);
+      expect(() => isLinux(unsupportedPlatform)).toThrow(/Unsupported platform/);
+      expect(() => isMacOS(unsupportedPlatform)).toThrow(/Unsupported platform/);
     });
   });
 });

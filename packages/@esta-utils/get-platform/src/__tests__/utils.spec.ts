@@ -10,6 +10,7 @@
 import { describe, expect, it } from 'vitest';
 // constants
 import { PATH_DELIMITER } from '../../shared/constants';
+import type { TPlatformKey } from '../../shared/constants';
 // test target
 import { getPlatform } from '@/getPlatform';
 // types
@@ -23,8 +24,8 @@ import { PLATFORM_TYPE } from '../../shared/types';
  * PATH区切り文字取得機能を検証します。
  */
 describe('Utility Functions', () => {
-  const getDelimiter = (platform?: string): string => {
-    const platformType = getPlatform(platform as string);
+  const getDelimiter = (platform?: TPlatformKey | 'unknown' | ''): string => {
+    const platformType = getPlatform(platform);
     return platformType === PLATFORM_TYPE.WINDOWS ? PATH_DELIMITER.WINDOWS : PATH_DELIMITER.UNIX;
   };
 
@@ -71,7 +72,8 @@ describe('Utility Functions', () => {
      */
     describe('Error Handling', () => {
       it('throws for unsupported platforms', () => {
-        expect(() => getDelimiter('freebsd')).toThrow(/Unsupported platform/);
+        const unsupportedPlatform = 'freebsd' as TPlatformKey;
+        expect(() => getDelimiter(unsupportedPlatform)).toThrow(/Unsupported platform/);
       });
     });
   });

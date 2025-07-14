@@ -46,6 +46,7 @@
     "pnpm": ">=10",
     "node": ">=20"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "valibot": "^1.1.0"
+  }
 }
