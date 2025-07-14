@@ -1,23 +1,24 @@
-<!--
-  src: docs/specs/error-handler-specs.md
-  Copyright (c) 2025 atsushifx
-  This software is released under the MIT License.
-  https://opensource.org/licenses/MIT
--->
-
 ---
+header:
+  - src: docs/specs/@esta-core-error-handler.spec.md
+  - @(#) : ESTA Core error handling framework
 title: 📘 エラーハンドリング統一仕様書（@esta-core/error-handler）
 version: 1.2.0
 created: 2025-07-09
-updated: 2025-07-11
+updated: 2025-07-14
 authors:
   - 🧠 つむぎ（設計統一・exec 分離提案）
   - 🧁 小紅（例示＆分岐設計）
   - ⚙️ エルファ（FeatureFlag 実装＆fatal 設計）
+  - 👤 atsushifx（全体設計・仕様確定）
 changes:
-  - ExitCode定数を共通定数(@shared/constants/exitCode)に移動
-  - POSIX準拠の終了コード体系を統一
-  - ExitCodeErrorMessage定数を追加
+  - 2025-07-14: フロントマター追加とドキュメント統一
+  - 2025-07-11: ExitCode定数を共通定数(@shared/constants/exitCode)に移動
+  - 2025-07-09: POSIX準拠の終了コード体系を統一、ExitCodeErrorMessage定数を追加
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 ---
 
 ## 概要
@@ -26,24 +27,24 @@ GitHub Actions と CLI の統一されたエラーハンドリングを提供す
 
 ### 主要機能
 
-- **ExitError クラス** - 終了コードと致命性フラグを持つ統一エラー
-- **errorExit 関数** - 非致命的エラー終了（ログ記録 + ExitError スロー）
-- **fatalExit 関数** - 致命的エラー終了（ログ記録 + 致命的 ExitError スロー）
-- **handleExitError 関数** - ExitError を適切に処理する共通ハンドラ
-- **統一された終了コード** - POSIX準拠の終了コード体系
+- ExitError クラス - 終了コードと致命性フラグを持つ統一エラー
+- errorExit 関数 - 的エラー終了（ログ記録 + ExitError スロー）
+- fatalExit 関数 - 致命的エラー終了（ログ記録 + 致命的 ExitError スロー）
+- handleExitError 関数 - ExitError を適切に処理する共通ハンドラ
+- 統一された終了コード - POSIX 準拠の終了コード体系
 
 ---
 
 ## パッケージ情報
 
-- **パッケージ名**: `@esta-core/error-handler`
-- **バージョン**: 0.0.0
-- **ライセンス**: MIT
-- **依存関係**:
-  - `@actions/core` - GitHub Actions統合
+- パッケージ名: `@esta-core/error-handler`
+- バージョン: 0.0.0
+- ライセンス: MIT
+- 依存関係:
+  - `@actions/core` - GitHub Actions 統合
   - `@agla-utils/ag-logger` - ログ機能
   - `@esta-core/feature-flags` - 実行環境判定
-  - `@shared/constants` - 共通定数（ExitCode等）
+  - `@shared/constants` - 共通定数 (ExitCode 等)
 
 ---
 
@@ -76,8 +77,8 @@ GitHub Actions と CLI の統一されたエラーハンドリングを提供す
 
 **定数の定義場所**:
 
-- **共通定数**: `@shared/constants` - POSIX準拠の統一定義
-- **インポート**: `import { ExitCode } from '@shared/constants'` で使用
+- 共通定数: `@shared/constants` - POSIX 準拠の統一定義
+- インポート: `import { ExitCode } from '@shared/constants'` で使用
 
 ---
 
@@ -130,7 +131,7 @@ export const errorExit = (
 **動作:**
 
 1. ログメッセージをフォーマット
-2. ERRORレベルでログ記録
+2. ERROR レベルでログ記録
 3. ExitError（fatal=false）をスロー
 
 ### fatalExit 関数
@@ -157,12 +158,12 @@ export const fatalExit = (
 **動作:**
 
 1. ログメッセージをフォーマット
-2. FATALレベルでログ記録
+2. FATAL レベルでログ記録
 3. ExitError（fatal=true）をスロー
 
 ### handleExitError 関数
 
-ExitErrorを適切に処理して終了します。
+ExitError を適切に処理して終了します。
 
 ```typescript
 export const handleExitError = (err: ExitError): void => {
@@ -179,12 +180,12 @@ export const handleExitError = (err: ExitError): void => {
 
 **パラメータ:**
 
-- `err`: 処理するExitErrorインスタンス
+- `err`: 処理する ExitError インスタンス
 
 **動作:**
 
-- GitHub Actions環境: `core.setFailed()`でエラー報告
-- CLI環境: `process.exit()`で終了
+- GitHub Actions 環境: `core.setFailed()`でエラー報告
+- CLI 環境: `process.exit()`で終了
 
 ---
 
@@ -210,7 +211,7 @@ export const formatErrorMessage = (
 
 **フォーマット例:**
 
-```
+```bash
 [ERROR(13)] Invalid command line arguments: 引数が必要です in main
 [FATAL(11)] Configuration file not found: CONFIG_PATHが未設定です in validateConfig
 ```
@@ -225,7 +226,8 @@ export const getExitCodeMessage = (code: TExitCode): string => {
 };
 ```
 
-**注意**: `ExitCodeErrorMessage` は `@shared/constants` から提供されます。
+> 注意:
+> `ExitCodeErrorMessage` は `@shared/constants` から提供されます。
 
 ### 呼び出し元情報の取得
 
@@ -235,7 +237,7 @@ export const getExitCodeMessage = (code: TExitCode): string => {
 
 ## ファイル構成
 
-```
+```bash
 packages/@esta-core/error-handler/
 ├── package.json
 ├── src/
@@ -263,7 +265,7 @@ packages/@esta-core/error-handler/
 
 ## 使用例
 
-### CLIアプリでの使用
+### CLIアプリケーションでの使用
 
 ```typescript
 import { errorExit, ExitError, handleExitError } from '@esta-core/error-handler';
@@ -342,12 +344,12 @@ const processFile = async (filePath: string) => {
 
 ### 単体テスト
 
-- **ExitError.spec.ts**: ExitErrorクラスのテスト
-- **errorExit.spec.ts**: errorExit関数のテスト
-- **fatalExit.spec.ts**: fatalExit関数のテスト
-- **handleExitError.spec.ts**: handleExitError関数のテスト
+- ExitError.spec.ts: ExitError クラスのテスト
+- errorExit.spec.ts: errorExit 関数のテスト
+- fatalExit.spec.ts: fatalExit 関数のテスト
+- handleExitError.spec.ts: handleExitError 関数のテスト
 
 ### E2Eテスト
 
-- **errorExit.spec.ts**: errorExit関数の統合テスト
-- **fatalExit.spec.ts**: fatalExit関数の統合テスト
+- errorExit.spec.ts: errorExit 関数の統合テスト
+- fatalExit.spec.ts: fatalExit 関数の統合テスト

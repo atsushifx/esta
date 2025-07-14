@@ -1,31 +1,57 @@
-# command-utils Package Specification
+---
+header:
+  - src: docs/specs/@esta-utils-command-runner.spec.md
+  - @(#) : ESTA Utils command execution utilities
+title: 🏃 コマンド実行ユーティリティ仕様書（@esta-utils/command-runner）
+version: 1.0.0
+created: 2025-07-14
+updated: 2025-07-14
+authors:
+  - 🧠 つむぎ（コマンド実行アーキテクチャ）
+  - 🧁 小紅（クロスプラットフォーム対応）
+  - ⚙️ エルファ（シェル統合実装）
+  - 👤 atsushifx（全体設計・仕様確定）
+changes:
+  - 2025-07-14: フロントマター追加とドキュメント統一
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
 
-## Overview
+## 概要
 
-The `@esta-utils/command-utils` package provides a comprehensive set of utilities for safe and reliable command execution in cross-platform environments. This package is designed to handle shell command execution with proper escaping, platform-specific shell management, and command existence checking.
+<!-- textlint-disable ja-technical-writing/sentence-length -->
+<!-- markdownlint-disable line-length -->
+
+The `@esta-utils/command-utils` package provides a comprehensive set of utilities for safe and reliable command execution in cross-platform environments. This package is designed to handle shell command
+execution with proper escaping, platform-specific shell management, and command existence checking.
+
+<!-- markdownlint-disable -->
+<!-- textlint-enable -->
 
 ## Package Information
 
-- **Package Name**: `@esta-utils/command-utils`
-- **Version**: 0.0.0
-- **License**: MIT
-- **Author**: atsushifx
-- **Type**: ESM Module with CommonJS compatibility
+- Package Name: `@esta-utils/command-utils`
+- Version: 0.0.0
+- License: MIT
+- Author: atsushifx
+- Type: ESM Module with CommonJS compatibility
 
 ## Current Implementation Status
 
 ### Existing Features
 
-- ✅ `commandExist`: Command existence checking utility
-- ✅ Platform detection integration with `@esta-utils/get-platform`
-- ✅ Windows and Linux/macOS support
+- `commandExist`: Command existence checking utility
+- Platform detection integration with `@esta-utils/get-platform`
+- Windows and Linux/macOS support
 
 ### Planned Features (To Be Implemented)
 
-- 🔄 `wrapCommand`: Safe command and argument wrapping
-- 🔄 `shellTable`: Platform-specific shell configuration
-- 🔄 `runCommand`: Asynchronous command execution with timeout
-- 🔄 Enhanced `commandExist` using `runCommand`
+- `wrapCommand`: Safe command and argument wrapping
+- `shellTable`: Platform-specific shell configuration
+- `runCommand`: Asynchronous command execution with timeout
+- Enhanced `commandExist` using `runCommand`
 
 ## API Specifications
 
@@ -259,10 +285,10 @@ console.log('All commands completed:', results);
 
 ## Compatibility
 
-- **Node.js**: >= 20
-- **Package Manager**: pnpm >= 10
-- **Platforms**: Windows, Linux, macOS
-- **Module System**: ESM with CommonJS compatibility
+- Node.js: >= 20
+- Package Manager: pnpm >= 10
+- Platforms: Windows, Linux, macOS
+- Module System: ESM with CommonJS compatibility
 
 ## Migration Guide
 
@@ -272,4 +298,8 @@ The existing `commandExist` function will remain backward compatible. New featur
 
 ### Integration with ESTA
 
+<!-- textlint-disable ja-technical-writing/sentence-length -->
+
 This package is designed to support the ESTA GitHub Actions framework, providing safe and reliable command execution for tool installation and automation workflows.
+
+<!-- textlint-enable -->

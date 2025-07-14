@@ -1,14 +1,26 @@
-<!--
-  src: docs/specs/feature-flags.spec.md
+---
+header:
+  - src: docs/specs/@esta-core-feature-flags.spec.md
+  - @(#) : ESTA Core feature flags management module
+title: 🏳️ フィーチャーフラグモジュール仕様書（@esta-core/feature-flags）
+version: 1.2.0
+created: 2025-07-09
+updated: 2025-07-14
+authors:
+  - 🧠 つむぎ（設計統一・グローバルフラグ設計）
+  - 🧁 小紅（実行環境判定設計）
+  - ⚙️ エルファ（コンテキスト実装）
+  - 👤 atsushifx（全体設計・仕様確定）
+changes:
+  - 2025-07-14: フロントマター追加とドキュメント統一
+  - 2025-07-09: 初回作成
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
 
-  Copyright (c) 2025 atsushifx
-  This software is released under the MIT License.
-  https://opensource.org/licenses/MIT
--->
-
-# 📘 FeatureFlags モジュール設計仕様書
-
-## 1. 概要
+## 概要
 
 <!-- textlint-disable ja-technical-writing/sentence-length -->
 

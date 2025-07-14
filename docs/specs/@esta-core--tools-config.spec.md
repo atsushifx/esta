@@ -1,24 +1,21 @@
-<!--
-  src: docs/specs/@esta-core--tools-config.spec.md
-
-  Copyright (c) 2025 atsushifx
-  This software is released under the MIT License.
-  https://opensource.org/licenses/MIT
--->
-
 ---
+header:
+  - src: docs/specs/@esta-core--tools-config.spec.md
+  - @(#) : ESTA Install Tools configuration reader
 title: 🔧 ツール設定統合管理仕様書（@esta-core/tools-config）
 version: 1.0.0
-created: 2025-01-14
-updated: 2025-01-14
+created: 2025-07-14
+updated: 2025-07-14
 authors:
   - 🤖 Claude（初期設計・API仕様策定）
   - 👤 atsushifx（要件定義・仕様確定）
 changes:
-  - 2025-01-14: 初回作成（GitHub issue #94 対応）
+  - 2025-07-14: 初回作成（GitHub issue #94 対応）
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 ---
-
-# @esta-core/tools-config パッケージ仕様書
 
 ## 概要
 
@@ -35,7 +32,7 @@ changes:
 
 ### 1. 設定ファイル読み込み
 
-- TypeScript、JSON、YAML、JavaScript形式の設定ファイルをサポート
+- TypeScript、JSON、YAML、JavaScript 形式の設定ファイルをサポート
 - 複数の設定ファイルのマージ機能
 - 設定ファイルの自動検出機能
 
@@ -48,7 +45,7 @@ changes:
 ### 3. 型安全性
 
 - `valibot`による設定検証
-- TypeScript型定義の完全なサポート
+- TypeScript 型定義の完全なサポート
 - ランタイム時の型チェック
 
 ## API仕様
@@ -57,7 +54,7 @@ changes:
 
 #### `getTool(id: string): ToolEntry | undefined`
 
-指定されたIDのツール設定を取得します。
+指定された ID のツール設定を取得します。
 
 **パラメータ:**
 

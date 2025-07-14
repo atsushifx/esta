@@ -1,14 +1,25 @@
-<!--
-  src: docs/specs/esta-executor-specs.md
+---
+header:
+  - src: docs/specs/@esta-actions-tools-installer.spec.md
+  - @(#) : ESTA Actions Tools Installer framework
+title: 📦 ツールインストーラー統合実行仕様書（@esta-actions/tools-installer）
+version: 1.0.0
+created: 2025-07-14
+updated: 2025-07-14
+authors:
+  - 🧠 つむぎ（executor分離設計）
+  - 🧁 小紅（実行環境統合設計）
+  - ⚙️ エルファ（GitHub Actions統合）
+  - 👤 atsushifx（全体設計・仕様確定）
+changes:
+  - 2025-07-14: フロントマター追加とドキュメント統一
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
 
-  Copyright (c) 2025 atsushifx
-  This software is released under the MIT License.
-  https://opensource.org/licenses/MIT
--->
-
-# 📘 `@esta/esta-executor` 設計仕様書
-
-## 1. 概要
+## 概要
 
 `@esta/esta-executor` は、複数の実行環境（CLI、GitHub Actions、Deno など）に対応した「統一的な実行制御フレームワーク」です。
 
