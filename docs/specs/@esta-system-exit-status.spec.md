@@ -1,4 +1,22 @@
-# @esta-system/exit-status 仕様書
+---
+header:
+  - src: docs/specs/@esta-system-exit-status.spec.md
+  - @(#) : ESTA System exit status management
+title: 🚪 終了ステータス管理仕様書（@esta-system/exit-status）
+version: 1.0.0
+created: 2025-07-14
+updated: 2025-07-14
+authors:
+  - 🧠 つむぎ（シングルトン設計）
+  - ⚙️ エルファ（フェイルファスト動作実装）
+  - 👤 atsushifx（全体設計・仕様確定）
+changes:
+  - 2025-07-14: フロントマター追加とドキュメント統一
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
 
 ## 概要
 
@@ -7,37 +25,39 @@
 
 ## パッケージ情報
 
-- **パッケージ名**: `@esta-system/exit-status`
-- **バージョン**: 0.0.0
-- **タイプ**: ES Module (dual package)
-- **依存関係**: `@esta-core/error-handler`
+- パッケージ名: `@esta-system/exit-status`
+- バージョン: 0.0.0
+- タイプ: ES Module (dual package)
+- 依存関係: `@esta-core/error-handler`
 
 ## API 仕様
+
+<!-- markdownlint-disable no-duplicate-heading -->
 
 ### ExitStatus クラス
 
 #### 概要
 
-static classを使用した終了ステータス管理クラス。
+static class を使用した終了ステータス管理クラス。
 
 #### メソッド
 
 ##### `static set(status: number): void`
 
-**目的**: 終了ステータスを設定する
+目的: 終了ステータスを設定する。
 
-**パラメータ**:
+パラメータ:
 
 - `status` (number): 設定する終了ステータスコード
 
-**動作仕様**:
+動作仕様:
 
 - 正の非ゼロ値のみ受け付ける
 - ゼロ値および負の値は無視される
 - 一度非ゼロ値が設定されると、その後のゼロ値は無視される
 - 複数の非ゼロ値が設定された場合、最後の値が保持される
 
-**例**:
+例:
 
 ```typescript
 ExitStatus.set(1); // ステータスを1に設定
@@ -48,13 +68,13 @@ ExitStatus.set(2); // ステータスを2に設定
 
 ##### `static get(): number`
 
-**目的**: 現在の終了ステータスを取得する
+目的: 現在の終了ステータスを取得。
 
-**戻り値**:
+リターン値:
 
 - `number`: 現在の終了ステータスコード（0=成功、非ゼロ=エラー）
 
-**例**:
+例:
 
 ```typescript
 const status = ExitStatus.get();
@@ -65,21 +85,23 @@ if (status !== 0) {
 
 ##### `static reset(): void`
 
-**目的**: 終了ステータスをゼロ（成功）にリセットする
+目的: 終了ステータスをゼロ (成功) にリセット。
 
-**動作仕様**:
+動作仕様:
 
-- 明示的に終了ステータスを0に設定する
+- 明示的に終了ステータスを 0に設定する
 - 以前に設定された非ゼロ値をクリアする唯一の方法
 - 連続して呼び出しても問題ない
 
-**例**:
+例:
 
 ```typescript
 ExitStatus.set(1); // エラーステータスを設定
 ExitStatus.reset(); // 成功ステータスにクリア
 console.log(ExitStatus.get()); // 出力: 0
 ```
+
+<!-- markdownlint-enable -->
 
 ## 使用例
 
@@ -163,7 +185,7 @@ console.log(`Process completed with status: ${status}`);
 - [x] 非ゼロ値設定後のゼロ値無視
 - [x] 複数非ゼロ値の最後の値保持
 - [x] 負の値の無視
-- [x] ExitCode.SUCCESS定数との連携
+- [x] ExitCode.SUCCESS 定数との連携
 
 ### エッジケーステスト
 

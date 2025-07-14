@@ -1,13 +1,25 @@
-<!--
-  src: docs/specs/esta-config-spec.md
-  Copyright (c) 2025 atsushifx
-  This software is released under the MIT License.
-  https://opensource.org/licenses/MIT
--->
+---
+header:
+  - src: docs/specs/@esta-core-esta-config.spec.md
+  - @(#) : ESTA Core configuration management module
+title: 📜 統合設定管理モジュール仕様書（@esta-core/esta-config）
+version: 1.0.0
+created: 2025-07-14
+updated: 2025-07-14
+authors:
+  - 🧠 つむぎ（設計統一・モジュラー設計）
+  - 🧁 小紅（GitHub Actions特化設計）
+  - ⚙️ エルファ（スキーマ検証実装）
+  - 👤 atsushifx（全体設計・仕様確定）
+changes:
+  - 2025-07-14: フロントマター追加とドキュメント統一
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
 
-# 📘 @esta-core/esta-config モジュール設計仕様書
-
-## 1. 概要
+## 概要
 
 `@esta-core/esta-config` は、ESTA プロジェクトにおける統一的な設定管理モジュールです。**GitHub Actions での使用をメイン**とし、CLI ツールとの共通設定処理を提供します。設定の重複・不整合を解決し、シンプルで実用的な設計を目指します。
 

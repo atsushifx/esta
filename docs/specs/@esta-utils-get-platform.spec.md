@@ -1,4 +1,23 @@
-# get-platform パッケージ仕様書
+---
+header:
+  - src: docs/specs/@esta-utils-get-platform.spec.md
+  - @(#) : ESTA Utils platform detection utilities
+title: 💻 プラットフォーム判定ユーティリティ仕様書（@esta-utils/get-platform）
+version: 1.0.0
+created: 2025-07-14
+updated: 2025-07-14
+authors:
+  - 🧠 つむぎ（プラットフォーム判定アーキテクチャ）
+  - 🧁 小紅（クロスプラットフォーム対応）
+  - ⚙️ エルファ（定数・型定義実装）
+  - 👤 atsushifx（全体設計・仕様確定）
+changes:
+  - 2025-07-14: フロントマター追加とドキュメント統一
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
 
 ## 概要
 
@@ -8,7 +27,7 @@
 
 ### アーキテクチャ
 
-```
+```bash
 src/
 ├── index.ts           # バレルファイル（エクスポート管理）
 ├── getPlatform.ts     # メイン機能実装
@@ -41,15 +60,15 @@ getPlatform(platform?: TPlatformKey | 'unknown' | '', strict?: boolean): PLATFOR
 ```
 
 - デフォルトで`os.platform()`を使用
-- strictモード：未対応プラットフォームで例外スロー
-- 非strictモード：`PLATFORM_TYPE.UNKNOWN`を返却
+- strict モード：未対応プラットフォームで例外スロー
+- 非 strict モード：`PLATFORM_TYPE.UNKNOWN`を返却
 - プラットフォーム情報をキャッシュして重複実行を防止
 
 #### 3. 個別判定関数
 
 ```typescript
 isWindows(): boolean
-isLinux(): boolean  
+isLinux(): boolean
 isMacOS(): boolean
 ```
 
@@ -67,9 +86,9 @@ clearPlatformCache(): void  // 主にテスト用
 
 ### エクスポート構造
 
-- **名前付きエクスポート**: 個別機能
-- **名前空間エクスポート**: `estaUtils`オブジェクト
-- **デフォルトエクスポート**: `getPlatform`関数
+- 名前付きエクスポート: 個別機能
+- 名前空間エクスポート: `estaUtils`オブジェクト
+- デフォルトエクスポート: `getPlatform`関数
 
 ### 型定義
 
@@ -106,7 +125,7 @@ export const PATH_DELIMITER = {
 
 **改善実施**:
 
-- `PLATFORM_TYPE.UNKNOWN`を空文字列に統一（全て文字列ベース）
+- `PLATFORM_TYPE.UNKNOWN`を空文字列に統一（すべて文字列ベース）
 - 型安全なプラットフォームマッピング
 - 詳細な型定義の提供
 
@@ -130,15 +149,15 @@ export const PATH_DELIMITER = {
 
 ### パフォーマンス
 
-- **初回実行**: `os.platform()`の1回呼び出し
-- **キャッシュ後**: 即座に返却
-- **メモリ使用量**: 最小限のキャッシュ変数のみ
+- 初回実行: `os.platform()`の 1回呼び出し
+- キャッシュ後: 即座に返却
+- メモリ使用量: 最小限のキャッシュ変数のみ
 
 ### 保守性
 
-- **コード品質**: ESLint/TSルール準拠
-- **型定義**: 完全な型情報提供
-- **構造化**: 責任分離されたファイル構成
+- コード品質: ESLint/TS ルール準拠
+- 型定義: 完全な型情報提供
+- 構造化: 責任分離されたファイル構成
 
 ## API仕様
 
@@ -204,9 +223,9 @@ const platform2 = estaUtils.getPlatform();
 
 ## 結論
 
-現在の実装は以下の改善を完了しています：
+現在の実装は以下の改善を完了しています。
 
-1. **型安全性**: 全て文字列ベースのenum、詳細な型定義
+1. **型安全性**: すべて文字列ベースの enum、詳細な型定義
 2. **パフォーマンス**: キャッシュ機構による最適化
 3. **保守性**: 責任分離された構造
 4. **拡張性**: 設定ベースのプラットフォーム定義
