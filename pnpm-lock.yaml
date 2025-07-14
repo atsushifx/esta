@@ -118,6 +118,8 @@ importers:
         specifier: workspace:*
         version: link:../../../shared/packages/constants
 
+  packages/@esta-core/tools-config: {}
+
   packages/@esta-system/exit-status:
     dependencies:
       '@esta-core/error-handler':
