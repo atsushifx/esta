@@ -55,8 +55,9 @@ export const findConfigFile = (
   baseNames: readonly string[],
   dirName: string,
   searchType: TSearchConfigFileType,
+  baseDirectory?: string,
 ): string | null => {
-  const searchDirs = configSearchDirs(dirName, searchType);
+  const searchDirs = configSearchDirs(dirName, searchType, baseDirectory);
   const configFilesList = searchDirs.flatMap((dir) =>
     baseNames.flatMap((base) =>
       PREFIXES.flatMap((pref) =>

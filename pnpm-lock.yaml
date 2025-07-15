@@ -118,7 +118,17 @@ importers:
         specifier: workspace:*
         version: link:../../../shared/packages/constants
 
-  packages/@esta-core/tools-config: {}
+  packages/@esta-core/tools-config:
+    dependencies:
+      '@agla-e2e/fileio-framework':
+        specifier: workspace:*
+        version: link:../../@agla-e2e/fileio-framework
+      '@esta-utils/config-loader':
+        specifier: workspace:*
+        version: link:../../@esta-utils/config-loader
+      valibot:
+        specifier: ^1.1.0
+        version: 1.1.0(typescript@5.8.3)
 
   packages/@esta-system/exit-status:
     dependencies:
@@ -2057,6 +2067,14 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
+
+  valibot@1.1.0:
+    resolution: {integrity: sha512-Nk8lX30Qhu+9txPYTwM0cFlWLdPFsFr6LblzqIySfbZph9+BFsAHsNvHOymEviUepeIW6KFHzpX8TKhbptBXXw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   vite-node@3.2.4:
     resolution: {integrity: sha512-EbKSKh+bh1E1IFxeO0pg1n4dvoOTt0UDiXMd/qn++r98+jPO1xtJilvXldeuQ8giIB5IkpjCgMleHMNEsGH6pg==}
@@ -4173,6 +4191,10 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
+
+  valibot@1.1.0(typescript@5.8.3):
+    optionalDependencies:
+      typescript: 5.8.3
 
   vite-node@3.2.4(@types/node@22.16.4)(tsx@4.20.3)(yaml@2.8.0):
     dependencies:

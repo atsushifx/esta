@@ -8,20 +8,26 @@ export const ToolEntrySchema = object({
   options: optional(record(string(), any())),
 });
 
-export const ToolsConfigSchema = object({
-  defaultInstallDir: pipe(
-    string(),
-    check(
-      validatePath,
-      'defaultInstallDir must be a valid path (absolute: "/" or "C:\\" or relative: "./" or directory name)',
+export const ToolsConfigSchema = pipe(
+  object({
+    defaultInstallDir: pipe(
+      string(),
+      check(
+        validatePath,
+        'defaultInstallDir must be a valid path (absolute: "/" or "C:\\" or relative: "./" or directory name)',
+      ),
     ),
-  ),
-  defaultTempDir: pipe(
-    string(),
-    check(
-      validatePath,
-      'defaultTempDir must be a valid path (absolute: "/" or "C:\\" or relative: "./" or directory name)',
+    defaultTempDir: pipe(
+      string(),
+      check(
+        validatePath,
+        'defaultTempDir must be a valid path (absolute: "/" or "C:\\" or relative: "./" or directory name)',
+      ),
     ),
+    tools: array(ToolEntrySchema),
+  }),
+  check(
+    (config) => config.defaultInstallDir !== config.defaultTempDir,
+    'defaultInstallDir and defaultTempDir must be different directories',
   ),
-  tools: array(ToolEntrySchema),
-});
+);

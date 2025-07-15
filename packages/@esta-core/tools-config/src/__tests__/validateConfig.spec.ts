@@ -315,4 +315,39 @@ describe('validateConfig', () => {
       expect(result.success).toBe(false);
     });
   });
+
+  describe('ディレクトリ同一性検証', () => {
+    it('defaultInstallDirとdefaultTempDirが同じ場合に失敗する', () => {
+      // Given: defaultInstallDirとdefaultTempDirが同じconfig
+      const invalidConfig = {
+        defaultInstallDir: '.tools/bin',
+        defaultTempDir: '.tools/bin',
+        tools: [],
+      };
+
+      // When: configを検証する
+      const result = validateConfig(invalidConfig);
+
+      // Then: 検証が失敗する
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.issues[0].message).toBe('defaultInstallDir and defaultTempDir must be different directories');
+      }
+    });
+
+    it('defaultInstallDirとdefaultTempDirが異なる場合に成功する', () => {
+      // Given: defaultInstallDirとdefaultTempDirが異なるconfig
+      const validConfig = {
+        defaultInstallDir: '.tools/bin',
+        defaultTempDir: '.tools/tmp',
+        tools: [],
+      };
+
+      // When: configを検証する
+      const result = validateConfig(validConfig);
+
+      // Then: 検証が成功する
+      expect(result.success).toBe(true);
+    });
+  });
 });

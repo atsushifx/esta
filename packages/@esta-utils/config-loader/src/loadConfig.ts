@@ -27,6 +27,8 @@ export type LoadConfigOptions = {
   appName?: string;
   /** 検索タイプ（PROJECT、USER、または SYSTEM、デフォルト: USER） */
   searchType?: TSearchConfigFileType;
+  /** 検索ベースディレクトリ（指定された場合、このディレクトリから検索を開始） */
+  baseDirectory?: string;
 };
 
 // modules
@@ -101,14 +103,22 @@ const isFileIOError = (error: Error): boolean => {
  * ```
  */
 export const loadConfig = async <T = object>(options: LoadConfigOptions): Promise<T | null> => {
-  const actualOptions: Required<LoadConfigOptions> = {
+  const actualOptions: Required<Omit<LoadConfigOptions, 'baseDirectory'>> & { baseDirectory?: string } = {
     baseNames: options.baseNames,
     appName: options.appName ?? process.cwd(),
     searchType: options.searchType ?? TSearchConfigFileType.USER,
+    baseDirectory: options.baseDirectory,
   };
 
   const baseNameArray = Array.isArray(actualOptions.baseNames) ? actualOptions.baseNames : [actualOptions.baseNames];
-  const configFilePath = findConfigFile(baseNameArray, actualOptions.appName, actualOptions.searchType);
+
+  // baseDirectoryが指定された場合は、それを使用して検索
+  const configFilePath = findConfigFile(
+    baseNameArray,
+    actualOptions.appName,
+    actualOptions.searchType,
+    actualOptions.baseDirectory,
+  );
 
   if (configFilePath === null) {
     return null;
