@@ -9,7 +9,7 @@
 // valibot
 import { safeParse, type SafeParseResult } from 'valibot';
 // schemas
-import { ExtendedToolsConfigSchema } from './utils/schemas/toolsConfigSchema';
+import { ToolsConfigSchema } from '../shared/schemas';
 // types
 import type { ToolEntry } from '../shared/types';
 // validators
@@ -18,7 +18,7 @@ import { isEgetToolEntry, validateEgetToolEntry } from './validator/egetValidato
 /**
  * ツール設定の検証結果
  */
-export type ValidateResult = SafeParseResult<typeof ExtendedToolsConfigSchema>;
+export type ValidateResult = SafeParseResult<typeof ToolsConfigSchema>;
 
 /**
  * ツール設定が正しいかチェックする
@@ -30,7 +30,7 @@ export type ValidateResult = SafeParseResult<typeof ExtendedToolsConfigSchema>;
  * @returns 検証結果
  */
 export const validateConfig = (config: unknown): ValidateResult => {
-  return safeParse(ExtendedToolsConfigSchema, config);
+  return safeParse(ToolsConfigSchema, config);
 };
 
 /**

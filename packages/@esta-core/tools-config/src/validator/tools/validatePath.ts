@@ -1,16 +1,9 @@
 /**
- * パス文字列の厳密な検証ユーティリティ
- */
-
-/**
  * パス文字列の厳密な検証
  * - 空文字列でないこと
  * - 絶対パス: "/"で始まる、またはWindowsドライブレター形式（C:\など）
  * - 相対パス: "."で始まる、または直接ディレクトリ名
  * - 無効文字を含まないこと
- *
- * @param path 検証するパス文字列
- * @returns パスが有効な場合true、無効な場合false
  */
 export const validatePath = (path: string): boolean => {
   // 空文字列チェック
@@ -33,7 +26,7 @@ export const validatePath = (path: string): boolean => {
 
   // 絶対パスの検証
   const isUnixAbsolute = trimmedPath.startsWith('/');
-  const isWindowsAbsolute = /^[a-zA-Z]:[\\\/]/.test(trimmedPath); // eslint-disable-line no-useless-escape
+  const isWindowsAbsolute = /^[a-zA-Z]:[\\/]/.test(trimmedPath);
 
   // 相対パスの検証
   const isRelative = trimmedPath.startsWith('./')
@@ -60,14 +53,4 @@ export const validatePath = (path: string): boolean => {
   }
 
   return true;
-};
-
-/**
- * パスvalidationのエラーメッセージを取得
- *
- * @param fieldName フィールド名
- * @returns エラーメッセージ
- */
-export const getPathValidationErrorMessage = (fieldName: string): string => {
-  return `${fieldName} must be a valid path (absolute: "/" or "C:\\" or relative: "./" or directory name)`;
 };
