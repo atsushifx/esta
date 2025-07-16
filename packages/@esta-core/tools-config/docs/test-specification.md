@@ -21,57 +21,17 @@
 
 ## テストスイート構成
 
-### 1. 基本API テスト (`src/__tests__/index.spec.ts`)
+### 1. デフォルト設定テスト (`src/__tests__/defaultToolsConfig.spec.ts`)
 
-#### 1.1 getTool関数のテスト
-
-**目的**: ツールID指定による単一ツール取得機能の検証
-
-```typescript
-describe('getTool', () => {
-  test('存在するツールIDを指定すると対応するToolEntryを返す', () => {
-    // Given: 存在するツールID 'gh'
-    // When: getToolを呼び出す
-    // Then: 対応するToolEntryオブジェクトを返す
-  });
-
-  test('存在しないツールIDを指定するとundefinedを返す', () => {
-    // Given: 存在しないツールID 'non-existent-tool'
-    // When: getToolを呼び出す
-    // Then: undefinedを返す
-  });
-});
-```
-
-#### 1.2 listTools関数のテスト
-
-**目的**: 全ツール一覧取得機能の検証
-
-```typescript
-describe('listTools', () => {
-  test('設定されているすべてのツールのリストを返す', () => {
-    // Given: 設定されたツールリスト
-    // When: listToolsを呼び出す
-    // Then: 配列形式でツールリストを返す
-  });
-
-  test('返されるツールは有効なToolEntryオブジェクト', () => {
-    // Given: ツールリスト
-    // When: listToolsを呼び出す
-    // Then: 各要素がToolEntryの必須プロパティを持つ
-  });
-});
-```
-
-#### 1.3 defaultToolsConfig関数のテスト
+#### 1.1 getDefaultToolsConfig関数のテスト
 
 **目的**: デフォルト設定生成機能の検証
 
 ```typescript
-describe('defaultToolsConfig', () => {
+describe('getDefaultToolsConfig', () => {
   test('デフォルト設定を正しく返す', () => {
     // Given: デフォルト設定要求
-    // When: defaultToolsConfigを呼び出す
+    // When: getDefaultToolsConfigを呼び出す
     // Then: 正しいデフォルト値を持つToolsConfigを返す
   });
 
@@ -89,35 +49,57 @@ describe('defaultToolsConfig', () => {
 });
 ```
 
-#### 1.4 型定義のテスト
+#### 1.2 getDefaultTools関数のテスト
 
-**目的**: TypeScript型定義の正確性検証
+**目的**: デフォルトツール一覧取得機能の検証
 
 ```typescript
-describe('ToolEntry型の検証', () => {
-  test('必須フィールドを持つToolEntryオブジェクトを作成できる');
-  test('optionsフィールドを持つToolEntryオブジェクトを作成できる');
-});
+describe('getDefaultTools', () => {
+  test('設定されているすべてのツールのリストを返す', () => {
+    // Given: 設定されたツールリスト
+    // When: getDefaultToolsを呼び出す
+    // Then: 配列形式でツールリストを返す
+  });
 
-describe('ToolsConfig型の検証', () => {
-  test('完全なToolsConfigオブジェクトを作成できる');
+  test('返されるツールは有効なToolEntryオブジェクト', () => {
+    // Given: ツールリスト
+    // When: getDefaultToolsを呼び出す
+    // Then: 各要素がToolEntryの必須プロパティを持つ
+  });
 });
 ```
 
-#### 1.5 スキーマ検証のテスト
+#### 1.3 getDefaultTool関数のテスト
 
-**目的**: Valibotスキーマによるランタイム検証
+**目的**: ツールID指定による単一ツール取得機能の検証
 
 ```typescript
-describe('ToolEntrySchema の検証', () => {
-  test('有効なToolEntryオブジェクトを正常に検証できる');
-  test('optionsを持つToolEntryオブジェクトを正常に検証できる');
-  test('必須フィールドが不足している場合はエラーを投げる');
-});
+describe('getDefaultTool', () => {
+  test('存在するツールIDを指定すると対応するToolEntryを返す', () => {
+    // Given: 存在するツールID 'gh'
+    // When: getDefaultToolを呼び出す
+    // Then: 対応するToolEntryオブジェクトを返す
+  });
 
-describe('ToolsConfigSchema の検証', () => {
-  test('有効なToolsConfigオブジェクトを正常に検証できる');
-  test('必須フィールドが不足している場合はエラーを投げる');
+  test('存在しないツールIDを指定するとundefinedを返す', () => {
+    // Given: 存在しないツールID 'non-existent-tool'
+    // When: getDefaultToolを呼び出す
+    // Then: undefinedを返す
+  });
+});
+```
+
+#### 1.4 下位互換性テスト
+
+**目的**: 既存APIとの互換性確認
+
+```typescript
+describe('下位互換性', () => {
+  test('defaultToolsConfig関数は getDefaultToolsConfig と同じ結果を返す', () => {
+    // Given: defaultToolsConfig と getDefaultToolsConfig
+    // When: それぞれを呼び出す
+    // Then: 同じ結果を返すことを確認
+  });
 });
 ```
 
@@ -155,7 +137,7 @@ describe('null/undefined検証', () => {
 
 #### 2.3 必須フィールド検証
 
-**目的**: 必須フィールドの存在確認
+**目的**: 完全設定の必須フィールドの存在確認
 
 ```typescript
 describe('必須フィールド検証', () => {
@@ -165,6 +147,8 @@ describe('必須フィールド検証', () => {
   test('toolsのみ欠如した場合に失敗する');
 });
 ```
+
+**注意**: これらのテストは`validateCompleteConfig`を使用して実行されます。
 
 #### 2.4 ツールエントリー検証
 
@@ -267,9 +251,48 @@ describe('validateTools', () => {
 });
 ```
 
-### 5. egetバリデーターテスト (`src/validator/__tests__/egetValidator.spec.ts`)
+### 5. スキーマ検証テスト (`src/__tests__/schemas.spec.ts`)
 
-#### 5.1 egetツールエントリー検証
+#### 5.1 ToolEntrySchemaの検証
+
+**目的**: Valibotスキーマによるランタイム検証
+
+```typescript
+describe('ToolEntrySchema の検証', () => {
+  test('有効なToolEntryオブジェクトを正常に検証できる');
+  test('optionsを持つToolEntryオブジェクトを正常に検証できる');
+  test('必須フィールドが不足している場合はエラーを投げる');
+  test('文字列正規化（小文字変換）が正しく実行される');
+});
+```
+
+#### 5.2 ToolsConfigSchemaの検証
+
+**目的**: 設定全体のスキーマ検証（部分設定対応）
+
+```typescript
+describe('ToolsConfigSchema の検証', () => {
+  test('有効なToolsConfigオブジェクトを正常に検証できる');
+  test('パス正規化（小文字変換、スラッシュ統一）が正しく実行される');
+  test('部分設定でも正規化が適用される');
+});
+```
+
+#### 5.3 CompleteToolsConfigSchemaの検証
+
+**目的**: 完全設定のスキーマ検証
+
+```typescript
+describe('CompleteToolsConfigSchema の検証', () => {
+  test('完全な設定オブジェクトを正常に検証できる');
+  test('必須フィールドが不足している場合はエラーを投げる');
+  test('ディレクトリ同一性チェックが正しく実行される');
+});
+```
+
+### 6. egetバリデーターテスト (`src/validator/__tests__/egetValidator.spec.ts`)
+
+#### 6.1 egetツールエントリー検証
 
 **目的**: eget固有の検証ロジックテスト
 
@@ -281,7 +304,8 @@ describe('egetValidator', () => {
       installer: 'eget',
       id: 'ripgrep',
       repository: 'BurntSushi/ripgrep',
-      options: { version: 'latest', quiet: true },
+      version: 'latest',
+      options: { '/q': '', '/asset:': 'gh_linux_amd64.tar.gz' },
     };
     // When: validateEgetToolEntryを実行
     // Then: 検証済みEgetToolEntryを返す
@@ -294,10 +318,13 @@ describe('egetValidator', () => {
   });
 
   test('installer !== "eget"で失敗する');
+  test('無効なegetオプション文字列で失敗する');
+  test('/a や /asset: でアセット文字列が空の場合に失敗する');
+  test('/q や /quiet で値が空でない場合に失敗する');
 });
 ```
 
-#### 5.2 型判定テスト
+#### 6.2 型判定テスト
 
 ```typescript
 describe('isEgetToolEntry', () => {
@@ -319,10 +346,10 @@ const validToolsConfig: ToolsConfig = {
       installer: 'eget',
       id: 'ripgrep',
       repository: 'BurntSushi/ripgrep',
+      version: 'latest',
       options: {
-        version: 'latest',
-        quiet: true,
-        asset: 'ripgrep-*-x86_64-unknown-linux-gnu.tar.gz',
+        '/q': '',
+        '/asset:': 'ripgrep-*-x86_64-unknown-linux-gnu.tar.gz',
       },
     },
   ],

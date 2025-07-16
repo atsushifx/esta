@@ -24,14 +24,37 @@
 
 ### 1. 設定ファイル読み込みE2E (`tests/e2e/loadConfig.e2e.spec.ts`)
 
+**概要**: `loadConfig` 関数の実ファイルシステムを使用した統合テスト
+
+**テストコンテキストヘルパー**:
+
+```typescript
+const createTestContext = async (
+  testName: string,
+  testContext: { task: { id: string } },
+): Promise<{ testDir: string; cleanup: () => Promise<void> }> => {
+  const testDir = await createTempDirectory(`loadConfig-${testName}-${testContext.task.id}`);
+  return {
+    testDir,
+    cleanup: async () => {
+      await removeDirectory(testDir);
+    },
+  };
+};
+```
+
 #### 1.1 JSONファイル読み込みテスト
 
 **目的**: JSON形式設定ファイルの実際の読み込み動作検証
 
 ```typescript
 describe('JSONファイル読み込み', () => {
-  test('有効なJSON設定ファイルを読み込める', async (testContext) => {
-    // Given: 一時ディレクトリとJSON設定ファイルを作成
+  it('有効なJSON設定ファイルを読み込める', async (testContext) => {
+    // Given: テストコンテキストを作成（一意の一時ディレクトリ）
+    const ctx = await createTestContext('valid-json', testContext);
+    testContext.onTestFinished(ctx.cleanup);
+
+    // Given: 有効なJSON設定ファイルを作成
     const configData = {
       defaultInstallDir: 'custom/install/dir',
       defaultTempDir: 'custom/temp/dir',
@@ -39,23 +62,42 @@ describe('JSONファイル読み込み', () => {
         installer: 'eget',
         id: 'custom-tool',
         repository: 'custom/repo',
+        version: 'latest',
+        options: {
+          '/q': '',
+        },
       }],
     };
 
-    // When: loadConfigで実ファイルを読み込み
-    // Then: 正確な設定データが取得される
+    // When: 設定ファイルを読み込む
+    const result = await loadConfig(configFilePath);
+
+    // Then: 成功して設定が読み込まれる
+    expect(result.success).toBe(true);
+    expect(result.config).toBeDefined();
+    expect(result.config!.defaultInstallDir).toBe('custom/install/dir');
+    expect(result.config!.tools).toHaveLength(1);
   });
 
-  test('部分的な設定ファイルを読み込める', async (testContext) => {
-    // Given: 一部のフィールドのみ含むJSON設定
-    // When: loadConfigで読み込み
-    // Then: 存在するフィールドのみ取得、未定義フィールドはundefined
+  it('部分的な設定ファイルを読み込める', async (testContext) => {
+    // Given: 部分的な設定ファイルを作成
+    const configData = {
+      defaultTempDir: 'custom/temp/dir',
+      // defaultInstallDirは指定しない
+    };
+
+    // When: 設定ファイルを読み込む
+    // Then: 成功して読み込まれる
+    expect(result.config!.defaultInstallDir).toBeUndefined();
   });
 
-  test('空のJSONファイルを読み込める', async (testContext) => {
-    // Given: 空のオブジェクト {}
-    // When: loadConfigで読み込み
-    // Then: 空の設定オブジェクトが取得される
+  it('空のJSONファイルを読み込める', async (testContext) => {
+    // Given: 空のJSON設定ファイルを作成
+    const configData = {};
+
+    // When: 設定ファイルを読み込む
+    // Then: 成功して空の設定が読み込まれる
+    expect(result.config).toEqual({});
   });
 });
 ```
@@ -73,8 +115,12 @@ describe('JSONファイル読み込み', () => {
 
 ```typescript
 describe('YAMLファイル読み込み', () => {
-  test('YAML設定ファイルを読み込める', async (testContext) => {
-    // Given: YAML形式の設定ファイル作成
+  it('YAML設定ファイルを読み込める', async (testContext) => {
+    // Given: テストコンテキストを作成
+    const ctx = await createTestContext('yaml-config', testContext);
+    testContext.onTestFinished(ctx.cleanup);
+
+    // Given: YAML設定ファイルを作成
     const yamlContent = `
 defaultInstallDir: custom/yaml/dir
 defaultTempDir: custom/yaml/tmp
@@ -82,10 +128,19 @@ tools:
   - installer: eget
     id: yaml-tool
     repository: yaml/repo
+    version: latest
+    options:
+      '/q': ''
 `;
 
-    // When: loadConfigで読み込み
-    // Then: YAML→オブジェクト変換が正確に実行される
+    // When: 設定ファイルを読み込む
+    const result = await loadConfig(configFilePath);
+
+    // Then: 成功して設定が読み込まれる
+    expect(result.success).toBe(true);
+    expect(result.config!.defaultInstallDir).toBe('custom/yaml/dir');
+    expect(result.config!.tools).toHaveLength(1);
+    expect(result.config!.tools![0].id).toBe('yaml-tool');
   });
 });
 ```
@@ -98,22 +153,32 @@ tools:
 
 #### 1.3 複数ツール設定テスト
 
-**目的**: 大規模設定ファイルの処理性能と正確性検証
+**目的**: 複数ツール設定ファイルの処理性能と正確性検証
 
 ```typescript
 describe('複数ツール設定', () => {
-  test('複数のツール設定を読み込める', async (testContext) => {
-    // Given: 複数ツールエントリーを含む設定ファイル
+  it('複数のツール設定を読み込める', async (testContext) => {
+    // Given: テストコンテキストを作成
+    const ctx = await createTestContext('multiple-tools', testContext);
+    testContext.onTestFinished(ctx.cleanup);
+
+    // Given: 複数のツール設定を含むファイルを作成
     const configData = {
       defaultInstallDir: 'custom/multi/dir',
       tools: [
-        { installer: 'eget', id: 'tool1', repository: 'owner1/repo1' },
-        { installer: 'eget', id: 'tool2', repository: 'owner2/repo2' },
+        { installer: 'eget', id: 'tool1', repository: 'owner1/repo1', version: 'latest' },
+        { installer: 'eget', id: 'tool2', repository: 'owner2/repo2', version: 'latest' },
       ],
     };
 
-    // When: loadConfigで読み込み
-    // Then: 全ツール設定が正確に読み込まれる
+    // When: 設定ファイルを読み込む
+    const result = await loadConfig(configFilePath);
+
+    // Then: 成功して複数のツール設定が読み込まれる
+    expect(result.success).toBe(true);
+    expect(result.config!.tools).toHaveLength(2);
+    expect(result.config!.tools![0].id).toBe('tool1');
+    expect(result.config!.tools![1].id).toBe('tool2');
   });
 });
 ```
@@ -130,16 +195,37 @@ describe('複数ツール設定', () => {
 
 ```typescript
 describe('エラーハンドリング', () => {
-  test('存在しないファイルでエラーが発生する', async (testContext) => {
+  it('存在しないファイルでエラーが発生する', async (testContext) => {
+    // Given: テストコンテキストを作成
+    const ctx = await createTestContext('nonexistent-file', testContext);
+    testContext.onTestFinished(ctx.cleanup);
+
     // Given: 存在しないファイルパス
-    // When: loadConfigで読み込み試行
-    // Then: 適切なエラーメッセージと失敗フラグ
+    const configFilePath = path.join(ctx.testDir, 'nonexistent-config.json');
+
+    // When: 設定ファイルを読み込む
+    const result = await loadConfig(configFilePath);
+
+    // Then: ファイル読み込みエラーが発生する
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('Configuration file not found');
   });
 
-  test('不正なJSONファイルでエラーが発生する', async (testContext) => {
-    // Given: 構文エラーのあるJSONファイル
-    // When: loadConfigで読み込み試行
-    // Then: JSONパースエラーが適切に処理される
+  it('不正なJSONファイルでエラーが発生する', async (testContext) => {
+    // Given: テストコンテキストを作成
+    const ctx = await createTestContext('invalid-json', testContext);
+    testContext.onTestFinished(ctx.cleanup);
+
+    // Given: 不正なJSONファイル
+    const invalidJsonContent = '{ invalid json content }';
+    await writeFile(configFilePath, invalidJsonContent);
+
+    // When: 設定ファイルを読み込む
+    const result = await loadConfig(configFilePath);
+
+    // Then: JSONパースエラーが発生する
+    expect(result.success).toBe(false);
+    expect(result.error).toBeDefined();
   });
 });
 ```
@@ -150,45 +236,37 @@ describe('エラーハンドリング', () => {
 - ファイル権限エラーの処理
 - 不正フォーマットの適切なエラーハンドリング
 
-### 2. config-loader統合確認テスト (`tests/e2e/config-loader-test.spec.ts`)
+### 2. 現在のE2Eテスト構成
 
-#### 2.1 config-loader基本動作確認
+**テストファイル**: `tests/e2e/loadConfig.e2e.spec.ts` のみ
 
-**目的**: 依存する`@esta-utils/config-loader`の実動作検証
+**テストスイート総覧**:
 
-```typescript
-describe('config-loader動作確認', () => {
-  test('JSONファイルを正しく読み込める', async (testContext) => {
-    // Given: テスト用JSONファイルを実際に作成
-    // When: config-loaderのloadConfig関数で直接読み込み
-    // Then: 期待通りの設定オブジェクトが返される
-  });
+1. **JSONファイル読み込み** (3テスト)
+   - 有効なJSON設定ファイル
+   - 部分的な設定ファイル
+   - 空のJSONファイル
 
-  test('存在しないファイルでnullが返される', async (testContext) => {
-    // Given: 存在しないファイル名を指定
-    // When: config-loader呼び出し
-    // Then: nullが返される（例外ではない）
-  });
-});
-```
+2. **YAMLファイル読み込み** (1テスト)
+   - YAML形式の設定ファイル
+
+3. **複数ツール設定** (1テスト)
+   - 複数ツールエントリーの処理
+
+4. **エラーハンドリング** (2テスト)
+   - 存在しないファイル
+   - 不正なJSONファイル
 
 **検証ポイント**:
 
-- 外部依存ライブラリの正確な動作
-- エラー処理の一貫性
-- ファイル検索の実動作
+- 実ファイルシステムでのファイルI/O動作
+- `@esta-utils/config-loader`との統合動作
+- エラー処理の実動作
+- ファイル存在チェックの実動作
 
-#### 2.2 複数フォーマット対応確認
+**削除したファイル**:
 
-```typescript
-describe('YAMLファイル読み込み', () => {
-  test('YAMLファイルを正しく読み込める', async (testContext) => {
-    // Given: YAML形式の実ファイル
-    // When: config-loaderで読み込み
-    // Then: 正確なオブジェクト変換
-  });
-});
-```
+- `tests/e2e/config-loader-test.spec.ts` - 依存ライブラリの動作確認テストであり、このパッケージのメインロジックとは無関係のため削除
 
 ## テストデータ設計
 
@@ -198,41 +276,54 @@ describe('YAMLファイル読み込み', () => {
 
 ```json
 {
-  "defaultInstallDir": ".tools/bin",
-  "defaultTempDir": ".tools/tmp",
-  "tools": []
-}
-```
-
-#### 完全設定データ
-
-```json
-{
   "defaultInstallDir": "custom/install/dir",
   "defaultTempDir": "custom/temp/dir",
   "tools": [
     {
       "installer": "eget",
-      "id": "ripgrep",
-      "repository": "BurntSushi/ripgrep",
+      "id": "custom-tool",
+      "repository": "custom/repo",
+      "version": "latest",
       "options": {
-        "version": "latest",
-        "quiet": true,
-        "asset": "ripgrep-*-x86_64-unknown-linux-gnu.tar.gz"
+        "/q": ""
       }
     }
   ]
 }
 ```
 
-#### 大規模設定データ
+#### 部分設定データ
 
 ```json
 {
-  "defaultInstallDir": "tools/bin",
-  "defaultTempDir": "tools/tmp",
+  "defaultTempDir": "custom/temp/dir"
+}
+```
+
+#### 空の設定データ
+
+```json
+{}
+```
+
+#### 複数ツール設定
+
+```json
+{
+  "defaultInstallDir": "custom/multi/dir",
   "tools": [
-    // 100個のツールエントリー（パフォーマンステスト用）
+    {
+      "installer": "eget",
+      "id": "tool1",
+      "repository": "owner1/repo1",
+      "version": "latest"
+    },
+    {
+      "installer": "eget",
+      "id": "tool2",
+      "repository": "owner2/repo2",
+      "version": "latest"
+    }
   ]
 }
 ```
@@ -244,39 +335,25 @@ defaultInstallDir: custom/yaml/dir
 defaultTempDir: custom/yaml/tmp
 tools:
   - installer: eget
-    id: jq
-    repository: jqlang/jq
+    id: yaml-tool
+    repository: yaml/repo
+    version: latest
     options:
-      version: latest
-      quiet: true
-  - installer: eget
-    id: ripgrep
-    repository: BurntSushi/ripgrep
-    options:
-      asset: "ripgrep-*-x86_64-unknown-linux-gnu.tar.gz"
+      "/q": ""
 ```
 
 ### 異常系テストデータ
 
 #### 不正JSON
 
-```text
-{
-  "defaultInstallDir": "test",
-  "defaultTempDir": "temp"
-  // 意図的な構文エラー: カンマ不足
-}
+```javascript
+'{ invalid json content }';
 ```
 
-#### 不正YAML
+#### 存在しないファイル
 
-```yaml
-defaultInstallDir: test
-defaultTempDir: temp
-tools:
-  - installer: eget
-    id: test
-  repository: invalid/indent  # 不正なインデント
+```javascript
+'nonexistent-config.json';
 ```
 
 ## テスト環境とライフサイクル
@@ -302,32 +379,41 @@ const createTestContext = async (
 
 ### ライフサイクル管理
 
+**テストコンテキストヘルパーの使用**:
+
+```typescript
+const ctx = await createTestContext('test-name', testContext);
+testContext.onTestFinished(ctx.cleanup);
+```
+
 1. **テスト前**:
-   - 一意の一時ディレクトリ作成
-   - テスト用設定ファイル作成
-   - クリーンアップ関数の登録
+   - 一意の一時ディレクトリ作成 (`loadConfig-{testName}-{taskId}`)
+   - テスト用設定ファイル作成 (`writeFile`)
+   - クリーンアップ関数の登録 (`testContext.onTestFinished`)
 
 2. **テスト実行**:
    - 実際のファイルI/O操作
-   - loadConfig関数の呼び出し
-   - 結果の検証
+   - `loadConfig(configFilePath)` 関数の呼び出し
+   - `LoadConfigResult` の検証
 
 3. **テスト後**:
-   - 一時ディレクトリの自動削除
+   - 一時ディレクトリの自動削除 (`removeDirectory`)
    - リソースの適切な解放
+   - テスト失敗時の確実なクリーンアップ
 
 ## パフォーマンス要件
 
 ### 処理時間要件
 
-- **小規模設定**（10ツール以下）: 50ms以下
-- **中規模設定**（100ツール以下）: 200ms以下
-- **大規模設定**（1000ツール以下）: 2秒以下
+- **小規模設定**（空の設定ファイル）: 50ms以下
+- **中規模設定**（数個のツールエントリー）: 100ms以下
+- **複数ツール設定**（2つのツールエントリー）: 100ms以下
 
 ### メモリ使用量要件
 
 - 設定ファイルサイズの5倍以下のメモリ使用量
 - テスト後のメモリリーク検出（0バイト）
+- 一時ディレクトリの確実なクリーンアップ
 
 ## 統合テストシナリオ
 
@@ -397,7 +483,7 @@ describe('ネットワークファイルシステム', () => {
 ### CI環境での実行
 
 - **実行頻度**: 全コミット、全プルリクエスト
-- **並列実行**: テストケース間の独立性確保
+- **並列実行**: テストケース間の独立性確保（一意テストID使用）
 - **クリーンアップ**: テスト失敗時の確実なリソース解放
 - **レポート**: 詳細なテスト結果とカバレッジレポート
 
@@ -414,6 +500,12 @@ describe('ネットワークファイルシステム', () => {
 3. **macOS環境**:
    - ケースセンシティブファイルシステムでの動作確認
 
+### テストコマンド
+
+- **単体テスト実行**: `pnpm run test:ci`
+- **テスト設定**: `vitest.config.ci.ts`
+- **テストファイル**: `tests/e2e/loadConfig.e2e.spec.ts`
+
 ## 保守とメンテナンス
 
 ### テストデータの保守
@@ -427,6 +519,12 @@ describe('ネットワークファイルシステム', () => {
 - `@esta-utils/config-loader`更新時の回帰テスト
 - `@agla-e2e/fileio-framework`更新時の動作確認
 - 新しいファイル形式サポート時の統合テスト追加
+
+### テスト改善推奨事項
+
+1. **ファイルサイズ制限テスト**: 大きな設定ファイルの処理テスト追加
+2. **ファイル権限テスト**: 読み込み専用ファイルの処理テスト
+3. **パフォーマンステスト**: 大量データ処理時のパフォーマンス検証
 
 ### トラブルシューティング
 

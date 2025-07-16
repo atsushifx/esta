@@ -12,19 +12,26 @@
 @esta-core/tools-config/
 ├── src/
 │   ├── index.ts              # エクスポート定義
-│   ├── defaults.ts           # デフォルト設定
-│   ├── loadConfig.ts         # 設定ファイル読み込み
-│   ├── tools.ts              # ツール操作
-│   ├── validateConfig.ts     # 設定検証
-│   └── validator/
-│       ├── egetValidator.ts  # eget専用バリデーター
+│   ├── core/
+│   │   ├── index.ts          # コア機能エクスポート
+│   │   └── config/
+│   │       ├── index.ts      # 設定関連エクスポート
+│   │       ├── loader.ts     # 設定ファイル読み込み
+│   │       └── defaults.ts   # デフォルト設定
+│   ├── types/               # 型定義（共有型のリエクスポート）
+│   │   ├── index.ts
+│   │   ├── config.ts
+│   │   └── tools.ts
+│   └── validator/           # 検証機能
+│       ├── index.ts
+│       ├── config.ts
+│       ├── egetValidator.ts
+│       ├── utils.ts
 │       └── tools/
-│           ├── index.ts
-│           └── validatePath.ts
+│           └── index.ts
 ├── shared/
 │   ├── types/               # 共有型定義
 │   │   ├── index.ts
-│   │   ├── toolEntry.types.ts
 │   │   └── tools.types.ts
 │   └── schemas/             # バリデーションスキーマ
 │       ├── index.ts
@@ -42,7 +49,8 @@ export type ToolEntry = {
   installer: string; // インストーラータイプ ('eget' 等)
   id: string; // ツール識別子
   repository: string; // GitHubリポジトリ ('owner/repo' 形式)
-  options?: Record<string, unknown>; // インストーラー固有オプション
+  version?: string; // バージョン指定（セマンティックバージョンまたは"latest"）
+  options?: Record<string, string>; // インストーラー固有オプション（文字列のみ）
 };
 
 export type ToolsConfig = {
@@ -50,27 +58,21 @@ export type ToolsConfig = {
   defaultTempDir: string; // デフォルト一時ディレクトリ
   tools: ToolEntry[]; // ツールエントリー配列
 };
+
+export type PartialToolsConfig = Partial<ToolsConfig>; // 部分設定
 ```
 
 #### eget専用型定義
 
 ```typescript
-export type EgetToolEntryOptions = {
-  version?: string; // バージョン指定 (/tag:xxx)
-  installDir?: string; // インストールディレクトリ (/to:xxx)
-  quiet?: boolean; // 静粛モード (/quiet)
-  asset?: string; // アセット指定 (/asset:xxx)
-};
-
-export type EgetToolEntry = Omit<ToolEntry, 'options'> & {
+export type EgetToolEntry = ToolEntry & {
   installer: 'eget';
-  options?: EgetToolEntryOptions;
 };
 ```
 
 ## 主要コンポーネント
 
-### 1. 設定ファイル読み込み (loadConfig.ts)
+### 1. 設定ファイル読み込み (core/config/loader.ts)
 
 **責務**: 設定ファイルの読み込みとパース
 
@@ -78,16 +80,19 @@ export type EgetToolEntry = Omit<ToolEntry, 'options'> & {
 
 - ファイル存在チェック
 - `@esta-utils/config-loader`を使用した設定読み込み
+- スキーマ検証による正規化処理
 - エラーハンドリング
 
 **API**:
 
 ```typescript
 export const loadConfig = async (configPath: string): Promise<LoadConfigResult>
+export const isCompleteConfig = (config: PartialToolsConfig): config is ToolsConfig
+export const validateCompleteConfig = (config: PartialToolsConfig): ToolsConfig
 
 export type LoadConfigResult = {
   success: boolean;
-  config?: Partial<ToolsConfig>;
+  config?: PartialToolsConfig;
   error?: string;
 };
 ```
@@ -97,22 +102,28 @@ export type LoadConfigResult = {
 - `TSearchConfigFileType.PROJECT`で指定ディレクトリ内を検索
 - JSON, YAML, JS/TS形式をサポート
 - ファイル拡張子を除いたベース名で検索
+- 部分設定でも文字列正規化を実行（小文字変換、パス正規化）
 
-### 2. 設定検証 (validateConfig.ts)
+### 2. 設定検証 (validator/config.ts)
 
 **責務**: 設定データの妥当性検証
 
 **機能**:
 
-- ToolsConfig全体の構造検証
+- 部分設定の検証（ToolsConfigSchema）
+- 完全設定の検証（CompleteToolsConfigSchema）
 - ツールエントリー配列の検証
 - インストーラータイプ別の詳細検証
 
 **API**:
 
 ```typescript
-export const validateConfig = (config: unknown): ValidateResult
+export const validateConfig = (config: unknown): ValidateConfigResult
+export const validateCompleteConfig = (config: unknown): ValidateCompleteConfigResult
 export const validateTools = (tools: unknown[]): ValidateToolsResult
+
+export type ValidateConfigResult = SafeParseResult<typeof ToolsConfigSchema>;
+export type ValidateCompleteConfigResult = SafeParseResult<typeof CompleteToolsConfigSchema>;
 
 export type ValidateToolsResult = {
   success: boolean;
@@ -131,6 +142,7 @@ export type ValidateToolsResult = {
 2. installerフィールドの存在確認
 3. インストーラータイプ別の詳細検証
 4. エラー収集と有効エントリーの分離
+5. 文字列正規化（小文字変換、パス正規化）
 
 ### 3. egetバリデーター (validator/egetValidator.ts)
 
@@ -139,7 +151,7 @@ export type ValidateToolsResult = {
 **機能**:
 
 - GitHubリポジトリ形式検証 (`owner/repo`)
-- eget専用オプションの検証
+- eget専用オプション文字列の検証
 - 型安全な変換処理
 
 **API**:
@@ -153,28 +165,65 @@ export const isEgetToolEntry = (entry: ToolEntry): entry is EgetToolEntry
 
 - `installer`フィールドが`'eget'`であること
 - `repository`が`owner/repo`形式であること
-- `options`がEgetToolEntryOptionsの形式であること
+- `options`が有効なegetオプション文字列であること
+
+**有効なegetオプション**:
+
+- `/q`: 静粛モード（値は空文字列）
+- `/quiet`: 静粛モード（値は空文字列）
+- `/a`: アセット指定（値にアセット文字列が必要）
+- `/asset:`: アセット指定（値にアセット文字列が必要）
 
 ### 4. ツール操作 (tools.ts)
 
 **責務**: ツール設定の操作機能
 
-**想定機能** (実装予定):
+**実装機能**:
 
 - ツール検索 (`getTool`)
 - ツール一覧取得 (`listTools`)
 - ツール追加/削除
 - 設定のマージ処理
 
-### 5. デフォルト設定 (defaults.ts)
+**API**:
+
+```typescript
+export const getTool = (id: string): ToolEntry | undefined
+export const listTools = (): ToolEntry[]
+export const addTool = (tool: ToolEntry): void
+export const removeTool = (id: string): boolean
+```
+
+### 5. デフォルト設定 (core/config/defaults.ts)
 
 **責務**: デフォルト設定値の提供
 
-**想定機能** (実装予定):
+**実装機能**:
 
-- `defaultToolsConfig`の定義
-- プラットフォーム別デフォルト値
-- 環境変数からの設定読み込み
+- `getDefaultToolsConfig`の定義
+- デフォルトツールリストの提供
+- 特定ツールの検索機能
+
+**API**:
+
+```typescript
+export const getDefaultToolsConfig = (): ToolsConfig
+export const getDefaultTools = (): ToolEntry[]
+export const getDefaultTool = (id: string): ToolEntry | undefined
+export const defaultToolsConfig = getDefaultToolsConfig // 下位互換性
+```
+
+**デフォルトツール一覧**:
+
+- gh (GitHub CLI)
+- ripgrep (高速検索)
+- fd (ファイル検索)
+- bat (cat代替)
+- exa (ls代替)
+- jq (JSON処理)
+- yq (YAML処理)
+- delta (git差分表示)
+- gitleaks (秘密情報検出)
 
 ## データフロー
 
@@ -226,6 +275,13 @@ valibotを使用した型安全なスキーマ検証:
 - コンパイル時とランタイムの型安全性
 - パフォーマンスを重視したバリデーション
 - カスタム変換処理のサポート
+- 部分設定と完全設定の分離検証
+
+**スキーマ構成**:
+
+- `ToolsConfigSchema`: 部分設定対応（フィールドがオプショナル）
+- `CompleteToolsConfigSchema`: 完全設定検証（必須フィールドチェック）
+- `ToolEntrySchema`: ツールエントリーの検証と正規化
 
 ## 依存関係
 
@@ -234,11 +290,13 @@ valibotを使用した型安全なスキーマ検証:
 - `valibot`: スキーマ検証ライブラリ
 - `@esta-utils/config-loader`: 設定ファイル読み込み
 - `@agla-e2e/fileio-framework`: E2Eテスト用
+- `node:fs`: ファイル存在チェック
+- `node:path`: パス操作
 
 ### 内部依存
 
 - `@shared/types`: 共有型定義
-- `@shared/constants`: 共有定数
+- `@shared/schemas`: 共有スキーマ定義
 
 ## 拡張性
 
@@ -262,6 +320,8 @@ valibotを使用した型安全なスキーマ検証:
 - 設定ファイル読み込みの最適化
 - 大量のツールエントリーに対応した効率的な検証
 - エラー情報の詳細化とパフォーマンスのバランス
+- デフォルト設定の配列コピーによるイミュータブル性の保証
+- ファイル存在チェックの効率化
 
 ## セキュリティ考慮事項
 
