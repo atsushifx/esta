@@ -1,4 +1,4 @@
-// src/__tests__/loadConfig.spec.ts
+// src/core/config/__tests__/loadConfig.spec.ts
 // @(#) : loadConfig関数のユニットテスト（ファイル読み込み専用）
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -10,7 +10,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { MockedFunction } from 'vitest';
 // test target
-import { loadConfig } from '@/core/config/loader';
+import { loadConfig } from '../loader';
 
 // fs moduleをモック
 vi.mock('node:fs', () => ({

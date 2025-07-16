@@ -12,6 +12,7 @@ export type { ValidateConfigResult } from './config';
 
 // Tools validation
 export * from './tools';
+export * from './validate';
 
 // Eget validator
 export * from './egetValidator';

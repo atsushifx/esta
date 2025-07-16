@@ -1,4 +1,4 @@
-// src/__tests__/validateConfig.spec.ts
+// src/validator/__tests__/validateConfig.spec.ts
 // @(#) : validateConfig関数のテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -9,9 +9,9 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // test target
-import { validateCompleteConfig, validateConfig } from '@/validator/config';
+import { validateCompleteConfig, validateConfig } from '../config';
 // types
-import type { ToolsConfig } from '../../shared/types';
+import type { ToolsConfig } from '../../../shared/types';
 
 /**
  * validateConfig関数のテスト

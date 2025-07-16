@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defaultToolsConfig } from '../core/config/defaults';
+import { defaultToolsConfig } from '../defaults';
 
 describe('defaultToolsConfig', () => {
   describe('基本設定の検証', () => {

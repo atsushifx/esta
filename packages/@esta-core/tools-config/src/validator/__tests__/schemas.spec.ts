@@ -1,7 +1,7 @@
 import { parse } from 'valibot';
 import { describe, expect, it } from 'vitest';
-import { CompleteToolsConfigSchema, ToolEntrySchema, ToolsConfigSchema } from '../../shared/schemas';
-import type { ToolEntry, ToolsConfig } from '../../shared/types';
+import { CompleteToolsConfigSchema, ToolEntrySchema, ToolsConfigSchema } from '../../../shared/schemas';
+import type { ToolEntry, ToolsConfig } from '../../../shared/types';
 
 describe('Type Definitions', () => {
   describe('ToolEntry型', () => {

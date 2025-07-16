@@ -9,9 +9,9 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // test target
-import { validateTools } from '@/validator/tools';
+import { validateTools } from '../validate';
 // types
-import type { ToolEntry } from '../../shared/types';
+import type { ToolEntry } from '../../../shared/types';
 
 /**
  * validateTools関数のテスト
