@@ -1,18 +1,17 @@
 import { boolean, object, optional, pipe, safeParse, string, transform } from 'valibot';
-import type { ToolEntry } from '../../shared/types';
+import type { ToolEntry } from '../types';
 
 /**
  * eget用ツールエントリーのオプション型
- * 実際に使用可能なオプションのみを定義
  */
 export type EgetToolEntryOptions = {
-  /** バージョン指定（/tag:xxxとして使用） */
+  /** バージョン指定 */
   version?: string;
-  /** インストールディレクトリ（/to:xxxとして使用） */
+  /** インストールディレクトリ */
   installDir?: string;
-  /** 静粛モード（/quietとして使用） */
+  /** 静粛モード */
   quiet?: boolean;
-  /** アセット指定（/asset:xxxとして使用） */
+  /** アセット指定 */
   asset?: string;
 };
 

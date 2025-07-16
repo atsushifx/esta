@@ -9,7 +9,7 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // test target
-import { validateTools } from '@/validateConfig';
+import { validateTools } from '@/validator/tools';
 // types
 import type { ToolEntry } from '../../shared/types';
 
@@ -108,7 +108,7 @@ describe('validateTools', () => {
       expect(result.errors[0]).toEqual({
         index: 1,
         entry: null,
-        error: 'Tool entry must be an object',
+        error: 'Tool entry must be an object with installer, id, and repository fields',
       });
     });
 
@@ -128,7 +128,7 @@ describe('validateTools', () => {
       expect(result.success).toBe(false);
       expect(result.validEntries).toHaveLength(0);
       expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].error).toBe('Tool entry must have an installer field');
+      expect(result.errors[0].error).toBe('Tool entry must be an object with installer, id, and repository fields');
     });
 
     it('未対応のinstallerタイプを検証して失敗する', () => {
@@ -210,7 +210,7 @@ describe('validateTools', () => {
       expect(result.errors[0].index).toBe(1);
       expect(result.errors[0].error).toBe('Unsupported installer type: npm');
       expect(result.errors[1].index).toBe(3);
-      expect(result.errors[1].error).toBe('Tool entry must be an object');
+      expect(result.errors[1].error).toBe('Tool entry must be an object with installer, id, and repository fields');
     });
 
     it('すべてのエントリーが無効なリストを検証して完全に失敗する', () => {

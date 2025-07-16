@@ -151,6 +151,18 @@ describe('ToolEntrySchema の検証', () => {
     expect(result.repository).toBe('cli/cli');
   });
 
+  test('idとrepositoryを小文字に正規化する', () => {
+    const validToolEntry = {
+      installer: 'eget',
+      id: 'GH',
+      repository: 'CLI/CLI',
+    };
+
+    const result = parse(ToolEntrySchema, validToolEntry);
+    expect(result.id).toBe('gh');
+    expect(result.repository).toBe('cli/cli');
+  });
+
   test('optionsを持つToolEntryオブジェクトを正常に検証できる', () => {
     const validToolEntry = {
       installer: 'eget',
@@ -165,6 +177,21 @@ describe('ToolEntrySchema の検証', () => {
     const result = parse(ToolEntrySchema, validToolEntry);
     expect(result.options?.version).toBe('latest');
     expect(result.options?.args).toEqual(['--quiet']);
+  });
+
+  test('optionsのargs配列を小文字に正規化する', () => {
+    const validToolEntry = {
+      installer: 'eget',
+      id: 'gh',
+      repository: 'cli/cli',
+      options: {
+        version: 'latest',
+        args: ['--QUIET', '--VERBOSE'],
+      },
+    };
+
+    const result = parse(ToolEntrySchema, validToolEntry);
+    expect(result.options?.args).toEqual(['--quiet', '--verbose']);
   });
 
   test('必須フィールドが不足している場合はエラーを投げる', () => {
@@ -201,6 +228,18 @@ describe('ToolsConfigSchema の検証', () => {
     expect(result.defaultTempDir).toBe('.tools/tmp');
     expect(result.tools).toHaveLength(1);
     expect(result.tools[0].id).toBe('gh');
+  });
+
+  test('パスを"/"形式+小文字に正規化する', () => {
+    const validToolsConfig = {
+      defaultInstallDir: '.TOOLS\\BIN',
+      defaultTempDir: '.TOOLS\\TMP',
+      tools: [],
+    };
+
+    const result = parse(ToolsConfigSchema, validToolsConfig);
+    expect(result.defaultInstallDir).toBe('.tools/bin');
+    expect(result.defaultTempDir).toBe('.tools/tmp');
   });
 
   test('必須フィールドが不足している場合はエラーを投げる', () => {

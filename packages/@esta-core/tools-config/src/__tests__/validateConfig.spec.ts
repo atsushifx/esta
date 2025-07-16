@@ -9,7 +9,7 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // test target
-import { validateConfig } from '@/validateConfig';
+import { validateConfig } from '@/validator/config';
 // types
 import type { ToolsConfig } from '../../shared/types';
 

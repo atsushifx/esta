@@ -1,15 +1,19 @@
-// Types
-export type { ToolEntry, ToolsConfig } from '../shared/types';
+// src/index.ts
+// @(#) : メインエクスポート
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
-// Schemas
-export { ToolEntrySchema, ToolsConfigSchema } from '../shared/schemas';
+// ===== 型定義 =====
+export type * from './types';
 
-// Functions
-export { defaultToolsConfig } from './defaults';
-export { getTool, listTools } from './tools';
-export { validateConfig, validateTools } from './validateConfig';
-export type { ValidateResult, ValidateToolsResult } from './validateConfig';
+// ===== スキーマ =====
+export * from '../shared/schemas';
 
-// Validators
-export { isEgetToolEntry, validateEgetToolEntry } from './validator/egetValidator';
-export type { EgetToolEntry, EgetToolEntryOptions } from './validator/egetValidator';
+// ===== コア機能 =====
+export * from './core';
+
+// ===== 検証機能 =====
+export * from './validator';
