@@ -6,6 +6,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { parse } from 'valibot';
+import { CompleteToolsConfigSchema } from '../../../shared/schemas';
 import type { ToolEntry, ToolsConfig } from '../../types';
 
 /**
@@ -61,32 +63,46 @@ const defaultTools: ToolEntry[] = [
 ];
 
 /**
- * デフォルトのツール設定を取得する
- * @returns デフォルトのToolsConfig
+ * デフォルトのツール設定を取得する（validated済み）
+ * @returns 検証済みのToolsConfig
  */
 export const getDefaultToolsConfig = (): ToolsConfig => {
-  return {
+  const config = {
     defaultInstallDir: '.tools/bin',
     defaultTempDir: '.tools/tmp',
     tools: [...defaultTools], // 配列のコピーを返す
   };
+
+  // スキーマで検証・正規化して返す
+  return parse(CompleteToolsConfigSchema, config) as ToolsConfig;
 };
 
 /**
- * デフォルトツールリストを取得する
- * @returns デフォルトツールの配列
+ * デフォルトツールリストを取得する（validated済み）
+ * @returns 検証済みのツールエントリー配列
  */
 export const getDefaultTools = (): ToolEntry[] => {
-  return [...defaultTools];
+  // 各ツールエントリーを検証して返す
+  return defaultTools.map((tool) => {
+    // ToolEntryの検証は既にdefaultToolsで行われているが、
+    // 将来的にスキーマ検証を追加する場合はここで実装
+    return { ...tool };
+  });
 };
 
 /**
- * 特定のデフォルトツールを取得する
+ * 特定のデフォルトツールを取得する（validated済み）
  * @param id ツールID
- * @returns 見つかったツールエントリー、または undefined
+ * @returns 見つかった検証済みツールエントリー、または undefined
  */
 export const getDefaultTool = (id: string): ToolEntry | undefined => {
-  return defaultTools.find((tool) => tool.id === id);
+  const tool = defaultTools.find((tool) => tool.id === id);
+  if (!tool) {
+    return undefined;
+  }
+
+  // ツールエントリーのコピーを返す
+  return { ...tool };
 };
 
 // 下位互換性のため

@@ -1,26 +1,42 @@
-import { boolean, object, optional, pipe, safeParse, string, transform } from 'valibot';
+import { object, optional, pipe, record, safeParse, string, transform } from 'valibot';
 import type { ToolEntry } from '../types';
 
 /**
- * eget用ツールエントリーのオプション型
+ * eget用の有効なオプション文字列
  */
-export type EgetToolEntryOptions = {
-  /** バージョン指定 */
-  version?: string;
-  /** インストールディレクトリ */
-  installDir?: string;
-  /** 静粛モード */
-  quiet?: boolean;
-  /** アセット指定 */
-  asset?: string;
+const VALID_EGET_OPTIONS = ['/q', '/quiet', '/a', '/asset:'] as const;
+
+/**
+ * eget用オプションの検証
+ * @param options オプション文字列のRecord
+ * @returns 検証結果
+ */
+const validateEgetOptions = (options: Record<string, string>): boolean => {
+  for (const [key, value] of Object.entries(options)) {
+    // キーが有効なオプションかチェック
+    if (!VALID_EGET_OPTIONS.includes(key as (typeof VALID_EGET_OPTIONS)[number])) {
+      return false;
+    }
+
+    // /a や /asset: の場合、値（アセット文字列）が必要
+    if ((key === '/a' || key === '/asset:') && (!value || value.trim() === '')) {
+      return false;
+    }
+
+    // /q や /quiet の場合、値は空でも良い
+    if ((key === '/q' || key === '/quiet') && value !== '') {
+      return false;
+    }
+  }
+
+  return true;
 };
 
 /**
  * eget用ツールエントリー型
  */
-export type EgetToolEntry = Omit<ToolEntry, 'options'> & {
+export type EgetToolEntry = ToolEntry & {
   installer: 'eget';
-  options?: EgetToolEntryOptions;
 };
 
 /**
@@ -30,16 +46,6 @@ const validateRepositoryFormat = (repository: string): boolean => {
   const githubRepoPattern = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
   return githubRepoPattern.test(repository);
 };
-
-/**
- * eget用のオプションスキーマ
- */
-export const EgetOptionsSchema = object({
-  version: optional(string()),
-  installDir: optional(string()),
-  quiet: optional(boolean()),
-  asset: optional(string()),
-});
 
 /**
  * eget用ツールエントリーのスキーマ
@@ -64,7 +70,20 @@ export const EgetToolEntrySchema = object({
       return value;
     }),
   ),
-  options: optional(EgetOptionsSchema),
+  version: optional(string()),
+  options: optional(
+    pipe(
+      record(string(), string()),
+      transform((options) => {
+        // eget用オプションの検証
+        if (!validateEgetOptions(options)) {
+          throw new Error('Invalid eget options');
+        }
+
+        return options;
+      }),
+    ),
+  ),
 });
 
 /**

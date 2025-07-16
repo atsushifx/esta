@@ -6,36 +6,5 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-/**
- * ツール設定エントリー
- * 個別のツールのインストール設定を表す
- */
-export type ToolEntry = {
-  /** インストーラータイプ（'eget', 'script'等） */
-  installer: string;
-  /** ツールの一意識別子 */
-  id: string;
-  /** GitHubリポジトリ（'owner/repo'形式） */
-  repository: string;
-  /** インストーラー固有のオプション */
-  options?: Record<string, unknown>;
-};
-
-/**
- * ツール設定全体
- * 複数のツールエントリーとデフォルト設定を含む
- */
-export type ToolsConfig = {
-  /** デフォルトインストールディレクトリ */
-  defaultInstallDir: string;
-  /** デフォルト一時ディレクトリ */
-  defaultTempDir: string;
-  /** ツールエントリーのリスト */
-  tools: ToolEntry[];
-};
-
-/**
- * 部分的なツール設定
- * 設定ファイル読み込み時に使用
- */
-export type PartialToolsConfig = Partial<ToolsConfig>;
+// 共有型は /shared/types からインポートする
+export type { PartialToolsConfig, ToolEntry, ToolsConfig } from '../../shared/types';

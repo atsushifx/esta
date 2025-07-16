@@ -9,7 +9,7 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // test target
-import { validateConfig } from '@/validator/config';
+import { validateCompleteConfig, validateConfig } from '@/validator/config';
 // types
 import type { ToolsConfig } from '../../shared/types';
 
@@ -31,9 +31,9 @@ describe('validateConfig', () => {
             installer: 'eget',
             id: 'ripgrep',
             repository: 'BurntSushi/ripgrep',
+            version: 'latest',
             options: {
-              version: 'latest',
-              quiet: true,
+              '/q': '',
             },
           },
         ],
@@ -76,8 +76,8 @@ describe('validateConfig', () => {
       // Given: 空オブジェクト
       const invalidConfig = {};
 
-      // When: configを検証する
-      const result = validateConfig(invalidConfig);
+      // When: 完全設定として検証する
+      const result = validateCompleteConfig(invalidConfig);
 
       // Then: 検証が失敗する
       expect(result.success).toBe(false);
@@ -90,8 +90,8 @@ describe('validateConfig', () => {
         tools: [],
       };
 
-      // When: configを検証する
-      const result = validateConfig(invalidConfig);
+      // When: 完全設定として検証する
+      const result = validateCompleteConfig(invalidConfig);
 
       // Then: 検証が失敗する
       expect(result.success).toBe(false);
@@ -104,8 +104,8 @@ describe('validateConfig', () => {
         tools: [],
       };
 
-      // When: configを検証する
-      const result = validateConfig(invalidConfig);
+      // When: 完全設定として検証する
+      const result = validateCompleteConfig(invalidConfig);
 
       // Then: 検証が失敗する
       expect(result.success).toBe(false);
@@ -118,8 +118,8 @@ describe('validateConfig', () => {
         defaultTempDir: '.tools/tmp',
       };
 
-      // When: configを検証する
-      const result = validateConfig(invalidConfig);
+      // When: 完全設定として検証する
+      const result = validateCompleteConfig(invalidConfig);
 
       // Then: 検証が失敗する
       expect(result.success).toBe(false);
@@ -325,8 +325,8 @@ describe('validateConfig', () => {
         tools: [],
       };
 
-      // When: configを検証する
-      const result = validateConfig(invalidConfig);
+      // When: 完全設定として検証する
+      const result = validateCompleteConfig(invalidConfig);
 
       // Then: 検証が失敗する
       expect(result.success).toBe(false);
@@ -343,8 +343,8 @@ describe('validateConfig', () => {
         tools: [],
       };
 
-      // When: configを検証する
-      const result = validateConfig(validConfig);
+      // When: 完全設定として検証する
+      const result = validateCompleteConfig(validConfig);
 
       // Then: 検証が成功する
       expect(result.success).toBe(true);

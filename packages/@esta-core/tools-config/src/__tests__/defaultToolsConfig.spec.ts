@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defaultToolsConfig } from '../defaults';
+import { defaultToolsConfig } from '../core/config/defaults';
 
 describe('defaultToolsConfig', () => {
   describe('基本設定の検証', () => {
@@ -61,7 +61,7 @@ describe('defaultToolsConfig', () => {
       config.tools.forEach((tool) => {
         expect(tool.id).toBe(tool.id.toLowerCase());
         expect(tool.repository).toBe(tool.repository.toLowerCase());
-        // installer は正規化対象外だが、確認
+        // installer も正規化対象になった
         expect(tool.installer).toBe('eget');
       });
     });
@@ -77,6 +77,7 @@ describe('defaultToolsConfig', () => {
       const ripgrep = config.tools.find((tool) => tool.id === 'ripgrep');
       expect(ripgrep?.id).toBe('ripgrep'); // 小文字
       expect(ripgrep?.repository).toBe('burntsushi/ripgrep'); // 小文字（BurntSushi → burntsushi）
+      expect(ripgrep?.installer).toBe('eget'); // 小文字
     });
   });
 });

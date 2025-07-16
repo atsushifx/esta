@@ -1,6 +1,6 @@
 import { parse } from 'valibot';
 import { describe, expect, it } from 'vitest';
-import { ToolEntrySchema, ToolsConfigSchema } from '../../shared/schemas';
+import { CompleteToolsConfigSchema, ToolEntrySchema, ToolsConfigSchema } from '../../shared/schemas';
 import type { ToolEntry, ToolsConfig } from '../../shared/types';
 
 describe('Type Definitions', () => {
@@ -23,13 +23,13 @@ describe('Type Definitions', () => {
         id: 'gh',
         repository: 'cli/cli',
         options: {
-          version: 'latest',
-          args: ['--quiet'],
+          '/q': '',
+          '/asset:': 'gh_linux_amd64.tar.gz',
         },
       };
 
-      expect(toolEntry.options?.version).toBe('latest');
-      expect(toolEntry.options?.args).toEqual(['--quiet']);
+      expect(toolEntry.options?.['/q']).toBe('');
+      expect(toolEntry.options?.['/asset:']).toBe('gh_linux_amd64.tar.gz');
     });
   });
 
@@ -44,8 +44,7 @@ describe('Type Definitions', () => {
             id: 'gh',
             repository: 'cli/cli',
             options: {
-              version: 'latest',
-              args: ['--quiet'],
+              '/q': '',
             },
           },
         ],
@@ -81,14 +80,14 @@ describe('Schema Validation', () => {
           id: 'gh',
           repository: 'cli/cli',
           options: {
-            version: 'latest',
-            args: ['--quiet'],
+            '/q': '',
+            '/asset:': 'gh_linux_amd64.tar.gz',
           },
         };
 
         const result = parse(ToolEntrySchema, validToolEntry);
-        expect(result.options?.version).toBe('latest');
-        expect(result.options?.args).toEqual(['--quiet']);
+        expect(result.options?.['/q']).toBe('');
+        expect(result.options?.['/asset:']).toBe('gh_linux_amd64.tar.gz');
       });
     });
 
@@ -105,19 +104,18 @@ describe('Schema Validation', () => {
         expect(result.repository).toBe('cli/cli');
       });
 
-      it('should normalize args array to lowercase', () => {
+      it('should normalize option values to lowercase', () => {
         const validToolEntry = {
           installer: 'eget',
           id: 'gh',
           repository: 'cli/cli',
           options: {
-            version: 'latest',
-            args: ['--QUIET', '--VERBOSE'],
+            '/asset:': 'GH_LINUX_AMD64.TAR.GZ',
           },
         };
 
         const result = parse(ToolEntrySchema, validToolEntry);
-        expect(result.options?.args).toEqual(['--quiet', '--verbose']);
+        expect(result.options?.['/asset:']).toBe('gh_linux_amd64.tar.gz');
       });
     });
 
@@ -145,9 +143,9 @@ describe('Schema Validation', () => {
               installer: 'eget',
               id: 'gh',
               repository: 'cli/cli',
+              version: 'latest',
               options: {
-                version: 'latest',
-                args: ['--quiet'],
+                '/q': '',
               },
             },
           ],
@@ -157,7 +155,7 @@ describe('Schema Validation', () => {
         expect(result.defaultInstallDir).toBe('.tools/bin');
         expect(result.defaultTempDir).toBe('.tools/tmp');
         expect(result.tools).toHaveLength(1);
-        expect(result.tools[0].id).toBe('gh');
+        expect(result.tools?.[0].id).toBe('gh');
       });
     });
 
@@ -217,7 +215,7 @@ describe('Schema Validation', () => {
           tools: [],
         };
 
-        expect(() => parse(ToolsConfigSchema, invalidToolsConfig)).toThrow();
+        expect(() => parse(CompleteToolsConfigSchema, invalidToolsConfig)).toThrow();
       });
     });
   });

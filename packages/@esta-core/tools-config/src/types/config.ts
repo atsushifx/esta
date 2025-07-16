@@ -10,12 +10,12 @@ import type { TSearchConfigFileType } from '@esta-utils/config-loader';
 import type { PartialToolsConfig } from './tools';
 
 /**
- * 設定読み込み結果
+ * 設定読み込み結果（部分設定をサポート）
  */
 export type LoadConfigResult = {
   /** 読み込み成功フラグ */
   success: boolean;
-  /** 読み込まれた設定（部分的） */
+  /** 読み込まれた設定（部分的可能） */
   config?: PartialToolsConfig;
   /** エラーメッセージ */
   error?: string;

@@ -6,4 +6,4 @@
 // https://opensource.org/licenses/MIT
 
 // Tools schemas (consolidated from src/schemas)
-export { ToolEntrySchema, ToolsConfigSchema } from './tools.schemas';
+export { CompleteToolsConfigSchema, ToolEntrySchema, ToolsConfigSchema } from './tools.schemas';

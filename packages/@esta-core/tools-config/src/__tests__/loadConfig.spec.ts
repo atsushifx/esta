@@ -10,7 +10,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { MockedFunction } from 'vitest';
 // test target
-import { loadConfig } from '@/loadConfig';
+import { loadConfig } from '@/core/config/loader';
 
 // fs moduleをモック
 vi.mock('node:fs', () => ({

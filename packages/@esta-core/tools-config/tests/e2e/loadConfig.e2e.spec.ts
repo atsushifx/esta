@@ -9,7 +9,7 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // test target
-import { loadConfig } from '@/loadConfig';
+import { loadConfig } from '@/core/config/loader';
 // e2e framework
 import {
   createTempDirectory,

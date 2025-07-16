@@ -28,18 +28,18 @@ describe('validateTools', () => {
           installer: 'eget',
           id: 'ripgrep',
           repository: 'BurntSushi/ripgrep',
+          version: 'latest',
           options: {
-            version: 'latest',
-            quiet: true,
+            '/q': '',
           },
         },
         {
           installer: 'eget',
           id: 'gh',
           repository: 'cli/cli',
+          version: 'v2.0.0',
           options: {
-            version: 'v2.0.0',
-            installDir: '/usr/local/bin',
+            '/asset:': 'gh_linux_amd64.tar.gz',
           },
         },
       ];

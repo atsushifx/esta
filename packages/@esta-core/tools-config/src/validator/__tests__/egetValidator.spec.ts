@@ -50,11 +50,10 @@ describe('egetValidator', () => {
         installer: 'eget',
         id: 'gh',
         repository: 'cli/cli',
+        version: 'v2.0.0',
         options: {
-          version: 'v2.0.0',
-          installDir: '/usr/local/bin',
-          quiet: true,
-          asset: 'gh_linux_amd64.tar.gz',
+          '/q': '',
+          '/asset:': 'gh_linux_amd64.tar.gz',
         },
       };
 
@@ -64,11 +63,10 @@ describe('egetValidator', () => {
         installer: 'eget',
         id: 'gh',
         repository: 'cli/cli',
+        version: 'v2.0.0',
         options: {
-          version: 'v2.0.0',
-          installDir: '/usr/local/bin',
-          quiet: true,
-          asset: 'gh_linux_amd64.tar.gz',
+          '/q': '',
+          '/asset:': 'gh_linux_amd64.tar.gz',
         },
       });
     });
@@ -108,23 +106,49 @@ describe('egetValidator', () => {
       );
     });
 
-    it('サポートされていないオプションがある場合は無視される', () => {
+    it('無効なオプションがある場合はエラーを投げる', () => {
       const entry: ToolEntry = {
         installer: 'eget',
         id: 'gh',
         repository: 'cli/cli',
         options: {
-          version: 'v2.0.0',
-          unsupportedOption: 'value',
+          '/invalid': 'value',
         },
       };
 
-      const result = validateEgetToolEntry(entry);
+      expect(() => validateEgetToolEntry(entry)).toThrow(
+        'Invalid eget options',
+      );
+    });
 
-      expect(result.options).toEqual({
-        version: 'v2.0.0',
-      });
-      expect(result.options).not.toHaveProperty('unsupportedOption');
+    it('/a や /asset: でアセット文字列が空の場合はエラーを投げる', () => {
+      const entry: ToolEntry = {
+        installer: 'eget',
+        id: 'gh',
+        repository: 'cli/cli',
+        options: {
+          '/a': '',
+        },
+      };
+
+      expect(() => validateEgetToolEntry(entry)).toThrow(
+        'Invalid eget options',
+      );
+    });
+
+    it('/q や /quiet で値が空でない場合はエラーを投げる', () => {
+      const entry: ToolEntry = {
+        installer: 'eget',
+        id: 'gh',
+        repository: 'cli/cli',
+        options: {
+          '/q': 'invalid',
+        },
+      };
+
+      expect(() => validateEgetToolEntry(entry)).toThrow(
+        'Invalid eget options',
+      );
     });
 
     it('複雑なrepository名パターンを正しく検証する', () => {
