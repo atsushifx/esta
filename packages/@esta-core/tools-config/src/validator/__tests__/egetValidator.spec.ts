@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { ToolEntry } from '../../../shared/types';
 import {
   isEgetToolEntry,
@@ -7,7 +7,7 @@ import {
 
 describe('egetValidator', () => {
   describe('isEgetToolEntry', () => {
-    test('egetインストーラーのエントリーでtrueを返す', () => {
+    it('egetインストーラーのエントリーでtrueを返す', () => {
       const entry: ToolEntry = {
         installer: 'eget',
         id: 'gh',
@@ -17,7 +17,7 @@ describe('egetValidator', () => {
       expect(isEgetToolEntry(entry)).toBe(true);
     });
 
-    test('eget以外のインストーラーでfalseを返す', () => {
+    it('eget以外のインストーラーでfalseを返す', () => {
       const entry: ToolEntry = {
         installer: 'npm',
         id: 'typescript',
@@ -29,7 +29,7 @@ describe('egetValidator', () => {
   });
 
   describe('validateEgetToolEntry', () => {
-    test('有効なegetエントリーを正常に検証する', () => {
+    it('有効なegetエントリーを正常に検証する', () => {
       const entry: ToolEntry = {
         installer: 'eget',
         id: 'gh',
@@ -45,7 +45,7 @@ describe('egetValidator', () => {
       });
     });
 
-    test('有効なegetエントリー（オプション付き）を正常に検証する', () => {
+    it('有効なegetエントリー（オプション付き）を正常に検証する', () => {
       const entry: ToolEntry = {
         installer: 'eget',
         id: 'gh',
@@ -73,7 +73,7 @@ describe('egetValidator', () => {
       });
     });
 
-    test('installerが"eget"でない場合はエラーを投げる', () => {
+    it('installerが"eget"でない場合はエラーを投げる', () => {
       const entry: ToolEntry = {
         installer: 'npm',
         id: 'typescript',
@@ -85,7 +85,7 @@ describe('egetValidator', () => {
       );
     });
 
-    test('repositoryがGitHub形式でない場合はエラーを投げる', () => {
+    it('repositoryがGitHub形式でない場合はエラーを投げる', () => {
       const entry: ToolEntry = {
         installer: 'eget',
         id: 'invalid',
@@ -97,7 +97,7 @@ describe('egetValidator', () => {
       );
     });
 
-    test('必須フィールドが不足している場合はエラーを投げる', () => {
+    it('必須フィールドが不足している場合はエラーを投げる', () => {
       const entryWithoutId = {
         installer: 'eget',
         repository: 'cli/cli',
@@ -108,7 +108,7 @@ describe('egetValidator', () => {
       );
     });
 
-    test('サポートされていないオプションがある場合は無視される', () => {
+    it('サポートされていないオプションがある場合は無視される', () => {
       const entry: ToolEntry = {
         installer: 'eget',
         id: 'gh',
@@ -127,7 +127,7 @@ describe('egetValidator', () => {
       expect(result.options).not.toHaveProperty('unsupportedOption');
     });
 
-    test('複雑なrepository名パターンを正しく検証する', () => {
+    it('複雑なrepository名パターンを正しく検証する', () => {
       const validRepositories = [
         'owner/repo',
         'owner-name/repo-name',
@@ -147,7 +147,7 @@ describe('egetValidator', () => {
       });
     });
 
-    test('無効なrepository名パターンでエラーを投げる', () => {
+    it('無効なrepository名パターンでエラーを投げる', () => {
       const invalidRepositories = [
         'owner',
         'owner/',

@@ -1,22 +1,9 @@
-import type { ToolEntry } from '../shared/types';
+// src/tools.ts
+// @(#) : ツール関連機能
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
-// サンプルデータ（後で設定ファイルから読み込むように変更）
-const sampleTools: ToolEntry[] = [
-  {
-    installer: 'eget',
-    id: 'gh',
-    repository: 'cli/cli',
-    options: {
-      version: 'latest',
-      args: ['--quiet'],
-    },
-  },
-];
-
-export const getTool = (id: string): ToolEntry | undefined => {
-  return sampleTools.find((tool) => tool.id === id);
-};
-
-export const listTools = (): ToolEntry[] => {
-  return [...sampleTools];
-};
+// 将来的にツール関連の機能を追加する場合はここに記載

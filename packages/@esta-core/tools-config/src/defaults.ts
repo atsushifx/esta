@@ -1,3 +1,5 @@
+import { parse } from 'valibot';
+import { ToolsConfigSchema } from '../shared/schemas';
 import type { ToolEntry, ToolsConfig } from '../shared/types';
 
 /**
@@ -52,10 +54,17 @@ const defaultTools: ToolEntry[] = [
   },
 ];
 
+/**
+ * デフォルトのツール設定を正規化済みで返す
+ * @returns 正規化済みのToolsConfig
+ */
 export const defaultToolsConfig = (): ToolsConfig => {
-  return {
+  const config = {
     defaultInstallDir: '.tools/bin',
     defaultTempDir: '.tools/tmp',
     tools: defaultTools,
   };
+
+  // スキーマで検証・正規化して返す
+  return parse(ToolsConfigSchema, config);
 };
