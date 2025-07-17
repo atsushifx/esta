@@ -1,4 +1,4 @@
-// shared/schemas/tools.schemas.ts
+// src/internal/schemas/tools.schemas.ts
 // @(#) : ツール関連スキーマ定義（正規化機能付き）
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 import { array, check, object, optional, pipe, record, string, transform } from 'valibot';
-import { validateAndNormalizePath } from '../../src/toolsValidator/utils';
+import { validateAndNormalizePath } from '../../toolsValidator/utils';
 
 /**
  * ツールエントリーのスキーマ
@@ -109,7 +109,3 @@ export const CompleteToolsConfigSchema = pipe(
     'defaultInstallDir and defaultTempDir must be different directories',
   ),
 );
-
-// 下位互換性のためのエイリアス
-export { ToolEntrySchema as ToolsEntrySchema };
-export { ToolsConfigSchema as ConfigSchema };

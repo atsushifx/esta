@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { defaultToolsConfig } from '../defaults';
+import { getDefaultToolsConfig } from '../defaults';
 
 describe('defaultToolsConfig', () => {
   describe('基本設定の検証', () => {
     it('should return correct default paths', () => {
-      const config = defaultToolsConfig();
+      const config = getDefaultToolsConfig();
 
-      expect(config.defaultInstallDir).toBe('.tools/bin');
-      expect(config.defaultTempDir).toBe('.tools/tmp');
+      expect(config.defaultInstallDir).toBe('./.tools/bin');
+      expect(config.defaultTempDir).toBe('./.tools/tmp');
       expect(Array.isArray(config.tools)).toBe(true);
     });
 
     it('should contain 9 default tools', () => {
-      const config = defaultToolsConfig();
+      const config = getDefaultToolsConfig();
 
       expect(config.tools).toHaveLength(9);
     });
@@ -20,7 +20,7 @@ describe('defaultToolsConfig', () => {
 
   describe('デフォルトツールの内容検証', () => {
     it('should contain gitleaks tool', () => {
-      const config = defaultToolsConfig();
+      const config = getDefaultToolsConfig();
 
       const gitleaks = config.tools.find((tool) => tool.id === 'gitleaks');
       expect(gitleaks).toBeDefined();
@@ -29,7 +29,7 @@ describe('defaultToolsConfig', () => {
     });
 
     it('should contain gh tool', () => {
-      const config = defaultToolsConfig();
+      const config = getDefaultToolsConfig();
 
       const gh = config.tools.find((tool) => tool.id === 'gh');
       expect(gh).toBeDefined();
@@ -38,7 +38,7 @@ describe('defaultToolsConfig', () => {
     });
 
     it('should have all tools as valid eget entries', () => {
-      const config = defaultToolsConfig();
+      const config = getDefaultToolsConfig();
 
       config.tools.forEach((tool) => {
         expect(tool.installer).toBe('eget');
@@ -51,11 +51,11 @@ describe('defaultToolsConfig', () => {
 
   describe('正規化の検証', () => {
     it('should return normalized configuration', () => {
-      const config = defaultToolsConfig();
+      const config = getDefaultToolsConfig();
 
       // パスが正規化済みであることを確認
-      expect(config.defaultInstallDir).toBe('.tools/bin');
-      expect(config.defaultTempDir).toBe('.tools/tmp');
+      expect(config.defaultInstallDir).toBe('./.tools/bin');
+      expect(config.defaultTempDir).toBe('./.tools/tmp');
 
       // ツールのid、repositoryが正規化済み（小文字）であることを確認
       config.tools.forEach((tool) => {
@@ -67,7 +67,7 @@ describe('defaultToolsConfig', () => {
     });
 
     it('should normalize specific tools correctly', () => {
-      const config = defaultToolsConfig();
+      const config = getDefaultToolsConfig();
 
       // 特定のツールが正規化済みであることを確認
       const gh = config.tools.find((tool) => tool.id === 'gh');

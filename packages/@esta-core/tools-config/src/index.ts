@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // ===== 型定義 =====
-export type * from './types';
+export type * from './internal/types';
 
 // ===== スキーマ =====
 export * from '../shared/schemas';

@@ -9,6 +9,8 @@
 // vitest
 import { describe, expect, it, vi } from 'vitest';
 import type { MockedFunction } from 'vitest';
+// types
+import type { PartialToolsConfig } from '../../../internal/types';
 // test target
 import { loadConfig } from '../loader';
 
@@ -51,8 +53,9 @@ describe('loadConfig', () => {
       // Then: 設定が正常に読み込まれる
       expect(result.success).toBe(true);
       expect(result.config).toBeDefined();
-      expect(result.config!.defaultInstallDir).toBe('custom/bin');
-      expect(result.config!.defaultTempDir).toBe('custom/tmp');
+      const config = result.config as PartialToolsConfig;
+      expect(config.defaultInstallDir).toBe('custom/bin');
+      expect(config.defaultTempDir).toBe('custom/tmp');
     });
 
     it('空の設定ファイルを読み込める', async () => {

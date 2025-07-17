@@ -1,10 +1,6 @@
 import { object, optional, pipe, record, safeParse, string, transform } from 'valibot';
-import type { ToolEntry } from '../types';
-
-/**
- * eget用の有効なオプション文字列
- */
-const VALID_EGET_OPTIONS = ['/q', '/quiet', '/a', '/asset:'] as const;
+import { VALID_EGET_OPTIONS, VALIDATION_ERROR_MESSAGES } from '../internal/constants';
+import type { ToolEntry } from '../internal/types';
 
 /**
  * eget用オプションの検証
@@ -55,7 +51,7 @@ export const EgetToolEntrySchema = object({
     string(),
     transform((value) => {
       if (value !== 'eget') {
-        throw new Error('installer must be "eget"');
+        throw new Error(VALIDATION_ERROR_MESSAGES.EGET_INSTALLER_REQUIRED);
       }
       return value as 'eget';
     }),
@@ -65,7 +61,7 @@ export const EgetToolEntrySchema = object({
     string(),
     transform((value) => {
       if (!validateRepositoryFormat(value)) {
-        throw new Error('repository must be in "owner/repo" format');
+        throw new Error(VALIDATION_ERROR_MESSAGES.INVALID_REPOSITORY_FORMAT);
       }
       return value;
     }),
@@ -77,7 +73,7 @@ export const EgetToolEntrySchema = object({
       transform((options) => {
         // eget用オプションの検証
         if (!validateEgetOptions(options)) {
-          throw new Error('Invalid eget options');
+          throw new Error(VALIDATION_ERROR_MESSAGES.INVALID_EGET_OPTIONS);
         }
 
         return options;

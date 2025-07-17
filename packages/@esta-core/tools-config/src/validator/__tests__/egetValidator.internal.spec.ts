@@ -7,8 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 import { describe, expect, it } from 'vitest';
-import type { ToolEntry } from '../../types';
-import { isEgetToolEntry, validateEgetToolEntry } from '../egetValidator';
+import type { ToolEntry } from '../../internal/types';
+import { isEgetToolEntry, validateEgetToolEntry } from '../../toolsValidator';
 
 describe('egetValidator.ts internal functions', () => {
   describe('validateEgetOptions (間接テスト)', () => {
@@ -349,7 +349,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証に失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('repository must be in "owner/repo" format');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Repository must be in "owner/repo" format');
       });
 
       it('複数のスラッシュを含むリポジトリ名で検証に失敗する', () => {
@@ -361,7 +361,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証に失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('repository must be in "owner/repo" format');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Repository must be in "owner/repo" format');
       });
 
       it('先頭にスラッシュがあるリポジトリ名で検証に失敗する', () => {
@@ -373,7 +373,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証に失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('repository must be in "owner/repo" format');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Repository must be in "owner/repo" format');
       });
 
       it('末尾にスラッシュがあるリポジトリ名で検証に失敗する', () => {
@@ -385,7 +385,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証に失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('repository must be in "owner/repo" format');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Repository must be in "owner/repo" format');
       });
 
       it('空のオーナー名で検証に失敗する', () => {
@@ -397,7 +397,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証に失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('repository must be in "owner/repo" format');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Repository must be in "owner/repo" format');
       });
 
       it('空のリポジトリ名で検証に失敗する', () => {
@@ -409,7 +409,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証に失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('repository must be in "owner/repo" format');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Repository must be in "owner/repo" format');
       });
 
       it('スペースを含むリポジトリ名で検証に失敗する', () => {
@@ -421,7 +421,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証に失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('repository must be in "owner/repo" format');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Repository must be in "owner/repo" format');
       });
 
       it('無効文字を含むリポジトリ名で検証に失敗する', () => {
@@ -433,7 +433,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証に失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('repository must be in "owner/repo" format');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Repository must be in "owner/repo" format');
       });
 
       it('空文字列のリポジトリ名で検証に失敗する', () => {
@@ -445,7 +445,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証に失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('repository must be in "owner/repo" format');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Repository must be in "owner/repo" format');
       });
     });
   });
@@ -641,7 +641,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証に失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('installer must be "eget"');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Installer must be "eget"');
       });
 
       it('複数のバリデーションエラーを含む場合は統合エラーメッセージを返す', () => {
@@ -656,7 +656,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 最初のエラーメッセージで失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('installer must be "eget"');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Installer must be "eget"');
       });
     });
   });

@@ -1,4 +1,4 @@
-// src/validator/utils.ts
+// src/toolsValidator/utils/pathUtils.ts
 // @(#) : パス検証・正規化ユーティリティ
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>

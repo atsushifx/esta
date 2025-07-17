@@ -8,6 +8,8 @@
 
 // vitest
 import { describe, expect, it } from 'vitest';
+// types
+import type { PartialToolsConfig } from '@/internal/types';
 // test target
 import { loadConfig } from '@/core/config/loader';
 // e2e framework
@@ -69,10 +71,11 @@ describe('loadConfig E2E', () => {
       // Then: 成功して設定が読み込まれる
       expect(result.success).toBe(true);
       expect(result.config).toBeDefined();
-      expect(result.config!.defaultInstallDir).toBe('custom/install/dir');
-      expect(result.config!.defaultTempDir).toBe('custom/temp/dir');
-      expect(result.config!.tools).toHaveLength(1);
-      expect(result.config!.tools![0].id).toBe('custom-tool');
+      const config = result.config as PartialToolsConfig;
+      expect(config.defaultInstallDir).toBe('custom/install/dir');
+      expect(config.defaultTempDir).toBe('custom/temp/dir');
+      expect(config.tools).toHaveLength(1);
+      expect(config.tools![0].id).toBe('custom-tool');
     });
 
     it('部分的な設定ファイルを読み込める', async (testContext) => {
@@ -96,8 +99,9 @@ describe('loadConfig E2E', () => {
       // Then: 成功して読み込まれる
       expect(result.success).toBe(true);
       expect(result.config).toBeDefined();
-      expect(result.config!.defaultTempDir).toBe('custom/temp/dir');
-      expect(result.config!.defaultInstallDir).toBeUndefined(); // 部分的な設定なので未定義
+      const config = result.config as PartialToolsConfig;
+      expect(config.defaultTempDir).toBe('custom/temp/dir');
+      expect(config.defaultInstallDir).toBeUndefined(); // 部分的な設定なので未定義
     });
 
     it('空のJSONファイルを読み込める', async (testContext) => {
@@ -148,10 +152,11 @@ tools:
       // Then: 成功して設定が読み込まれる
       expect(result.success).toBe(true);
       expect(result.config).toBeDefined();
-      expect(result.config!.defaultInstallDir).toBe('custom/yaml/dir');
-      expect(result.config!.defaultTempDir).toBe('custom/yaml/tmp');
-      expect(result.config!.tools).toHaveLength(1);
-      expect(result.config!.tools![0].id).toBe('yaml-tool');
+      const config = result.config as PartialToolsConfig;
+      expect(config.defaultInstallDir).toBe('custom/yaml/dir');
+      expect(config.defaultTempDir).toBe('custom/yaml/tmp');
+      expect(config.tools).toHaveLength(1);
+      expect(config.tools![0].id).toBe('yaml-tool');
     });
   });
 
@@ -188,9 +193,10 @@ tools:
       // Then: 成功して複数のツール設定が読み込まれる
       expect(result.success).toBe(true);
       expect(result.config).toBeDefined();
-      expect(result.config!.tools).toHaveLength(2);
-      expect(result.config!.tools![0].id).toBe('tool1');
-      expect(result.config!.tools![1].id).toBe('tool2');
+      const config = result.config as PartialToolsConfig;
+      expect(config.tools).toHaveLength(2);
+      expect(config.tools![0].id).toBe('tool1');
+      expect(config.tools![1].id).toBe('tool2');
     });
   });
 

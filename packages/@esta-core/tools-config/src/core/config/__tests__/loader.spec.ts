@@ -9,7 +9,7 @@
 import { loadConfig as loadConfigFile } from '@esta-utils/config-loader';
 import { existsSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import type { PartialToolsConfig } from '../../../types';
+import type { PartialToolsConfig } from '../../../internal/types';
 import { isCompleteConfig, loadConfig, validateCompleteConfig } from '../loader';
 
 // Mock dependencies
@@ -45,10 +45,11 @@ describe('loader.ts functions', () => {
         expect(result.success).toBe(true);
         if (result.success) {
           expect(result.config).toBeDefined();
-          expect(result.config!.tools!).toHaveLength(1);
-          expect(result.config!.tools![0].id).toBe('gh');
-          expect(result.config!.defaultInstallDir).toBeUndefined();
-          expect(result.config!.defaultTempDir).toBeUndefined();
+          const config = result.config as PartialToolsConfig;
+          expect(config.tools!).toHaveLength(1);
+          expect(config.tools![0].id).toBe('gh');
+          expect(config.defaultInstallDir).toBeUndefined();
+          expect(config.defaultTempDir).toBeUndefined();
         }
       });
 
@@ -77,9 +78,10 @@ describe('loader.ts functions', () => {
         // Then: 成功する
         expect(result.success).toBe(true);
         if (result.success) {
-          expect(result.config!.defaultInstallDir).toBe('/custom/bin');
-          expect(result.config!.defaultTempDir).toBe('/custom/tmp');
-          expect(result.config!.tools!).toHaveLength(1);
+          const config = result.config as PartialToolsConfig;
+          expect(config.defaultInstallDir).toBe('/custom/bin');
+          expect(config.defaultTempDir).toBe('/custom/tmp');
+          expect(config.tools!).toHaveLength(1);
         }
       });
 
@@ -99,7 +101,8 @@ describe('loader.ts functions', () => {
         // Then: 成功する
         expect(result.success).toBe(true);
         if (result.success) {
-          expect(result.config!.tools!).toHaveLength(0);
+          const config = result.config as PartialToolsConfig;
+          expect(config.tools!).toHaveLength(0);
         }
       });
     });
@@ -158,8 +161,9 @@ describe('loader.ts functions', () => {
         // Then: 成功する（スキーマが許可しているため）
         expect(result.success).toBe(true);
         if (result.success) {
-          expect(result.config!.tools!).toHaveLength(1);
-          expect(result.config!.tools![0].installer).toBe('invalid');
+          const config = result.config as PartialToolsConfig;
+          expect(config.tools!).toHaveLength(1);
+          expect(config.tools![0].installer).toBe('invalid');
         }
       });
 

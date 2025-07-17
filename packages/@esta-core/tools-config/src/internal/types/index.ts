@@ -1,17 +1,10 @@
-// src/types/index.ts
-// @(#) : 型定義のエクスポート
+// src/internal/types/index.ts
+// @(#) : 内部型定義のエクスポート
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
-
-// Tools types
-export type {
-  PartialToolsConfig,
-  ToolEntry,
-  ToolsConfig,
-} from './tools';
 
 // Configuration types
 export type {
@@ -20,6 +13,13 @@ export type {
   LoadConfigResult,
   SupportedConfigFileFormat,
 } from './config';
+
+// Tools types
+export type {
+  PartialToolsConfig,
+  ToolEntry,
+  ToolsConfig,
+} from './tools';
 
 // Validation types
 export type {

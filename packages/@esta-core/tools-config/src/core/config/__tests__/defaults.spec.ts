@@ -18,8 +18,8 @@ describe('defaults.ts functions', () => {
 
         // Then: 期待される設定を返す
         expect(config).toBeDefined();
-        expect(config.defaultInstallDir).toBe('.tools/bin');
-        expect(config.defaultTempDir).toBe('.tools/tmp');
+        expect(config.defaultInstallDir).toBe('./.tools/bin');
+        expect(config.defaultTempDir).toBe('./.tools/tmp');
         expect(Array.isArray(config.tools)).toBe(true);
         expect(config.tools.length).toBeGreaterThan(0);
       });

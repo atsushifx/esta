@@ -7,8 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 import { parse } from 'valibot';
-import { CompleteToolsConfigSchema } from '../../../shared/schemas';
-import type { ToolEntry, ToolsConfig } from '../../types';
+import { DEFAULT_INSTALL_DIR, DEFAULT_TEMP_DIR } from '../../internal/constants';
+import { CompleteToolsConfigSchema } from '../../internal/schemas';
+import type { ToolEntry, ToolsConfig } from '../../internal/types';
 
 /**
  * デフォルトのツール設定リスト
@@ -68,8 +69,8 @@ const defaultTools: ToolEntry[] = [
  */
 export const getDefaultToolsConfig = (): ToolsConfig => {
   const config = {
-    defaultInstallDir: '.tools/bin',
-    defaultTempDir: '.tools/tmp',
+    defaultInstallDir: DEFAULT_INSTALL_DIR,
+    defaultTempDir: DEFAULT_TEMP_DIR,
     tools: [...defaultTools], // 配列のコピーを返す
   };
 
@@ -104,6 +105,3 @@ export const getDefaultTool = (id: string): ToolEntry | undefined => {
   // ツールエントリーのコピーを返す
   return { ...tool };
 };
-
-// 下位互換性のため
-export const defaultToolsConfig = getDefaultToolsConfig;

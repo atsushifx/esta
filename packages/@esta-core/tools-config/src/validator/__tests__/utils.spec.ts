@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 import { describe, expect, it } from 'vitest';
-import { arePathsEqual, normalizePath, validateAndNormalizePath } from '../utils';
+import { arePathsEqual, normalizePath, validateAndNormalizePath } from '../../toolsValidator/utils';
 
 describe('utils.ts functions', () => {
   describe('normalizePath', () => {

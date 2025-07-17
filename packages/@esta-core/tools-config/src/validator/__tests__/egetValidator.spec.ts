@@ -3,7 +3,7 @@ import type { ToolEntry } from '../../../shared/types';
 import {
   isEgetToolEntry,
   validateEgetToolEntry,
-} from '../egetValidator';
+} from '../../toolsValidator';
 
 describe('egetValidator', () => {
   describe('isEgetToolEntry', () => {
@@ -79,7 +79,7 @@ describe('egetValidator', () => {
       };
 
       expect(() => validateEgetToolEntry(entry)).toThrow(
-        'installer must be "eget"',
+        'Installer must be "eget"',
       );
     });
 
@@ -91,7 +91,7 @@ describe('egetValidator', () => {
       };
 
       expect(() => validateEgetToolEntry(entry)).toThrow(
-        'repository must be in "owner/repo" format',
+        'Repository must be in "owner/repo" format',
       );
     });
 
@@ -189,7 +189,7 @@ describe('egetValidator', () => {
         };
 
         expect(() => validateEgetToolEntry(entry)).toThrow(
-          'repository must be in "owner/repo" format',
+          'Repository must be in "owner/repo" format',
         );
       });
     });

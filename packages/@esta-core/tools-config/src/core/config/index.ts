@@ -9,7 +9,6 @@
 export { loadConfig } from './loader';
 
 export {
-  defaultToolsConfig,
   getDefaultTool,
   getDefaultTools,
   getDefaultToolsConfig,

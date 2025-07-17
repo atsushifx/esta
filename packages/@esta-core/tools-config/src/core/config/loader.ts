@@ -10,9 +10,8 @@ import { loadConfig as loadConfigFile, TSearchConfigFileType } from '@esta-utils
 import { existsSync } from 'node:fs';
 import { basename, dirname, extname } from 'node:path';
 import { parse } from 'valibot';
-import { CompleteToolsConfigSchema, ToolsConfigSchema } from '../../../shared/schemas';
-import type { PartialToolsConfig, ToolsConfig } from '../../../shared/types';
-import type { LoadConfigResult } from '../../types';
+import { CompleteToolsConfigSchema, ToolsConfigSchema } from '../../internal/schemas';
+import type { LoadConfigResult, PartialToolsConfig, ToolsConfig } from '../../internal/types';
 
 /**
  * 設定ファイルを読み込む（validated済み）
