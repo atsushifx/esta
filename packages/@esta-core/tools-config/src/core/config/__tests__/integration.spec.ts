@@ -6,10 +6,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// vitest
 import { beforeEach, describe, expect, test } from 'vitest';
+
+// Internal
 import { defaultToolsConfig } from '../../../defaults';
+// type
 import type { PartialToolsConfig } from '../../../internal/types';
-import { isCompleteConfig, validateCompleteConfig } from '../loader';
+// test target
+import { isCompleteConfig, validateCompleteConfig } from '../loadToolsConfig';
 
 describe('設定管理統合テスト', () => {
   describe('設定読み込みから検証までの完全なフロー', () => {

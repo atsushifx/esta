@@ -1,4 +1,4 @@
-// src/core/config/loader.ts
+// src/core/config/loadConfig.ts
 // @(#) : 設定ファイル読み込み機能
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -20,10 +20,10 @@ import type { PartialToolsConfig, ToolsConfig } from '../../internal/types';
  * @param configPath 設定ファイルのパス
  * @returns 検証済み読み込み結果
  */
-export const loadConfig = async (configPath: string): Promise<PartialToolsConfig> => {
-  // 指定されたファイルが存在するかチェック
+export const loadToolsConfig = async (configPath: string): Promise<PartialToolsConfig> => {
+  // 指定されたファイルが存在しない場合は空オブジェクトを返す
   if (!existsSync(configPath)) {
-    errorExit(ExitCode.CONFIG_ERROR, `${VALIDATION_ERROR_MESSAGES.CONFIG_FILE_NOT_FOUND}: ${configPath}`);
+    return {};
   }
 
   try {
@@ -38,9 +38,9 @@ export const loadConfig = async (configPath: string): Promise<PartialToolsConfig
       baseDirectory: configDirPath,
     });
 
-    // 設定ファイルが見つからない場合はnull
+    // 設定ファイルが見つからない場合は空オブジェクトを返す
     if (fileConfig === null) {
-      errorExit(ExitCode.CONFIG_ERROR, `${VALIDATION_ERROR_MESSAGES.CONFIG_FILE_LOAD_FAILED}: ${configPath}`);
+      return {};
     }
 
     // 設定を正規化（部分設定でも全て正規化される）

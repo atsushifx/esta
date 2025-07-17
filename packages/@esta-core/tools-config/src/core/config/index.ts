@@ -6,4 +6,5 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-export { loadConfig } from './loader';
+export { loadToolsConfig } from './loadToolsConfig';
+export { mergeToolsConfig } from './mergeToolsConfig';

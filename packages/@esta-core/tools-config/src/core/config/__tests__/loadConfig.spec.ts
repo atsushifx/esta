@@ -1,17 +1,24 @@
-// src/core/config/__tests__/loader.spec.ts
-// @(#) : loader.ts関数のテスト
+// src/core/config/__tests__/loadConfig.spec.ts
+// @(#) : loadConfig.ts関数のテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { errorExit } from '@esta-core/error-handler';
-import { loadConfig as loadConfigFile } from '@esta-utils/config-loader';
-import { existsSync } from 'node:fs';
+// vitest
 import { describe, expect, it, vi } from 'vitest';
+
+// lib
+import { existsSync } from 'node:fs';
+// internal module
+import { errorExit, ExitCode } from '@esta-core/error-handler';
+import { loadConfig as loadConfigFile } from '@esta-utils/config-loader';
+
+// type
 import type { PartialToolsConfig } from '../../../internal/types';
-import { isCompleteConfig, loadConfig, validateCompleteConfig } from '../loader';
+// test target
+import { isCompleteConfig, loadToolsConfig, validateCompleteConfig } from '../loadToolsConfig';
 
 // Mock dependencies
 vi.mock('node:fs');
@@ -22,8 +29,8 @@ const mockExistsSync = vi.mocked(existsSync);
 const mockLoadConfigFile = vi.mocked(loadConfigFile);
 const mockErrorExit = vi.mocked(errorExit);
 
-describe('loader.ts functions', () => {
-  describe('loadConfig', () => {
+describe('loadConfig.ts functions', () => {
+  describe('loadToolsConfig', () => {
     describe('正常系', () => {
       it('有効な設定ファイルを読み込んで成功する', async () => {
         // Given: 有効な設定ファイルが存在する
@@ -42,7 +49,7 @@ describe('loader.ts functions', () => {
         mockLoadConfigFile.mockResolvedValue(mockConfig);
 
         // When: 設定ファイルを読み込む
-        const result = await loadConfig(configPath);
+        const result = await loadToolsConfig(configPath);
 
         // Then: 成功する
         expect(result).toBeDefined();
@@ -72,7 +79,7 @@ describe('loader.ts functions', () => {
         mockLoadConfigFile.mockResolvedValue(mockConfig);
 
         // When: 設定ファイルを読み込む
-        const result = await loadConfig(configPath);
+        const result = await loadToolsConfig(configPath);
 
         // Then: 成功する
         expect(result.defaultInstallDir).toBe('/custom/bin');
@@ -91,7 +98,7 @@ describe('loader.ts functions', () => {
         mockLoadConfigFile.mockResolvedValue(mockConfig);
 
         // When: 設定ファイルを読み込む
-        const result = await loadConfig(configPath);
+        const result = await loadToolsConfig(configPath);
 
         // Then: 成功する
         expect(result.tools!).toHaveLength(0);
@@ -99,31 +106,31 @@ describe('loader.ts functions', () => {
     });
 
     describe('異常系', () => {
-      it('設定ファイルが存在しない場合はerrorExitを呼び出す', async () => {
+      it('設定ファイルが存在しない場合は空オブジェクトを返す', async () => {
         // Given: 設定ファイルが存在しない
         const configPath = '/path/to/nonexistent.json';
         mockExistsSync.mockReturnValue(false);
-        mockErrorExit.mockImplementation(() => {
-          throw new Error('errorExit called');
-        });
 
-        // When & Then: 設定ファイルを読み込む
-        await expect(loadConfig(configPath)).rejects.toThrow('errorExit called');
-        expect(mockErrorExit).toHaveBeenCalledWith('Configuration file not found: /path/to/nonexistent.json');
+        // When: 設定ファイルを読み込む
+        const result = await loadToolsConfig(configPath);
+
+        // Then: 空オブジェクトを返す
+        expect(result).toEqual({});
+        expect(mockErrorExit).not.toHaveBeenCalled();
       });
 
-      it('設定ファイルの読み込みに失敗した場合はerrorExitを呼び出す', async () => {
+      it('設定ファイルの読み込みに失敗した場合は空オブジェクトを返す', async () => {
         // Given: 設定ファイルは存在するが読み込みに失敗する
         const configPath = '/path/to/config.json';
         mockExistsSync.mockReturnValue(true);
         mockLoadConfigFile.mockResolvedValue(null);
-        mockErrorExit.mockImplementation(() => {
-          throw new Error('errorExit called');
-        });
 
-        // When & Then: 設定ファイルを読み込む
-        await expect(loadConfig(configPath)).rejects.toThrow('errorExit called');
-        expect(mockErrorExit).toHaveBeenCalledWith('Configuration file could not be loaded: /path/to/config.json');
+        // When: 設定ファイルを読み込む
+        const result = await loadToolsConfig(configPath);
+
+        // Then: 空オブジェクトを返す
+        expect(result).toEqual({});
+        expect(mockErrorExit).not.toHaveBeenCalled();
       });
 
       it('設定ファイルの内容が無効な場合は成功する（スキーマが許可しているため）', async () => {
@@ -143,7 +150,7 @@ describe('loader.ts functions', () => {
         mockLoadConfigFile.mockResolvedValue(invalidConfig);
 
         // When: 設定ファイルを読み込む
-        const result = await loadConfig(configPath);
+        const result = await loadToolsConfig(configPath);
 
         // Then: 成功する（スキーマが許可しているため）
         expect(result.tools!).toHaveLength(1);
@@ -161,8 +168,11 @@ describe('loader.ts functions', () => {
         });
 
         // When & Then: 設定ファイルを読み込む
-        await expect(loadConfig(configPath)).rejects.toThrow('errorExit called');
-        expect(mockErrorExit).toHaveBeenCalledWith('Configuration validation failed: File read error');
+        await expect(loadToolsConfig(configPath)).rejects.toThrow('errorExit called');
+        expect(mockErrorExit).toHaveBeenCalledWith(
+          ExitCode.VALIDATION_FAILED,
+          'Configuration validation failed: File read error',
+        );
       });
 
       it('不明なエラーの場合はerrorExitを呼び出す', async () => {
@@ -175,8 +185,11 @@ describe('loader.ts functions', () => {
         });
 
         // When & Then: 設定ファイルを読み込む
-        await expect(loadConfig(configPath)).rejects.toThrow('errorExit called');
-        expect(mockErrorExit).toHaveBeenCalledWith('Configuration validation failed: Unknown error');
+        await expect(loadToolsConfig(configPath)).rejects.toThrow('errorExit called');
+        expect(mockErrorExit).toHaveBeenCalledWith(
+          ExitCode.VALIDATION_FAILED,
+          'Configuration validation failed: Unknown error',
+        );
       });
     });
   });

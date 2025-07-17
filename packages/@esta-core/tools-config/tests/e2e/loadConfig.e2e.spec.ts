@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 // types
 // test target
-import { loadConfig } from '@/core/config/loader';
+import { loadToolsConfig } from '@/core/config/loadToolsConfig';
 // e2e framework
 import {
   createTempDirectory,
@@ -27,7 +27,7 @@ const createTestContext = async (
   testName: string,
   testContext: { task: { id: string } },
 ): Promise<{ testDir: string; cleanup: () => Promise<void> }> => {
-  const testDir = await createTempDirectory(`loadConfig-${testName}-${testContext.task.id}`);
+  const testDir = await createTempDirectory(`loadToolsConfig-${testName}-${testContext.task.id}`);
   return {
     testDir,
     cleanup: async () => {
@@ -37,10 +37,10 @@ const createTestContext = async (
 };
 
 /**
- * loadConfig関数のE2Eテスト
+ * loadToolsConfig関数のE2Eテスト
  * 指定ファイルが正しく読めるかどうかのテスト
  */
-describe('loadConfig E2E', () => {
+describe('loadToolsConfig E2E', () => {
   describe('JSONファイル読み込み', () => {
     it('有効なJSON設定ファイルを読み込める', async (testContext) => {
       // Given: テストコンテキストを作成（一意の一時ディレクトリ）
@@ -65,7 +65,7 @@ describe('loadConfig E2E', () => {
       await writeFile(configFilePath, JSON.stringify(configData, null, 2));
 
       // When: 設定ファイルを読み込む
-      const config = await loadConfig(configFilePath);
+      const config = await loadToolsConfig(configFilePath);
 
       // Then: 成功して設定が読み込まれる
       expect(config.defaultInstallDir).toBe('custom/install/dir');
@@ -90,7 +90,7 @@ describe('loadConfig E2E', () => {
       await writeFile(configFilePath, JSON.stringify(configData, null, 2));
 
       // When: 設定ファイルを読み込む
-      const config = await loadConfig(configFilePath);
+      const config = await loadToolsConfig(configFilePath);
 
       // Then: 成功して読み込まれる
       expect(config.defaultTempDir).toBe('custom/temp/dir');
@@ -110,7 +110,7 @@ describe('loadConfig E2E', () => {
       await writeFile(configFilePath, JSON.stringify(configData, null, 2));
 
       // When: 設定ファイルを読み込む
-      const config = await loadConfig(configFilePath);
+      const config = await loadToolsConfig(configFilePath);
 
       // Then: 成功して空の設定が読み込まれる
       expect(config).toEqual({});
@@ -138,7 +138,7 @@ tools:
       await writeFile(configFilePath, yamlContent);
 
       // When: 設定ファイルを読み込む
-      const config = await loadConfig(configFilePath);
+      const config = await loadToolsConfig(configFilePath);
 
       // Then: 成功して設定が読み込まれる
       expect(config.defaultInstallDir).toBe('custom/yaml/dir');
@@ -176,7 +176,7 @@ tools:
       await writeFile(configFilePath, JSON.stringify(configData, null, 2));
 
       // When: 設定ファイルを読み込む
-      const config = await loadConfig(configFilePath);
+      const config = await loadToolsConfig(configFilePath);
 
       // Then: 成功して複数のツール設定が読み込まれる
       expect(config.tools).toHaveLength(2);
@@ -186,7 +186,7 @@ tools:
   });
 
   describe('エラーハンドリング', () => {
-    it('存在しないファイルでエラーが発生する', async (testContext) => {
+    it('存在しないファイルの場合は空オブジェクトを返す', async (testContext) => {
       // Given: テストコンテキストを作成（一意の一時ディレクトリ）
       const ctx = await createTestContext('nonexistent-file', testContext);
       testContext.onTestFinished(ctx.cleanup);
@@ -194,8 +194,11 @@ tools:
       // Given: 存在しないファイルパス
       const configFilePath = path.join(ctx.testDir, 'nonexistent-config.json');
 
-      // When: 設定ファイルを読み込む & Then: ファイル読み込みエラーが発生する
-      await expect(loadConfig(configFilePath)).rejects.toThrow(`Configuration file not found: ${configFilePath}`);
+      // When: 設定ファイルを読み込む
+      const result = await loadToolsConfig(configFilePath);
+
+      // Then: 空オブジェクトを返す
+      expect(result).toEqual({});
     });
 
     it('不正なJSONファイルでエラーが発生する', async (testContext) => {
@@ -211,7 +214,7 @@ tools:
       await writeFile(configFilePath, invalidJsonContent);
 
       // When: 設定ファイルを読み込む & Then: JSONパースエラーが発生する
-      await expect(loadConfig(configFilePath)).rejects.toThrow('Configuration validation failed');
+      await expect(loadToolsConfig(configFilePath)).rejects.toThrow('Configuration validation failed');
     });
   });
 });
