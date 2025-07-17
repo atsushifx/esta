@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { ExitCode, ExitError } from '@esta-core/error-handler';
+import { errorExit, ExitCode } from '@esta-core/error-handler';
 import { VALIDATION_ERROR_MESSAGES } from '../../internal/constants';
 import type { ToolEntry, ValidateToolsResult } from '../../internal/types';
 import { isEgetToolEntry, validateEgetToolEntry } from './egetValidator';
@@ -16,14 +16,14 @@ import { isEgetToolEntry, validateEgetToolEntry } from './egetValidator';
  * @param entry 検証対象のエントリー
  * @throws 検証エラーの場合
  */
-const validateBasicToolEntry = (entry: unknown): { valid: boolean; errors: string[] } => {
+const validateBasicToolEntry = (entry: unknown): void => {
   const errors: string[] = [];
 
   if (!entry || typeof entry !== 'object') {
     errors.push(VALIDATION_ERROR_MESSAGES.INSTALLER_REQUIRED);
     errors.push(VALIDATION_ERROR_MESSAGES.ID_REQUIRED);
     errors.push(VALIDATION_ERROR_MESSAGES.REPOSITORY_REQUIRED);
-    throw new ExitError(ExitCode.VALIDATION_FAILED, errors.join(', '));
+    errorExit(ExitCode.VALIDATION_FAILED, errors.join(', '));
   }
 
   const entryObj = entry as Record<string, unknown>;
@@ -41,7 +41,7 @@ const validateBasicToolEntry = (entry: unknown): { valid: boolean; errors: strin
   }
 
   if (errors.length > 0) {
-    throw new ExitError(ExitCode.VALIDATION_FAILED, errors.join(', '));
+    errorExit(ExitCode.VALIDATION_FAILED, errors.join(', '));
   }
 };
 
@@ -57,14 +57,12 @@ const validateToolEntryByInstaller = (entry: ToolEntry): ToolEntry => {
       if (isEgetToolEntry(entry)) {
         return validateEgetToolEntry(entry);
       }
-      throw new ExitError(ExitCode.VALIDATION_FAILED, 'Invalid eget tool entry format');
+      errorExit(ExitCode.VALIDATION_FAILED, 'Invalid eget tool entry format');
+      break;
     }
     default: {
       // 未対応のインストーラータイプ
-      throw new ExitError(
-        ExitCode.VALIDATION_FAILED,
-        `${VALIDATION_ERROR_MESSAGES.UNSUPPORTED_INSTALLER}: ${entry.installer}`,
-      );
+      errorExit(ExitCode.VALIDATION_FAILED, `${VALIDATION_ERROR_MESSAGES.UNSUPPORTED_INSTALLER}: ${entry.installer}`);
     }
   }
 };
@@ -85,10 +83,7 @@ export const validateTools = (tools: ToolEntry[]): ValidateToolsResult => {
   tools.forEach((tool, index) => {
     try {
       // まず基本構造を検証
-      const basicValidation = validateBasicToolEntry(tool);
-      if (!basicValidation.valid) {
-        throw new Error(basicValidation.errors.join(', '));
-      }
+      validateBasicToolEntry(tool);
 
       // インストーラータイプに応じた詳細検証
       const validatedEntry = validateToolEntryByInstaller(tool);

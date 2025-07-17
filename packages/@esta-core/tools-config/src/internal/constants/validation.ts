@@ -29,4 +29,7 @@ export const VALIDATION_ERROR_MESSAGES = {
   EGET_INSTALLER_REQUIRED: 'Installer must be "eget"',
   INVALID_PATH_FORMAT: 'Invalid path format',
   UNSUPPORTED_INSTALLER: 'Unsupported installer type',
+  CONFIG_FILE_NOT_FOUND: 'Configuration file not found',
+  CONFIG_FILE_LOAD_FAILED: 'Configuration file could not be loaded',
+  CONFIG_VALIDATION_FAILED: 'Configuration validation failed',
 } as const;

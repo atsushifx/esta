@@ -11,7 +11,7 @@ import * as fs from 'fs';
 import { extname } from 'path';
 
 // error handling
-import { ExitError } from '@esta-core/error-handler';
+import { errorExit } from '@esta-core/error-handler';
 import { ExitCode } from '@shared/constants';
 
 // types
@@ -133,16 +133,16 @@ export const loadConfig = async <T = object>(options: LoadConfigOptions): Promis
     if (error instanceof Error) {
       // ファイル I/O エラーの検出
       if (isFileIOError(error)) {
-        throw new ExitError(
+        errorExit(
           ExitCode.FILE_IO_ERROR,
           `File I/O error accessing config file '${configFilePath}': ${error.message}`,
         );
       }
       // その他のエラーは設定エラーとして扱う
-      throw new ExitError(ExitCode.CONFIG_ERROR, `Failed to parse config file '${configFilePath}': ${error.message}`);
+      errorExit(ExitCode.CONFIG_ERROR, `Failed to parse config file '${configFilePath}': ${error.message}`);
     }
     // 不明なエラー
-    throw new ExitError(ExitCode.UNKNOWN_ERROR, `Unknown error occurred while loading config file '${configFilePath}'`);
+    errorExit(ExitCode.UNKNOWN_ERROR, `Unknown error occurred while loading config file '${configFilePath}'`);
   }
 };
 

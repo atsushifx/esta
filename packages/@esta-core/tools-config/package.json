@@ -49,6 +49,7 @@
   "dependencies": {
     "valibot": "^1.1.0",
     "@esta-utils/config-loader": "workspace:*",
-    "@agla-e2e/fileio-framework": "workspace:*"
+    "@agla-e2e/fileio-framework": "workspace:*",
+    "@esta-core/error-handler": "workspace:*"
   }
 }

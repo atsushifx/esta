@@ -35,7 +35,7 @@ describe('設定管理統合テスト', () => {
       const mergedConfig = {
         ...defaultConfig,
         ...partialConfig,
-        tools: partialConfig.tools || defaultConfig.tools,
+        tools: partialConfig.tools ?? defaultConfig.tools,
       };
       const completeConfig = validateCompleteConfig(mergedConfig);
 
@@ -70,7 +70,7 @@ describe('設定管理統合テスト', () => {
       // When & Then: 検証エラーが発生
       expect(() => {
         validateCompleteConfig(invalidConfig);
-      }).toThrow();
+      }).toThrow('Invalid config: not complete');
     });
 
     test('エッジケース: 空の設定配列', () => {
@@ -85,7 +85,7 @@ describe('設定管理統合テスト', () => {
       const mergedConfig = {
         ...defaultConfig,
         ...emptyConfig,
-        tools: emptyConfig.tools || defaultConfig.tools,
+        tools: emptyConfig.tools ?? defaultConfig.tools,
       };
       const completeConfig = validateCompleteConfig(mergedConfig);
 
@@ -115,7 +115,7 @@ describe('設定管理統合テスト', () => {
       const mergedConfig = {
         ...defaultConfig,
         ...largeConfig,
-        tools: largeConfig.tools || defaultConfig.tools,
+        tools: largeConfig.tools ?? defaultConfig.tools,
       };
       const result = validateCompleteConfig(mergedConfig);
       const end = Date.now();
@@ -145,7 +145,7 @@ describe('設定管理統合テスト', () => {
       const mergedConfig = {
         ...defaultConfig,
         ...configWithLongStrings,
-        tools: configWithLongStrings.tools || defaultConfig.tools,
+        tools: configWithLongStrings.tools ?? defaultConfig.tools,
       };
       expect(() => {
         validateCompleteConfig(mergedConfig);
@@ -188,7 +188,7 @@ describe('設定管理統合テスト', () => {
       const mergedConfig = {
         ...baseConfig,
         ...overrideConfig,
-        tools: [...(baseConfig.tools || []), ...(overrideConfig.tools || [])],
+        tools: [...(baseConfig.tools ?? []), ...(overrideConfig.tools ?? [])],
       };
 
       // When: 統合設定の検証
@@ -219,13 +219,13 @@ describe('設定管理統合テスト', () => {
         ],
       };
 
-      // When & Then: 重複検出は現在の実装では通るが、将来的に検証が必要
+      // When & Then: 重複検出は現在の実装では通る
       // デフォルト値とマージして完全設定を作成
       const defaultConfig = defaultToolsConfig();
       const mergedConfig = {
         ...defaultConfig,
         ...duplicateConfig,
-        tools: duplicateConfig.tools || defaultConfig.tools,
+        tools: duplicateConfig.tools,
       };
       expect(() => {
         validateCompleteConfig(mergedConfig);
@@ -254,7 +254,7 @@ describe('設定管理統合テスト', () => {
         const mergedConfig = {
           ...defaultConfig,
           ...unicodeConfig,
-          tools: unicodeConfig.tools || defaultConfig.tools,
+          tools: unicodeConfig.tools ?? defaultConfig.tools,
         };
         const result = validateCompleteConfig(mergedConfig);
         expect(result.defaultInstallDir).toBe('/テスト/ディレクトリ');
@@ -281,7 +281,7 @@ describe('設定管理統合テスト', () => {
         const mergedConfig = {
           ...defaultConfig,
           ...emojiConfig,
-          tools: emojiConfig.tools || defaultConfig.tools,
+          tools: emojiConfig.tools ?? defaultConfig.tools,
         };
         const result = validateCompleteConfig(mergedConfig);
         expect(result.tools[0].id).toBe('tool-with-emoji-🚀');

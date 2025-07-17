@@ -123,6 +123,9 @@ importers:
       '@agla-e2e/fileio-framework':
         specifier: workspace:*
         version: link:../../@agla-e2e/fileio-framework
+      '@esta-core/error-handler':
+        specifier: workspace:*
+        version: link:../error-handler
       '@esta-utils/config-loader':
         specifier: workspace:*
         version: link:../../@esta-utils/config-loader

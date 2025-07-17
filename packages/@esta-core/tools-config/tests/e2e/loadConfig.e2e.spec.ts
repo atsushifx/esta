@@ -9,7 +9,6 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // types
-import type { PartialToolsConfig } from '@/internal/types';
 // test target
 import { loadConfig } from '@/core/config/loader';
 // e2e framework
@@ -66,12 +65,9 @@ describe('loadConfig E2E', () => {
       await writeFile(configFilePath, JSON.stringify(configData, null, 2));
 
       // When: 設定ファイルを読み込む
-      const result = await loadConfig(configFilePath);
+      const config = await loadConfig(configFilePath);
 
       // Then: 成功して設定が読み込まれる
-      expect(result.success).toBe(true);
-      expect(result.config).toBeDefined();
-      const config = result.config as PartialToolsConfig;
       expect(config.defaultInstallDir).toBe('custom/install/dir');
       expect(config.defaultTempDir).toBe('custom/temp/dir');
       expect(config.tools).toHaveLength(1);
@@ -94,12 +90,9 @@ describe('loadConfig E2E', () => {
       await writeFile(configFilePath, JSON.stringify(configData, null, 2));
 
       // When: 設定ファイルを読み込む
-      const result = await loadConfig(configFilePath);
+      const config = await loadConfig(configFilePath);
 
       // Then: 成功して読み込まれる
-      expect(result.success).toBe(true);
-      expect(result.config).toBeDefined();
-      const config = result.config as PartialToolsConfig;
       expect(config.defaultTempDir).toBe('custom/temp/dir');
       expect(config.defaultInstallDir).toBeUndefined(); // 部分的な設定なので未定義
     });
@@ -117,12 +110,10 @@ describe('loadConfig E2E', () => {
       await writeFile(configFilePath, JSON.stringify(configData, null, 2));
 
       // When: 設定ファイルを読み込む
-      const result = await loadConfig(configFilePath);
+      const config = await loadConfig(configFilePath);
 
       // Then: 成功して空の設定が読み込まれる
-      expect(result.success).toBe(true);
-      expect(result.config).toBeDefined();
-      expect(result.config).toEqual({});
+      expect(config).toEqual({});
     });
   });
 
@@ -147,12 +138,9 @@ tools:
       await writeFile(configFilePath, yamlContent);
 
       // When: 設定ファイルを読み込む
-      const result = await loadConfig(configFilePath);
+      const config = await loadConfig(configFilePath);
 
       // Then: 成功して設定が読み込まれる
-      expect(result.success).toBe(true);
-      expect(result.config).toBeDefined();
-      const config = result.config as PartialToolsConfig;
       expect(config.defaultInstallDir).toBe('custom/yaml/dir');
       expect(config.defaultTempDir).toBe('custom/yaml/tmp');
       expect(config.tools).toHaveLength(1);
@@ -188,12 +176,9 @@ tools:
       await writeFile(configFilePath, JSON.stringify(configData, null, 2));
 
       // When: 設定ファイルを読み込む
-      const result = await loadConfig(configFilePath);
+      const config = await loadConfig(configFilePath);
 
       // Then: 成功して複数のツール設定が読み込まれる
-      expect(result.success).toBe(true);
-      expect(result.config).toBeDefined();
-      const config = result.config as PartialToolsConfig;
       expect(config.tools).toHaveLength(2);
       expect(config.tools![0].id).toBe('tool1');
       expect(config.tools![1].id).toBe('tool2');
@@ -209,13 +194,8 @@ tools:
       // Given: 存在しないファイルパス
       const configFilePath = path.join(ctx.testDir, 'nonexistent-config.json');
 
-      // When: 設定ファイルを読み込む
-      const result = await loadConfig(configFilePath);
-
-      // Then: ファイル読み込みエラーが発生する
-      expect(result.success).toBe(false);
-      expect(result.error).toBeDefined();
-      expect(result.error).toContain('Configuration file not found');
+      // When: 設定ファイルを読み込む & Then: ファイル読み込みエラーが発生する
+      await expect(loadConfig(configFilePath)).rejects.toThrow(`Configuration file not found: ${configFilePath}`);
     });
 
     it('不正なJSONファイルでエラーが発生する', async (testContext) => {
@@ -230,12 +210,8 @@ tools:
 
       await writeFile(configFilePath, invalidJsonContent);
 
-      // When: 設定ファイルを読み込む
-      const result = await loadConfig(configFilePath);
-
-      // Then: JSONパースエラーが発生する
-      expect(result.success).toBe(false);
-      expect(result.error).toBeDefined();
+      // When: 設定ファイルを読み込む & Then: JSONパースエラーが発生する
+      await expect(loadConfig(configFilePath)).rejects.toThrow('Configuration validation failed');
     });
   });
 });

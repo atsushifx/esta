@@ -30,7 +30,7 @@ describe('パスユーティリティエッジケーステスト', () => {
       // When & Then: 空文字列はエラーとなる
       expect(() => {
         normalizePath(emptyPath);
-      }).toThrow('Invalid path format:');
+      }).toThrow('Invalid path format: ');
     });
 
     test('単一文字パスの処理', () => {
@@ -75,7 +75,7 @@ describe('パスユーティリティエッジケーステスト', () => {
       // When & Then: 無効な文字はエラーとなる
       expect(() => {
         normalizePath(pathWithInvalidSymbols);
-      }).toThrow('Invalid path format:');
+      }).toThrow('Invalid path format: /path<>|?*/file');
     });
 
     test('Unicode文字を含むパス', () => {
@@ -109,7 +109,7 @@ describe('パスユーティリティエッジケーステスト', () => {
       // When & Then: 連続バックスラッシュはエラーとなる
       expect(() => {
         normalizePath(uncPath);
-      }).toThrow('Invalid path format:');
+      }).toThrow('Invalid path format: \\\\server\\share\\folder\\file.txt');
     });
 
     test('単一バックスラッシュパスの処理', () => {
@@ -189,7 +189,7 @@ describe('パスユーティリティエッジケーステスト', () => {
       // When & Then: エラーが発生するか、適切にハンドリングされる
       expect(() => {
         normalizePath(nullPath);
-      }).toThrow();
+      }).toThrow('Invalid path format: null');
     });
 
     test('undefined値の処理', () => {
@@ -199,7 +199,7 @@ describe('パスユーティリティエッジケーステスト', () => {
       // When & Then: エラーが発生するか、適切にハンドリングされる
       expect(() => {
         normalizePath(undefinedPath);
-      }).toThrow();
+      }).toThrow('Invalid path format: undefined');
     });
 
     test('非文字列型の処理', () => {
@@ -209,7 +209,7 @@ describe('パスユーティリティエッジケーステスト', () => {
       // When & Then: エラーが発生するか、適切にハンドリングされる
       expect(() => {
         normalizePath(numberPath);
-      }).toThrow();
+      }).toThrow('Invalid path format: 123');
     });
   });
 

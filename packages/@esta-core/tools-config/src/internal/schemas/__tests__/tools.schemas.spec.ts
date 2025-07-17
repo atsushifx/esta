@@ -127,7 +127,9 @@ describe('Schema Validation', () => {
           // repository が不足
         };
 
-        expect(() => parse(ToolEntrySchema, invalidToolEntry)).toThrow();
+        expect(() => parse(ToolEntrySchema, invalidToolEntry)).toThrow(
+          'Invalid type: Expected string but received undefined',
+        );
       });
     });
   });
@@ -205,7 +207,9 @@ describe('Schema Validation', () => {
           tools: [],
         };
 
-        expect(() => parse(ToolsConfigSchema, invalidToolsConfig)).toThrow();
+        expect(() => parse(ToolsConfigSchema, invalidToolsConfig)).toThrow(
+          'Invalid path format: tools//bin//subfolder',
+        );
       });
 
       it('should throw error when required field is missing', () => {
@@ -215,7 +219,9 @@ describe('Schema Validation', () => {
           tools: [],
         };
 
-        expect(() => parse(CompleteToolsConfigSchema, invalidToolsConfig)).toThrow();
+        expect(() => parse(CompleteToolsConfigSchema, invalidToolsConfig)).toThrow(
+          'Invalid type: Expected string but received undefined',
+        );
       });
     });
   });

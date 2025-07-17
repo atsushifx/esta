@@ -1,3 +1,4 @@
+import { errorExit, ExitCode } from '@esta-core/error-handler';
 import { object, optional, pipe, record, safeParse, string, transform } from 'valibot';
 import { VALID_EGET_OPTIONS, VALIDATION_ERROR_MESSAGES } from '../../internal/constants';
 import type { ToolEntry } from '../../internal/types';
@@ -90,7 +91,7 @@ export const validateEgetToolEntry = (entry: ToolEntry): EgetToolEntry => {
 
   if (!result.success) {
     const errorMessages = result.issues.map((issue) => issue.message).join(', ');
-    throw new Error(`Invalid eget tool entry: ${errorMessages}`);
+    errorExit(ExitCode.VALIDATION_FAILED, `Invalid eget tool entry: ${errorMessages}`);
   }
 
   return result.output as EgetToolEntry;
