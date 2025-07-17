@@ -1,4 +1,4 @@
-// src/__tests__/validateTools.spec.ts
+// src/toolsValidator/validator/__tests__/validateTools.spec.ts
 // @(#) : validateTools関数のテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -9,9 +9,9 @@
 // vitest
 import { describe, expect, it } from 'vitest';
 // test target
-import { validateTools } from '../../toolsValidator';
+import { validateTools } from '../../index';
 // types
-import type { ToolEntry } from '../../internal/types';
+import type { ToolEntry } from '../../../internal/types';
 
 /**
  * validateTools関数のテスト

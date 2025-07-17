@@ -1,4 +1,4 @@
-// src/toolsValidator/utils/index.ts
+// src/utils/index.ts
 // @(#) : ツール検証用ユーティリティのエクスポート
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -7,4 +7,4 @@
 // https://opensource.org/licenses/MIT
 
 // Path utilities
-export { arePathsEqual, normalizePath, validateAndNormalizePath } from './pathUtils';
+export { arePathsEqual, normalizePath, normalizePathForSchema, validateAndNormalizePath } from './pathUtils';

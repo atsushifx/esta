@@ -10,10 +10,13 @@
 export type * from './internal/types';
 
 // ===== スキーマ =====
-export * from '../shared/schemas';
+export * from './internal/schemas';
 
 // ===== コア機能 =====
 export * from './core';
 
+// ===== ユーティリティ =====
+export * from './utils';
+
 // ===== 検証機能 =====
-export * from './validator';
+export * from './tools-validator';

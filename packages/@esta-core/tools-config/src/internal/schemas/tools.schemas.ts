@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 import { array, check, object, optional, pipe, record, string, transform } from 'valibot';
-import { validateAndNormalizePath } from '../../toolsValidator/utils';
+import { normalizePathForSchema, validateAndNormalizePath } from '../../utils';
 
 /**
  * ツールエントリーのスキーマ
@@ -39,16 +39,6 @@ export const ToolEntrySchema = object({
 });
 
 /**
- * パス正規化関数
- * パスの形式を統一（区切り文字を統一し、小文字に正規化）
- */
-const normalizePath = (path: string): string => {
-  const normalized = validateAndNormalizePath(path);
-  // Windows形式のパスを Unix形式に変換し、小文字に正規化
-  return normalized.replace(/\\/g, '/').toLowerCase();
-};
-
-/**
  * ツール設定全体のスキーマ（部分設定対応）
  * パス検証と正規化を含む。必須フィールドのチェックは別途実施
  */
@@ -66,7 +56,7 @@ export const ToolsConfigSchema = object({
       },
       'defaultInstallDir must be a valid path (absolute: "/" or "C:\\" or relative: "./" or directory name)',
     ),
-    transform(normalizePath),
+    transform(normalizePathForSchema),
   )),
   defaultTempDir: optional(pipe(
     string(),
@@ -81,7 +71,7 @@ export const ToolsConfigSchema = object({
       },
       'defaultTempDir must be a valid path (absolute: "/" or "C:\\" or relative: "./" or directory name)',
     ),
-    transform(normalizePath),
+    transform(normalizePathForSchema),
   )),
   tools: optional(array(ToolEntrySchema)),
 });

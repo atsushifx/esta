@@ -7,9 +7,3 @@
 // https://opensource.org/licenses/MIT
 
 export { loadConfig } from './loader';
-
-export {
-  getDefaultTool,
-  getDefaultTools,
-  getDefaultToolsConfig,
-} from './defaults';

@@ -1,5 +1,5 @@
-// src/toolsValidator/index.ts
-// @(#) : ツール検証機能のエクスポート
+// src/toolsValidator/validator/index.ts
+// @(#) : インストーラー別のバリデータエクスポート
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -11,6 +11,3 @@ export { validateTools } from './base';
 
 // Eget validator
 export * from './egetValidator';
-
-// Utilities
-export * from './utils';

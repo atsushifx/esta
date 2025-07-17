@@ -8,13 +8,10 @@
 
 // Configuration types
 export type {
-  ConfigFileInfo,
-  ConfigSearchOptions,
   LoadConfigResult,
-  SupportedConfigFileFormat,
 } from './config';
 
-// Tools types
+// Tools types (re-exported from shared)
 export type {
   PartialToolsConfig,
   ToolEntry,
@@ -23,9 +20,5 @@ export type {
 
 // Validation types
 export type {
-  ConfigValidationError,
-  DetailedValidateConfigResult,
-  ValidateResult,
   ValidateToolsResult,
-  ValidationResult,
 } from './validation';

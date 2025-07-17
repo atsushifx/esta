@@ -1,5 +1,5 @@
-// src/validator/__tests__/utils.spec.ts
-// @(#) : utils.ts関数のテスト
+// src/utils/__tests__/pathUtils.spec.ts
+// @(#) : pathUtils.ts関数のテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -7,9 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 import { describe, expect, it } from 'vitest';
-import { arePathsEqual, normalizePath, validateAndNormalizePath } from '../../toolsValidator/utils';
+import { arePathsEqual, normalizePath, validateAndNormalizePath } from '../pathUtils';
 
-describe('utils.ts functions', () => {
+describe('pathUtils.ts functions', () => {
   describe('normalizePath', () => {
     describe('正常系', () => {
       describe('Unixパス', () => {
@@ -81,8 +81,8 @@ describe('utils.ts functions', () => {
           // When: 基本的なWindowsパスを正規化する
           const result = normalizePath('C:\\Users\\user\\project');
 
-          // Then: 正規化されたパスを返す
-          expect(result).toBe('C:\\Users\\user\\project');
+          // Then: 正規化されたパスを返す（フォワードスラッシュに変換、小文字化）
+          expect(result).toBe('c:/users/user/project');
         });
 
         it('末尾のバックスラッシュを除去する', () => {
@@ -90,15 +90,15 @@ describe('utils.ts functions', () => {
           const result = normalizePath('C:\\Users\\user\\project\\');
 
           // Then: 末尾のバックスラッシュが除去される
-          expect(result).toBe('C:\\Users\\user\\project');
+          expect(result).toBe('c:/users/user/project');
         });
 
         it('Windowsルートディレクトリの場合は末尾バックスラッシュを保持する', () => {
           // When: Windowsルートディレクトリを正規化する
           const result = normalizePath('C:\\');
 
-          // Then: 末尾のバックスラッシュが保持される
-          expect(result).toBe('C:\\');
+          // Then: 末尾のスラッシュが保持される（フォワードスラッシュに変換）
+          expect(result).toBe('c:/');
         });
 
         it('ドライブのみの場合を正規化する', () => {
@@ -106,23 +106,23 @@ describe('utils.ts functions', () => {
           const result = normalizePath('C:');
 
           // Then: 正規化されたパスを返す
-          expect(result).toBe('C:');
+          expect(result).toBe('c:');
         });
 
-        it('フォワードスラッシュを含むWindowsパスをバックスラッシュに変換する', () => {
+        it('フォワードスラッシュを含むWindowsパスをそのまま保持する', () => {
           // When: フォワードスラッシュを含むWindowsパスを正規化する
           const result = normalizePath('C:/Users/user/project');
 
-          // Then: バックスラッシュに変換される
-          expect(result).toBe('C:\\Users\\user\\project');
+          // Then: フォワードスラッシュのまま、小文字化される
+          expect(result).toBe('c:/users/user/project');
         });
 
         it('混合スラッシュを含むWindowsパスを正規化する', () => {
           // When: 混合スラッシュを含むWindowsパスを正規化する
           const result = normalizePath('C:\\Users/user\\project');
 
-          // Then: バックスラッシュに統一される
-          expect(result).toBe('C:\\Users\\user\\project');
+          // Then: フォワードスラッシュに統一される
+          expect(result).toBe('c:/users/user/project');
         });
 
         it('小文字ドライブレターのWindowsパスを正規化する', () => {
@@ -130,7 +130,7 @@ describe('utils.ts functions', () => {
           const result = normalizePath('d:\\temp\\project');
 
           // Then: 正規化されたパスを返す
-          expect(result).toBe('d:\\temp\\project');
+          expect(result).toBe('d:/temp/project');
         });
       });
     });
@@ -202,8 +202,8 @@ describe('utils.ts functions', () => {
         // When: 有効な絶対Windowsパスを検証・正規化する
         const result = validateAndNormalizePath('C:\\Users\\user\\project');
 
-        // Then: 正規化されたパスを返す
-        expect(result).toBe('C:\\Users\\user\\project');
+        // Then: 正規化されたパスを返す（フォワードスラッシュに変換、小文字化）
+        expect(result).toBe('c:/users/user/project');
       });
 
       it('有効な相対パス（./）を検証・正規化する', () => {
@@ -250,7 +250,7 @@ describe('utils.ts functions', () => {
         // When: Windowsの暗黙的な相対パスを検証・正規化する
         const result = validateAndNormalizePath('project\\src');
 
-        // Then: 正規化されたパスを返す
+        // Then: 正規化されたパスを返す（フォワードスラッシュに変換）
         expect(result).toBe('project/src');
       });
     });

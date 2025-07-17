@@ -1,6 +1,6 @@
 import { object, optional, pipe, record, safeParse, string, transform } from 'valibot';
-import { VALID_EGET_OPTIONS, VALIDATION_ERROR_MESSAGES } from '../internal/constants';
-import type { ToolEntry } from '../internal/types';
+import { VALID_EGET_OPTIONS, VALIDATION_ERROR_MESSAGES } from '../../internal/constants';
+import type { ToolEntry } from '../../internal/types';
 
 /**
  * eget用オプションの検証

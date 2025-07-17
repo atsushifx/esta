@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import type { ToolEntry } from '../../../shared/types';
+import type { ToolEntry } from '../../../internal/types';
 import {
   isEgetToolEntry,
   validateEgetToolEntry,
-} from '../../toolsValidator';
+} from '../egetValidator';
 
 describe('egetValidator', () => {
   describe('isEgetToolEntry', () => {

@@ -1,4 +1,4 @@
-// src/toolsValidator/utils/pathUtils.ts
+// src/utils/pathUtils.ts
 // @(#) : パス検証・正規化ユーティリティ
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -39,12 +39,13 @@ const isValidPathFormat = (path: string): boolean => {
 
 /**
  * ディレクトリパスの正規化
- * - パス区切り文字を統一
+ * - 前後の空白を削除
+ * - パス区切り文字をフォワードスラッシュに統一
+ * - 英小文字に変換
  * - 末尾のスラッシュを除去
- * - 相対パス記号の解決
  *
  * @param path 正規化するパス
- * @returns 正規化されたパス
+ * @returns 正規化されたパス（常にフォワードスラッシュ、小文字）
  */
 export const normalizePath = (path: string): string => {
   if (!isValidPathFormat(path)) {
@@ -53,25 +54,20 @@ export const normalizePath = (path: string): string => {
 
   let normalized = path.trim();
 
-  // Windowsパスの判定
-  const isWindowsPath = /^[a-zA-Z]:[\\/]/.test(normalized);
+  // 全てのパスをフォワードスラッシュに統一
+  normalized = normalized.replace(/\\/g, '/');
 
-  if (isWindowsPath) {
-    // Windowsパスの場合: バックスラッシュに統一
-    normalized = normalized.replace(/\//g, '\\');
-  } else {
-    // Unix系パスの場合: フォワードスラッシュに統一
-    normalized = normalized.replace(/\\/g, '/');
-  }
+  // 英小文字に変換
+  normalized = normalized.toLowerCase();
 
   // 末尾のスラッシュを除去（ルートディレクトリ以外）
   const rootPatterns = [
-    /^[a-zA-Z]:\\?$/, // Windows root (C:\ or C:)
+    /^[a-zA-Z]:\/?,?$/, // Windows root (c:/ or c:)
     /^\/$/, // Unix root (/)
   ];
 
   const isRoot = rootPatterns.some((pattern) => pattern.test(normalized));
-  if (!isRoot && (normalized.endsWith('/') || normalized.endsWith('\\'))) {
+  if (!isRoot && normalized.endsWith('/')) {
     normalized = normalized.slice(0, -1);
   }
 
@@ -93,13 +89,11 @@ export const validateAndNormalizePath = (path: string): string => {
 
   // 絶対パスの検証
   const isUnixAbsolute = trimmedPath.startsWith('/');
-  const isWindowsAbsolute = /^[a-zA-Z]:[\\]/.test(trimmedPath);
+  const isWindowsAbsolute = /^[a-zA-Z]:\//.test(trimmedPath);
 
   // 相対パスの検証
   const isRelative = trimmedPath.startsWith('./')
     || trimmedPath.startsWith('../')
-    || trimmedPath.startsWith('.\\')
-    || trimmedPath.startsWith('..\\')
     || trimmedPath === '.'
     || trimmedPath === '..'
     || (!trimmedPath.startsWith('/') && !isWindowsAbsolute);
@@ -110,6 +104,19 @@ export const validateAndNormalizePath = (path: string): string => {
   }
 
   return normalized;
+};
+
+/**
+ * スキーマ用パス正規化関数
+ * パスの形式を統一（区切り文字を統一し、小文字に正規化）
+ *
+ * @param path 正規化するパス文字列
+ * @returns 正規化されたパス（小文字、Unix形式スラッシュ）
+ */
+export const normalizePathForSchema = (path: string): string => {
+  // validateAndNormalizePathを呼ばずに直接normalizePathを使用
+  // (normalizePathが既に検証と小文字化を含むため)
+  return normalizePath(path);
 };
 
 /**

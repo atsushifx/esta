@@ -1,4 +1,4 @@
-// src/toolsValidator/base.ts
+// src/toolsValidator/validator/base.ts
 // @(#) : ツール検証基本機能
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -6,14 +6,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { VALIDATION_ERROR_MESSAGES } from '../internal/constants';
-import type { ToolEntry, ValidateToolsResult } from '../internal/types';
+import { ExitCode, ExitError } from '@esta-core/error-handler';
+import { VALIDATION_ERROR_MESSAGES } from '../../internal/constants';
+import type { ToolEntry, ValidateToolsResult } from '../../internal/types';
 import { isEgetToolEntry, validateEgetToolEntry } from './egetValidator';
 
 /**
  * ツールエントリーの基本構造を検証する
  * @param entry 検証対象のエントリー
- * @returns 検証結果
+ * @throws 検証エラーの場合
  */
 const validateBasicToolEntry = (entry: unknown): { valid: boolean; errors: string[] } => {
   const errors: string[] = [];
@@ -22,7 +23,7 @@ const validateBasicToolEntry = (entry: unknown): { valid: boolean; errors: strin
     errors.push(VALIDATION_ERROR_MESSAGES.INSTALLER_REQUIRED);
     errors.push(VALIDATION_ERROR_MESSAGES.ID_REQUIRED);
     errors.push(VALIDATION_ERROR_MESSAGES.REPOSITORY_REQUIRED);
-    return { valid: false, errors };
+    throw new ExitError(ExitCode.VALIDATION_FAILED, errors.join(', '));
   }
 
   const entryObj = entry as Record<string, unknown>;
@@ -39,7 +40,9 @@ const validateBasicToolEntry = (entry: unknown): { valid: boolean; errors: strin
     errors.push(VALIDATION_ERROR_MESSAGES.REPOSITORY_REQUIRED);
   }
 
-  return { valid: errors.length === 0, errors };
+  if (errors.length > 0) {
+    throw new ExitError(ExitCode.VALIDATION_FAILED, errors.join(', '));
+  }
 };
 
 /**
@@ -54,11 +57,14 @@ const validateToolEntryByInstaller = (entry: ToolEntry): ToolEntry => {
       if (isEgetToolEntry(entry)) {
         return validateEgetToolEntry(entry);
       }
-      throw new Error('Invalid eget tool entry format');
+      throw new ExitError(ExitCode.VALIDATION_FAILED, 'Invalid eget tool entry format');
     }
     default: {
       // 未対応のインストーラータイプ
-      throw new Error(`${VALIDATION_ERROR_MESSAGES.UNSUPPORTED_INSTALLER}: ${entry.installer}`);
+      throw new ExitError(
+        ExitCode.VALIDATION_FAILED,
+        `${VALIDATION_ERROR_MESSAGES.UNSUPPORTED_INSTALLER}: ${entry.installer}`,
+      );
     }
   }
 };
