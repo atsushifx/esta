@@ -348,6 +348,22 @@ describe('egetValidator.ts internal functions', () => {
         // When & Then: 検証が失敗する
         expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
       });
+
+      it('/qと/quietの両方が使用された場合を検証して失敗する', () => {
+        // Given: /q と /quiet の両方を持つツールエントリー（同じオプションのショート・ロングフォーム）
+        const toolEntry: ToolEntry = {
+          installer: 'eget',
+          id: 'gh',
+          repository: 'cli/cli',
+          options: {
+            '/q': '',
+            '/quiet': '', // 競合
+          },
+        };
+
+        // When & Then: 検証が失敗する
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+      });
     });
   });
 

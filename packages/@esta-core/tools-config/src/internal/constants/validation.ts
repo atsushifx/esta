@@ -12,10 +12,20 @@
 export const SUPPORTED_INSTALLER_TYPES = ['eget'] as const;
 
 /**
- * eget用の有効なオプション
- * ESTAでサポートされるegetコマンドのオプション一覧
+ * eget用オプションのショートフォーム → ロングフォーム変換テーブル
  */
-export const VALID_EGET_OPTIONS = ['/q', '/quiet', '/a', '/asset:'] as const;
+export const EGET_SHORT_TO_LONG_FORM = {
+  '/a': '/asset:',
+  '/q': '/quiet',
+} as const;
+
+/**
+ * eget用の有効なオプション一覧
+ */
+export const VALID_EGET_OPTIONS = [
+  ...Object.keys(EGET_SHORT_TO_LONG_FORM), // ショートフォーム (/a, /q)
+  ...Object.values(EGET_SHORT_TO_LONG_FORM), // ロングフォーム (/asset:, /quiet)
+] as const;
 
 /**
  * 検証エラーメッセージ

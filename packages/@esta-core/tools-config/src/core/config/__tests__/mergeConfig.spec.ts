@@ -57,4 +57,58 @@ describe('mergeToolsConfig', () => {
       tools: [{ installer: 'eget', id: 'default-tool', repository: 'default/repo' }],
     });
   });
+
+  describe('バリデーション機能', () => {
+    test('結果を完全な設定として検証する', () => {
+      // Arrange
+      const defaultConfig: ToolsConfig = {
+        defaultInstallDir: '/default',
+        defaultTempDir: '/tmp',
+        tools: [],
+      };
+      const loadConfig: PartialToolsConfig = {
+        defaultInstallDir: '/custom',
+        tools: [{ installer: 'eget', id: 'test-tool', repository: 'owner/repo' }],
+      };
+
+      // Act
+      const resultConfig = mergeToolsConfig(defaultConfig, loadConfig);
+
+      // Assert
+      // 結果が ToolsConfig 型であることを確認
+      expect(resultConfig).toBeDefined();
+      expect(typeof resultConfig).toBe('object');
+      expect(resultConfig).toHaveProperty('defaultInstallDir');
+      expect(resultConfig).toHaveProperty('defaultTempDir');
+      expect(resultConfig).toHaveProperty('tools');
+      expect(Array.isArray(resultConfig.tools)).toBe(true);
+      // CompleteToolsConfigSchema で検証されたオブジェクトが返されることを期待
+      expect(resultConfig.defaultInstallDir).toBe('/custom');
+      expect(resultConfig.defaultTempDir).toBe('/tmp');
+      expect(resultConfig.tools).toHaveLength(1);
+    });
+
+    test('無効なマージ結果の場合、適切なエラーを投げる', () => {
+      // Arrange
+      const defaultConfig: ToolsConfig = {
+        defaultInstallDir: '/default',
+        defaultTempDir: '/tmp',
+        tools: [],
+      };
+      const invalidLoadConfig = {
+        defaultInstallDir: 123, // 無効な型
+        tools: 'invalid', // 無効な型
+      };
+
+      // Act & Assert
+      // 検証機能を実装した後は、この場合にエラーが投げられることを期待
+      expect(() => {
+        mergeToolsConfig(defaultConfig, invalidLoadConfig as unknown as PartialToolsConfig);
+      }).toThrow(
+        expect.objectContaining({
+          message: expect.stringMatching(/Invalid|validation|schema|type/i),
+        }),
+      );
+    });
+  });
 });

@@ -157,6 +157,24 @@ describe('loadConfig.ts functions', () => {
         expect(result.tools![0].installer).toBe('invalid');
       });
 
+      it('無効なJSONファイルを読み込んだ場合はerrorExitを呼び出す', async () => {
+        // Given: 無効なJSONファイルを読み込む
+        const configPath = '/path/to/invalid-json.json';
+        const jsonError = new SyntaxError('Unexpected token in JSON');
+        mockExistsSync.mockReturnValue(true);
+        mockLoadConfigFile.mockRejectedValue(jsonError);
+        mockErrorExit.mockImplementation(() => {
+          throw new Error('errorExit called');
+        });
+
+        // When & Then: 設定ファイルを読み込む
+        await expect(loadToolsConfig(configPath)).rejects.toThrow('errorExit called');
+        expect(mockErrorExit).toHaveBeenCalledWith(
+          ExitCode.VALIDATION_FAILED,
+          expect.stringContaining('Configuration validation failed: Unexpected token in JSON'),
+        );
+      });
+
       it('loadConfigFile が例外を投げた場合はerrorExitを呼び出す', async () => {
         // Given: loadConfigFile が例外を投げる
         const configPath = '/path/to/config.json';
