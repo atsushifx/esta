@@ -20,3 +20,6 @@ export * from './utils';
 
 // ===== 検証機能 =====
 export * from './tools-validator';
+
+// ===== メインエントリーポイント =====
+export { getToolsConfig } from './getToolsConfig';
