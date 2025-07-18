@@ -113,7 +113,7 @@ describe('バリデーター境界値テスト', () => {
         repository: 'owner/repo',
         version: 'latest',
         options: {
-          '/asset': longAsset,
+          '/asset:': longAsset,
         },
       };
 

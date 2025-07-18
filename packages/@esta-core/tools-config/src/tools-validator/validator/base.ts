@@ -8,7 +8,7 @@
 
 import { VALIDATION_ERROR_MESSAGES } from '@/internal/constants';
 import type { ToolEntry } from '@/internal/types';
-import { errorExit, ExitCode, ExitError } from '@esta-core/error-handler';
+import { errorExit, ExitCode } from '@esta-core/error-handler';
 import { isEgetToolEntry, validateEgetToolEntry } from './egetValidator';
 
 /**
@@ -58,8 +58,8 @@ const validateToolEntryByInstaller = (entry: ToolEntry): ToolEntry => {
         return validateEgetToolEntry(entry);
       }
       errorExit(ExitCode.VALIDATION_FAILED, 'Invalid eget tool entry format');
-      break;
     }
+    // eslint-disable-next-line no-fallthrough
     default: {
       // 未対応のインストーラータイプ
       errorExit(ExitCode.VALIDATION_FAILED, `${VALIDATION_ERROR_MESSAGES.UNSUPPORTED_INSTALLER}: ${entry.installer}`);

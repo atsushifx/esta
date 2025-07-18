@@ -367,9 +367,12 @@ describe('loadConfig.ts functions', () => {
             },
           ],
         };
+        mockErrorExit.mockImplementation(() => {
+          throw new Error('Configuration validation failed');
+        });
 
         // When & Then: 例外を投げる
-        expect(() => validateCompleteConfig(partialConfig)).toThrow();
+        expect(() => validateCompleteConfig(partialConfig)).toThrow(/Configuration validation failed/);
       });
 
       it('無効な設定の場合は例外を投げる', () => {
@@ -379,9 +382,12 @@ describe('loadConfig.ts functions', () => {
           defaultTempDir: '/custom/tmp',
           tools: 'invalid', // 配列でない
         } as unknown as PartialToolsConfig;
+        mockErrorExit.mockImplementation(() => {
+          throw new Error('Configuration validation failed');
+        });
 
         // When & Then: 例外を投げる
-        expect(() => validateCompleteConfig(invalidConfig)).toThrow();
+        expect(() => validateCompleteConfig(invalidConfig)).toThrow(/Configuration validation failed/);
       });
 
       it('toolsが欠如した設定の場合は例外を投げる', () => {
@@ -390,9 +396,12 @@ describe('loadConfig.ts functions', () => {
           defaultInstallDir: '/custom/bin',
           defaultTempDir: '/custom/tmp',
         };
+        mockErrorExit.mockImplementation(() => {
+          throw new Error('Configuration validation failed');
+        });
 
         // When & Then: 例外を投げる
-        expect(() => validateCompleteConfig(invalidConfig)).toThrow();
+        expect(() => validateCompleteConfig(invalidConfig)).toThrow(/Configuration validation failed/);
       });
     });
   });
