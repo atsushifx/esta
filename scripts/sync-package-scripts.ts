@@ -82,7 +82,8 @@ function syncScripts(targetDir: string, repoRoot: string): void {
     console.log('🚫 Dry run mode is active. No changes will be written.');
   }
 
-  pkgJson.scripts = mergeScripts(pkgJson.scripts ?? {}, baseScripts);
+  // pkgJson.scripts = mergeScripts(pkgJson.scripts ?? {}, baseScripts);
+  pkgJson.scripts = baseScripts; // overwrite base scripts
   updatePackageJson(targetPkgPath, pkgJson);
 }
 

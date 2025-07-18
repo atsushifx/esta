@@ -20,7 +20,6 @@ export default [
   // esta-system
   'packages/@esta-system/exit-status/tsconfig.json',
   // utils
-  './packages/@esta-utils/utils/tsconfig.json',
   './packages/@esta-utils/command-runner/tsconfig.json',
   './packages/@esta-utils/get-platform/tsconfig.json',
   './packages/@esta-utils/config-loader/tsconfig.json',
