@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // Base validation
-export { validateTools } from './base';
+export { validateTools } from './baseValidator';
 
 // Eget validator
 export * from './egetValidator';

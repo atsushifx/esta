@@ -19,11 +19,3 @@ export type ValidOption = {
   long: string;
   requireValue: boolean;
 };
-
-/**
- * バリデーション結果の型定義
- */
-export type ValidateToolsResult = {
-  success: boolean;
-  error?: string;
-};

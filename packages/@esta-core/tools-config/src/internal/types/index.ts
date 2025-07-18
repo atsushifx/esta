@@ -17,8 +17,3 @@ export type {
   ToolEntry,
   ToolsConfig,
 } from './tools';
-
-// Validation types
-export type {
-  ValidateToolsResult,
-} from './validation';
