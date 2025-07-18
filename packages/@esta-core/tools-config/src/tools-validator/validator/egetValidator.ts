@@ -2,7 +2,9 @@ import { errorExit, ExitCode } from '@esta-core/error-handler';
 import { safeParse } from 'valibot';
 import { object, optional, pipe, record, string, transform } from 'valibot';
 import { VALID_EGET_OPTIONS, VALIDATION_ERROR_MESSAGES } from '../../internal/constants/validation';
-import type { ToolEntry } from '../../internal/types';
+// tool entry types
+import type { ToolEntry } from '@/shared/types/toolsConfig.types';
+// validation utility functions
 import { chkValidOptions, isValidGitHubRepoFormat, isValidSemverOrLatest } from '../utils/validatorUtils';
 
 /**

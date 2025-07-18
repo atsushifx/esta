@@ -9,7 +9,8 @@
 import { parse } from 'valibot';
 import { DEFAULT_INSTALL_DIR, DEFAULT_TEMP_DIR } from './internal/constants';
 import { CompleteToolsConfigSchema } from './internal/schemas';
-import type { ToolEntry, ToolsConfig } from './internal/types';
+// tools configuration types
+import type { ToolEntry, ToolsConfig } from '@/shared/types/toolsConfig.types';
 
 /**
  * デフォルトのツール設定リスト

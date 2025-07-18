@@ -13,7 +13,8 @@ import { basename, dirname, extname } from 'node:path';
 import { parse } from 'valibot';
 import { VALIDATION_ERROR_MESSAGES } from '../../internal/constants';
 import { CompleteToolsConfigSchema, ToolsConfigSchema } from '../../internal/schemas';
-import type { PartialToolsConfig, ToolsConfig } from '../../internal/types';
+// tools configuration types
+import type { PartialToolsConfig, ToolsConfig } from '@/shared/types/toolsConfig.types';
 
 /**
  * 設定ファイルを読み込む（validated済み）
@@ -49,8 +50,7 @@ export const loadToolsConfig = async (configPath: string): Promise<PartialToolsC
   } catch (error) {
     errorExit(
       ExitCode.VALIDATION_FAILED,
-      `${VALIDATION_ERROR_MESSAGES.CONFIG_VALIDATION_FAILED}: ${
-        error instanceof Error ? error.message : 'Unknown error'
+      `${VALIDATION_ERROR_MESSAGES.CONFIG_VALIDATION_FAILED}: ${error instanceof Error ? error.message : 'Unknown error'
       }`,
     );
   }
@@ -81,8 +81,7 @@ export const validateCompleteConfig = (config: PartialToolsConfig): ToolsConfig 
   } catch (error) {
     errorExit(
       ExitCode.VALIDATION_FAILED,
-      `${VALIDATION_ERROR_MESSAGES.CONFIG_VALIDATION_FAILED}: ${
-        error instanceof Error ? error.message : 'Unknown error'
+      `${VALIDATION_ERROR_MESSAGES.CONFIG_VALIDATION_FAILED}: ${error instanceof Error ? error.message : 'Unknown error'
       }`,
     );
   }

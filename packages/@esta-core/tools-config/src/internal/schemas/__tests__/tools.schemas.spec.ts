@@ -1,6 +1,18 @@
+// src/internal/schemas/__tests__/tools.schemas.spec.ts
+// @(#) : ツール設定スキーマの単体テスト
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// lib
 import { parse } from 'valibot';
+// type
+import type { ToolEntry, ToolsConfig } from '@/shared/types/toolsConfig.types';
+// vitest
 import { describe, expect, it } from 'vitest';
-import type { ToolEntry, ToolsConfig } from '../../types';
+// schemas
 import { CompleteToolsConfigSchema, ToolEntrySchema, ToolsConfigSchema } from '../tools.schemas';
 
 describe('Type Definitions', () => {

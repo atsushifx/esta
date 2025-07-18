@@ -1,5 +1,5 @@
+import type { ToolEntry } from '@/shared/types/toolsConfig.types';
 import { describe, expect, it } from 'vitest';
-import type { ToolEntry } from '../../../internal/types';
 import {
   isEgetToolEntry,
   validateEgetToolEntry,

@@ -1,4 +1,15 @@
-import type { ValidOption } from '@/internal/types/validation';
+// src/tools-validator/utils/validatorUtils.ts
+// @(#) : バリデーション用ユーティリティ関数
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// validation option types
+import type { ValidOption } from '../../internal/types/validation';
+// validation error messages
+import { VALIDATION_ERROR_MESSAGES } from '@/internal/constants/validation';
 
 export const isValidGitHubRepoFormat = (repository: string): boolean => {
   const pattern = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
@@ -79,19 +90,19 @@ export const chkValidOptions = (
 
   // オプションの重複
   if (hasDuplicatedOptions(options, validator)) {
-    return 'duplicated options';
+    return VALIDATION_ERROR_MESSAGES.DUPLICATED_OPTIONS;
   }
 
   // 必要な値
   const missingValueOptions = getMissingValueOptions(options, validator);
   if (missingValueOptions.length > 0) {
-    return 'option has no value: ' + missingValueOptions.join(', ');
+    return `${VALIDATION_ERROR_MESSAGES.OPTION_HAS_NO_VALUE}: ${missingValueOptions.join(', ')}`;
   }
 
   // 不要な値
   const unexpectedValueOptions = getUnexpectedValueOptions(options, validator);
   if (unexpectedValueOptions.length > 0) {
-    return 'option has unexpected value: ' + unexpectedValueOptions.join(', ');
+    return `${VALIDATION_ERROR_MESSAGES.OPTION_HAS_UNEXPECTED_VALUE}: ${unexpectedValueOptions.join(', ')}`;
   }
 
   return '';

@@ -16,7 +16,7 @@ import { errorExit, ExitCode } from '@esta-core/error-handler';
 import { loadConfig as loadConfigFile } from '@esta-utils/config-loader';
 
 // type
-import type { PartialToolsConfig } from '../../../internal/types';
+import type { PartialToolsConfig } from '@/shared/types/toolsConfig.types';
 // test target
 import { isCompleteConfig, loadToolsConfig, validateCompleteConfig } from '../loadToolsConfig';
 

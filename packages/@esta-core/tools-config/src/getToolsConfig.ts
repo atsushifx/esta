@@ -9,8 +9,8 @@
 // core
 import { loadToolsConfig, mergeToolsConfig } from './core';
 import { defaultToolsConfig } from './defaults';
-// type
-import type { ToolsConfig } from './internal/types';
+// tools configuration types
+import type { ToolsConfig } from '@/shared/types/toolsConfig.types';
 
 /**
  * 設定ファイルを読み込み、デフォルト値とマージして完全な設定を取得
