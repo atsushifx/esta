@@ -1,5 +1,5 @@
-// src: shared/common/configs/vitest.config.unit.ts
-// @(#) : vitest config for unit test
+// src: shared/common/configs/vitest.config.integration.ts
+// @(#) : vitest config for integration test
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -22,12 +22,12 @@ import baseConfig from '../../../../base/configs/vitest.config.base';
 export default mergeConfig(baseConfig, {
   test: {
     include: [
-      // Unit Test (develop test) exec only sub repositories
-      'src/**/*.test.ts',
-      'src/**/*.spec.ts',
+      // CI (Integration) Tests
+      'tests/integration/**/*.test.ts',
+      'tests/integration/**/*.spec.ts',
     ],
     caches: {
-      dir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),
+      dir: path.resolve(__dirname, '../../../.cache/vitest-cache/integration/'),
     },
   },
   resolve: {

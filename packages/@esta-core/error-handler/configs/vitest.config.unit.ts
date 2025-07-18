@@ -1,4 +1,4 @@
-// src: ./configs/vitest.config.unit.ts
+// src: shared/common/configs/vitest.config.unit.ts
 // @(#) : vitest config for unit test
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
@@ -7,8 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // libs for base directory
-import path from 'path';
-import { dirname } from 'path';
+import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 // base directory
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -16,7 +15,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // system config
 import { mergeConfig } from 'vitest/config';
 
-// user common config
+// shared base config
 import baseConfig from '../../../../base/configs/vitest.config.base';
 
 // config
@@ -28,7 +27,7 @@ export default mergeConfig(baseConfig, {
       'src/**/*.spec.ts',
     ],
     caches: {
-      dir: path.resolve(__dirname, '../../../../.cache/vitest-cache/unit/'),
+      dir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),
     },
   },
   resolve: {

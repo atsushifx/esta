@@ -30,10 +30,10 @@
     "lint:all": "pnpm run lint && pnpm run lint:types",
     "lint:fix": "pnpm run lint --fix",
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*",
-    "test": "pnpm run test:develop && pnpm run test:ci",
+    "test:all": "pnpm run test:develop && pnpm run test:ci && pnpm run tests:e2e",
     "test:develop": "pnpm exec vitest run --config ./configs/vitest.config.unit.ts",
-    "test:ci": "pnpm exec vitest run --config ./configs/vitest.config.ci.ts",
-    "test:watch": "pnpm exec vitest --config ./configs/vitest.config.unit.ts --watch",
+    "test:ci": "pnpm exec vitest run --config ./configs/vitest.config.integration.ts",
+    "test:e2e": "pnpm exec vitest run --config ./configs/vitest.config.e2e.ts",
     "sync:configs": "bash ../../../scripts/sync-configs.sh . "
   },
   "devDependencies": {}
