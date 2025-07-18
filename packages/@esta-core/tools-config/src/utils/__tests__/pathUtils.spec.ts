@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { arePathsEqual, normalizePath, validateAndNormalizePath } from '../pathUtils';
 
 /**
- * pathUtils.ts関数のテスト
+ * pathUtils.ts関数の単体テスト
  *
  * パス操作に関する各種ユーティリティ関数の動作を検証します。
  * 主要な関数：normalizePath, validateAndNormalizePath, arePathsEqual
@@ -29,6 +29,10 @@ describe('pathUtils.ts functions', () => {
      * 有効なパス文字列が正しく正規化されることを確認します。
      */
     describe('正常系', () => {
+      /**
+       * Unixパス正規化テスト
+       * Unixスタイルパスの正しい正規化と末尾スラッシュ処理を検証
+       */
       describe('Unixパス', () => {
         it('基本的なUnixパスを正規化する', () => {
           // When: 基本的なUnixパスを正規化する
@@ -93,6 +97,10 @@ describe('pathUtils.ts functions', () => {
         });
       });
 
+      /**
+       * Windowsパス正規化テスト
+       * Windowsスタイルパスのフォーマット変換と小文字化を検証
+       */
       describe('Windowsパス', () => {
         it('基本的なWindowsパスを正規化する', () => {
           // When: 基本的なWindowsパスを正規化する
@@ -152,6 +160,10 @@ describe('pathUtils.ts functions', () => {
       });
     });
 
+    /**
+     * パスバリデーションエラーテスト
+     * 無効なパス形式や特殊文字での適切なエラーハンドリングを検証
+     */
     describe('異常系', () => {
       it('空文字列の場合は例外を投げる', () => {
         // When & Then: 空文字列で例外を投げる
@@ -205,7 +217,15 @@ describe('pathUtils.ts functions', () => {
     });
   });
 
+  /**
+   * パス検証正規化関数のテスト
+   * パスのバリデーションと正規化を組み合わせた機能を検証
+   */
   describe('validateAndNormalizePath', () => {
+    /**
+     * 正常系パス検証テスト
+     * 有効な絶対パス、相対パスの正しい検証と正規化を検証
+     */
     describe('正常系', () => {
       it('有効な絶対Unixパスを検証・正規化する', () => {
         // When: 有効な絶対Unixパスを検証・正規化する
@@ -272,6 +292,10 @@ describe('pathUtils.ts functions', () => {
       });
     });
 
+    /**
+     * パス検証エラーテスト
+     * 無効なパス形式での適切なエラー検出とハンドリングを検証
+     */
     describe('異常系', () => {
       it('無効なパス形式の場合は例外を投げる', () => {
         // When & Then: 無効なパス形式で例外を投げる
@@ -297,7 +321,15 @@ describe('pathUtils.ts functions', () => {
     });
   });
 
+  /**
+   * パス比較関数のテスト
+   * パスの等価性判定とクロスプラットフォーム対応を検証
+   */
   describe('arePathsEqual', () => {
+    /**
+     * 正常系パス比較テスト
+     * 同等なパスの正しい識別と大文字小文字、スラッシュ形式の対応を検証
+     */
     describe('正常系', () => {
       it('同じUnixパスの場合はtrueを返す', () => {
         // When: 同じUnixパスを比較する
@@ -388,6 +420,10 @@ describe('pathUtils.ts functions', () => {
       });
     });
 
+    /**
+     * パス比較エラーテスト
+     * 無効なパスや異常値での適切なエラーハンドリングを検証
+     */
     describe('異常系', () => {
       it('第1引数が無効な場合はfalseを返す', () => {
         // When: 第1引数が無効な場合
