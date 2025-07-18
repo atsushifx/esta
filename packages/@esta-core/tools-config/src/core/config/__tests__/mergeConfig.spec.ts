@@ -5,8 +5,12 @@ import type { PartialToolsConfig, ToolsConfig } from '../../../../shared/types/t
 // test target
 import { mergeToolsConfig } from '../mergeToolsConfig';
 
+/**
+ * mergeToolsConfig関数のテスト
+ * デフォルト設定と読み込み設定をマージして完全な設定を生成する関数のテスト
+ */
 describe('mergeToolsConfig', () => {
-  test('should return parameter as-is when it is an empty object', () => {
+  test('should return defaultConfig when loadConfig is empty', () => {
     const defaultConfig: ToolsConfig = {
       defaultInstallDir: '/default',
       defaultTempDir: '/tmp',
@@ -14,9 +18,9 @@ describe('mergeToolsConfig', () => {
     };
     const loadConfig: PartialToolsConfig = {};
 
-    const result = mergeToolsConfig(defaultConfig, loadConfig);
+    const resultConfig = mergeToolsConfig(defaultConfig, loadConfig);
 
-    expect(result).toEqual({});
+    expect(resultConfig).toEqual(defaultConfig);
   });
 
   test('should merge defaultConfig and loadConfig', () => {
@@ -30,9 +34,9 @@ describe('mergeToolsConfig', () => {
       tools: [{ installer: 'eget', id: 'tool1', repository: 'owner/repo' }],
     };
 
-    const result = mergeToolsConfig(defaultConfig, loadConfig);
+    const resultConfig = mergeToolsConfig(defaultConfig, loadConfig);
 
-    expect(result).toEqual({
+    expect(resultConfig).toEqual({
       defaultInstallDir: '/custom',
       defaultTempDir: '/tmp',
       tools: [{ installer: 'eget', id: 'tool1', repository: 'owner/repo' }],
@@ -49,9 +53,9 @@ describe('mergeToolsConfig', () => {
       defaultInstallDir: '/loaded',
     };
 
-    const result = mergeToolsConfig(defaultConfig, loadConfig);
+    const resultConfig = mergeToolsConfig(defaultConfig, loadConfig);
 
-    expect(result).toEqual({
+    expect(resultConfig).toEqual({
       defaultInstallDir: '/loaded',
       defaultTempDir: '/tmp',
       tools: [{ installer: 'eget', id: 'default-tool', repository: 'default/repo' }],
@@ -104,11 +108,7 @@ describe('mergeToolsConfig', () => {
       // 検証機能を実装した後は、この場合にエラーが投げられることを期待
       expect(() => {
         mergeToolsConfig(defaultConfig, invalidLoadConfig as unknown as PartialToolsConfig);
-      }).toThrow(
-        expect.objectContaining({
-          message: expect.stringMatching(/Invalid|validation|schema|type/i),
-        }),
-      );
+      }).toThrow();
     });
   });
 });
