@@ -7,9 +7,12 @@
 // https://opensource.org/licenses/MIT
 
 // vitest
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 // test target
-import { isLinux, isMacOS, isWindows } from '@/getPlatform';
+import { getPlatform } from '@/getPlatform';
+// constants
+import type { TPlatformKey } from '../../shared/constants';
+import { PLATFORM_TYPE } from '../../shared/types';
 
 /**
  * プラットフォーム判定関数のテスト
@@ -19,43 +22,31 @@ import { isLinux, isMacOS, isWindows } from '@/getPlatform';
  * process.platformをモックして異なるプラットフォームでの動作を確認します。
  */
 describe('Platform Checker Functions', () => {
-  let originalPlatform: PropertyDescriptor | undefined;
+  const isWindows = (platform?: TPlatformKey | 'unknown' | ''): boolean => {
+    return getPlatform(platform) === PLATFORM_TYPE.WINDOWS;
+  };
 
-  beforeEach(() => {
-    // Store original process.platform descriptor
-    originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
-  });
+  const isLinux = (platform?: TPlatformKey | 'unknown' | ''): boolean => {
+    return getPlatform(platform) === PLATFORM_TYPE.LINUX;
+  };
 
-  afterEach(() => {
-    // Restore original process.platform
-    if (originalPlatform) {
-      Object.defineProperty(process, 'platform', originalPlatform);
-    }
-  });
+  const isMacOS = (platform?: TPlatformKey | 'unknown' | ''): boolean => {
+    return getPlatform(platform) === PLATFORM_TYPE.MACOS;
+  };
 
   /**
    * isWindows関数のテスト
    */
   describe('isWindows', () => {
     it('returns true for Windows platform', () => {
-      Object.defineProperty(process, 'platform', {
-        value: 'win32',
-        configurable: true,
-      });
-
-      expect(isWindows()).toBe(true);
+      expect(isWindows('win32')).toBe(true);
     });
 
     it('returns false for non-Windows platforms', () => {
-      const nonWindowsPlatforms = ['linux', 'darwin'];
+      const nonWindowsPlatforms: (TPlatformKey)[] = ['linux', 'darwin'];
 
       nonWindowsPlatforms.forEach((platform) => {
-        Object.defineProperty(process, 'platform', {
-          value: platform,
-          configurable: true,
-        });
-
-        expect(isWindows()).toBe(false);
+        expect(isWindows(platform)).toBe(false);
       });
     });
   });
@@ -65,24 +56,14 @@ describe('Platform Checker Functions', () => {
    */
   describe('isLinux', () => {
     it('returns true for Linux platform', () => {
-      Object.defineProperty(process, 'platform', {
-        value: 'linux',
-        configurable: true,
-      });
-
-      expect(isLinux()).toBe(true);
+      expect(isLinux('linux')).toBe(true);
     });
 
     it('returns false for non-Linux platforms', () => {
-      const nonLinuxPlatforms = ['win32', 'darwin'];
+      const nonLinuxPlatforms: (TPlatformKey)[] = ['win32', 'darwin'];
 
       nonLinuxPlatforms.forEach((platform) => {
-        Object.defineProperty(process, 'platform', {
-          value: platform,
-          configurable: true,
-        });
-
-        expect(isLinux()).toBe(false);
+        expect(isLinux(platform)).toBe(false);
       });
     });
   });
@@ -92,24 +73,14 @@ describe('Platform Checker Functions', () => {
    */
   describe('isMacOS', () => {
     it('returns true for macOS platform', () => {
-      Object.defineProperty(process, 'platform', {
-        value: 'darwin',
-        configurable: true,
-      });
-
-      expect(isMacOS()).toBe(true);
+      expect(isMacOS('darwin')).toBe(true);
     });
 
     it('returns false for non-macOS platforms', () => {
-      const nonMacOSPlatforms = ['win32', 'linux'];
+      const nonMacOSPlatforms: (TPlatformKey)[] = ['win32', 'linux'];
 
       nonMacOSPlatforms.forEach((platform) => {
-        Object.defineProperty(process, 'platform', {
-          value: platform,
-          configurable: true,
-        });
-
-        expect(isMacOS()).toBe(false);
+        expect(isMacOS(platform)).toBe(false);
       });
     });
   });
@@ -119,14 +90,10 @@ describe('Platform Checker Functions', () => {
    */
   describe('Error Handling', () => {
     it('throws for unsupported platforms', () => {
-      Object.defineProperty(process, 'platform', {
-        value: 'freebsd',
-        configurable: true,
-      });
-
-      expect(() => isWindows()).toThrow(/Unsupported platform/);
-      expect(() => isLinux()).toThrow(/Unsupported platform/);
-      expect(() => isMacOS()).toThrow(/Unsupported platform/);
+      const unsupportedPlatform = 'freebsd' as TPlatformKey;
+      expect(() => isWindows(unsupportedPlatform)).toThrow(/Unsupported platform/);
+      expect(() => isLinux(unsupportedPlatform)).toThrow(/Unsupported platform/);
+      expect(() => isMacOS(unsupportedPlatform)).toThrow(/Unsupported platform/);
     });
   });
 });

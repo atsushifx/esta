@@ -59,23 +59,24 @@ const uniqDirs = (dirs: string[]): string[] =>
  * プロジェクト設定用のディレクトリリストを作成します
  *
  * @param appConfig アプリケーション名
+ * @param baseDirectory 検索ベースディレクトリ（デフォルト: カレントディレクトリ）
  * @returns プロジェクト設定ディレクトリリスト
  *
  * @description
  * プロジェクトローカルな設定ファイルを検索するディレクトリリストを作成します：
- * - `.` - カレントディレクトリ
- * - `./.{appConfig}` - アプリ専用ディレクトリ
- * - `./.config` - 汎用設定ディレクトリ
- * - `./.config/{appConfig}` - .config内のアプリ専用ディレクトリ
+ * - `{baseDirectory}` - ベースディレクトリ
+ * - `{baseDirectory}/.{appConfig}` - アプリ専用ディレクトリ
+ * - `{baseDirectory}/.config` - 汎用設定ディレクトリ
+ * - `{baseDirectory}/.config/{appConfig}` - .config内のアプリ専用ディレクトリ
  */
-const createProjectConfigDirs = (appConfig: string): string[] => {
+const createProjectConfigDirs = (appConfig: string, baseDirectory = '.'): string[] => {
   const dirs: string[] = [];
 
   // add dirs
-  dirs.push('.');
-  dirs.push(`./.${appConfig}`);
-  dirs.push('./.config');
-  dirs.push(`./.config/${appConfig}`);
+  dirs.push(baseDirectory);
+  dirs.push(`${baseDirectory}/.${appConfig}`);
+  dirs.push(`${baseDirectory}/.config`);
+  dirs.push(`${baseDirectory}/.config/${appConfig}`);
 
   return dirs;
 };
@@ -138,6 +139,7 @@ const createUserConfigDirs = (appConfig: string): string[] => {
  *
  * @param appConfig アプリケーション名
  * @param searchType 検索タイプ（PROJECT、USER、または SYSTEM）
+ * @param baseDirectory 検索ベースディレクトリ（PROJECTタイプでのみ使用）
  * @returns 重複除去された設定ディレクトリリスト
  *
  * @description
@@ -153,16 +155,20 @@ const createUserConfigDirs = (appConfig: string): string[] => {
  * // -> ['~/.config/myapp', '~/configs/myapp', '~/.configs/myapp', '~/.myapp']
  *
  * // プロジェクト設定ディレクトリを取得
- * const projectDirs = configSearchDirs('myapp', TSearchConfigFileType.PROJECT);
- * // -> ['.', './.myapp', './.config', './.config/myapp']
+ * const projectDirs = configSearchDirs('myapp', TSearchConfigFileType.PROJECT, '/path/to/project');
+ * // -> ['/path/to/project', '/path/to/project/.myapp', '/path/to/project/.config', '/path/to/project/.config/myapp']
  * ```
  */
-export const configSearchDirs = (appConfig: string, searchType: TSearchConfigFileType): string[] => {
+export const configSearchDirs = (
+  appConfig: string,
+  searchType: TSearchConfigFileType,
+  baseDirectory?: string,
+): string[] => {
   let dirs: string[] = [];
 
   switch (searchType) {
     case TSearchConfigFileType.PROJECT:
-      dirs = createProjectConfigDirs(appConfig);
+      dirs = createProjectConfigDirs(appConfig, baseDirectory);
       break;
     case TSearchConfigFileType.SYSTEM:
       dirs = createSystemConfigDirs(appConfig);
