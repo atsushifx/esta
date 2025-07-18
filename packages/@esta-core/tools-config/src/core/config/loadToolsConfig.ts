@@ -6,13 +6,20 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// error handling utilities
 import { errorExit, ExitCode } from '@esta-core/error-handler';
+// configuration file loading utilities
 import { loadConfig as loadConfigFile, TSearchConfigFileType } from '@esta-utils/config-loader';
+// Node.js filesystem and path utilities
 import { existsSync } from 'node:fs';
 import { basename, dirname, extname } from 'node:path';
+// valibot schema validation utilities
 import { parse } from 'valibot';
+// validation error messages
 import { VALIDATION_ERROR_MESSAGES } from '../../internal/constants';
+// validation schemas
 import { CompleteToolsConfigSchema, ToolsConfigSchema } from '../../internal/schemas';
+// tools configuration types
 import type { PartialToolsConfig, ToolsConfig } from '../../internal/types';
 
 /**
