@@ -10,6 +10,8 @@
 import { array, check, object, optional, pipe, record, string, transform } from 'valibot';
 // path validation and normalization utilities
 import { normalizePathForSchema, validateAndNormalizePath } from '../../utils';
+// validation error messages
+import { VALIDATION_ERROR_MESSAGES } from '../constants/validation';
 
 /**
  * ツールエントリーのスキーマ
@@ -56,7 +58,7 @@ export const ToolsConfigSchema = object({
           return false;
         }
       },
-      'defaultInstallDir must be a valid path (absolute: "/" or "C:\\" or relative: "./" or directory name)',
+      VALIDATION_ERROR_MESSAGES.DEFAULT_INSTALL_DIR_INVALID_PATH,
     ),
     transform(normalizePathForSchema),
   )),
@@ -71,7 +73,7 @@ export const ToolsConfigSchema = object({
           return false;
         }
       },
-      'defaultTempDir must be a valid path (absolute: "/" or "C:\\" or relative: "./" or directory name)',
+      VALIDATION_ERROR_MESSAGES.DEFAULT_TEMP_DIR_INVALID_PATH,
     ),
     transform(normalizePathForSchema),
   )),
@@ -86,18 +88,18 @@ export const CompleteToolsConfigSchema = pipe(
   ToolsConfigSchema,
   check(
     (config) => config.defaultInstallDir !== undefined,
-    'defaultInstallDir is required',
+    VALIDATION_ERROR_MESSAGES.DEFAULT_INSTALL_DIR_REQUIRED,
   ),
   check(
     (config) => config.defaultTempDir !== undefined,
-    'defaultTempDir is required',
+    VALIDATION_ERROR_MESSAGES.DEFAULT_TEMP_DIR_REQUIRED,
   ),
   check(
     (config) => config.tools !== undefined,
-    'tools is required',
+    VALIDATION_ERROR_MESSAGES.TOOLS_REQUIRED,
   ),
   check(
     (config) => config.defaultInstallDir !== config.defaultTempDir,
-    'defaultInstallDir and defaultTempDir must be different directories',
+    VALIDATION_ERROR_MESSAGES.DIRECTORIES_MUST_BE_DIFFERENT,
   ),
 );

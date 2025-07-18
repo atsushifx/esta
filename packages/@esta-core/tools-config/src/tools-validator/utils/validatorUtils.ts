@@ -8,6 +8,8 @@
 
 // validation option types
 import type { ValidOption } from '@/internal/types/validation';
+// validation error messages
+import { VALIDATION_ERROR_MESSAGES } from '@/internal/constants/validation';
 
 /**
  * GitHubリポジトリ形式の検証
@@ -128,19 +130,19 @@ export const chkValidOptions = (
 
   // オプションの重複
   if (hasDuplicatedOptions(options, validator)) {
-    return 'duplicated options';
+    return VALIDATION_ERROR_MESSAGES.DUPLICATED_OPTIONS;
   }
 
   // 必要な値
   const missingValueOptions = getMissingValueOptions(options, validator);
   if (missingValueOptions.length > 0) {
-    return 'option has no value: ' + missingValueOptions.join(', ');
+    return `${VALIDATION_ERROR_MESSAGES.OPTION_HAS_NO_VALUE}: ${missingValueOptions.join(', ')}`;
   }
 
   // 不要な値
   const unexpectedValueOptions = getUnexpectedValueOptions(options, validator);
   if (unexpectedValueOptions.length > 0) {
-    return 'option has unexpected value: ' + unexpectedValueOptions.join(', ');
+    return `${VALIDATION_ERROR_MESSAGES.OPTION_HAS_UNEXPECTED_VALUE}: ${unexpectedValueOptions.join(', ')}`;
   }
 
   return '';
