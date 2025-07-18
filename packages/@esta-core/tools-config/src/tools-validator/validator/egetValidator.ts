@@ -43,6 +43,9 @@ export type EgetToolEntry = ToolEntry & {
 
 /**
  * repositoryフィールドがGitHub形式（owner/repo）であることを検証
+ *
+ * @param repository 検証するリポジトリ文字列
+ * @returns GitHub形式として有効かどうか
  */
 const validateRepositoryFormat = (repository: string): boolean => {
   const githubRepoPattern = /^[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+$/;
@@ -52,6 +55,9 @@ const validateRepositoryFormat = (repository: string): boolean => {
 /**
  * versionフィールドが有効な形式であることを検証
  * 許可される形式: latest, v##.##.##, ##.##.##
+ *
+ * @param version 検証するバージョン文字列
+ * @returns バージョン形式として有効かどうか
  */
 const validateVersionFormat = (version: string): boolean => {
   if (version === 'latest') {
@@ -128,6 +134,9 @@ export const validateEgetToolEntry = (entry: ToolEntry): EgetToolEntry => {
 
 /**
  * ToolEntryがeget用エントリーかどうかを判定
+ *
+ * @param entry 判定対象のツールエントリー
+ * @returns eget用エントリーかどうか
  */
 export const isEgetToolEntry = (entry: ToolEntry): entry is EgetToolEntry => {
   return entry.installer === 'eget';

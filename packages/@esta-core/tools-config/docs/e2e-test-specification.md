@@ -15,16 +15,17 @@
 
 ### テストフレームワーク
 
-- **テストランナー**: Vitest (CI設定)
+- **テストランナー**: Vitest (CI設定 - `configs/vitest.config.ci.ts`)
 - **ファイルI/O**: `@agla-e2e/fileio-framework`
 - **一時ディレクトリ**: 自動生成・自動削除
 - **依存関係**: `@esta-utils/config-loader`の統合テスト
+- **テストコマンド**: `pnpm run test:ci`
 
 ## E2Eテストスイート構成
 
 ### 1. 設定ファイル読み込みE2E (`tests/e2e/loadConfig.e2e.spec.ts`)
 
-**概要**: `loadConfig` 関数の実ファイルシステムを使用した統合テスト
+**概要**: `loadToolsConfig` 関数の実ファイルシステムを使用した統合テスト
 
 **テストコンテキストヘルパー**:
 
@@ -70,13 +71,11 @@ describe('JSONファイル読み込み', () => {
     };
 
     // When: 設定ファイルを読み込む
-    const result = await loadConfig(configFilePath);
+    const result = await loadToolsConfig(configFilePath);
 
     // Then: 成功して設定が読み込まれる
-    expect(result.success).toBe(true);
-    expect(result.config).toBeDefined();
-    expect(result.config!.defaultInstallDir).toBe('custom/install/dir');
-    expect(result.config!.tools).toHaveLength(1);
+    expect(result.defaultInstallDir).toBe('custom/install/dir');
+    expect(result.tools).toHaveLength(1);
   });
 
   it('部分的な設定ファイルを読み込める', async (testContext) => {
@@ -88,7 +87,7 @@ describe('JSONファイル読み込み', () => {
 
     // When: 設定ファイルを読み込む
     // Then: 成功して読み込まれる
-    expect(result.config!.defaultInstallDir).toBeUndefined();
+    expect(result.defaultInstallDir).toBeUndefined();
   });
 
   it('空のJSONファイルを読み込める', async (testContext) => {
@@ -97,7 +96,7 @@ describe('JSONファイル読み込み', () => {
 
     // When: 設定ファイルを読み込む
     // Then: 成功して空の設定が読み込まれる
-    expect(result.config).toEqual({});
+    expect(result).toEqual({});
   });
 });
 ```
@@ -134,13 +133,12 @@ tools:
 `;
 
     // When: 設定ファイルを読み込む
-    const result = await loadConfig(configFilePath);
+    const result = await loadToolsConfig(configFilePath);
 
     // Then: 成功して設定が読み込まれる
-    expect(result.success).toBe(true);
-    expect(result.config!.defaultInstallDir).toBe('custom/yaml/dir');
-    expect(result.config!.tools).toHaveLength(1);
-    expect(result.config!.tools![0].id).toBe('yaml-tool');
+    expect(result.defaultInstallDir).toBe('custom/yaml/dir');
+    expect(result.tools).toHaveLength(1);
+    expect(result.tools![0].id).toBe('yaml-tool');
   });
 });
 ```
@@ -172,13 +170,12 @@ describe('複数ツール設定', () => {
     };
 
     // When: 設定ファイルを読み込む
-    const result = await loadConfig(configFilePath);
+    const result = await loadToolsConfig(configFilePath);
 
     // Then: 成功して複数のツール設定が読み込まれる
-    expect(result.success).toBe(true);
-    expect(result.config!.tools).toHaveLength(2);
-    expect(result.config!.tools![0].id).toBe('tool1');
-    expect(result.config!.tools![1].id).toBe('tool2');
+    expect(result.tools).toHaveLength(2);
+    expect(result.tools![0].id).toBe('tool1');
+    expect(result.tools![1].id).toBe('tool2');
   });
 });
 ```
@@ -195,7 +192,7 @@ describe('複数ツール設定', () => {
 
 ```typescript
 describe('エラーハンドリング', () => {
-  it('存在しないファイルでエラーが発生する', async (testContext) => {
+  it('存在しないファイルでエラー終了する', async (testContext) => {
     // Given: テストコンテキストを作成
     const ctx = await createTestContext('nonexistent-file', testContext);
     testContext.onTestFinished(ctx.cleanup);
@@ -203,15 +200,11 @@ describe('エラーハンドリング', () => {
     // Given: 存在しないファイルパス
     const configFilePath = path.join(ctx.testDir, 'nonexistent-config.json');
 
-    // When: 設定ファイルを読み込む
-    const result = await loadConfig(configFilePath);
-
-    // Then: ファイル読み込みエラーが発生する
-    expect(result.success).toBe(false);
-    expect(result.error).toContain('Configuration file not found');
+    // When/Then: 設定ファイル読み込みでerrorExitが呼ばれる
+    expect(() => loadToolsConfig(configFilePath)).toThrow();
   });
 
-  it('不正なJSONファイルでエラーが発生する', async (testContext) => {
+  it('不正なJSONファイルでエラー終了する', async (testContext) => {
     // Given: テストコンテキストを作成
     const ctx = await createTestContext('invalid-json', testContext);
     testContext.onTestFinished(ctx.cleanup);
@@ -220,12 +213,8 @@ describe('エラーハンドリング', () => {
     const invalidJsonContent = '{ invalid json content }';
     await writeFile(configFilePath, invalidJsonContent);
 
-    // When: 設定ファイルを読み込む
-    const result = await loadConfig(configFilePath);
-
-    // Then: JSONパースエラーが発生する
-    expect(result.success).toBe(false);
-    expect(result.error).toBeDefined();
+    // When/Then: 設定ファイル読み込みでerrorExitが呼ばれる
+    expect(() => loadToolsConfig(configFilePath)).toThrow();
   });
 });
 ```
@@ -234,7 +223,8 @@ describe('エラーハンドリング', () => {
 
 - ファイル存在チェックの実動作
 - ファイル権限エラーの処理
-- 不正フォーマットの適切なエラーハンドリング
+- 不正フォーマットでのerrorExit処理
+- プロセス終了時の適切なエラーハンドリング
 
 ### 2. 現在のE2Eテスト構成
 
@@ -261,12 +251,10 @@ describe('エラーハンドリング', () => {
 
 - 実ファイルシステムでのファイルI/O動作
 - `@esta-utils/config-loader`との統合動作
-- エラー処理の実動作
+- `errorExit`によるエラーハンドリング
 - ファイル存在チェックの実動作
-
-**削除したファイル**:
-
-- `tests/e2e/config-loader-test.spec.ts` - 依存ライブラリの動作確認テストであり、このパッケージのメインロジックとは無関係のため削除
+- Valibotスキーマによる設定正規化
+- 各種ファイル形式（JSON、YAML）の読み込み
 
 ## テストデータ設計
 
@@ -502,9 +490,10 @@ describe('ネットワークファイルシステム', () => {
 
 ### テストコマンド
 
-- **単体テスト実行**: `pnpm run test:ci`
-- **テスト設定**: `vitest.config.ci.ts`
+- **E2Eテスト実行**: `pnpm run test:ci`
+- **テスト設定**: `configs/vitest.config.ci.ts`
 - **テストファイル**: `tests/e2e/loadConfig.e2e.spec.ts`
+- **統合テスト**: `pnpm run test` (単体テスト + E2Eテスト)
 
 ## 保守とメンテナンス
 

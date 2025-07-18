@@ -16,7 +16,19 @@ import type { PartialToolsConfig } from '../../../internal/types';
 // test target
 import { isCompleteConfig, validateCompleteConfig } from '../loadToolsConfig';
 
+/**
+ * 設定管理統合テスト
+ *
+ * 設定の読み込み、マージ、検証処理の統合的な動作を検証します。
+ * 実際の使用シナリオに基づいたE2Eテストケースを含みます。
+ */
 describe('設定管理統合テスト', () => {
+  /**
+   * 設定読み込みから検証までの完全なフロー
+   *
+   * 部分設定の読み込み、デフォルト値とのマージ、最終的な検証までの
+   * 一連の処理が正しく動作することを確認します。
+   */
   describe('設定読み込みから検証までの完全なフロー', () => {
     test('正常系: 部分設定 → デフォルト値マージ → 完全設定', () => {
       // Given: 部分設定データ

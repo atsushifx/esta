@@ -13,8 +13,9 @@ export const SUPPORTED_INSTALLER_TYPES = ['eget'] as const;
 
 /**
  * eget用の有効なオプション
+ * ESTAでサポートされるegetコマンドのオプション一覧
  */
-export const VALID_EGET_OPTIONS = ['/q', '/quiet', '/a', '/asset:', '/asset', '/tag', '/file', '/to'] as const;
+export const VALID_EGET_OPTIONS = ['/q', '/quiet', '/a', '/asset:'] as const;
 
 /**
  * 検証エラーメッセージ

@@ -9,8 +9,25 @@
 import { describe, expect, it } from 'vitest';
 import { arePathsEqual, normalizePath, validateAndNormalizePath } from '../pathUtils';
 
+/**
+ * pathUtils.ts関数のテスト
+ *
+ * パス操作に関する各種ユーティリティ関数の動作を検証します。
+ * 主要な関数：normalizePath, validateAndNormalizePath, arePathsEqual
+ */
 describe('pathUtils.ts functions', () => {
+  /**
+   * normalizePath関数のテスト
+   *
+   * パス文字列の正規化機能をテストします。
+   * 区切り文字の統一、大文字小文字の変換、末尾スラッシュの処理などを検証します。
+   */
   describe('normalizePath', () => {
+    /**
+     * 正常系のテスト
+     *
+     * 有効なパス文字列が正しく正規化されることを確認します。
+     */
     describe('正常系', () => {
       describe('Unixパス', () => {
         it('基本的なUnixパスを正規化する', () => {

@@ -10,8 +10,25 @@ import { describe, expect, it } from 'vitest';
 import type { ToolEntry } from '../../../internal/types';
 import { validateEgetToolEntry } from '../egetValidator';
 
+/**
+ * egetValidator.ts内部関数のテスト
+ *
+ * egetValidator.tsで定義されている内部関数の動作を間接的にテストします。
+ * 主にvalidateEgetOptions関数やvalidateRepositoryFormat関数の動作確認を行います。
+ */
 describe('egetValidator.ts internal functions', () => {
+  /**
+   * validateEgetOptions関数の間接テスト
+   *
+   * egetツールエントリーの検証を通じて、内部で呼び出される
+   * validateEgetOptions関数の動作をテストします。
+   */
   describe('validateEgetOptions (間接テスト)', () => {
+    /**
+     * 正常系のテスト
+     *
+     * 有効なegetオプションが正しく検証されることを確認します。
+     */
     describe('正常系', () => {
       it('有効な /q オプションを検証する', () => {
         // Given: /q オプションを持つツールエントリー
@@ -156,6 +173,11 @@ describe('egetValidator.ts internal functions', () => {
       });
     });
 
+    /**
+     * 異常系のテスト
+     *
+     * 無効なegetオプションが適切にエラーとして検出されることを確認します。
+     */
     describe('異常系', () => {
       it('無効なオプションキー /invalid を検証して失敗する', () => {
         // Given: 無効なオプションキーを持つツールエントリー
@@ -329,7 +351,18 @@ describe('egetValidator.ts internal functions', () => {
     });
   });
 
+  /**
+   * validateGitHubRepository関数の間接テスト
+   *
+   * egetツールエントリーの検証を通じて、内部で呼び出される
+   * validateGitHubRepository関数の動作をテストします。
+   */
   describe('validateGitHubRepository (間接テスト)', () => {
+    /**
+     * 正常系のテスト
+     *
+     * 有効なGitHubリポジトリ形式が正しく検証されることを確認します。
+     */
     describe('正常系', () => {
       it('標準的なGitHubリポジトリ形式を検証する', () => {
         // Given: 標準的なGitHubリポジトリ形式のツールエントリー
@@ -407,6 +440,11 @@ describe('egetValidator.ts internal functions', () => {
       });
     });
 
+    /**
+     * 異常系のテスト
+     *
+     * 無効なGitHubリポジトリ形式が適切にエラーとして検出されることを確認します。
+     */
     describe('異常系', () => {
       it('スラッシュが不足するリポジトリ名を検証して失敗する', () => {
         // Given: スラッシュが不足するリポジトリ名のツールエントリー

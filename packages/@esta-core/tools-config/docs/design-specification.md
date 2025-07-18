@@ -11,38 +11,46 @@
 ```
 @esta-core/tools-config/
 ├── src/
-│   ├── index.ts              # エクスポート定義
+│   ├── index.ts              # メインエクスポート
 │   ├── core/
-│   │   ├── index.ts          # コア機能エクスポート
-│   │   └── config/
-│   │       ├── index.ts      # 設定関連エクスポート
-│   │       ├── loader.ts     # 設定ファイル読み込み
-│   │       └── defaults.ts   # デフォルト設定
-│   ├── types/               # 型定義（共有型のリエクスポート）
-│   │   ├── index.ts
-│   │   ├── config.ts
-│   │   └── tools.ts
-│   └── validator/           # 検証機能
-│       ├── index.ts
-│       ├── config.ts
-│       ├── egetValidator.ts
-│       ├── utils.ts
-│       └── tools/
-│           └── index.ts
+│   │   └── config/           # コア設定管理
+│   │       ├── loadToolsConfig.ts
+│   │       ├── mergeToolsConfig.ts
+│   │       └── index.ts
+│   ├── internal/
+│   │   ├── constants/        # 内部定数
+│   │   │   ├── config.ts
+│   │   │   ├── validation.ts
+│   │   │   └── index.ts
+│   │   ├── schemas/          # Valibotスキーマ
+│   │   │   ├── tools.schemas.ts
+│   │   │   └── index.ts
+│   │   └── types/            # 内部型定義
+│   │       ├── config.ts
+│   │       ├── tools.ts
+│   │       ├── validation.ts
+│   │       └── index.ts
+│   ├── tools-validator/      # ツール検証フレームワーク
+│   │   └── validator/
+│   │       ├── base.ts
+│   │       ├── egetValidator.ts
+│   │       └── index.ts
+│   ├── utils/                # ユーティリティ
+│   │   ├── pathUtils.ts
+│   │   └── index.ts
+│   └── defaults.ts           # デフォルト設定プロバイダー
 ├── shared/
-│   ├── types/               # 共有型定義
-│   │   ├── index.ts
-│   │   └── tools.types.ts
-│   └── schemas/             # バリデーションスキーマ
-│       ├── index.ts
-│       └── tools.schemas.ts
+│   └── types/                # 共有型定義
+│       ├── toolsConfig.types.ts
+│       └── index.ts
 └── tests/
-    └── e2e/                 # E2Eテスト
+    └── e2e/                  # E2Eテスト
+        └── loadConfig.e2e.spec.ts
 ```
 
 ### 型システム
 
-#### 基本型定義
+#### 基本型定義 (shared/types/toolsConfig.types.ts)
 
 ```typescript
 export type ToolEntry = {
@@ -59,12 +67,32 @@ export type ToolsConfig = {
   tools: ToolEntry[]; // ツールエントリー配列
 };
 
-export type PartialToolsConfig = Partial<ToolsConfig>; // 部分設定
+export type PartialToolsConfig = {
+  defaultInstallDir?: string; // オプショナルインストールディレクトリ
+  defaultTempDir?: string; // オプショナル一時ディレクトリ
+  tools?: ToolEntry[]; // オプショナルツールエントリー配列
+};
 ```
 
-#### eget専用型定義
+#### 内部型定義 (src/internal/types/)
 
 ```typescript
+export type LoadConfigResult<T = unknown> = {
+  success: boolean;
+  config?: T;
+  error?: string;
+};
+
+export type ValidateToolsResult = {
+  success: boolean;
+  validEntries: ToolEntry[];
+  errors: Array<{
+    index: number;
+    entry: ToolEntry;
+    error: string;
+  }>;
+};
+
 export type EgetToolEntry = ToolEntry & {
   installer: 'eget';
 };
@@ -72,89 +100,67 @@ export type EgetToolEntry = ToolEntry & {
 
 ## 主要コンポーネント
 
-### 1. 設定ファイル読み込み (core/config/loader.ts)
+### 1. 設定ファイル読み込み (core/config/loadToolsConfig.ts)
 
-**責務**: 設定ファイルの読み込みとパース
+**責務**: 設定ファイルの読み込みとバリデーション
 
 **機能**:
 
-- ファイル存在チェック
 - `@esta-utils/config-loader`を使用した設定読み込み
-- スキーマ検証による正規化処理
+- Valibotスキーマによる検証と正規化
+- 部分設定の処理
 - エラーハンドリング
 
 **API**:
 
 ```typescript
-export const loadConfig = async (configPath: string): Promise<LoadConfigResult>
+export const loadToolsConfig = async (configPath: string): Promise<PartialToolsConfig>
 export const isCompleteConfig = (config: PartialToolsConfig): config is ToolsConfig
 export const validateCompleteConfig = (config: PartialToolsConfig): ToolsConfig
-
-export type LoadConfigResult = {
-  success: boolean;
-  config?: PartialToolsConfig;
-  error?: string;
-};
 ```
 
 **実装詳細**:
 
-- `TSearchConfigFileType.PROJECT`で指定ディレクトリ内を検索
 - JSON, YAML, JS/TS形式をサポート
-- ファイル拡張子を除いたベース名で検索
+- 設定ファイル読み込みでエラーが発生した場合は `errorExit` でプロセス終了
 - 部分設定でも文字列正規化を実行（小文字変換、パス正規化）
 
-### 2. 設定検証 (validator/config.ts)
+### 2. 設定マージ (core/config/mergeToolsConfig.ts)
 
-**責務**: 設定データの妥当性検証
+**責務**: デフォルト設定と読み込み設定のマージ
 
 **機能**:
 
-- 部分設定の検証（ToolsConfigSchema）
-- 完全設定の検証（CompleteToolsConfigSchema）
-- ツールエントリー配列の検証
-- インストーラータイプ別の詳細検証
+- デフォルト設定と部分設定の統合
+- ツール配列のマージ処理
+- 設定値の上書き処理
 
 **API**:
 
 ```typescript
-export const validateConfig = (config: unknown): ValidateConfigResult
-export const validateCompleteConfig = (config: unknown): ValidateCompleteConfigResult
-export const validateTools = (tools: unknown[]): ValidateToolsResult
-
-export type ValidateConfigResult = SafeParseResult<typeof ToolsConfigSchema>;
-export type ValidateCompleteConfigResult = SafeParseResult<typeof CompleteToolsConfigSchema>;
-
-export type ValidateToolsResult = {
-  success: boolean;
-  validEntries: ToolEntry[];
-  errors: Array<{
-    index: number;
-    entry: unknown;
-    error: string;
-  }>;
-};
+export const mergeToolsConfig = (
+  defaultConfig: ToolsConfig,
+  loadConfig: PartialToolsConfig | object
+): ToolsConfig | object
 ```
 
-**検証フロー**:
+**実装詳細**:
 
-1. 基本的なToolEntry形式チェック
-2. installerフィールドの存在確認
-3. インストーラータイプ別の詳細検証
-4. エラー収集と有効エントリーの分離
-5. 文字列正規化（小文字変換、パス正規化）
+- グローバル設定（defaultInstallDir、defaultTempDir）は読み込み設定で上書き
+- ツール配列はデフォルトと読み込み設定を結合
+- 無効な設定の場合は空のオブジェクトを返す
 
-### 3. egetバリデーター (validator/egetValidator.ts)
+### 3. ツール検証フレームワーク (tools-validator/validator/)
 
-**責須**: eget固有の検証ロジック
+**責務**: ツールエントリーの検証とバリデーション
 
-**機能**:
+**base.ts**:
 
-- GitHubリポジトリ形式検証 (`owner/repo`)
-- eget専用オプション文字列の検証
-- 型安全な変換処理
+```typescript
+export const validateTools = (tools: ToolEntry[]): void
+```
 
-**API**:
+**egetValidator.ts**:
 
 ```typescript
 export const validateEgetToolEntry = (entry: ToolEntry): EgetToolEntry
@@ -174,43 +180,38 @@ export const isEgetToolEntry = (entry: ToolEntry): entry is EgetToolEntry
 - `/a`: アセット指定（値にアセット文字列が必要）
 - `/asset:`: アセット指定（値にアセット文字列が必要）
 
-### 4. ツール操作 (tools.ts)
+### 4. パスユーティリティ (utils/pathUtils.ts)
 
-**責務**: ツール設定の操作機能
+**責務**: クロスプラットフォーム対応のパス処理
 
-**実装機能**:
+**機能**:
 
-- ツール検索 (`getTool`)
-- ツール一覧取得 (`listTools`)
-- ツール追加/削除
-- 設定のマージ処理
+- パス正規化とバリデーション
+- Windows/Unixパス形式の処理
+- スキーマ用パス正規化
 
 **API**:
 
 ```typescript
-export const getTool = (id: string): ToolEntry | undefined
-export const listTools = (): ToolEntry[]
-export const addTool = (tool: ToolEntry): void
-export const removeTool = (id: string): boolean
+export const normalizePath = (path: string): string
+export const validateAndNormalizePath = (path: string): string
+export const normalizePathForSchema = (path: string): string
+export const arePathsEqual = (path1: string, path2: string): boolean
 ```
 
-### 5. デフォルト設定 (core/config/defaults.ts)
+### 5. デフォルト設定プロバイダー (defaults.ts)
 
 **責務**: デフォルト設定値の提供
 
 **実装機能**:
 
-- `getDefaultToolsConfig`の定義
-- デフォルトツールリストの提供
-- 特定ツールの検索機能
+- デフォルト設定の生成
+- 共通開発ツールの設定提供
 
 **API**:
 
 ```typescript
-export const getDefaultToolsConfig = (): ToolsConfig
-export const getDefaultTools = (): ToolEntry[]
-export const getDefaultTool = (id: string): ToolEntry | undefined
-export const defaultToolsConfig = getDefaultToolsConfig // 下位互換性
+export const defaultToolsConfig = (): ToolsConfig
 ```
 
 **デフォルトツール一覧**:
@@ -225,22 +226,50 @@ export const defaultToolsConfig = getDefaultToolsConfig // 下位互換性
 - delta (git差分表示)
 - gitleaks (秘密情報検出)
 
+### 6. Valibotスキーマ (internal/schemas/tools.schemas.ts)
+
+**責務**: 設定データのスキーマ定義とバリデーション
+
+**機能**:
+
+- 自動パス正規化とバリデーション
+- 文字列正規化（小文字変換）
+- 包括的なバリデーションとエラーメッセージ
+
+**スキーマ構成**:
+
+- `ToolsConfigSchema`: 部分設定対応（フィールドがオプショナル）
+- `CompleteToolsConfigSchema`: 完全設定検証（必須フィールドチェック）
+- `ToolEntrySchema`: ツールエントリーの検証と正規化
+
 ## データフロー
 
 ### 1. 設定読み込みフロー
 
 ```
-設定ファイル → loadConfig() → Partial<ToolsConfig>
+設定ファイル → loadToolsConfig() → PartialToolsConfig
                     ↓
-               validateConfig() → ValidateResult
+               Valibotスキーマ検証 → 正規化された設定
                     ↓
-               デフォルト値マージ → ToolsConfig
+               isCompleteConfig() → 完全性チェック
+                    ↓
+               validateCompleteConfig() → ToolsConfig
 ```
 
-### 2. ツール検証フロー
+### 2. 設定マージフロー
 
 ```
-ToolEntry[] → validateTools() → ValidateToolsResult
+defaultToolsConfig() → ToolsConfig (デフォルト)
+                    ↓
+loadToolsConfig() → PartialToolsConfig (読み込み設定)
+                    ↓
+mergeToolsConfig() → ToolsConfig (マージ結果)
+```
+
+### 3. ツール検証フロー
+
+```
+ToolEntry[] → validateTools() → void (エラー時throw)
                   ↓
             インストーラー判定
                   ↓
@@ -256,16 +285,13 @@ ToolEntry[] → validateTools() → ValidateToolsResult
 - `egetValidator`: eget固有の検証
 - 将来的に`scriptValidator`等を追加予定
 
-### 2. Result型パターン
+### 2. エラーハンドリングパターン
 
-エラー処理に明示的なResult型を使用:
+`@esta-core/error-handler`を使用したエラーハンドリング:
 
 ```typescript
-type Result<T> = {
-  success: boolean;
-  data?: T;
-  error?: string;
-};
+// 設定読み込みエラー時は即座にプロセス終了
+errorExit(exitCode, message);
 ```
 
 ### 3. スキーマ検証パターン
@@ -274,7 +300,7 @@ valibotを使用した型安全なスキーマ検証:
 
 - コンパイル時とランタイムの型安全性
 - パフォーマンスを重視したバリデーション
-- カスタム変換処理のサポート
+- カスタム変換処理のサポート（自動正規化）
 - 部分設定と完全設定の分離検証
 
 **スキーマ構成**:
@@ -283,20 +309,30 @@ valibotを使用した型安全なスキーマ検証:
 - `CompleteToolsConfigSchema`: 完全設定検証（必須フィールドチェック）
 - `ToolEntrySchema`: ツールエントリーの検証と正規化
 
+### 4. モジュール分離パターン
+
+機能別のモジュール分離:
+
+- `internal/`: 内部実装詳細（types, schemas, constants）
+- `shared/`: 公開API用の共有型
+- `tools-validator/`: 拡張可能なバリデーター フレームワーク
+- `utils/`: 再利用可能なユーティリティ
+
 ## 依存関係
 
 ### 外部依存
 
 - `valibot`: スキーマ検証ライブラリ
 - `@esta-utils/config-loader`: 設定ファイル読み込み
+- `@esta-core/error-handler`: エラーハンドリング
 - `@agla-e2e/fileio-framework`: E2Eテスト用
 - `node:fs`: ファイル存在チェック
 - `node:path`: パス操作
 
 ### 内部依存
 
-- `@shared/types`: 共有型定義
-- `@shared/schemas`: 共有スキーマ定義
+- パッケージは自己完結型で、内部では共有型を使用
+- 公開APIは`shared/types`で定義された型を使用
 
 ## 拡張性
 
