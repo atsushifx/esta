@@ -138,10 +138,10 @@ describe('バリデーター境界値テスト', () => {
         },
       };
 
-      // When & Then: 無効なオプションでエラーが発生する
+      // When & Then: 重複オプションでエラーが発生する
       expect(() => {
         validateEgetToolEntry(toolEntry);
-      }).toThrow('Invalid eget options');
+      }).toThrow('Invalid options: duplicated options');
     });
 
     test('空のオプション値', () => {

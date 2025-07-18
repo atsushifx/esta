@@ -21,7 +21,8 @@ Comprehensive validation and debugging workflow for the E2E framework.
 ## Phase 2: Testing
 
 - Run `pnpm run test:develop` - Execute development tests
-- Run `pnpm run test:ci` - Execute CI/CD tests
+- Run `pnpm run test:ci` - Execute CI (Integrate) tests
+- Run `pnpm run test:e2e - Execute CI (E2E) tests
 - If fails: Read test output, identify failing tests, analyze error messages, check for common issues (imports, types, async/await, mocking), suggest specific fixes
 
 **Note**: `/shared/` packages (constants and type definitions only) are expected to have missing node_modules and no test files. This is normal and should not be reported as errors.

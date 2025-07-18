@@ -191,7 +191,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
 
       it('/q オプションに値がある場合を検証して失敗する', () => {
@@ -206,7 +206,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
 
       it('/quiet オプションに値がある場合を検証して失敗する', () => {
@@ -221,7 +221,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
 
       it('/a オプションが空文字列の場合を検証して失敗する', () => {
@@ -236,7 +236,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
 
       it('/asset: オプションが空文字列の場合を検証して失敗する', () => {
@@ -251,7 +251,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
 
       it('/to: オプションが空文字列の場合を検証して失敗する', () => {
@@ -266,7 +266,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
 
       it('/tag: オプションが空文字列の場合を検証して失敗する', () => {
@@ -281,7 +281,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
 
       it('複数の無効なオプションを検証して失敗する', () => {
@@ -297,7 +297,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
 
       it('有効と無効なオプションが混在する場合を検証して失敗する', () => {
@@ -313,7 +313,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
 
       it('/aと/asset:の競合を検証して失敗する', () => {
@@ -329,7 +329,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
 
       it('/a,/q,/asset:の競合を検証して失敗する', () => {
@@ -346,7 +346,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
 
       it('/qと/quietの両方が使用された場合を検証して失敗する', () => {
@@ -362,7 +362,7 @@ describe('egetValidator.ts internal functions', () => {
         };
 
         // When & Then: 検証が失敗する
-        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid options:');
       });
     });
   });
