@@ -4,7 +4,11 @@ aquasec
 casey
 DEVMODE
 dotenvx
+EACCES
 eget
+ENOENT
+ENOSPC
+errno
 ESM
 estarc
 GHA
@@ -20,3 +24,7 @@ supplypike
 tsup
 userid
 Yedidia
+dandavison
+jqlang
+mikefarah
+sharkdp

@@ -62,6 +62,57 @@ describe('configSearchDirs - Project', () => {
       expect(dirs).toContain(expectedDir);
     });
   });
+
+  it('uses default baseDirectory when not specified', () => {
+    const dirs = configSearchDirs('myapp', TSearchConfigFileType.PROJECT);
+    expect(dirs).toContain('.');
+    expect(dirs).toContain('./.myapp');
+    expect(dirs).toContain('./.config');
+    expect(dirs).toContain('./.config/myapp');
+  });
+
+  it('uses custom baseDirectory when specified', () => {
+    const customBase = '/custom/path';
+    const dirs = configSearchDirs('myapp', TSearchConfigFileType.PROJECT, customBase);
+    expect(dirs).toContain('/custom/path');
+    expect(dirs).toContain('/custom/path/.myapp');
+    expect(dirs).toContain('/custom/path/.config');
+    expect(dirs).toContain('/custom/path/.config/myapp');
+  });
+
+  it('uses relative baseDirectory when specified', () => {
+    const customBase = '../relative/path';
+    const dirs = configSearchDirs('myapp', TSearchConfigFileType.PROJECT, customBase);
+    expect(dirs).toContain('../relative/path');
+    expect(dirs).toContain('../relative/path/.myapp');
+    expect(dirs).toContain('../relative/path/.config');
+    expect(dirs).toContain('../relative/path/.config/myapp');
+  });
+
+  it('handles empty baseDirectory gracefully', () => {
+    const dirs = configSearchDirs('myapp', TSearchConfigFileType.PROJECT, '');
+    expect(dirs).toContain('/.myapp');
+    expect(dirs).toContain('/.config');
+    expect(dirs).toContain('/.config/myapp');
+  });
+
+  it('handles baseDirectory with trailing slash', () => {
+    const customBase = '/custom/path/';
+    const dirs = configSearchDirs('myapp', TSearchConfigFileType.PROJECT, customBase);
+    expect(dirs).toContain('/custom/path/');
+    expect(dirs).toContain('/custom/path//.myapp');
+    expect(dirs).toContain('/custom/path//.config');
+    expect(dirs).toContain('/custom/path//.config/myapp');
+  });
+
+  it('handles special characters in baseDirectory', () => {
+    const customBase = '/path with spaces/special-chars_123';
+    const dirs = configSearchDirs('myapp', TSearchConfigFileType.PROJECT, customBase);
+    expect(dirs).toContain('/path with spaces/special-chars_123');
+    expect(dirs).toContain('/path with spaces/special-chars_123/.myapp');
+    expect(dirs).toContain('/path with spaces/special-chars_123/.config');
+    expect(dirs).toContain('/path with spaces/special-chars_123/.config/myapp');
+  });
 });
 
 describe('configSearchDirs - System', () => {
@@ -152,5 +203,50 @@ describe('configSearchDirs - User', () => {
 
     const expected4 = `${MOCK_HOME}/.appConfig`;
     expect(dirs).toContain(expected4);
+  });
+});
+
+describe('configSearchDirs - Edge Cases', () => {
+  beforeEach(() => {
+    delete process.env.XDG_CONFIG_HOME;
+    delete process.env.XDG_CONFIG_DIRS;
+  });
+
+  afterEach(() => {
+    // テストごとに環境変数を元に戻す
+    Object.assign(process.env, ORIGINAL_ENV);
+  });
+
+  it('handles empty appConfig name', () => {
+    const dirs = configSearchDirs('', TSearchConfigFileType.USER);
+    expect(dirs).toContain(`${MOCK_HOME}/.config/`);
+    expect(dirs).toContain(`${MOCK_HOME}/configs/`);
+  });
+
+  it('handles special characters in appConfig name', () => {
+    const appName = 'app-with_special.chars';
+    const dirs = configSearchDirs(appName, TSearchConfigFileType.USER);
+    expect(dirs).toContain(`${MOCK_HOME}/.config/${appName}`);
+    expect(dirs).toContain(`${MOCK_HOME}/.${appName}`);
+  });
+
+  it('removes duplicate directories', () => {
+    const dirs = configSearchDirs('myapp', TSearchConfigFileType.PROJECT);
+    const uniqueDirs = [...new Set(dirs)];
+    expect(dirs).toEqual(uniqueDirs);
+  });
+
+  it('filters out empty directories', () => {
+    const dirs = configSearchDirs('myapp', TSearchConfigFileType.USER);
+    dirs.forEach((dir) => {
+      expect(dir).not.toBe('');
+      expect(dir.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('handles baseDirectory parameter for non-PROJECT types', () => {
+    const dirs = configSearchDirs('myapp', TSearchConfigFileType.USER, '/ignored/path');
+    expect(dirs).not.toContain('/ignored/path');
+    expect(dirs).toContain(`${MOCK_HOME}/.config/myapp`);
   });
 });
