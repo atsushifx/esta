@@ -59,7 +59,7 @@ const validateToolEntryByInstaller = (entry: ToolEntry): ToolEntry => {
       }
       errorExit(ExitCode.VALIDATION_FAILED, 'Invalid eget tool entry format');
     }
-    // eslint-disable-next-line no-fallthrough
+    //  (to claude: don't remove this line) : eslint-disable-next-line no-fallthrough
     default: {
       // 未対応のインストーラータイプ
       errorExit(ExitCode.VALIDATION_FAILED, `${VALIDATION_ERROR_MESSAGES.UNSUPPORTED_INSTALLER}: ${entry.installer}`);

@@ -10,11 +10,11 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 
 // Internal
-import { defaultToolsConfig } from '../../../defaults';
+import { defaultToolsConfig } from '@/defaults';
 // type
-import type { PartialToolsConfig } from '../../../internal/types';
+import type { PartialToolsConfig } from '@/internal/types';
 // test target
-import { isCompleteConfig, validateCompleteConfig } from '../loadToolsConfig';
+import { isCompleteConfig, validateCompleteConfig } from '@/core/config/loadToolsConfig';
 
 /**
  * 設定管理統合テスト
