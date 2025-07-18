@@ -1,6 +1,6 @@
 import { errorExit, ExitCode } from '@esta-core/error-handler';
 import { object, optional, pipe, record, safeParse, string, transform } from 'valibot';
-import { VALID_EGET_OPTIONS, VALIDATION_ERROR_MESSAGES } from '../../internal/constants';
+import { EGET_SHORT_TO_LONG_FORM, VALID_EGET_OPTIONS, VALIDATION_ERROR_MESSAGES } from '../../internal/constants';
 import type { ToolEntry } from '../../internal/types';
 
 /**
@@ -9,10 +9,13 @@ import type { ToolEntry } from '../../internal/types';
  * @returns 検証結果
  */
 const validateEgetOptions = (options: Record<string, string>): boolean => {
-  // /a と /asset: の両方が存在する場合は無効
-  if (('/a' in options) && ('/asset:' in options)) {
-    return false;
+  // optionsが未定義の場合は有効とする
+  if (!options) {
+    return true;
   }
+
+  // ロングフォームに統一したオプションを格納するセット
+  const normalizedOptions = new Set<string>();
 
   for (const [key, value] of Object.entries(options)) {
     // キーが有効なオプションかチェック
@@ -20,13 +23,24 @@ const validateEgetOptions = (options: Record<string, string>): boolean => {
       return false;
     }
 
-    // /a や /asset: の場合、値（アセット文字列）が必要
-    if ((key === '/a' || key === '/asset:') && (!value || value.trim() === '')) {
+    // ショートフォームをロングフォームに統一
+    const normalizedKey = EGET_SHORT_TO_LONG_FORM[key as keyof typeof EGET_SHORT_TO_LONG_FORM] || key;
+
+    // 同じオプション（ロングフォーム）が既に存在するかチェック
+    if (normalizedOptions.has(normalizedKey)) {
       return false;
     }
 
-    // /q や /quiet の場合、値は空でも良い
-    if ((key === '/q' || key === '/quiet') && value !== '') {
+    // ロングフォームで格納
+    normalizedOptions.add(normalizedKey);
+
+    // /asset: の場合、値（アセット文字列）が必要
+    if (normalizedKey === '/asset:' && (!value || value.trim() === '')) {
+      return false;
+    }
+
+    // /quiet の場合、値は空でなければならない
+    if (normalizedKey === '/quiet' && value !== '') {
       return false;
     }
   }
