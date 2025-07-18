@@ -1,5 +1,5 @@
-// src: shared/common/configs/vitest.config.unit.ts
-// @(#) : vitest config for unit test
+// src: shared/common/configs/vitest.config.e2e.ts
+// @(#) : vitest config for end-to-end test
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -7,7 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // libs for base directory
-import path, { dirname } from 'path';
+import path from 'path';
+import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 // base directory
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -22,12 +23,12 @@ import baseConfig from '../../../../base/configs/vitest.config.base';
 export default mergeConfig(baseConfig, {
   test: {
     include: [
-      // Unit Test (develop test) exec only sub repositories
-      'src/**/*.test.ts',
-      'src/**/*.spec.ts',
+      // CI (End-to-End) Tests
+      'tests/e2e/**/*.test.ts',
+      'tests/e2e/**/*.spec.ts',
     ],
     caches: {
-      dir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),
+      dir: path.resolve(__dirname, '../../../.cache/vitest-cache/e2e/'),
     },
   },
   resolve: {
