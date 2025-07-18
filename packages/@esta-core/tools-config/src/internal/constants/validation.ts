@@ -6,25 +6,22 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// type
+import type { ValidOption } from '@/internal/types/validation';
+
 /**
  * サポートされるインストーラータイプ
  */
-export const SUPPORTED_INSTALLER_TYPES = ['eget'] as const;
+export const SUPPORTED_INSTALLER_TYPES: string[] = [
+  'eget',
+] as const;
 
 /**
  * eget用オプションのショートフォーム → ロングフォーム変換テーブル
  */
-export const EGET_SHORT_TO_LONG_FORM = {
-  '/a': '/asset:',
-  '/q': '/quiet',
-} as const;
-
-/**
- * eget用の有効なオプション一覧
- */
-export const VALID_EGET_OPTIONS = [
-  ...Object.keys(EGET_SHORT_TO_LONG_FORM), // ショートフォーム (/a, /q)
-  ...Object.values(EGET_SHORT_TO_LONG_FORM), // ロングフォーム (/asset:, /quiet)
+export const VALID_EGET_OPTIONS: ValidOption[] = [
+  { short: '/a', long: '/asset:', requireValue: true },
+  { short: '/q', long: '/quiet', requireValue: false },
 ] as const;
 
 /**
@@ -37,7 +34,7 @@ export const VALIDATION_ERROR_MESSAGES = {
   REPOSITORY_REQUIRED: 'Repository field is required',
   INVALID_REPOSITORY_FORMAT: 'Repository must be in "owner/repo" format',
   INVALID_VERSION_FORMAT: 'Version must be "latest", "v##.##.##", or "##.##.##" format',
-  INVALID_EGET_OPTIONS: 'Invalid eget options',
+  INVALID_OPTIONS: 'Invalid options',
   EGET_INSTALLER_REQUIRED: 'Installer must be "eget"',
   INVALID_PATH_FORMAT: 'Invalid path format',
   UNSUPPORTED_INSTALLER: 'Unsupported installer type',

@@ -6,23 +6,24 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import type { ToolEntry } from '../../../shared/types';
+/**
+ * オプション定義の型。
+ * コマンドライン引数におけるショート・ロングオプション、および値の有無を記述します。
+ *
+ * @property short - ショートオプション（例: "-h"）。存在しない場合は空文字列 `""`。
+ * @property long - ロングオプション（例: "--help"）。必須。
+ * @property requireValue - このオプションが値を必要とするかどうか（例: "--output <file>" → true）
+ */
+export type ValidOption = {
+  short: string;
+  long: string;
+  requireValue: boolean;
+};
 
 /**
- * ツール検証結果
+ * バリデーション結果の型定義
  */
 export type ValidateToolsResult = {
-  /** 検証成功フラグ */
   success: boolean;
-  /** 有効なツールエントリー */
-  validEntries: ToolEntry[];
-  /** エラーの配列 */
-  errors: Array<{
-    /** エラーが発生したインデックス */
-    index: number;
-    /** エラーが発生したエントリー */
-    entry: ToolEntry;
-    /** エラーメッセージ */
-    error: string;
-  }>;
+  error?: string;
 };

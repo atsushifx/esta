@@ -279,7 +279,7 @@ describe('tools-config CI統合テスト', () => {
         // Given: Unicode文字を含む設定
         const unicodeConfig: PartialToolsConfig = {
           defaultInstallDir: '/テスト/ディレクトリ',
-          defaultTempDir: '/тест/директория',
+          defaultTempDir: '/tëst/dîrëctørÿ',
           tools: [{
             installer: 'eget',
             id: 'ツール名',
@@ -299,7 +299,7 @@ describe('tools-config CI統合テスト', () => {
           };
           const result = validateCompleteConfig(mergedConfig);
           expect(result.defaultInstallDir).toBe('/テスト/ディレクトリ');
-          expect(result.defaultTempDir).toBe('/тест/директория');
+          expect(result.defaultTempDir).toBe('/tëst/dîrëctørÿ');
           expect(result.tools[0].id).toBe('ツール名');
         }).not.toThrow();
       });
