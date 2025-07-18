@@ -16,6 +16,11 @@
  * @returns パスが基本的に有効かどうか
  */
 const isValidPathFormat = (path: string): boolean => {
+  // 型チェック
+  if (typeof path !== 'string') {
+    return false;
+  }
+
   // 空文字列チェック
   if (!path || path.trim().length === 0) {
     return false;
@@ -24,6 +29,7 @@ const isValidPathFormat = (path: string): boolean => {
   const trimmedPath = path.trim();
 
   // 無効な文字をチェック（Windows/Unix共通）
+  // 特殊記号 !@#$%^&()_+-={}[].:, は許可、*は無効
   const invalidChars = /[<>"|*?]/;
   if (invalidChars.test(trimmedPath)) {
     return false;

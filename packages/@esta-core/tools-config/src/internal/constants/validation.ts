@@ -14,7 +14,7 @@ export const SUPPORTED_INSTALLER_TYPES = ['eget'] as const;
 /**
  * eget用の有効なオプション
  */
-export const VALID_EGET_OPTIONS = ['/q', '/quiet', '/a', '/asset:'] as const;
+export const VALID_EGET_OPTIONS = ['/q', '/quiet', '/a', '/asset:', '/asset', '/tag', '/file', '/to'] as const;
 
 /**
  * 検証エラーメッセージ
@@ -25,6 +25,7 @@ export const VALIDATION_ERROR_MESSAGES = {
   ID_REQUIRED: 'ID field is required',
   REPOSITORY_REQUIRED: 'Repository field is required',
   INVALID_REPOSITORY_FORMAT: 'Repository must be in "owner/repo" format',
+  INVALID_VERSION_FORMAT: 'Version must be "latest", "v##.##.##", or "##.##.##" format',
   INVALID_EGET_OPTIONS: 'Invalid eget options',
   EGET_INSTALLER_REQUIRED: 'Installer must be "eget"',
   INVALID_PATH_FORMAT: 'Invalid path format',

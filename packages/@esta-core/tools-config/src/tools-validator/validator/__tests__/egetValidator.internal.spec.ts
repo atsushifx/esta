@@ -103,14 +103,14 @@ describe('egetValidator.ts internal functions', () => {
         expect(result).toEqual(toolEntry);
       });
 
-      it('有効な /tag: オプションを検証する', () => {
-        // Given: /tag: オプションを持つツールエントリー
+      it('有効な /a オプションを検証する', () => {
+        // Given: /a オプションを持つツールエントリー
         const toolEntry: ToolEntry = {
           installer: 'eget',
           id: 'gh',
           repository: 'cli/cli',
           options: {
-            '/tag:': 'v2.0.0',
+            '/a': 'gh_linux_amd64.tar.gz',
           },
         };
 
@@ -130,8 +130,6 @@ describe('egetValidator.ts internal functions', () => {
           options: {
             '/q': '',
             '/asset:': 'gh_linux_amd64.tar.gz',
-            '/to:': 'bin/gh',
-            '/tag:': 'v2.0.0',
           },
         };
 
@@ -289,6 +287,39 @@ describe('egetValidator.ts internal functions', () => {
           options: {
             '/q': '', // 有効
             '/invalid': 'value', // 無効
+          },
+        };
+
+        // When & Then: 検証が失敗する
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+      });
+
+      it('/aと/asset:の競合を検証して失敗する', () => {
+        // Given: /aと/asset:の両方を持つツールエントリー
+        const toolEntry: ToolEntry = {
+          installer: 'eget',
+          id: 'gh',
+          repository: 'cli/cli',
+          options: {
+            '/a': 'asset1.tar.gz',
+            '/asset:': 'asset2.tar.gz', // 競合
+          },
+        };
+
+        // When & Then: 検証が失敗する
+        expect(() => validateEgetToolEntry(toolEntry)).toThrow('Invalid eget options');
+      });
+
+      it('/a,/q,/asset:の競合を検証して失敗する', () => {
+        // Given: /a,/q,/asset:の組み合わせ（/aと/asset:が競合）
+        const toolEntry: ToolEntry = {
+          installer: 'eget',
+          id: 'gh',
+          repository: 'cli/cli',
+          options: {
+            '/a': 'asset1.tar.gz',
+            '/q': '',
+            '/asset:': 'asset2.tar.gz', // /aと競合
           },
         };
 

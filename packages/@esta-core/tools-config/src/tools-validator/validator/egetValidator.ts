@@ -9,6 +9,11 @@ import type { ToolEntry } from '../../internal/types';
  * @returns 検証結果
  */
 const validateEgetOptions = (options: Record<string, string>): boolean => {
+  // /a と /asset: の両方が存在する場合は無効
+  if (('/a' in options) && ('/asset:' in options)) {
+    return false;
+  }
+
   for (const [key, value] of Object.entries(options)) {
     // キーが有効なオプションかチェック
     if (!VALID_EGET_OPTIONS.includes(key as (typeof VALID_EGET_OPTIONS)[number])) {
@@ -45,6 +50,20 @@ const validateRepositoryFormat = (repository: string): boolean => {
 };
 
 /**
+ * versionフィールドが有効な形式であることを検証
+ * 許可される形式: latest, v##.##.##, ##.##.##
+ */
+const validateVersionFormat = (version: string): boolean => {
+  if (version === 'latest') {
+    return true;
+  }
+
+  // セマンティックバージョン: v1.2.3 または 1.2.3 形式
+  const semverPattern = /^v?\d+\.\d+\.\d+$/;
+  return semverPattern.test(version);
+};
+
+/**
  * eget用ツールエントリーのスキーマ
  */
 export const EgetToolEntrySchema = object({
@@ -67,7 +86,17 @@ export const EgetToolEntrySchema = object({
       return value;
     }),
   ),
-  version: optional(string()),
+  version: optional(
+    pipe(
+      string(),
+      transform((value) => {
+        if (!validateVersionFormat(value)) {
+          throw new Error(VALIDATION_ERROR_MESSAGES.INVALID_VERSION_FORMAT);
+        }
+        return value;
+      }),
+    ),
+  ),
   options: optional(
     pipe(
       record(string(), string()),

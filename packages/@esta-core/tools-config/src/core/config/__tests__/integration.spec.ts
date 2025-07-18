@@ -75,7 +75,7 @@ describe('設定管理統合テスト', () => {
       // When & Then: 検証エラーが発生
       expect(() => {
         validateCompleteConfig(invalidConfig);
-      }).toThrow('Invalid config: not complete');
+      }).toThrow('Configuration validation failed: defaultInstallDir is required');
     });
 
     test('エッジケース: 空の設定配列', () => {
@@ -133,9 +133,9 @@ describe('設定管理統合テスト', () => {
     test('境界値: 最大文字列長', () => {
       // Given: 長い文字列を含む設定
       const longString = 'a'.repeat(1000);
-      const configWithLongStrings: PartialToolsConfig = {
+      const configWithDifferentDirs: PartialToolsConfig = {
         defaultInstallDir: longString,
-        defaultTempDir: longString,
+        defaultTempDir: longString + '/temp', // 異なるディレクトリにする
         tools: [{
           installer: 'eget',
           id: longString,
@@ -144,13 +144,13 @@ describe('設定管理統合テスト', () => {
         }],
       };
 
-      // When & Then: 長い文字列が適切に処理される
+      // When & Then: 異なるディレクトリなので成功する
       // デフォルト値とマージして完全設定を作成
       const defaultConfig = defaultToolsConfig();
       const mergedConfig = {
         ...defaultConfig,
-        ...configWithLongStrings,
-        tools: configWithLongStrings.tools ?? defaultConfig.tools,
+        ...configWithDifferentDirs,
+        tools: configWithDifferentDirs.tools ?? defaultConfig.tools,
       };
       expect(() => {
         validateCompleteConfig(mergedConfig);

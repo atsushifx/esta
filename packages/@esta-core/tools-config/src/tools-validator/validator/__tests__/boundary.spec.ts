@@ -6,9 +6,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// vitest
 import { describe, expect, test } from 'vitest';
-import type { ToolEntry } from '../../../internal/types';
+// type
+import type { ToolEntry } from '@/internal/types';
+// error handling
+import { ExitError } from '@esta-core/error-handler';
+// validator
 import { validateEgetToolEntry } from '../egetValidator';
+// test target
 import { validateTools } from '../index';
 
 describe('バリデーター境界値テスト', () => {
@@ -23,13 +29,8 @@ describe('バリデーター境界値テスト', () => {
         version: 'latest',
       };
 
-      // When: ツール検証
-      const result = validateTools([toolEntry]);
-
-      // Then: 長いIDが適切に処理される
-      expect(result.success).toBe(true);
-      expect(result.validEntries).toHaveLength(1);
-      expect(result.validEntries[0].id).toBe(longId);
+      // When & Then: ツール検証（例外が発生しないことを確認）
+      expect(() => validateTools([toolEntry])).not.toThrow();
     });
 
     test('最大文字数でのリポジトリ名検証', () => {
@@ -43,13 +44,8 @@ describe('バリデーター境界値テスト', () => {
         version: 'latest',
       };
 
-      // When: ツール検証
-      const result = validateTools([toolEntry]);
-
-      // Then: 長いリポジトリ名が適切に処理される
-      expect(result.success).toBe(true);
-      expect(result.validEntries).toHaveLength(1);
-      expect(result.validEntries[0].repository).toBe(`${longOwner}/${longRepo}`);
+      // When & Then: ツール検証（例外が発生しないことを確認）
+      expect(() => validateTools([toolEntry])).not.toThrow();
     });
 
     test('空文字列での検証', () => {
@@ -61,13 +57,8 @@ describe('バリデーター境界値テスト', () => {
         version: '',
       };
 
-      // When: ツール検証
-      const result = validateTools([emptyStringEntry]);
-
-      // Then: 空文字列が適切にハンドリングされる
-      expect(result.success).toBe(false);
-      expect(result.validEntries).toHaveLength(0);
-      expect(result.errors).toHaveLength(1);
+      // When & Then: ツール検証（ExitErrorが投げられることを確認）
+      expect(() => validateTools([emptyStringEntry])).toThrow(ExitError);
     });
   });
 
@@ -83,26 +74,19 @@ describe('バリデーター境界値テスト', () => {
 
       // When: 処理時間を測定
       const start = Date.now();
-      const result = validateTools(largeToolList);
+      expect(() => validateTools(largeToolList)).not.toThrow();
       const end = Date.now();
 
       // Then: 適切な時間内で処理される（500ms未満）
       expect(end - start).toBeLessThan(500);
-      expect(result.success).toBe(true);
-      expect(result.validEntries).toHaveLength(1000);
     });
 
     test('空の配列検証', () => {
       // Given: 空の配列
       const emptyArray: ToolEntry[] = [];
 
-      // When: ツール検証
-      const result = validateTools(emptyArray);
-
-      // Then: 空配列が適切に処理される
-      expect(result.success).toBe(true);
-      expect(result.validEntries).toHaveLength(0);
-      expect(result.errors).toHaveLength(0);
+      // When & Then: ツール検証（例外が発生しないことを確認）
+      expect(() => validateTools(emptyArray)).not.toThrow();
     });
 
     test('単一要素配列検証', () => {
@@ -114,13 +98,8 @@ describe('バリデーター境界値テスト', () => {
         version: 'latest',
       }];
 
-      // When: ツール検証
-      const result = validateTools(singleToolArray);
-
-      // Then: 単一要素が適切に処理される
-      expect(result.success).toBe(true);
-      expect(result.validEntries).toHaveLength(1);
-      expect(result.errors).toHaveLength(0);
+      // When & Then: ツール検証（例外が発生しないことを確認）
+      expect(() => validateTools(singleToolArray)).not.toThrow();
     });
   });
 
@@ -145,7 +124,7 @@ describe('バリデーター境界値テスト', () => {
     });
 
     test('最大数のオプション組み合わせ', () => {
-      // Given: 多数のオプション組み合わせ
+      // Given: 許可されたオプションの組み合わせ
       const toolEntry: ToolEntry = {
         installer: 'eget',
         id: 'test-tool',
@@ -153,25 +132,16 @@ describe('バリデーター境界値テスト', () => {
         version: 'latest',
         options: {
           '/q': '',
-          '/asset': 'asset-name',
-          '/tag': 'v1.0.0',
-          '/file': 'filename',
-          '/to': '/custom/path',
+          '/asset:': 'asset-name',
+          '/a': 'another-asset',
+          '/quiet': '',
         },
       };
 
-      // When: egetバリデーション
-      const result = validateEgetToolEntry(toolEntry);
-
-      // Then: 多数のオプションが適切に処理される
-      expect(result.installer).toBe('eget');
-      expect(result.options).toEqual({
-        '/q': '',
-        '/asset': 'asset-name',
-        '/tag': 'v1.0.0',
-        '/file': 'filename',
-        '/to': '/custom/path',
-      });
+      // When & Then: 無効なオプションでエラーが発生する
+      expect(() => {
+        validateEgetToolEntry(toolEntry);
+      }).toThrow('Invalid eget options');
     });
 
     test('空のオプション値', () => {
@@ -203,13 +173,8 @@ describe('バリデーター境界値テスト', () => {
         version: 'latest',
       };
 
-      // When: ツール検証
-      const result = validateTools([unicodeEntry]);
-
-      // Then: Unicode文字が適切に処理される
-      expect(result.success).toBe(true);
-      expect(result.validEntries).toHaveLength(1);
-      expect(result.validEntries[0].id).toBe('テスト-ツール-🚀');
+      // When & Then: ツール検証（例外が発生しないことを確認）
+      expect(() => validateTools([unicodeEntry])).not.toThrow();
     });
 
     test('制御文字を含む文字列', () => {
@@ -221,12 +186,8 @@ describe('バリデーター境界値テスト', () => {
         version: 'latest',
       };
 
-      // When: ツール検証
-      const result = validateTools([controlCharEntry]);
-
-      // Then: 制御文字が適切にハンドリングされる（通常は受け入れられる）
-      expect(result.success).toBe(true);
-      expect(result.validEntries).toHaveLength(1);
+      // When & Then: ツール検証（例外が発生しないことを確認）
+      expect(() => validateTools([controlCharEntry])).not.toThrow();
     });
 
     test('特殊記号を含むリポジトリ名', () => {
@@ -238,13 +199,8 @@ describe('バリデーター境界値テスト', () => {
         version: 'latest',
       };
 
-      // When: ツール検証
-      const result = validateTools([specialCharEntry]);
-
-      // Then: 無効なリポジトリ名がエラーとして処理される
-      expect(result.success).toBe(false);
-      expect(result.validEntries).toHaveLength(0);
-      expect(result.errors).toHaveLength(1);
+      // When & Then: ツール検証（ExitErrorが投げられることを確認）
+      expect(() => validateTools([specialCharEntry])).toThrow(ExitError);
     });
   });
 
@@ -263,33 +219,26 @@ describe('バリデーター境界値テスト', () => {
           })),
       );
 
-      // When: 並行処理
-      const results = batches.map((batch) => validateTools(batch));
-
-      // Then: すべてのバッチが適切に処理される
-      results.forEach((result, _index) => {
-        expect(result.success).toBe(true);
-        expect(result.validEntries).toHaveLength(batchSize);
-        expect(result.errors).toHaveLength(0);
+      // When & Then: 並行処理（すべてのバッチで例外が発生しないことを確認）
+      batches.forEach((batch) => {
+        expect(() => validateTools(batch)).not.toThrow();
       });
     });
 
     test('深い入れ子構造のオプション', () => {
-      // Given: 複雑なオプション構造（実際は文字列のみだが、テストとして）
+      // Given: 有効なオプションのみを含む複雑な構造
       const complexEntry: ToolEntry = {
         installer: 'eget',
         id: 'complex-tool',
         repository: 'owner/repo',
         version: 'latest',
         options: {
-          '/asset': 'very-long-asset-name-with-many-characters'.repeat(10),
-          '/tag': 'v1.0.0-beta.1+build.123456789',
-          '/file': 'extremely-long-filename-with-multiple-extensions.tar.gz.sig',
-          '/to': '/very/deep/directory/structure/with/many/levels/of/nesting',
+          '/asset:': 'very-long-asset-name-with-many-characters'.repeat(10),
+          '/q': '', // 有効なオプション
         },
       };
 
-      // When: egetバリデーション
+      // When & Then: 有効なオプションのみなので成功する
       expect(() => {
         const result = validateEgetToolEntry(complexEntry);
         expect(result.installer).toBe('eget');

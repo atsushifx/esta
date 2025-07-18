@@ -11,7 +11,9 @@ import { describe, expect, it } from 'vitest';
 // test target
 import { validateTools } from '../../index';
 // types
-import type { ToolEntry } from '../../../internal/types';
+import type { ToolEntry } from '@/internal/types';
+// error handling
+import { ExitError } from '@esta-core/error-handler';
 
 /**
  * validateTools関数のテスト
@@ -44,26 +46,16 @@ describe('validateTools', () => {
         },
       ];
 
-      // When: toolsを検証する
-      const result = validateTools(validTools);
-
-      // Then: 検証が成功する
-      expect(result.success).toBe(true);
-      expect(result.validEntries).toHaveLength(2);
-      expect(result.errors).toHaveLength(0);
+      // When & Then: toolsを検証する（例外が発生しないことを確認）
+      expect(() => validateTools(validTools)).not.toThrow();
     });
 
     it('空のツールリストを検証して成功する', () => {
       // Given: 空のツールリスト
       const emptyTools: ToolEntry[] = [];
 
-      // When: toolsを検証する
-      const result = validateTools(emptyTools);
-
-      // Then: 検証が成功する
-      expect(result.success).toBe(true);
-      expect(result.validEntries).toHaveLength(0);
-      expect(result.errors).toHaveLength(0);
+      // When & Then: toolsを検証する（例外が発生しないことを確認）
+      expect(() => validateTools(emptyTools)).not.toThrow();
     });
 
     it('optionsが省略されたegetツールエントリーを検証して成功する', () => {
@@ -76,13 +68,8 @@ describe('validateTools', () => {
         },
       ];
 
-      // When: toolsを検証する
-      const result = validateTools(validTools);
-
-      // Then: 検証が成功する
-      expect(result.success).toBe(true);
-      expect(result.validEntries).toHaveLength(1);
-      expect(result.errors).toHaveLength(0);
+      // When & Then: toolsを検証する（例外が発生しないことを確認）
+      expect(() => validateTools(validTools)).not.toThrow();
     });
   });
 
@@ -91,33 +78,14 @@ describe('validateTools', () => {
       // Given: 不正なインストーラータイプのツールリスト
       const toolsWithInvalidInstaller: ToolEntry[] = [
         {
-          installer: 'eget',
-          id: 'ripgrep',
-          repository: 'BurntSushi/ripgrep',
-        },
-        {
           installer: 'npm' as ToolEntry['installer'], // 未対応のインストーラー
           id: 'typescript',
           repository: 'microsoft/typescript',
         },
       ];
 
-      // When: toolsを検証する
-      const result = validateTools(toolsWithInvalidInstaller);
-
-      // Then: 検証が部分的に失敗する
-      expect(result.success).toBe(false);
-      expect(result.validEntries).toHaveLength(1);
-      expect(result.errors).toHaveLength(1);
-      expect(result.errors[0]).toEqual({
-        index: 1,
-        entry: {
-          installer: 'npm',
-          id: 'typescript',
-          repository: 'microsoft/typescript',
-        },
-        error: 'Unsupported installer type: npm',
-      });
+      // When & Then: toolsを検証する（ExitErrorが投げられることを確認）
+      expect(() => validateTools(toolsWithInvalidInstaller)).toThrow(ExitError);
     });
 
     it('不正なリポジトリ形式を検証して失敗する', () => {
@@ -130,14 +98,8 @@ describe('validateTools', () => {
         },
       ];
 
-      // When: toolsを検証する
-      const result = validateTools(invalidTools);
-
-      // Then: 検証が失敗する
-      expect(result.success).toBe(false);
-      expect(result.validEntries).toHaveLength(0);
-      expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].error).toContain('Repository must be in "owner/repo" format');
+      // When & Then: toolsを検証する（ExitErrorが投げられることを確認）
+      expect(() => validateTools(invalidTools)).toThrow(ExitError);
     });
 
     it('不正なegetオプションを検証して失敗する', () => {
@@ -153,20 +115,14 @@ describe('validateTools', () => {
         },
       ];
 
-      // When: toolsを検証する
-      const result = validateTools(invalidTools);
-
-      // Then: 検証が失敗する
-      expect(result.success).toBe(false);
-      expect(result.validEntries).toHaveLength(0);
-      expect(result.errors).toHaveLength(1);
-      expect(result.errors[0].error).toContain('Invalid eget options');
+      // When & Then: toolsを検証する（ExitErrorが投げられることを確認）
+      expect(() => validateTools(invalidTools)).toThrow(ExitError);
     });
   });
 
   describe('混合リスト検証', () => {
-    it('有効・無効エントリーが混在するリストを検証して部分的に成功する', () => {
-      // Given: 有効・無効エントリーが混在するリスト
+    it('有効・無効エントリーが混在するリストを検証して最初のエラーで失敗する', () => {
+      // Given: 有効・無効エントリーが混在するリスト（有効なエントリーが最初）
       const mixedTools: ToolEntry[] = [
         {
           installer: 'eget',
@@ -174,7 +130,7 @@ describe('validateTools', () => {
           repository: 'BurntSushi/ripgrep',
         },
         {
-          installer: 'npm' as ToolEntry['installer'], // 型安全性テストのため
+          installer: 'npm' as ToolEntry['installer'], // 2番目で失敗
           id: 'typescript',
           repository: 'microsoft/typescript',
         },
@@ -183,57 +139,30 @@ describe('validateTools', () => {
           id: 'gh',
           repository: 'cli/cli',
         },
-        null as unknown as ToolEntry, // 型安全性テストのため
       ];
 
-      // When: toolsを検証する
-      const result = validateTools(mixedTools);
-
-      // Then: 検証が部分的に成功する
-      expect(result.success).toBe(false);
-      expect(result.validEntries).toHaveLength(2);
-      expect(result.errors).toHaveLength(2);
-
-      // 有効なエントリーを確認
-      expect(result.validEntries[0].id).toBe('ripgrep');
-      expect(result.validEntries[1].id).toBe('gh');
-
-      // エラーを確認
-      expect(result.errors[0].index).toBe(1);
-      expect(result.errors[0].error).toBe('Unsupported installer type: npm');
-      expect(result.errors[1].index).toBe(3);
-      expect(result.errors[1].error).toBe(
-        'Installer field is required, ID field is required, Repository field is required',
-      );
+      // When & Then: toolsを検証する（最初の無効エントリーでExitErrorが投げられる）
+      expect(() => validateTools(mixedTools)).toThrow(ExitError);
     });
 
-    it('すべてのエントリーが無効なリストを検証して完全に失敗する', () => {
+    it('すべてのエントリーが無効なリストを検証して最初のエラーで失敗する', () => {
       // Given: すべてのエントリーが無効なリスト
       const invalidTools: ToolEntry[] = [
-        null as unknown as ToolEntry, // 型安全性テストのため
+        null as unknown as ToolEntry, // 最初で失敗
         {
-          installer: 'npm' as ToolEntry['installer'], // 型安全性テストのため
+          installer: 'npm' as ToolEntry['installer'],
           id: 'typescript',
           repository: 'microsoft/typescript',
         },
-        {
-          id: 'missing-installer',
-          repository: 'some/repo',
-        } as ToolEntry, // 型安全性テストのため
       ];
 
-      // When: toolsを検証する
-      const result = validateTools(invalidTools);
-
-      // Then: 検証が完全に失敗する
-      expect(result.success).toBe(false);
-      expect(result.validEntries).toHaveLength(0);
-      expect(result.errors).toHaveLength(3);
+      // When & Then: toolsを検証する（最初のエントリーでExitErrorが投げられる）
+      expect(() => validateTools(invalidTools)).toThrow(ExitError);
     });
   });
 
   describe('エラー情報の詳細確認', () => {
-    it('エラー情報にindex、entry、errorが含まれることを確認する', () => {
+    it('ExitErrorメッセージにindexが含まれることを確認する', () => {
       // Given: 無効なツールエントリー
       const invalidEntry: ToolEntry = {
         installer: 'unknown' as ToolEntry['installer'], // 型安全性テストのため
@@ -241,15 +170,8 @@ describe('validateTools', () => {
         repository: 'test/test',
       };
 
-      // When: toolsを検証する
-      const result = validateTools([invalidEntry]);
-
-      // Then: エラー情報が正しく設定される
-      expect(result.errors).toHaveLength(1);
-      expect(result.errors[0]).toHaveProperty('index', 0);
-      expect(result.errors[0]).toHaveProperty('entry', invalidEntry);
-      expect(result.errors[0]).toHaveProperty('error');
-      expect(typeof result.errors[0].error).toBe('string');
+      // When & Then: toolsを検証する（エラーメッセージにindexが含まれることを確認）
+      expect(() => validateTools([invalidEntry])).toThrow(/Tool entry at index 0:/);
     });
   });
 });

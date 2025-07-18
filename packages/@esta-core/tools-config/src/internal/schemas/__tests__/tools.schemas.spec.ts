@@ -128,7 +128,7 @@ describe('Schema Validation', () => {
         };
 
         expect(() => parse(ToolEntrySchema, invalidToolEntry)).toThrow(
-          'Invalid type: Expected string but received undefined',
+          'Invalid key: Expected "repository" but received undefined',
         );
       });
     });
@@ -208,7 +208,7 @@ describe('Schema Validation', () => {
         };
 
         expect(() => parse(ToolsConfigSchema, invalidToolsConfig)).toThrow(
-          'Invalid path format: tools//bin//subfolder',
+          'defaultInstallDir must be a valid path (absolute: "/" or "C:\\" or relative: "./" or directory name)',
         );
       });
 
@@ -220,7 +220,7 @@ describe('Schema Validation', () => {
         };
 
         expect(() => parse(CompleteToolsConfigSchema, invalidToolsConfig)).toThrow(
-          'Invalid type: Expected string but received undefined',
+          'defaultTempDir is required',
         );
       });
     });

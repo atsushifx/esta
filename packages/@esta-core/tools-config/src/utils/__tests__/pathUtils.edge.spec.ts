@@ -58,14 +58,14 @@ describe('パスユーティリティエッジケーステスト', () => {
     });
 
     test('許可される特殊記号を含むパス', () => {
-      // Given: 許可される特殊記号を含むパス
-      const pathWithSymbols = '/path!@#$%^&*()_+-={}[].:,/file';
+      // Given: 許可される特殊記号を含むパス (*は無効なので除外)
+      const pathWithSymbols = '/path!@#$%^&()_+-={}[].:,/file';
 
       // When: パス正規化
       const result = normalizePath(pathWithSymbols);
 
       // Then: 許可される特殊記号が保持される（小文字化）
-      expect(result).toBe('/path!@#$%^&*()_+-={}[].:,/file');
+      expect(result).toBe('/path!@#$%^&()_+-={}[].:,/file');
     });
 
     test('無効な特殊記号を含むパス', () => {

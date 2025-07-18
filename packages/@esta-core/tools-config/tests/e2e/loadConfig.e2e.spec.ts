@@ -8,7 +8,9 @@
 
 // vitest
 import { describe, expect, it } from 'vitest';
-// types
+// path
+import path from 'node:path';
+
 // test target
 import { loadToolsConfig } from '@/core/config/loadToolsConfig';
 // e2e framework
@@ -17,8 +19,6 @@ import {
   removeDirectory,
   writeFile,
 } from '@agla-e2e/fileio-framework';
-// path
-import path from 'node:path';
 
 /**
  * テストコンテキスト作成ヘルパー

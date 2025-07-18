@@ -6,9 +6,9 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { errorExit, ExitCode } from '@esta-core/error-handler';
-import { VALIDATION_ERROR_MESSAGES } from '../../internal/constants';
-import type { ToolEntry, ValidateToolsResult } from '../../internal/types';
+import { VALIDATION_ERROR_MESSAGES } from '@/internal/constants';
+import type { ToolEntry } from '@/internal/types';
+import { errorExit, ExitCode, ExitError } from '@esta-core/error-handler';
 import { isEgetToolEntry, validateEgetToolEntry } from './egetValidator';
 
 /**
@@ -70,36 +70,19 @@ const validateToolEntryByInstaller = (entry: ToolEntry): ToolEntry => {
 /**
  * 複数のToolEntryを検証する
  * @param tools 検証するツールエントリーの配列
- * @returns 検証結果
+ * @throws ExitError 最初の無効なエントリーで即座に終了
  */
-export const validateTools = (tools: ToolEntry[]): ValidateToolsResult => {
-  const validEntries: ToolEntry[] = [];
-  const errors: Array<{
-    index: number;
-    entry: ToolEntry;
-    error: string;
-  }> = [];
-
+export const validateTools = (tools: ToolEntry[]): void => {
   tools.forEach((tool, index) => {
     try {
       // まず基本構造を検証
       validateBasicToolEntry(tool);
 
       // インストーラータイプに応じた詳細検証
-      const validatedEntry = validateToolEntryByInstaller(tool);
-      validEntries.push(validatedEntry);
+      validateToolEntryByInstaller(tool);
     } catch (error) {
-      errors.push({
-        index,
-        entry: tool,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      errorExit(ExitCode.VALIDATION_FAILED, `Tool entry at index ${index}: ${message}`);
     }
   });
-
-  return {
-    success: errors.length === 0,
-    validEntries,
-    errors,
-  };
 };
