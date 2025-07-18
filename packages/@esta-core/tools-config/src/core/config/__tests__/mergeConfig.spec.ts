@@ -6,7 +6,7 @@ import type { PartialToolsConfig, ToolsConfig } from '../../../../shared/types/t
 import { mergeToolsConfig } from '../mergeToolsConfig';
 
 /**
- * mergeToolsConfig関数のテスト
+ * mergeToolsConfig関数の単体テスト
  * デフォルト設定と読み込み設定をマージして完全な設定を生成する関数のテスト
  */
 describe('mergeToolsConfig', () => {
@@ -62,6 +62,10 @@ describe('mergeToolsConfig', () => {
     });
   });
 
+  /**
+   * マージ結果バリデーションテスト
+   * マージされた設定が完全設定スキーマに適合していることを検証
+   */
   describe('バリデーション機能', () => {
     test('結果を完全な設定として検証する', () => {
       // Arrange

@@ -6,8 +6,11 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// valibot schema validation utilities
 import { parse } from 'valibot';
+// default directory constants
 import { DEFAULT_INSTALL_DIR, DEFAULT_TEMP_DIR } from './internal/constants';
+// validation schemas
 import { CompleteToolsConfigSchema } from './internal/schemas';
 // tools configuration types
 import type { ToolEntry, ToolsConfig } from '@/shared/types/toolsConfig.types';

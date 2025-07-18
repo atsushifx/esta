@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// core
+// core configuration functions
 import { loadToolsConfig, mergeToolsConfig } from './core';
 import { defaultToolsConfig } from './defaults';
 // tools configuration types

@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// type
+// validation option types
 import type { ValidOption } from '@/internal/types/validation';
 
 /**

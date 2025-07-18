@@ -1,6 +1,16 @@
+// src/tools-validator/validator/egetValidator.ts
+// @(#) : eget installer用ツールエントリーの検証機能
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// error handling utilities
 import { errorExit, ExitCode } from '@esta-core/error-handler';
-import { safeParse } from 'valibot';
-import { object, optional, pipe, record, string, transform } from 'valibot';
+// valibot schema validation utilities
+import { object, optional, pipe, record, safeParse, string, transform } from 'valibot';
+// validation constants and error messages
 import { VALID_EGET_OPTIONS, VALIDATION_ERROR_MESSAGES } from '../../internal/constants/validation';
 // tool entry types
 import type { ToolEntry } from '@/shared/types/toolsConfig.types';
@@ -65,6 +75,9 @@ export const EgetToolEntrySchema = object({
 
 /**
  * 単一のeget用ツールエントリーの検証
+ * @param entry 検証するツールエントリー
+ * @returns 検証済みのeget用ツールエントリー
+ * @throws 検証に失敗した場合はプロセスを終了
  */
 export const validateEgetToolEntry = (entry: ToolEntry): EgetToolEntry => {
   const result = safeParse(EgetToolEntrySchema, entry);

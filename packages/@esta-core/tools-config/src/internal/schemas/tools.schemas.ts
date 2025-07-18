@@ -6,7 +6,9 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// valibot schema validation utilities
 import { array, check, object, optional, pipe, record, string, transform } from 'valibot';
+// path validation and normalization utilities
 import { normalizePathForSchema, validateAndNormalizePath } from '../../utils';
 // validation error messages
 import { VALIDATION_ERROR_MESSAGES } from '../constants/validation';

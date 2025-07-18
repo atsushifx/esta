@@ -16,12 +16,16 @@ import type { ToolEntry } from '@/shared/types/toolsConfig.types';
 import { ExitError } from '@esta-core/error-handler';
 
 /**
- * validateTools関数のテスト
+ * validateTools関数の単体テスト
  *
  * このテストスイートでは、ツールエントリーリストの検証機能を
  * BDDスタイルでテストします。
  */
 describe('validateTools', () => {
+  /**
+   * 正常系バリデーションテスト
+   * 有効なツールエントリーの正しい検証を検証
+   */
   describe('正常なtools検証', () => {
     it('有効なegetツールエントリーのリストを検証して成功する', () => {
       // Given: 有効なegetツールエントリーのリスト
@@ -73,6 +77,10 @@ describe('validateTools', () => {
     });
   });
 
+  /**
+   * 異常系バリデーションテスト
+   * 無効なツールエントリーでの適切なエラーハンドリングを検証
+   */
   describe('異常なtools検証', () => {
     it('不正なインストーラータイプを検証して失敗する', () => {
       // Given: 不正なインストーラータイプのツールリスト
@@ -120,6 +128,10 @@ describe('validateTools', () => {
     });
   });
 
+  /**
+   * 複数アイテムバリデーションテスト
+   * 有効と無効が混在するリストのエラー処理を検証
+   */
   describe('混合リスト検証', () => {
     it('有効・無効エントリーが混在するリストを検証して最初のエラーで失敗する', () => {
       // Given: 有効・無効エントリーが混在するリスト（有効なエントリーが最初）
@@ -161,6 +173,10 @@ describe('validateTools', () => {
     });
   });
 
+  /**
+   * エラーメッセージテスト
+   * エラー情報の詳細化とデバッグ情報の適切な含有を検証
+   */
   describe('エラー情報の詳細確認', () => {
     it('ExitErrorメッセージにindexが含まれることを確認する', () => {
       // Given: 無効なツールエントリー

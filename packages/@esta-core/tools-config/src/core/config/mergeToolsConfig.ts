@@ -6,8 +6,11 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// valibot schema validation utilities
 import { parse } from 'valibot';
+// tools configuration types
 import type { PartialToolsConfig, ToolsConfig } from '../../../shared/types/toolsConfig.types';
+// validation schemas
 import { CompleteToolsConfigSchema } from '../../internal/schemas';
 
 /**
