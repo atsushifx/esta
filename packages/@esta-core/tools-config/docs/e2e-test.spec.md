@@ -15,7 +15,7 @@
 
 ### テストフレームワーク
 
-- **テストランナー**: Vitest (CI設定 - `configs/vitest.config.ci.ts`)
+- **テストランナー**: Vitest (E2E設定 - `configs/vitest.config.e2e.ts`)
 - **ファイルI/O**: `@agla-e2e/fileio-framework`
 - **一時ディレクトリ**: 自動生成・自動削除
 - **依存関係**: `@esta-utils/config-loader`の統合テスト
@@ -23,9 +23,9 @@
 
 ## E2Eテストスイート構成
 
-### 1. 設定ファイル読み込みE2E (`tests/e2e/loadConfig.e2e.spec.ts`)
+### 1. メイン機能E2E (`tests/e2e/getToolsConfig.e2e.spec.ts`)
 
-**概要**: `loadToolsConfig` 関数の実ファイルシステムを使用した統合テスト
+**概要**: `getToolsConfig` 関数の実ファイルシステムを使用した統合テスト
 
 **テストコンテキストヘルパー**:
 
@@ -34,7 +34,7 @@ const createTestContext = async (
   testName: string,
   testContext: { task: { id: string } },
 ): Promise<{ testDir: string; cleanup: () => Promise<void> }> => {
-  const testDir = await createTempDirectory(`loadConfig-${testName}-${testContext.task.id}`);
+  const testDir = await createTempDirectory(`getToolsConfig-${testName}-${testContext.task.id}`);
   return {
     testDir,
     cleanup: async () => {
@@ -44,7 +44,192 @@ const createTestContext = async (
 };
 ```
 
-#### 1.1 JSONファイル読み込みテスト
+#### 1.1 完全設定統合テスト
+
+**目的**: 設定読み込み→デフォルトマージ→検証の完全フロー検証
+
+```typescript
+describe('完全設定統合フロー', () => {
+  it('有効な設定ファイルから完全なToolsConfigを生成する', async (testContext) => {
+    // Given: テストコンテキストを作成（一意の一時ディレクトリ）
+    const ctx = await createTestContext('complete-flow', testContext);
+    testContext.onTestFinished(ctx.cleanup);
+
+    // Given: 有効な設定ファイルを作成
+    const configData = {
+      defaultInstallDir: 'custom/install/dir',
+      defaultTempDir: 'custom/temp/dir',
+      tools: [{
+        installer: 'eget',
+        id: 'custom-tool',
+        repository: 'custom/repo',
+        version: 'latest',
+        options: {
+          '/q': '',
+        },
+      }],
+    };
+
+    // When: getToolsConfigを実行
+    const result = await getToolsConfig(configFilePath);
+
+    // Then: 完全なToolsConfigが返される
+    expect(result.defaultInstallDir).toBe('custom/install/dir');
+    expect(result.defaultTempDir).toBe('custom/temp/dir');
+    expect(result.tools).toContain(
+      expect.objectContaining({
+        installer: 'eget',
+        id: 'custom-tool',
+        repository: 'custom/repo',
+      }),
+    );
+    // デフォルトツールも含まれていることを確認
+    expect(result.tools.length).toBeGreaterThan(1);
+  });
+
+  it('部分設定でもデフォルトとマージされて完全設定になる', async (testContext) => {
+    // Given: 部分設定ファイルを作成
+    const configData = {
+      defaultTempDir: 'custom/temp/dir',
+      // defaultInstallDir, toolsは指定しない
+    };
+
+    // When: getToolsConfigを実行
+    const result = await getToolsConfig(configFilePath);
+
+    // Then: デフォルト値でマージされた完全設定を返す
+    expect(result.defaultInstallDir).toBe('.tools/bin'); // デフォルト値
+    expect(result.defaultTempDir).toBe('custom/temp/dir'); // 設定値
+    expect(result.tools).toHaveLength(9); // デフォルトツール
+  });
+
+  it('空設定でもデフォルト設定として完全設定になる', async (testContext) => {
+    // Given: 空の設定ファイルを作成
+    const configData = {};
+
+    // When: getToolsConfigを実行
+    const result = await getToolsConfig(configFilePath);
+
+    // Then: デフォルト設定が返される
+    expect(result.defaultInstallDir).toBe('.tools/bin');
+    expect(result.defaultTempDir).toBe('.tools/tmp');
+    expect(result.tools).toHaveLength(9);
+  });
+});
+```
+
+#### 1.2 フォーマット別統合テスト
+
+**目的**: 各ファイル形式での完全フロー検証
+
+```typescript
+describe('フォーマット別統合テスト', () => {
+  it('YAML設定ファイルで完全フローが動作する', async (testContext) => {
+    // Given: YAML形式の設定ファイル
+    const yamlContent = `
+defaultInstallDir: custom/yaml/dir
+defaultTempDir: custom/yaml/tmp
+tools:
+  - installer: eget
+    id: yaml-tool
+    repository: yaml/repo
+    version: latest
+    options:
+      '/q': ''
+`;
+
+    // When: getToolsConfigを実行
+    const result = await getToolsConfig(configFilePath);
+
+    // Then: YAML設定が正しく読み込まれ、マージされる
+    expect(result.defaultInstallDir).toBe('custom/yaml/dir');
+    expect(result.tools).toContainEqual(
+      expect.objectContaining({
+        installer: 'eget',
+        id: 'yaml-tool',
+        repository: 'yaml/repo',
+      }),
+    );
+    expect(result.tools.length).toBeGreaterThan(1); // デフォルト + 設定
+  });
+
+  it('JavaScript設定ファイルで完全フローが動作する', async (testContext) => {
+    // Given: JavaScript形式の設定ファイル
+    const jsContent = `
+module.exports = {
+  defaultInstallDir: 'custom/js/dir',
+  tools: [
+    {
+      installer: 'eget',
+      id: 'js-tool',
+      repository: 'js/repo',
+      version: 'latest'
+    }
+  ]
+};
+`;
+
+    // When: getToolsConfigを実行
+    const result = await getToolsConfig(configFilePath);
+
+    // Then: JavaScript設定が正しく処理される
+    expect(result.defaultInstallDir).toBe('custom/js/dir');
+    expect(result.tools).toContainEqual(
+      expect.objectContaining({
+        installer: 'eget',
+        id: 'js-tool',
+        repository: 'js/repo',
+      }),
+    );
+  });
+});
+```
+
+#### 1.3 エラーハンドリング統合テスト
+
+**目的**: 実ファイルシステムでのエラー状況の処理検証
+
+```typescript
+describe('エラーハンドリング統合テスト', () => {
+  it('存在しないファイルでエラー終了する', async (testContext) => {
+    // Given: テストコンテキストを作成
+    const ctx = await createTestContext('nonexistent-file', testContext);
+    testContext.onTestFinished(ctx.cleanup);
+
+    // Given: 存在しないファイルパス
+    const configFilePath = path.join(ctx.testDir, 'nonexistent-config.json');
+
+    // When/Then: getToolsConfigでerrorExitが呼ばれる
+    await expect(getToolsConfig(configFilePath)).rejects.toThrow();
+  });
+
+  it('不正なJSONファイルでエラー終了する', async (testContext) => {
+    // Given: 不正なJSONファイル
+    const invalidJsonContent = '{ invalid json content }';
+    await writeFile(configFilePath, invalidJsonContent);
+
+    // When/Then: getToolsConfigでerrorExitが呼ばれる
+    await expect(getToolsConfig(configFilePath)).rejects.toThrow();
+  });
+
+  it('無効なスキーマの設定でエラー終了する', async (testContext) => {
+    // Given: スキーマに違反する設定
+    const invalidConfigData = {
+      defaultInstallDir: 123, // 数値（文字列ではない）
+      tools: ['invalid-tool'], // 文字列配列（オブジェクト配列ではない）
+    };
+
+    // When/Then: getToolsConfigでバリデーションエラー
+    await expect(getToolsConfig(configFilePath)).rejects.toThrow();
+  });
+});
+```
+
+### 2. 設定読み込みE2E (`tests/e2e/loadConfig.e2e.spec.ts`)
+
+**概要**: `loadToolsConfig` 関数の実ファイルシステムを使用した統合テスト
+
+#### 2.1 JSONファイル読み込みテスト
 
 **目的**: JSON形式設定ファイルの実際の読み込み動作検証
 
@@ -86,8 +271,11 @@ describe('JSONファイル読み込み', () => {
     };
 
     // When: 設定ファイルを読み込む
+    const result = await loadToolsConfig(configFilePath);
+
     // Then: 成功して読み込まれる
     expect(result.defaultInstallDir).toBeUndefined();
+    expect(result.defaultTempDir).toBe('custom/temp/dir');
   });
 
   it('空のJSONファイルを読み込める', async (testContext) => {
@@ -95,20 +283,15 @@ describe('JSONファイル読み込み', () => {
     const configData = {};
 
     // When: 設定ファイルを読み込む
+    const result = await loadToolsConfig(configFilePath);
+
     // Then: 成功して空の設定が読み込まれる
     expect(result).toEqual({});
   });
 });
 ```
 
-**検証ポイント**:
-
-- 実ファイルからの正確なデータ読み込み
-- JSON形式の正しいパース処理
-- 部分設定の適切な処理
-- ファイル存在チェックの動作
-
-#### 1.2 YAMLファイル読み込みテスト
+#### 2.2 YAMLファイル読み込みテスト
 
 **目的**: YAML形式設定ファイルの読み込み統合テスト
 
@@ -143,13 +326,7 @@ tools:
 });
 ```
 
-**検証ポイント**:
-
-- YAML形式の正確なパース処理
-- 配列とオブジェクトの適切な変換
-- インデント構造の正しい解釈
-
-#### 1.3 複数ツール設定テスト
+#### 2.3 複数ツール設定テスト
 
 **目的**: 複数ツール設定ファイルの処理性能と正確性検証
 
@@ -180,57 +357,37 @@ describe('複数ツール設定', () => {
 });
 ```
 
-**検証ポイント**:
+## 実際のテストファイル構成
 
-- 複数エントリーの順序保持
-- 大量データの処理性能
-- メモリ効率性
+### 現在のE2Eテストファイル (2ファイル)
 
-#### 1.4 エラーハンドリングテスト
+1. **`tests/e2e/getToolsConfig.e2e.spec.ts`**
+   - メイン機能の完全フロー統合テスト
+   - 設定読み込み→マージ→検証の一連の処理
 
-**目的**: 実ファイルシステムでのエラー状況の処理検証
+2. **`tests/e2e/loadConfig.e2e.spec.ts`**
+   - 設定ファイル読み込み機能の統合テスト
+   - 各種ファイル形式（JSON、YAML）の読み込み
 
-```typescript
-describe('エラーハンドリング', () => {
-  it('存在しないファイルでエラー終了する', async (testContext) => {
-    // Given: テストコンテキストを作成
-    const ctx = await createTestContext('nonexistent-file', testContext);
-    testContext.onTestFinished(ctx.cleanup);
+### テストスイート総覧
 
-    // Given: 存在しないファイルパス
-    const configFilePath = path.join(ctx.testDir, 'nonexistent-config.json');
+#### getToolsConfig.e2e.spec.ts
 
-    // When/Then: 設定ファイル読み込みでerrorExitが呼ばれる
-    expect(() => loadToolsConfig(configFilePath)).toThrow();
-  });
+1. **完全設定統合フロー** (3テスト)
+   - 有効な設定ファイルからの完全設定生成
+   - 部分設定でのデフォルトマージ
+   - 空設定でのデフォルト設定使用
 
-  it('不正なJSONファイルでエラー終了する', async (testContext) => {
-    // Given: テストコンテキストを作成
-    const ctx = await createTestContext('invalid-json', testContext);
-    testContext.onTestFinished(ctx.cleanup);
+2. **フォーマット別統合テスト** (2テスト)
+   - YAML設定ファイルでの完全フロー
+   - JavaScript設定ファイルでの完全フロー
 
-    // Given: 不正なJSONファイル
-    const invalidJsonContent = '{ invalid json content }';
-    await writeFile(configFilePath, invalidJsonContent);
+3. **エラーハンドリング統合テスト** (3テスト)
+   - 存在しないファイル
+   - 不正なJSONファイル
+   - 無効なスキーマの設定
 
-    // When/Then: 設定ファイル読み込みでerrorExitが呼ばれる
-    expect(() => loadToolsConfig(configFilePath)).toThrow();
-  });
-});
-```
-
-**検証ポイント**:
-
-- ファイル存在チェックの実動作
-- ファイル権限エラーの処理
-- 不正フォーマットでのerrorExit処理
-- プロセス終了時の適切なエラーハンドリング
-
-### 2. 現在のE2Eテスト構成
-
-**テストファイル**: `tests/e2e/loadConfig.e2e.spec.ts` のみ
-
-**テストスイート総覧**:
+#### loadConfig.e2e.spec.ts
 
 1. **JSONファイル読み込み** (3テスト)
    - 有効なJSON設定ファイル
@@ -242,19 +399,6 @@ describe('エラーハンドリング', () => {
 
 3. **複数ツール設定** (1テスト)
    - 複数ツールエントリーの処理
-
-4. **エラーハンドリング** (2テスト)
-   - 存在しないファイル
-   - 不正なJSONファイル
-
-**検証ポイント**:
-
-- 実ファイルシステムでのファイルI/O動作
-- `@esta-utils/config-loader`との統合動作
-- `errorExit`によるエラーハンドリング
-- ファイル存在チェックの実動作
-- Valibotスキーマによる設定正規化
-- 各種ファイル形式（JSON、YAML）の読み込み
 
 ## テストデータ設計
 
@@ -330,12 +474,37 @@ tools:
       "/q": ""
 ```
 
+### JavaScript形式テストデータ
+
+```javascript
+module.exports = {
+  defaultInstallDir: 'custom/js/dir',
+  tools: [
+    {
+      installer: 'eget',
+      id: 'js-tool',
+      repository: 'js/repo',
+      version: 'latest',
+    },
+  ],
+};
+```
+
 ### 異常系テストデータ
 
 #### 不正JSON
 
 ```javascript
 '{ invalid json content }';
+```
+
+#### 無効スキーマ
+
+```json
+{
+  "defaultInstallDir": 123,
+  "tools": ["invalid-tool"]
+}
 ```
 
 #### 存在しないファイル
@@ -354,7 +523,7 @@ const createTestContext = async (
   testContext: { task: { id: string } },
 ): Promise<{ testDir: string; cleanup: () => Promise<void> }> => {
   // 一意の一時ディレクトリ作成
-  const testDir = await createTempDirectory(`loadConfig-${testName}-${testContext.task.id}`);
+  const testDir = await createTempDirectory(`${testName}-${testContext.task.id}`);
 
   return {
     testDir,
@@ -375,14 +544,14 @@ testContext.onTestFinished(ctx.cleanup);
 ```
 
 1. **テスト前**:
-   - 一意の一時ディレクトリ作成 (`loadConfig-{testName}-{taskId}`)
+   - 一意の一時ディレクトリ作成 (`{testName}-{taskId}`)
    - テスト用設定ファイル作成 (`writeFile`)
    - クリーンアップ関数の登録 (`testContext.onTestFinished`)
 
 2. **テスト実行**:
    - 実際のファイルI/O操作
-   - `loadConfig(configFilePath)` 関数の呼び出し
-   - `LoadConfigResult` の検証
+   - `getToolsConfig` / `loadToolsConfig` 関数の呼び出し
+   - 結果の検証
 
 3. **テスト後**:
    - 一時ディレクトリの自動削除 (`removeDirectory`)
@@ -396,6 +565,7 @@ testContext.onTestFinished(ctx.cleanup);
 - **小規模設定**（空の設定ファイル）: 50ms以下
 - **中規模設定**（数個のツールエントリー）: 100ms以下
 - **複数ツール設定**（2つのツールエントリー）: 100ms以下
+- **完全フロー**（読み込み→マージ→検証）: 150ms以下
 
 ### メモリ使用量要件
 
@@ -408,12 +578,12 @@ testContext.onTestFinished(ctx.cleanup);
 ### シナリオ1: 新規プロジェクト設定
 
 ```typescript
-test('新規プロジェクトでの設定ファイル作成から読み込みまで', async () => {
+test('新規プロジェクトでの設定ファイル作成から完全設定生成まで', async () => {
   // 1. 空のプロジェクトディレクトリ作成
   // 2. tools-config.jsonファイル作成
-  // 3. デフォルト設定の書き込み
-  // 4. loadConfigによる読み込み
-  // 5. 設定内容の検証
+  // 3. 基本設定の書き込み
+  // 4. getToolsConfigによる完全設定生成
+  // 5. デフォルト設定とのマージ確認
 });
 ```
 
@@ -434,7 +604,7 @@ test('既存設定ファイルの更新と再読み込み', async () => {
 test('JSON設定からYAML設定への変換', async () => {
   // 1. JSON形式の設定ファイル作成
   // 2. YAML形式での同じ設定作成
-  // 3. 両方を読み込み、内容の一致確認
+  // 3. 両方から生成される設定の一致確認
 });
 ```
 
@@ -491,8 +661,8 @@ describe('ネットワークファイルシステム', () => {
 ### テストコマンド
 
 - **E2Eテスト実行**: `pnpm run test:ci`
-- **テスト設定**: `configs/vitest.config.ci.ts`
-- **テストファイル**: `tests/e2e/loadConfig.e2e.spec.ts`
+- **テスト設定**: `configs/vitest.config.e2e.ts`
+- **テストファイル**: `tests/e2e/` 配下の2ファイル
 - **統合テスト**: `pnpm run test` (単体テスト + E2Eテスト)
 
 ## 保守とメンテナンス
@@ -526,3 +696,26 @@ describe('ネットワークファイルシステム', () => {
    - ベンチマークテストの実行
    - メモリプロファイリング
    - I/O最適化の検討
+
+## 実装完成度
+
+### 現在の実装状況
+
+- ✅ E2Eテストフレームワーク構築済み
+- ✅ 実ファイルシステム統合テスト実装済み
+- ✅ 完全フロー統合テスト（getToolsConfig）実装済み
+- ✅ 設定読み込み統合テスト（loadToolsConfig）実装済み
+- ✅ 複数ファイル形式（JSON、YAML、JS）対応
+- ✅ エラーハンドリング統合テスト実装済み
+- ✅ 一時ディレクトリ管理システム実装済み
+
+### 品質レベル
+
+- **テストカバレッジ**: E2Eレベルでの包括的なテスト
+- **統合テスト**: 実ファイルシステムでの動作確認
+- **エラーハンドリング**: プロダクション環境を想定したエラー処理
+- **パフォーマンス**: 実用的なレスポンス時間での動作確認
+
+### 結論
+
+E2Eテストスイートは完全に実装され、`@esta-core/tools-config`パッケージの実ファイルシステムでの動作を包括的に検証しています。プロダクション環境での信頼性を確保するための十分なテストカバレッジを提供しています。
