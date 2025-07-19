@@ -9,7 +9,7 @@
 // vitest
 import { beforeEach, describe, expect, it } from 'vitest';
 // type
-import type { PartialToolsConfig } from '@/internal/types';
+import type { PartialToolsConfig } from '@/shared/types/toolsConfig.types';
 // test target
 import { isCompleteConfig } from '@/core/config/loadToolsConfig';
 import { mergeToolsConfig } from '@/core/config/mergeToolsConfig';

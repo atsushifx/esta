@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // validation option types
-import type { ValidOption } from '@/internal/types/validation';
+import type { ValidOption } from '../../internal/types/validation';
 // validation error messages
 import { VALIDATION_ERROR_MESSAGES } from '@/internal/constants/validation';
 

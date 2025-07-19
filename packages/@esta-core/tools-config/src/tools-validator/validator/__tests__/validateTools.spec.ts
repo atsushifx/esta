@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
 // test target
 import { validateTools } from '../../index';
 // types
-import type { ToolEntry } from '@/internal/types';
+import type { ToolEntry } from '@/shared/types/toolsConfig.types';
 // error handling
 import { ExitError } from '@esta-core/error-handler';
 

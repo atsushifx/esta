@@ -13,7 +13,7 @@ import { object, optional, pipe, record, safeParse, string, transform } from 'va
 // validation constants and error messages
 import { VALID_EGET_OPTIONS, VALIDATION_ERROR_MESSAGES } from '../../internal/constants/validation';
 // tool entry types
-import type { ToolEntry } from '../../internal/types';
+import type { ToolEntry } from '@/shared/types/toolsConfig.types';
 // validation utility functions
 import { chkValidOptions, isValidGitHubRepoFormat, isValidSemverOrLatest } from '../utils/validatorUtils';
 

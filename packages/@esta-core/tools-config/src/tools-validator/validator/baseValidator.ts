@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 import { VALIDATION_ERROR_MESSAGES } from '@/internal/constants';
-import type { ToolEntry } from '@/internal/types';
+import type { ToolEntry } from '@/shared/types/toolsConfig.types';
 import { errorExit, ExitCode } from '@esta-core/error-handler';
 import { isEgetToolEntry, validateEgetToolEntry } from './egetValidator';
 

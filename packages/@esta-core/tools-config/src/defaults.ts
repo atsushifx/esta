@@ -13,7 +13,7 @@ import { DEFAULT_INSTALL_DIR, DEFAULT_TEMP_DIR } from './internal/constants';
 // validation schemas
 import { CompleteToolsConfigSchema } from './internal/schemas';
 // tools configuration types
-import type { ToolEntry, ToolsConfig } from './internal/types';
+import type { ToolEntry, ToolsConfig } from '@/shared/types/toolsConfig.types';
 
 /**
  * デフォルトのツール設定リスト

@@ -10,7 +10,7 @@
 import { loadToolsConfig, mergeToolsConfig } from './core';
 import { defaultToolsConfig } from './defaults';
 // tools configuration types
-import type { ToolsConfig } from './internal/types';
+import type { ToolsConfig } from '@/shared/types/toolsConfig.types';
 
 /**
  * 設定ファイルを読み込み、デフォルト値とマージして完全な設定を取得

@@ -20,7 +20,7 @@ import { VALIDATION_ERROR_MESSAGES } from '../../internal/constants';
 // validation schemas
 import { CompleteToolsConfigSchema, ToolsConfigSchema } from '../../internal/schemas';
 // tools configuration types
-import type { PartialToolsConfig, ToolsConfig } from '../../internal/types';
+import type { PartialToolsConfig, ToolsConfig } from '@/shared/types/toolsConfig.types';
 
 /**
  * 設定ファイルを読み込む（validated済み）
