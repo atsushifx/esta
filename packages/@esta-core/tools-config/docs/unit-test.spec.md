@@ -1,24 +1,40 @@
-# @esta-core/tools-config ユニットテスト仕様書
+---
+header:
+  - src: docs/specs/uni-test.spec.md
+  - @(#) : @esta-core/tools-config Unit Test specs
+title: @esta-core/tools-config ユニットテスト仕様書
+version: 1.0.0
+created: 2025-07-19
+updated: 2025-07-19
+authors:
+    - atsushifx（要件定義・仕様確定）
+changes:
+  - 2025-07-19 初回作成（ドキュメント整備）
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
 
 ## 概要
 
-`@esta-core/tools-config`モジュールのユニットテスト仕様書です。TDD（テスト駆動開発）のt-wada方式に基づき、各機能の動作を検証するテストケースを定義します。
+`@esta-core/tools-config`モジュールのユニットテスト仕様書です。TDD（テスト駆動開発）の t-wada 方式に基づき、各機能の動作を検証するテストケースを定義します。
 
 ## テスト方針
 
 ### テスト戦略
 
-- **BDDスタイル**: Given-When-Thenパターンでテストを記述
-- **境界値テスト**: 正常値、異常値、境界値を包括的にテスト
-- **型安全性**: TypeScriptの型システムとランタイム検証の両方をテスト
-- **エラーハンドリング**: 異常系の動作を詳細に検証
+- BDD スタイル: Given-When-Then パターンでテストを記述
+- 境界値テスト: 正常値、異常値、境界値を包括的にテスト
+- 型安全性: TypeScript の型システムとランタイム検証の両方をテスト
+- エラーハンドリング: 異常系の動作を詳細に検証
 
 ### テストフレームワーク
 
-- **テストランナー**: Vitest (単体テスト設定 - `configs/vitest.config.unit.ts`)
-- **アサーション**: Vitest標準アサーション
-- **カバレッジ**: 包括的なテストカバレッジを目標
-- **テストコマンド**: `pnpm run test:develop`
+- テストランナー: Vitest (単体テスト設定 - `configs/vitest.config.unit.ts`)
+- アサーション: Vitest 標準アサーション
+- カバレッジ: 包括的なテストカバレッジを目標
+- テストコマンド: `pnpm run test:develop`
 
 ## テストスイート構成
 
@@ -26,23 +42,23 @@
 
 #### 1.1 getToolsConfig関数のテスト
 
-**目的**: メインエントリーポイントの機能検証
+**目的**: メインエントリーポイントの機能検証。
 
 ```typescript
 describe('getToolsConfig', () => {
-  test('有効な設定ファイルから完全なToolsConfigを返す', async () => {
+  it('有効な設定ファイルから完全なToolsConfigを返す', async () => {
     // Given: 有効な設定ファイルパス
     // When: getToolsConfigを呼び出す
     // Then: 完全なToolsConfigオブジェクトを返す
   });
 
-  test('部分設定とデフォルト設定を正しくマージする', async () => {
+  it('部分設定とデフォルト設定を正しくマージする', async () => {
     // Given: 部分的な設定ファイル
     // When: getToolsConfigを呼び出す
     // Then: デフォルト値でマージされた完全設定を返す
   });
 
-  test('存在しないファイルでエラー終了する', async () => {
+  it('存在しないファイルでエラー終了する', async () => {
     // Given: 存在しないファイルパス
     // When: getToolsConfigを呼び出す
     // Then: errorExitでプロセス終了
@@ -54,23 +70,23 @@ describe('getToolsConfig', () => {
 
 #### 2.1 defaultToolsConfig関数のテスト
 
-**目的**: デフォルト設定生成機能の検証
+**目的**: デフォルト設定生成機能の検証。
 
 ```typescript
 describe('defaultToolsConfig', () => {
-  test('デフォルト設定を正しく返す', () => {
+  it('デフォルト設定を正しく返す', () => {
     // Given: デフォルト設定要求
     // When: defaultToolsConfigを呼び出す
     // Then: 正しいデフォルト値を持つToolsConfigを返す
   });
 
-  test('9個のデフォルトツールが含まれている', () => {
+  it('9個のデフォルトツールが含まれている', () => {
     // 期待値: 9個のツールエントリー
     const config = defaultToolsConfig();
     expect(config.tools).toHaveLength(9);
   });
 
-  test('特定ツール（gitleaks, gh, ripgrep）が含まれている', () => {
+  it('特定ツール（gitleaks, gh, ripgrep）が含まれている', () => {
     // 重要ツールの存在確認
     const config = defaultToolsConfig();
     const toolIds = config.tools.map((tool) => tool.id);
@@ -79,7 +95,7 @@ describe('defaultToolsConfig', () => {
     expect(toolIds).toContain('ripgrep');
   });
 
-  test('すべてのデフォルトツールが有効なegetエントリー', () => {
+  it('すべてのデフォルトツールが有効なegetエントリー', () => {
     // installerが'eget'、リポジトリ形式が正しいことを確認
     const config = defaultToolsConfig();
     config.tools.forEach((tool) => {
@@ -88,7 +104,7 @@ describe('defaultToolsConfig', () => {
     });
   });
 
-  test('デフォルト設定の不変性を保証する', () => {
+  it('デフォルト設定の不変性を保証する', () => {
     // デフォルト設定が変更されないことを確認
     const config1 = defaultToolsConfig();
     const config2 = defaultToolsConfig();
@@ -102,41 +118,41 @@ describe('defaultToolsConfig', () => {
 
 #### 3.1 正常系テスト
 
-**目的**: 設定ファイル読み込み機能の検証
+**目的**: 設定ファイル読み込み機能の検証。
 
 ```typescript
 describe('loadToolsConfig', () => {
-  test('存在する設定ファイルを正常に読み込める', async () => {
+  it('存在する設定ファイルを正常に読み込める', async () => {
     // Given: 存在する設定ファイルパス
     // When: loadToolsConfigを実行
     // Then: PartialToolsConfigを返す
   });
 
-  test('JSON形式の設定ファイルを読み込める', async () => {
+  it('JSON形式の設定ファイルを読み込める', async () => {
     // Given: JSON形式の設定ファイル
     // When: loadToolsConfigを実行
     // Then: 正規化された設定を返す
   });
 
-  test('YAML形式の設定ファイルを読み込める', async () => {
+  it('YAML形式の設定ファイルを読み込める', async () => {
     // Given: YAML形式の設定ファイル
     // When: loadToolsConfigを実行
     // Then: 正規化された設定を返す
   });
 
-  test('JavaScript形式の設定ファイルを読み込める', async () => {
+  it('JavaScript形式の設定ファイルを読み込める', async () => {
     // Given: JavaScript形式の設定ファイル
     // When: loadToolsConfigを実行
     // Then: 正規化された設定を返す
   });
 
-  test('部分設定を正しく処理する', async () => {
+  it('部分設定を正しく処理する', async () => {
     // Given: 部分的な設定ファイル
     // When: loadToolsConfigを実行
     // Then: undefinedフィールドを持つPartialToolsConfigを返す
   });
 
-  test('空の設定ファイルを処理する', async () => {
+  it('空の設定ファイルを処理する', async () => {
     // Given: 空の設定ファイル
     // When: loadToolsConfigを実行
     // Then: 空のオブジェクトを返す
@@ -146,23 +162,23 @@ describe('loadToolsConfig', () => {
 
 #### 3.2 異常系テスト
 
-**目的**: エラーケースの適切な処理確認
+**目的**: エラーケースでの処理の確認。
 
 ```typescript
 describe('loadToolsConfig異常系', () => {
-  test('存在しないファイルパスでエラー終了する', async () => {
+  it('存在しないファイルパスでエラー終了する', async () => {
     // Given: 存在しないファイルパス
     // When: loadToolsConfigを実行
     // Then: errorExitでプロセス終了
   });
 
-  test('無効な形式のファイルでエラー終了する', async () => {
+  it('無効な形式のファイルでエラー終了する', async () => {
     // Given: 無効なJSON/YAML形式のファイル
     // When: loadToolsConfigを実行
     // Then: errorExitでプロセス終了
   });
 
-  test('読み込み権限のないファイルでエラー終了する', async () => {
+  it('読み込み権限のないファイルでエラー終了する', async () => {
     // Given: 読み込み権限のないファイル
     // When: loadToolsConfigを実行
     // Then: errorExitでプロセス終了
@@ -174,25 +190,25 @@ describe('loadToolsConfig異常系', () => {
 
 ```typescript
 describe('設定検証', () => {
-  test('isCompleteConfig: 完全設定を正しく判定する', () => {
+  it('isCompleteConfig: 完全設定を正しく判定する', () => {
     // Given: 完全なToolsConfig
     // When: isCompleteConfigを実行
     // Then: trueを返す
   });
 
-  test('isCompleteConfig: 部分設定を正しく判定する', () => {
+  it('isCompleteConfig: 部分設定を正しく判定する', () => {
     // Given: 部分的なPartialToolsConfig
     // When: isCompleteConfigを実行
     // Then: falseを返す
   });
 
-  test('validateCompleteConfig: 完全設定を検証する', () => {
+  it('validateCompleteConfig: 完全設定を検証する', () => {
     // Given: 完全なPartialToolsConfig
     // When: validateCompleteConfigを実行
     // Then: ToolsConfigを返す
   });
 
-  test('validateCompleteConfig: 不完全設定でエラーを投げる', () => {
+  it('validateCompleteConfig: 不完全設定でエラーを投げる', () => {
     // Given: 不完全なPartialToolsConfig
     // When: validateCompleteConfigを実行
     // Then: バリデーションエラーを投げる
@@ -204,35 +220,35 @@ describe('設定検証', () => {
 
 #### 4.1 正常系テスト
 
-**目的**: 設定マージ機能の検証
+**目的**: 設定マージ機能の検証。
 
 ```typescript
 describe('mergeToolsConfig', () => {
-  test('デフォルト設定と部分設定を正しくマージする', () => {
+  it('デフォルト設定と部分設定を正しくマージする', () => {
     // Given: デフォルト設定と部分設定
     // When: mergeToolsConfigを実行
     // Then: 統合された設定を返す
   });
 
-  test('ツール配列を正しくマージする', () => {
+  it('ツール配列を正しくマージする', () => {
     // Given: デフォルトツールと追加ツール
     // When: mergeToolsConfigを実行
     // Then: 結合されたツール配列を持つ設定を返す
   });
 
-  test('グローバル設定を上書きする', () => {
+  it('グローバル設定を上書きする', () => {
     // Given: デフォルト設定と上書き設定
     // When: mergeToolsConfigを実行
     // Then: 上書きされたグローバル設定を返す
   });
 
-  test('空の読み込み設定でもマージできる', () => {
+  it('空の読み込み設定でもマージできる', () => {
     // Given: デフォルト設定と空の読み込み設定
     // When: mergeToolsConfigを実行
     // Then: デフォルト設定をそのまま返す
   });
 
-  test('無効な読み込み設定で空オブジェクトを返す', () => {
+  it('無効な読み込み設定で空オブジェクトを返す', () => {
     // Given: デフォルト設定と無効な読み込み設定
     // When: mergeToolsConfigを実行
     // Then: 空のオブジェクトを返す
@@ -244,35 +260,35 @@ describe('mergeToolsConfig', () => {
 
 #### 5.1 ToolsConfigSchemaの検証
 
-**目的**: Valibotスキーマによるランタイム検証
+**目的**: Valibot スキーマによるランタイム検証。
 
 ```typescript
 describe('ToolsConfigSchema', () => {
-  test('有効なToolsConfigオブジェクトを正常に検証できる', () => {
+  it('有効なToolsConfigオブジェクトを正常に検証できる', () => {
     // Given: 有効なToolsConfigオブジェクト
     // When: ToolsConfigSchemaで検証
     // Then: 検証に成功し、正規化された値を返す
   });
 
-  test('パス正規化（小文字変換、スラッシュ統一）が正しく実行される', () => {
+  it('パス正規化（小文字変換、スラッシュ統一）が正しく実行される', () => {
     // Given: 大文字・バックスラッシュを含むパス
     // When: ToolsConfigSchemaで検証
     // Then: 小文字・フォワードスラッシュに正規化される
   });
 
-  test('部分設定でも正規化が適用される', () => {
+  it('部分設定でも正規化が適用される', () => {
     // Given: 部分的な設定オブジェクト
     // When: ToolsConfigSchemaで検証
     // Then: 存在するフィールドのみ正規化される
   });
 
-  test('無効な型のフィールドでエラーを投げる', () => {
+  it('無効な型のフィールドでエラーを投げる', () => {
     // Given: 型が間違った設定オブジェクト
     // When: ToolsConfigSchemaで検証
     // Then: バリデーションエラーを投げる
   });
 
-  test('文字列フィールドの小文字正規化', () => {
+  it('文字列フィールドの小文字正規化', () => {
     // Given: 大文字を含むinstaller、repository
     // When: ToolsConfigSchemaで検証
     // Then: 小文字に正規化される
@@ -282,29 +298,29 @@ describe('ToolsConfigSchema', () => {
 
 #### 5.2 CompleteToolsConfigSchemaの検証
 
-**目的**: 完全設定のスキーマ検証
+**目的**: 完全設定のスキーマ検証。
 
 ```typescript
 describe('CompleteToolsConfigSchema', () => {
-  test('完全な設定オブジェクトを正常に検証できる', () => {
+  it('完全な設定オブジェクトを正常に検証できる', () => {
     // Given: 完全なToolsConfigオブジェクト
     // When: CompleteToolsConfigSchemaで検証
     // Then: 検証に成功する
   });
 
-  test('必須フィールドが不足している場合はエラーを投げる', () => {
+  it('必須フィールドが不足している場合はエラーを投げる', () => {
     // Given: 必須フィールドが欠けた設定
     // When: CompleteToolsConfigSchemaで検証
     // Then: バリデーションエラーを投げる
   });
 
-  test('ディレクトリ同一性チェックが正しく実行される', () => {
+  it('ディレクトリ同一性チェックが正しく実行される', () => {
     // Given: installDirとtempDirが同じ設定
     // When: CompleteToolsConfigSchemaで検証
     // Then: バリデーションエラーを投げる
   });
 
-  test('パス正規化後の比較でディレクトリ重複を検出する', () => {
+  it('パス正規化後の比較でディレクトリ重複を検出する', () => {
     // Given: 表記は異なるが正規化後に同じパス
     // When: CompleteToolsConfigSchemaで検証
     // Then: バリデーションエラーを投げる
@@ -316,25 +332,25 @@ describe('CompleteToolsConfigSchema', () => {
 
 ```typescript
 describe('ToolEntrySchema', () => {
-  test('有効なToolEntryを正常に検証できる', () => {
+  it('有効なToolEntryを正常に検証できる', () => {
     // Given: 有効なToolEntryオブジェクト
     // When: ToolEntrySchemaで検証
     // Then: 検証に成功し、正規化された値を返す
   });
 
-  test('repositoryの形式を検証する', () => {
+  it('repositoryの形式を検証する', () => {
     // Given: owner/repo形式のrepository
     // When: ToolEntrySchemaで検証
     // Then: 検証に成功する
   });
 
-  test('無効なrepository形式でエラーを投げる', () => {
+  it('無効なrepository形式でエラーを投げる', () => {
     // Given: owner/repo形式ではないrepository
     // When: ToolEntrySchemaで検証
     // Then: バリデーションエラーを投げる
   });
 
-  test('optionsオブジェクトを正しく検証する', () => {
+  it('optionsオブジェクトを正しく検証する', () => {
     // Given: Record<string, string>形式のoptions
     // When: ToolEntrySchemaで検証
     // Then: 検証に成功する
@@ -346,29 +362,29 @@ describe('ToolEntrySchema', () => {
 
 #### 6.1 基本検証テスト (`src/tools-validator/validator/__tests__/validateTools.spec.ts`)
 
-**目的**: ツール検証の基本機能テスト
+**目的**: ツール検証の基本機能テスト。
 
 ```typescript
 describe('validateTools', () => {
-  test('すべて有効なツールエントリーの場合に成功する', () => {
+  it('すべて有効なツールエントリーの場合に成功する', () => {
     // Given: 有効なToolEntry配列
     // When: validateToolsを実行
     // Then: エラーを投げない
   });
 
-  test('無効なエントリーがある場合にエラーを投げる', () => {
+  it('無効なエントリーがある場合にエラーを投げる', () => {
     // Given: 無効なToolEntryを含む配列
     // When: validateToolsを実行
     // Then: 詳細エラーメッセージを投げる
   });
 
-  test('空配列の場合に成功する', () => {
+  it('空配列の場合に成功する', () => {
     // Given: 空のToolEntry配列
     // When: validateToolsを実行
     // Then: エラーを投げない
   });
 
-  test('混在配列（有効・無効）で適切なエラーを投げる', () => {
+  it('混在配列（有効・無効）で適切なエラーを投げる', () => {
     // Given: 有効と無効が混在したToolEntry配列
     // When: validateToolsを実行
     // Then: 無効エントリーの詳細を含むエラーを投げる
@@ -378,29 +394,29 @@ describe('validateTools', () => {
 
 #### 6.2 egetバリデーターAPIテスト (`src/tools-validator/validator/__tests__/egetValidator.api.spec.ts`)
 
-**目的**: 公開APIの機能テスト
+**目的**: 公開 API の機能テスト。
 
 ```typescript
 describe('egetValidator API', () => {
-  test('validateEgetToolEntry: 有効なegetエントリーを検証する', () => {
+  it('validateEgetToolEntry: 有効なegetエントリーを検証する', () => {
     // Given: 有効なegetToolEntry
     // When: validateEgetToolEntryを実行
     // Then: EgetToolEntryを返す
   });
 
-  test('validateEgetToolEntry: 無効なエントリーでエラーを投げる', () => {
+  it('validateEgetToolEntry: 無効なエントリーでエラーを投げる', () => {
     // Given: 無効なToolEntry
     // When: validateEgetToolEntryを実行
     // Then: バリデーションエラーを投げる
   });
 
-  test('isEgetToolEntry: egetエントリーを正しく判定する', () => {
+  it('isEgetToolEntry: egetエントリーを正しく判定する', () => {
     // Given: installer='eget'のToolEntry
     // When: isEgetToolEntryを実行
     // Then: trueを返す
   });
 
-  test('isEgetToolEntry: 非egetエントリーを正しく判定する', () => {
+  it('isEgetToolEntry: 非egetエントリーを正しく判定する', () => {
     // Given: installer!='eget'のToolEntry
     // When: isEgetToolEntryを実行
     // Then: falseを返す
@@ -410,29 +426,29 @@ describe('egetValidator API', () => {
 
 #### 6.3 egetバリデーター内部テスト (`src/tools-validator/validator/__tests__/egetValidator.internal.spec.ts`)
 
-**目的**: 内部実装の詳細テスト
+**目的**: 内部実装の詳細テスト。
 
 ```typescript
 describe('egetValidator 内部実装', () => {
-  test('有効なegetオプションを検証する', () => {
+  it('有効なegetオプションを検証する', () => {
     // Given: 有効なegetオプション (/q, /quiet, /a, /asset:)
     // When: オプション検証を実行
     // Then: 検証に成功する
   });
 
-  test('無効なegetオプションでエラーを投げる', () => {
+  it('無効なegetオプションでエラーを投げる', () => {
     // Given: 無効なegetオプション
     // When: オプション検証を実行
     // Then: バリデーションエラーを投げる
   });
 
-  test('repository形式の厳密な検証', () => {
+  it('repository形式の厳密な検証', () => {
     // Given: 様々なrepository形式
     // When: repository検証を実行
     // Then: owner/repo形式のみ成功する
   });
 
-  test('installerフィールドの型安全性', () => {
+  it('installerフィールドの型安全性', () => {
     // Given: installer='eget'のエントリー
     // When: 型チェックを実行
     // Then: EgetToolEntry型として扱える
@@ -442,35 +458,35 @@ describe('egetValidator 内部実装', () => {
 
 #### 6.4 境界値テスト (`src/tools-validator/validator/__tests__/boundary.spec.ts`)
 
-**目的**: 境界値とエッジケースの検証
+**目的**: 境界値とエッジケースの検証。
 
 ```typescript
 describe('境界値テスト', () => {
-  test('大量のツールエントリー処理', () => {
+  it('大量のツールエントリー処理', () => {
     // Given: 1000個のツールエントリー
     // When: validateToolsを実行
     // Then: 合理的な時間で処理完了する
   });
 
-  test('Unicode文字を含むツール名', () => {
+  it('Unicode文字を含むツール名', () => {
     // Given: Unicode文字を含むid、repository
     // When: 検証を実行
     // Then: 適切に処理される
   });
 
-  test('極端に長いリポジトリ名', () => {
+  it('極端に長いリポジトリ名', () => {
     // Given: 極端に長いowner/repo
     // When: 検証を実行
     // Then: 適切にバリデーションされる
   });
 
-  test('メモリ使用量の測定', () => {
+  it('メモリ使用量の測定', () => {
     // Given: 大量のツールエントリー
     // When: 処理を実行
     // Then: メモリリークしない
   });
 
-  test('最小有効値でのテスト', () => {
+  it('最小有効値でのテスト', () => {
     // Given: 最小限の有効なエントリー
     // When: 検証を実行
     // Then: 正常に処理される
@@ -482,29 +498,29 @@ describe('境界値テスト', () => {
 
 #### 7.1 基本機能テスト (`src/utils/__tests__/pathUtils.spec.ts`)
 
-**目的**: パス処理の基本機能テスト
+**目的**: パス処理の基本機能テスト。
 
 ```typescript
 describe('pathUtils', () => {
-  test('normalizePath: パス正規化が正しく動作する', () => {
+  it('normalizePath: パス正規化が正しく動作する', () => {
     // Given: 様々な形式のパス
     // When: normalizePathを実行
     // Then: 統一された形式のパスを返す
   });
 
-  test('validateAndNormalizePath: パス検証と正規化', () => {
+  it('validateAndNormalizePath: パス検証と正規化', () => {
     // Given: 有効・無効なパス
     // When: validateAndNormalizePathを実行
     // Then: 有効パスは正規化、無効パスはエラー
   });
 
-  test('normalizePathForSchema: スキーマ用正規化', () => {
+  it('normalizePathForSchema: スキーマ用正規化', () => {
     // Given: スキーマ検証用のパス
     // When: normalizePathForSchemaを実行
     // Then: スキーマ用に正規化されたパスを返す
   });
 
-  test('arePathsEqual: パス比較が正しく動作する', () => {
+  it('arePathsEqual: パス比較が正しく動作する', () => {
     // Given: 表記が異なるが同じパス
     // When: arePathsEqualを実行
     // Then: trueを返す
@@ -516,19 +532,19 @@ describe('pathUtils', () => {
 
 ```typescript
 describe('クロスプラットフォーム対応', () => {
-  test('Windowsパス形式の処理', () => {
+  it('Windowsパス形式の処理', () => {
     // Given: Windows形式のパス（バックスラッシュ、ドライブレター）
     // When: パス処理を実行
     // Then: 適切に正規化される
   });
 
-  test('Unixパス形式の処理', () => {
+  it('Unixパス形式の処理', () => {
     // Given: Unix形式のパス（フォワードスラッシュ）
     // When: パス処理を実行
     // Then: 適切に処理される
   });
 
-  test('相対パスと絶対パスの処理', () => {
+  it('相対パスと絶対パスの処理', () => {
     // Given: 相対パスと絶対パス
     // When: パス処理を実行
     // Then: それぞれ適切に処理される
@@ -538,35 +554,35 @@ describe('クロスプラットフォーム対応', () => {
 
 #### 7.3 エッジケーステスト (`src/utils/__tests__/pathUtils.edge.spec.ts`)
 
-**目的**: パス処理のエッジケース検証
+**目的**: パス処理のエッジケース検証。
 
 ```typescript
 describe('pathUtils エッジケース', () => {
-  test('無効な文字を含むパス', () => {
+  it('無効な文字を含むパス', () => {
     // Given: 無効文字（|, <, >, "等）を含むパス
     // When: パス処理を実行
     // Then: 適切にエラーハンドリングされる
   });
 
-  test('極端に長いパス', () => {
+  it('極端に長いパス', () => {
     // Given: 260文字を超える長いパス
     // When: パス処理を実行
     // Then: 適切に処理される
   });
 
-  test('Unicode文字を含むパス', () => {
+  it('Unicode文字を含むパス', () => {
     // Given: Unicode文字を含むパス
     // When: パス処理を実行
     // Then: 適切に処理される
   });
 
-  test('空文字列やnullの処理', () => {
+  it('空文字列やnullの処理', () => {
     // Given: 空文字列、null、undefined
     // When: パス処理を実行
     // Then: 適切にエラーハンドリングされる
   });
 
-  test('特殊パターンの処理', () => {
+  it('特殊パターンの処理', () => {
     // Given: ".", "..", "~"等の特殊パターン
     // When: パス処理を実行
     // Then: 適切に正規化される
@@ -763,25 +779,25 @@ const expectValidationError = (fn: () => void, expectedMessage?: string) => {
 
 ### 最小カバレッジ要件
 
-- **ライン**: 95%以上
-- **関数**: 100%
-- **ブランチ**: 90%以上
-- **ステートメント**: 95%以上
+- ライン: 95%以上
+- 関数: 100%
+- ブランチ: 90%以上
+- ステートメント: 95%以上
 
 ### 重点カバレッジ領域
 
-1. **エラーハンドリング**: すべてのerrorExitパターン
-2. **バリデーション**: すべての検証ルール
-3. **型変換**: TypeScriptとランタイムの型安全性
-4. **境界値**: 正常値と異常値の境界
-5. **パフォーマンス**: 大量データ処理時の挙動
+1. エラーハンドリング: すべての errorExit パターン
+2. バリデーション: すべての検証ルール
+3. 型変換: TypeScript とランタイムの型安全性
+4. 境界値: 正常値と異常値の境界
+5. パフォーマンス: 大量データ処理時の挙動
 
 ## パフォーマンステスト
 
 ### レスポンステスト
 
-- 小規模設定（10ツール以下）: 10ms以下
-- 中規模設定（100ツール以下）: 100ms以下
+- 小規模設定（10ツール以下）: 10ms 以下
+- 中規模設定（100ツール以下）: 100ms 以下
 - 大規模設定（1000ツール以下）: 1秒以下
 
 ### メモリ使用量テスト
@@ -794,9 +810,9 @@ const expectValidationError = (fn: () => void, expectedMessage?: string) => {
 
 ### テスト実行環境
 
-- **Node.js**: v20以上
-- **OS**: Windows, Linux, macOS
-- **TypeScript**: 最新安定版
+- Node.j*: v20以上
+- OS: Windows, Linux, macOS
+- TypeScript: 最新安定版
 
 ### 自動化テスト
 
@@ -807,10 +823,10 @@ const expectValidationError = (fn: () => void, expectedMessage?: string) => {
 
 ### テストコマンド
 
-- **単体テスト**: `pnpm run test:develop`
-- **ウォッチモード**: `pnpm run test:watch`
-- **カバレッジ**: `pnpm run test:coverage`
-- **全テスト**: `pnpm run test`
+- 単体テスト: `pnpm run test:develop`
+- ウォッチモード: `pnpm run test:watch`
+- カバレッジ: `pnpm run test:coverage`
+- 全テスト: `pnpm run test`
 
 ## テスト保守
 
@@ -823,38 +839,38 @@ const expectValidationError = (fn: () => void, expectedMessage?: string) => {
 
 ### テストコード品質
 
-- DRY原則の適用（重複テストコードの排除）
-- SOLID原則に基づくテストヘルパー設計
+- DRY 原則の適用（重複テストコードの排除）
+- SOLID 原則に基づくテストヘルパー設計
 - テストケース名の一貫性確保（日本語での説明）
 - アサーションメッセージの明確化
-- モック・スタブの適切な使用
+- モック・スタブの使用
 
 ## 実装完成度
 
 ### 現在の実装状況
 
-- ✅ 包括的なユニットテストスイート実装済み（12ファイル）
-- ✅ BDD形式のテスト記述
-- ✅ 正常系・異常系・境界値テスト
-- ✅ 型安全性テスト（TypeScript + Valibot）
-- ✅ パフォーマンステスト（大量データ処理）
-- ✅ エラーハンドリングテスト
-- ✅ クロスプラットフォーム対応テスト
+- 包括的なユニットテストスイート実装済み（12ファイル）
+- BDD 形式のテスト記述
+- 正常系・異常系・境界値テスト
+- 型安全性テスト（TypeScript + Valibot）
+- パフォーマンステスト（大量データ処理）
+- エラーハンドリングテスト
+- クロスプラットフォーム対応テスト
 
 ### テストカバレッジ
 
-- **機能カバレッジ**: 全主要機能をカバー
-- **エラーケースカバレッジ**: 包括的なエラーハンドリング検証
-- **型安全性カバレッジ**: TypeScript型システムとランタイム検証の両方
-- **パフォーマンスカバレッジ**: 大量データ・境界値での動作確認
+- 機能カバレッジ: 全主要機能をカバー
+- エラーケースカバレッジ: 包括的なエラーハンドリング検証
+- 型安全性カバレッジ: TypeScript 型システムとランタイム検証の両方
+- パフォーマンスカバレッジ: 大量データ・境界値での動作確認
 
 ### 品質レベル
 
-- **テスト構造**: 機能別・層別の適切な分離
-- **保守性**: テストヘルパーとデータ生成関数による保守性向上
-- **可読性**: BDD形式による高い可読性
-- **信頼性**: エッジケースを含む包括的なテスト
+- テスト構造: 機能別・層別の分離
+- 保守性: テストヘルパーとデータ生成関数による保守性向上
+- 可読性: BDD 形式による高い可読性
+- 信頼性: エッジケースを含む包括的なテスト
 
 ### 結論
 
-ユニットテストスイートは完全に実装され、`@esta-core/tools-config`パッケージの全機能を包括的に検証しています。高品質なテストカバレッジにより、継続的な開発とリファクタリングを安全に実行できる基盤を提供しています。
+ユニットテストスイートが実装され、`@esta-core/tools-config`パッケージの全機能を包括的に検証しています。高品質なテストカバレッジにより、継続的な開発とリファクタリングを安全に実行できる基盤を提供しています。
