@@ -3,14 +3,15 @@ header:
   - src: docs/specs/@esta-core--tools-config.spec.md
   - @(#) : ESTA Install Tools configuration reader
 title: 🔧 ツール設定統合管理仕様書（@esta-core/tools-config）
-version: 1.0.0
+version: 1.2.0
 created: 2025-07-14
-updated: 2025-07-14
+updated: 2025-07-19
 authors:
-  - 🤖 Claude（初期設計・API仕様策定）
+  - 🤖 Claude（初期設計・API仕様策定・実装更新）
   - 👤 atsushifx（要件定義・仕様確定）
 changes:
   - 2025-07-14: 初回作成（GitHub issue #94 対応）
+  - 2025-07-19: 最新実装に合わせて仕様書を改訂
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
@@ -50,49 +51,83 @@ copyright:
 
 ## API仕様
 
-### 基本API
+### メインAPI
 
-#### `getTool(id: string): ToolEntry | undefined`
+#### `getToolsConfig(configPath: string): Promise<ToolsConfig>`
 
-指定された ID のツール設定を取得します。
+設定ファイルを読み込み、デフォルト値とマージして完全な設定を取得します。
 
 **パラメータ:**
 
-- `id`: ツールの一意識別子
+- `configPath`: 設定ファイルのパス（TypeScript、JSON、YAML、JavaScript 形式をサポート）
 
 **戻り値:**
 
-- `ToolEntry` オブジェクト、または見つからない場合は`undefined`
+- 完全な`ToolsConfig`オブジェクト（Promise）
 
-#### `listTools(): ToolEntry[]`
+**機能:**
 
-設定されているすべてのツールのリストを取得します。
+- デフォルト設定の自動マージ
+- 設定の検証と正規化
+- 複数設定ファイル形式のサポート
 
-**戻り値:**
+### コア機能API
 
-- `ToolEntry`オブジェクトの配列
+#### `loadToolsConfig(configPath: string): Promise<PartialToolsConfig>`
+
+指定されたパスから設定ファイルを読み込みます。
+
+#### `mergeToolsConfig(defaultConfig: ToolsConfig, fileConfig: PartialToolsConfig): ToolsConfig`
+
+デフォルト設定とファイル設定をマージします。
+
+#### `defaultToolsConfig(): ToolsConfig`
+
+デフォルトのツール設定を取得します。
 
 ### 設定データ構造
 
 #### `ToolEntry`
 
 ```typescript
-interface ToolEntry {
-  installer: string; // インストーラータイプ（例: 'eget', 'scoop'）
-  id: string; // ツールの一意識別子
-  repository: string; // GitHubリポジトリまたはソース
-  options?: Record<string, any>; // インストーラー固有のオプション
-}
+export type ToolEntry = {
+  /** インストーラータイプ */
+  installer: string;
+  /** ツールID */
+  id: string;
+  /** リポジトリ */
+  repository: string;
+  /** バージョン（任意） */
+  version?: string;
+  /** オプション（任意） */
+  options?: Record<string, string>;
+};
 ```
 
 #### `ToolsConfig`
 
 ```typescript
-interface ToolsConfig {
-  defaultInstallDir: string; // デフォルトインストールディレクトリ
-  defaultTempDir: string; // デフォルト一時ディレクトリ
-  tools: ToolEntry[]; // ツール設定配列
-}
+export type ToolsConfig = {
+  /** デフォルトインストールディレクトリ */
+  defaultInstallDir: string;
+  /** デフォルト一時ディレクトリ */
+  defaultTempDir: string;
+  /** ツールエントリーの配列 */
+  tools: ToolEntry[];
+};
+```
+
+#### `PartialToolsConfig`
+
+```typescript
+export type PartialToolsConfig = {
+  /** デフォルトインストールディレクトリ（任意） */
+  defaultInstallDir?: string;
+  /** デフォルト一時ディレクトリ（任意） */
+  defaultTempDir?: string;
+  /** ツールエントリーの配列（任意） */
+  tools?: ToolEntry[];
+};
 ```
 
 ## 技術仕様
@@ -100,9 +135,9 @@ interface ToolsConfig {
 ### 依存関係
 
 - `valibot`: 設定検証ライブラリ
-- `@esta-utils/config-loader`: 設定ファイル読み込み（可能であれば）
-- `@shared/types`: 共通型定義
-- `@shared/constants`: 共通定数
+- `@esta-utils/config-loader`: 設定ファイル読み込み
+- `@agla-e2e/fileio-framework`: E2E テストフレームワーク
+- `@esta-core/error-handler`: エラーハンドリング
 
 ### 設定ファイル形式
 
@@ -151,24 +186,96 @@ export default {
 
 ### 検証スキーマ
 
-`valibot`を使用したスキーマ定義:
+`valibot`を使用したスキーマ定義 (正規化機能付き)
 
 ```typescript
-import { any, array, object, optional, record, string } from 'valibot';
+import { array, check, object, optional, pipe, record, string, transform } from 'valibot';
 
-const ToolEntrySchema = object({
-  installer: string(),
-  id: string(),
-  repository: string(),
-  options: optional(record(any())),
+// ツールエントリーのスキーマ（正規化機能付き）
+export const ToolEntrySchema = object({
+  installer: pipe(string(), transform((installer) => installer.toLowerCase())),
+  id: pipe(string(), transform((id) => id.toLowerCase())),
+  repository: pipe(string(), transform((repo) => repo.toLowerCase())),
+  version: optional(string()),
+  options: optional(
+    pipe(
+      record(string(), string()),
+      transform((options) => {
+        const normalized: Record<string, string> = {};
+        for (const [key, value] of Object.entries(options)) {
+          normalized[key] = value.toLowerCase();
+        }
+        return normalized;
+      }),
+    ),
+  ),
 });
 
-const ToolsConfigSchema = object({
-  defaultInstallDir: string(),
-  defaultTempDir: string(),
-  tools: array(ToolEntrySchema),
+// 部分設定対応スキーマ（パス検証と正規化付き）
+export const ToolsConfigSchema = object({
+  defaultInstallDir: optional(pipe(
+    string(),
+    check(validateAndNormalizePath),
+    transform(normalizePathForSchema),
+  )),
+  defaultTempDir: optional(pipe(
+    string(),
+    check(validateAndNormalizePath),
+    transform(normalizePathForSchema),
+  )),
+  tools: optional(array(ToolEntrySchema)),
 });
+
+// 完全な設定のスキーマ（必須フィールドチェック付き）
+export const CompleteToolsConfigSchema = pipe(
+  ToolsConfigSchema,
+  check((config) => config.defaultInstallDir !== undefined),
+  check((config) => config.defaultTempDir !== undefined),
+  check((config) => config.tools !== undefined),
+  check((config) => config.defaultInstallDir !== config.defaultTempDir),
+);
 ```
+
+## アーキテクチャ詳細
+
+### パッケージ構造
+
+```bash
+src/
+├── core/
+│   └── config/              # 設定読み込み・マージ機能
+├── internal/
+│   ├── constants/           # 内部定数
+│   ├── schemas/             # valibotスキーマ定義
+│   └── types/               # 内部型定義
+├── tools-validator/         # ツール検証機能
+├── utils/                   # ユーティリティ機能
+├── defaults.ts              # デフォルト設定
+├── getToolsConfig.ts        # メインエントリーポイント
+└── index.ts                 # パッケージエクスポート
+```
+
+### 主要機能
+
+1. **設定読み込み**: `@esta-utils/config-loader`を使用した多形式サポート
+2. **設定検証**: `valibot`による型安全な検証と正規化
+3. **設定マージ**: デフォルト設定との安全なマージ
+4. **パス正規化**: クロスプラットフォーム対応のパス処理
+5. **ツール検証**: eget ベースのツール設定検証
+
+### デフォルトツール
+
+現在デフォルトで含まれているツール:
+
+- gh (GitHub CLI)
+- ripgrep (高速 grep)
+- fd (高速 find)
+- bat (syntax highlighting された cat)
+- exa (modern な ls)
+- jq (JSON プロセッサー)
+- yq (YAML プロセッサー)
+- delta (git の diff ビューア)
+- gitleaks (秘匿情報検出)
 
 ## 制約事項
 
@@ -176,23 +283,49 @@ const ToolsConfigSchema = object({
 - 設定の肥大化を防ぐ
 - 軽量で独立してテスト可能な設計を維持
 - 現在は`eget`インストーラーを中心とした設計（将来的に拡張可能）
+- パス区切り文字の正規化による互換性確保
 
 ## 使用例
 
+### 基本的な使用方法
+
 ```typescript
-import { getTool, listTools } from '@esta-core/tools-config';
+import { getToolsConfig } from '@esta-core/tools-config';
 
-// 特定のツール設定を取得
-const ghTool = getTool('gh');
-if (ghTool) {
-  console.log(`Installing ${ghTool.id} from ${ghTool.repository}`);
-}
+// 設定ファイルから完全な設定を取得
+const config = await getToolsConfig('./tools.config.ts');
 
-// すべてのツール設定を取得
-const allTools = listTools();
-allTools.forEach((tool) => {
-  console.log(`Tool: ${tool.id} (${tool.installer})`);
+console.log(`Install directory: ${config.defaultInstallDir}`);
+console.log(`Temp directory: ${config.defaultTempDir}`);
+
+// ツールの一覧を表示
+config.tools.forEach((tool) => {
+  console.log(`Tool: ${tool.id} (${tool.installer}) from ${tool.repository}`);
+  if (tool.version) {
+    console.log(`  Version: ${tool.version}`);
+  }
 });
+```
+
+### デフォルト設定の取得
+
+```typescript
+import { defaultToolsConfig } from '@esta-core/tools-config';
+
+// デフォルト設定を取得（検証済み）
+const defaultConfig = defaultToolsConfig();
+console.log('Default tools:', defaultConfig.tools.map((t) => t.id));
+```
+
+### カスタム設定とのマージ
+
+```typescript
+import { defaultToolsConfig, loadToolsConfig, mergeToolsConfig } from '@esta-core/tools-config';
+
+// 段階的な設定管理
+const defaultConfig = defaultToolsConfig();
+const customConfig = await loadToolsConfig('./custom-tools.json');
+const finalConfig = mergeToolsConfig(defaultConfig, customConfig);
 ```
 
 ## 互換性

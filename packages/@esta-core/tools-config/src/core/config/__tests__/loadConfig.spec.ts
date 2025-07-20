@@ -16,7 +16,7 @@ import { errorExit, ExitCode } from '@esta-core/error-handler';
 import { loadConfig as loadConfigFile } from '@esta-utils/config-loader';
 
 // type
-import type { PartialToolsConfig } from '../../../internal/types';
+import type { PartialToolsConfig } from '@/shared/types/toolsConfig.types';
 // test target
 import { isCompleteConfig, loadToolsConfig, validateCompleteConfig } from '../loadToolsConfig';
 
@@ -29,8 +29,20 @@ const mockExistsSync = vi.mocked(existsSync);
 const mockLoadConfigFile = vi.mocked(loadConfigFile);
 const mockErrorExit = vi.mocked(errorExit);
 
+/**
+ * 設定ローダー関数の単体テスト
+ * ファイル読み込み、バリデーション、エラーハンドリングのモックベーステスト
+ */
 describe('loadConfig.ts functions', () => {
+  /**
+   * メインローダー関数のテスト
+   * 設定ファイルの読み込みとパーシャル設定の生成を検証
+   */
   describe('loadToolsConfig', () => {
+    /**
+     * 正常系テスト
+     * 有効な設定ファイルの読み込み成功ケースを検証
+     */
     describe('正常系', () => {
       it('有効な設定ファイルを読み込んで成功する', async () => {
         // Given: 有効な設定ファイルが存在する
@@ -105,6 +117,10 @@ describe('loadConfig.ts functions', () => {
       });
     });
 
+    /**
+     * 異常系テスト
+     * ファイル不存在、フォーマットエラー、アクセスエラーの適切な処理を検証
+     */
     describe('異常系', () => {
       it('設定ファイルが存在しない場合は空オブジェクトを返す', async () => {
         // Given: 設定ファイルが存在しない
@@ -157,6 +173,24 @@ describe('loadConfig.ts functions', () => {
         expect(result.tools![0].installer).toBe('invalid');
       });
 
+      it('無効なJSONファイルを読み込んだ場合はerrorExitを呼び出す', async () => {
+        // Given: 無効なJSONファイルを読み込む
+        const configPath = '/path/to/invalid-json.json';
+        const jsonError = new SyntaxError('Unexpected token in JSON');
+        mockExistsSync.mockReturnValue(true);
+        mockLoadConfigFile.mockRejectedValue(jsonError);
+        mockErrorExit.mockImplementation(() => {
+          throw new Error('errorExit called');
+        });
+
+        // When & Then: 設定ファイルを読み込む
+        await expect(loadToolsConfig(configPath)).rejects.toThrow('errorExit called');
+        expect(mockErrorExit).toHaveBeenCalledWith(
+          ExitCode.VALIDATION_FAILED,
+          expect.stringContaining('Configuration validation failed: Unexpected token in JSON'),
+        );
+      });
+
       it('loadConfigFile が例外を投げた場合はerrorExitを呼び出す', async () => {
         // Given: loadConfigFile が例外を投げる
         const configPath = '/path/to/config.json';
@@ -194,7 +228,15 @@ describe('loadConfig.ts functions', () => {
     });
   });
 
+  /**
+   * 設定完全性チェッカー関数のテスト
+   * 部分設定が完全設定かどうかの判定ロジックを検証
+   */
   describe('isCompleteConfig', () => {
+    /**
+     * 正常系テスト
+     * 完全な設定の正しい識別を検証
+     */
     describe('正常系', () => {
       it('完全な設定の場合はtrueを返す', () => {
         // Given: 完全な設定
@@ -233,6 +275,10 @@ describe('loadConfig.ts functions', () => {
       });
     });
 
+    /**
+     * 異常系テスト
+     * 不完全や無効な設定の正しい識別を検証
+     */
     describe('異常系', () => {
       it('部分的な設定の場合はfalseを返す', () => {
         // Given: 部分的な設定（defaultInstallDirが欠如）
@@ -310,7 +356,15 @@ describe('loadConfig.ts functions', () => {
     });
   });
 
+  /**
+   * 設定バリデーション関数のテスト
+   * 完全設定のスキーマバリデーションと型安全性を検証
+   */
   describe('validateCompleteConfig', () => {
+    /**
+     * 正常系テスト
+     * 有効な完全設定のバリデーション成功を検証
+     */
     describe('正常系', () => {
       it('有効な完全設定を検証して返す', () => {
         // Given: 有効な完全設定
@@ -355,6 +409,10 @@ describe('loadConfig.ts functions', () => {
       });
     });
 
+    /**
+     * 異常系テスト
+     * 不完全や無効な設定でのバリデーションエラーを検証
+     */
     describe('異常系', () => {
       it('部分的な設定の場合は例外を投げる', () => {
         // Given: 部分的な設定

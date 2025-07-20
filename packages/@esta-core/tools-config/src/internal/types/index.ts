@@ -6,19 +6,4 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// Configuration types
-export type {
-  LoadConfigResult,
-} from './config';
-
-// Tools types (re-exported from shared)
-export type {
-  PartialToolsConfig,
-  ToolEntry,
-  ToolsConfig,
-} from './tools';
-
-// Validation types
-export type {
-  ValidateToolsResult,
-} from './validation';
+export * from './validation';

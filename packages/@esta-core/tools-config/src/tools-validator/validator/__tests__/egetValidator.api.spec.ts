@@ -1,5 +1,5 @@
+import type { ToolEntry } from '@/shared/types/toolsConfig.types';
 import { describe, expect, it } from 'vitest';
-import type { ToolEntry } from '../../../internal/types';
 import {
   isEgetToolEntry,
   validateEgetToolEntry,
@@ -102,7 +102,7 @@ describe('egetValidator', () => {
       } as ToolEntry;
 
       expect(() => validateEgetToolEntry(entryWithoutId)).toThrow(
-        'Invalid eget tool entry',
+        'Invalid tool entry: Invalid key: Expected "id" but received undefined',
       );
     });
 
@@ -117,7 +117,7 @@ describe('egetValidator', () => {
       };
 
       expect(() => validateEgetToolEntry(entry)).toThrow(
-        'Invalid eget options',
+        'Invalid options:',
       );
     });
 
@@ -132,7 +132,7 @@ describe('egetValidator', () => {
       };
 
       expect(() => validateEgetToolEntry(entry)).toThrow(
-        'Invalid eget options',
+        'Invalid options: option has no value:',
       );
     });
 
@@ -147,7 +147,7 @@ describe('egetValidator', () => {
       };
 
       expect(() => validateEgetToolEntry(entry)).toThrow(
-        'Invalid eget options',
+        'Invalid options: option has unexpected value:',
       );
     });
 

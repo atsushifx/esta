@@ -1,9 +1,34 @@
+// src/internal/schemas/__tests__/tools.schemas.spec.ts
+// @(#) : ツール設定スキーマの単体テスト
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// lib
 import { parse } from 'valibot';
+// type
+import type { ToolEntry, ToolsConfig } from '@/shared/types/toolsConfig.types';
+// vitest
 import { describe, expect, it } from 'vitest';
-import type { ToolEntry, ToolsConfig } from '../../types';
+// schemas
 import { CompleteToolsConfigSchema, ToolEntrySchema, ToolsConfigSchema } from '../tools.schemas';
 
+/**
+ * スキーマバリデーションの単体テスト
+ * TypeScript型定義とValibotスキーマのバリデーション機能を検証
+ */
+
+/**
+ * TypeScript型定義テスト
+ * コンパイル時の型安全性と基本的なオブジェクト構築を検証
+ */
 describe('Type Definitions', () => {
+  /**
+   * ToolEntry型テスト
+   * ツールエントリーの基本的な型定義とプロパティを検証
+   */
   describe('ToolEntry型', () => {
     it('should create ToolEntry with required fields', () => {
       const toolEntry: ToolEntry = {
@@ -33,6 +58,10 @@ describe('Type Definitions', () => {
     });
   });
 
+  /**
+   * ToolsConfig型テスト
+   * ツール設定全体の型定義と必須フィールドを検証
+   */
   describe('ToolsConfig型', () => {
     it('should create complete ToolsConfig object', () => {
       const toolsConfig: ToolsConfig = {
@@ -58,8 +87,20 @@ describe('Type Definitions', () => {
   });
 });
 
+/**
+ * Valibotスキーマバリデーションテスト
+ * ランタイムデータのバリデーション、正規化、エラーハンドリングを検証
+ */
 describe('Schema Validation', () => {
+  /**
+   * ToolEntryスキーマバリデーションテスト
+   * ツールエントリーのバリデーション、正規化、エラー処理を検証
+   */
   describe('ToolEntrySchema', () => {
+    /**
+     * 正常系バリデーションテスト
+     * 有効なツールエントリーの正しいバリデーションを検証
+     */
     describe('正常なケース', () => {
       it('should validate valid ToolEntry object', () => {
         const validToolEntry = {
@@ -91,6 +132,10 @@ describe('Schema Validation', () => {
       });
     });
 
+    /**
+     * 数値正規化テスト
+     * ID、リポジトリ、オプション値の小文字化を検証
+     */
     describe('正規化の検証', () => {
       it('should normalize id and repository to lowercase', () => {
         const validToolEntry = {
@@ -119,6 +164,10 @@ describe('Schema Validation', () => {
       });
     });
 
+    /**
+     * バリデーションエラーテスト
+     * 不正なデータでの適切なエラーハンドリングを検証
+     */
     describe('エラーケース', () => {
       it('should throw error when required field is missing', () => {
         const invalidToolEntry = {
@@ -134,7 +183,15 @@ describe('Schema Validation', () => {
     });
   });
 
+  /**
+   * ToolsConfigスキーマバリデーションテスト
+   * ツール設定全体のバリデーション、パス正規化、エラー処理を検証
+   */
   describe('ToolsConfigSchema', () => {
+    /**
+     * 正常系バリデーションテスト
+     * 有効なツール設定の正しいバリデーションを検証
+     */
     describe('正常なケース', () => {
       it('should validate complete ToolsConfig object', () => {
         const validToolsConfig = {
@@ -161,6 +218,10 @@ describe('Schema Validation', () => {
       });
     });
 
+    /**
+     * パス正規化テスト
+     * Windows/Unixパスの正規化とクロスプラットフォーム対応を検証
+     */
     describe('パス正規化の検証', () => {
       it('should normalize paths to "/" format with lowercase', () => {
         const validToolsConfig = {
@@ -199,6 +260,10 @@ describe('Schema Validation', () => {
       });
     });
 
+    /**
+     * スキーマエラーテスト
+     * 不正なパス、欠損フィールドでの適切なエラーハンドリングを検証
+     */
     describe('エラーケース', () => {
       it('should throw error for double slash paths', () => {
         const invalidToolsConfig = {

@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // ===== 型定義 =====
-export type * from './internal/types';
+export type * from '@/shared/types/toolsConfig.types';
 
 // ===== スキーマ =====
 export * from './internal/schemas';
@@ -20,3 +20,6 @@ export * from './utils';
 
 // ===== 検証機能 =====
 export * from './tools-validator';
+
+// ===== メインエントリーポイント =====
+export { getToolsConfig } from './getToolsConfig';

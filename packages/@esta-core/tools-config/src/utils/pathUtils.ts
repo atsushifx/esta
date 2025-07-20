@@ -6,6 +6,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { VALIDATION_ERROR_MESSAGES } from '@/internal/constants/validation';
+
 /**
  * パス文字列の基本検証
  * - 空文字列でないこと
@@ -55,7 +57,7 @@ const isValidPathFormat = (path: string): boolean => {
  */
 export const normalizePath = (path: string): string => {
   if (!isValidPathFormat(path)) {
-    throw new Error(`Invalid path format: ${path}`);
+    throw new Error(`${VALIDATION_ERROR_MESSAGES.INVALID_PATH_FORMAT}: ${path}`);
   }
 
   let normalized = path.trim();
@@ -106,7 +108,7 @@ export const validateAndNormalizePath = (path: string): string => {
 
   // 絶対パスまたは相対パスのいずれかである必要がある
   if (!isUnixAbsolute && !isWindowsAbsolute && !isRelative) {
-    throw new Error(`Path must be absolute or relative: ${path}`);
+    throw new Error(`${VALIDATION_ERROR_MESSAGES.PATH_MUST_BE_ABSOLUTE_OR_RELATIVE}: ${path}`);
   }
 
   return normalized;

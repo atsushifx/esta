@@ -6,7 +6,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// valibot schema validation utilities
+import { parse } from 'valibot';
+// tools configuration types
 import type { PartialToolsConfig, ToolsConfig } from '../../../shared/types/toolsConfig.types';
+// validation schemas
+import { CompleteToolsConfigSchema } from '../../internal/schemas';
 
 /**
  * デフォルト設定と読み込み設定をマージしてツール設定を生成
@@ -18,19 +23,31 @@ import type { PartialToolsConfig, ToolsConfig } from '../../../shared/types/tool
 export const mergeToolsConfig = (
   defaultConfig: ToolsConfig,
   loadConfig: PartialToolsConfig | object,
-): ToolsConfig | object => {
+): ToolsConfig => {
   if (Object.keys(loadConfig).length === 0) {
-    return loadConfig as ToolsConfig;
+    return defaultConfig;
   }
 
   const partialConfig = loadConfig as PartialToolsConfig;
 
-  return {
+  // ツールIDベースでマージ（重複IDは新しい設定で上書き）
+  const newTools = Array.isArray(partialConfig.tools) ? partialConfig.tools : [];
+  const mergedTools = newTools.reduce(
+    (tools, newTool) => {
+      const existingIndex = tools.findIndex((tool) => tool.id === newTool.id);
+      return existingIndex >= 0
+        ? tools.map((tool, index) => index === existingIndex ? newTool : tool)
+        : [...tools, newTool];
+    },
+    [...defaultConfig.tools],
+  );
+
+  const mergedConfig = {
     ...defaultConfig,
     ...partialConfig,
-    tools: [
-      ...defaultConfig.tools,
-      ...(partialConfig.tools ?? []),
-    ],
-  } as ToolsConfig;
+    tools: mergedTools,
+  };
+
+  // 結果を完全な設定として検証
+  return parse(CompleteToolsConfigSchema, mergedConfig) as ToolsConfig;
 };

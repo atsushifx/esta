@@ -41,6 +41,10 @@ const createTestContext = async (
  * 指定ファイルが正しく読めるかどうかのテスト
  */
 describe('loadToolsConfig E2E', () => {
+  /**
+   * JSONファイル入出力テスト
+   * 実際のJSONファイルを使用した読み込み機能の検証
+   */
   describe('JSONファイル読み込み', () => {
     it('有効なJSON設定ファイルを読み込める', async (testContext) => {
       // Given: テストコンテキストを作成（一意の一時ディレクトリ）
@@ -117,6 +121,10 @@ describe('loadToolsConfig E2E', () => {
     });
   });
 
+  /**
+   * YAMLファイル入出力テスト
+   * 実際のYAMLファイルを使用した読み込み機能の検証
+   */
   describe('YAMLファイル読み込み', () => {
     it('YAML設定ファイルを読み込める', async (testContext) => {
       // Given: テストコンテキストを作成（一意の一時ディレクトリ）
@@ -148,6 +156,10 @@ tools:
     });
   });
 
+  /**
+   * 複数アイテム処理テスト
+   * 複数のツール設定を含むファイルの適切な処理を検証
+   */
   describe('複数ツール設定', () => {
     it('複数のツール設定を読み込める', async (testContext) => {
       // Given: テストコンテキストを作成（一意の一時ディレクトリ）
@@ -185,6 +197,50 @@ tools:
     });
   });
 
+  /**
+   * ファイルパス処理テスト
+   * 相対パス、絶対パスの両方でのファイルアクセスを検証
+   */
+  describe('パス処理', () => {
+    it('相対パスと絶対パスの両方を正しく処理する', async (testContext) => {
+      // Given: テストコンテキストを作成（一意の一時ディレクトリ）
+      const ctx = await createTestContext('path-handling', testContext);
+      testContext.onTestFinished(ctx.cleanup);
+
+      // Given: 設定ファイルを作成
+      const configFileName = 'path-test-config.json';
+      const configFilePath = path.join(ctx.testDir, configFileName);
+      const configData = {
+        defaultInstallDir: 'relative/path/dir',
+        defaultTempDir: '/absolute/path/dir',
+        tools: [
+          {
+            installer: 'eget',
+            id: 'path-test-tool',
+            repository: 'owner/repo',
+          },
+        ],
+      };
+
+      await writeFile(configFilePath, JSON.stringify(configData, null, 2));
+
+      // When: 相対パスで設定ファイルを読み込む
+      const relativePathConfig = await loadToolsConfig(configFilePath);
+
+      // When: 絶対パスで設定ファイルを読み込む
+      const absolutePathConfig = await loadToolsConfig(path.resolve(configFilePath));
+
+      // Then: 両方とも同じ設定が読み込まれる
+      expect(relativePathConfig).toEqual(absolutePathConfig);
+      expect(relativePathConfig.defaultInstallDir).toBe('relative/path/dir');
+      expect(relativePathConfig.defaultTempDir).toBe('/absolute/path/dir');
+    });
+  });
+
+  /**
+   * エラーケーステスト
+   * ファイル不存在、無効フォーマットなどのエラーケースでの適切な処理を検証
+   */
   describe('エラーハンドリング', () => {
     it('存在しないファイルの場合は空オブジェクトを返す', async (testContext) => {
       // Given: テストコンテキストを作成（一意の一時ディレクトリ）
@@ -214,7 +270,11 @@ tools:
       await writeFile(configFilePath, invalidJsonContent);
 
       // When: 設定ファイルを読み込む & Then: JSONパースエラーが発生する
-      await expect(loadToolsConfig(configFilePath)).rejects.toThrow('Configuration validation failed');
+      await expect(loadToolsConfig(configFilePath)).rejects.toThrow(
+        expect.objectContaining({
+          message: expect.stringContaining('Configuration validation failed'),
+        }),
+      );
     });
   });
 });
