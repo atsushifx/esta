@@ -30,13 +30,22 @@ export const mergeToolsConfig = (
 
   const partialConfig = loadConfig as PartialToolsConfig;
 
+  // ツールIDベースでマージ（重複IDは新しい設定で上書き）
+  const newTools = partialConfig.tools ?? [];
+  const mergedTools = newTools.reduce(
+    (tools, newTool) => {
+      const existingIndex = tools.findIndex((tool) => tool.id === newTool.id);
+      return existingIndex >= 0
+        ? tools.map((tool, index) => index === existingIndex ? newTool : tool)
+        : [...tools, newTool];
+    },
+    [...defaultConfig.tools],
+  );
+
   const mergedConfig = {
     ...defaultConfig,
     ...partialConfig,
-    tools: [
-      ...defaultConfig.tools,
-      ...(partialConfig.tools ?? []),
-    ],
+    tools: mergedTools,
   };
 
   // 結果を完全な設定として検証

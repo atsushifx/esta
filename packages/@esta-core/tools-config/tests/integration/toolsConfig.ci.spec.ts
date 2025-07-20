@@ -304,21 +304,23 @@ describe('tools-config CI統合テスト', () => {
           defaultTempDir: '/tëst/dîrëctørÿ',
           tools: [{
             installer: 'eget',
-            id: 'ツール名',
-            repository: 'owner/repo',
+            id: 'gh', // デフォルト設定のghツールを上書き
+            repository: 'owner/ツール名',
             version: 'latest',
           }],
         };
 
         // When & Then: Unicode文字が適切に処理される
-        expect(() => {
-          // デフォルト値とマージして完全設定を作成
-          const defaultConfig = defaultToolsConfig();
-          const result = mergeToolsConfig(defaultConfig, unicodeConfig);
-          expect(result.defaultInstallDir).toBe('/テスト/ディレクトリ');
-          expect(result.defaultTempDir).toBe('/tëst/dîrëctørÿ');
-          expect(result.tools[0].id).toBe('ツール名');
-        }).not.toThrow();
+        // デフォルト値とマージして完全設定を作成
+        const defaultConfig = defaultToolsConfig();
+        const result = mergeToolsConfig(defaultConfig, unicodeConfig);
+        expect(result.defaultInstallDir).toBe('/テスト/ディレクトリ');
+        expect(result.defaultTempDir).toBe('/tëst/dîrëctørÿ');
+
+        // ghツールが上書きされてUnicode文字を含むrepositoryになっている
+        const ghTool = result.tools.find((tool) => tool.id === 'gh');
+        expect(ghTool).toBeDefined();
+        expect(ghTool?.repository).toBe('owner/ツール名');
       });
 
       it('絵文字を含む文字列を適切に処理する', () => {

@@ -112,7 +112,7 @@ describe('mergeToolsConfig', () => {
       // 検証機能を実装した後は、この場合にエラーが投げられることを期待
       expect(() => {
         mergeToolsConfig(defaultConfig, invalidLoadConfig as unknown as PartialToolsConfig);
-      }).toThrow();
+      }).toThrow('Invalid configuration provided for merging');
     });
   });
 });
