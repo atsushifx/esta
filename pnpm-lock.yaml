@@ -114,6 +114,9 @@ importers:
 
   packages/@esta-core/esta-config:
     dependencies:
+      '@agla-utils/ag-logger':
+        specifier: workspace:*
+        version: link:../../@agla-utils/ag-logger
       '@esta-utils/config-loader':
         specifier: workspace:*
         version: link:../../@esta-utils/config-loader

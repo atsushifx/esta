@@ -6,7 +6,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import type { AgLogLevel, AgLogMessage } from '../../shared/types/AgLogger.types';
+import type { AgTLogLevel } from '../../shared/types';
+import type { AgLogMessage } from '../../shared/types/AgLogger.types';
 
 /**
  * Parses log arguments into a structured log message object.
@@ -19,7 +20,7 @@ import type { AgLogLevel, AgLogMessage } from '../../shared/types/AgLogger.types
  *               a timestamp string, primitive values, and complex objects.
  * @returns A structured `AgLogMessage` object with parsed timestamp, message, and arguments.
  */
-export const AgLoggerGetMessage = (logLevel: AgLogLevel, ...args: unknown[]): AgLogMessage => {
+export const AgLoggerGetMessage = (logLevel: AgTLogLevel, ...args: unknown[]): AgLogMessage => {
   const args2 = [...args];
 
   const isArgToString = (arg: unknown): boolean => {

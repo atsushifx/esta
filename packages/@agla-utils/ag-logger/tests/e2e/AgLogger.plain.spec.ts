@@ -10,7 +10,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // constants
-import { AgLogLevelCode } from '../../shared/types';
+import { AG_LOG_LEVEL } from '../../shared/types';
 // test unit
 import { getLogger } from '../../src/AgLogger.class';
 import { PlainFormat } from '../../src/plugins/format/PlainFormat';
@@ -43,7 +43,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
   describe('Basic log output tests', () => {
     it('outputs INFO log using PlainFormat and ConsoleLogger', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.INFO);
+      logger.setLogLevel(AG_LOG_LEVEL.INFO);
 
       logger.info('Test message');
 
@@ -54,7 +54,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('outputs ERROR log using PlainFormat and ConsoleLogger', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.ERROR);
+      logger.setLogLevel(AG_LOG_LEVEL.ERROR);
 
       logger.error('Error message');
 
@@ -65,7 +65,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('outputs WARN log using PlainFormat and ConsoleLogger', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.WARN);
+      logger.setLogLevel(AG_LOG_LEVEL.WARN);
 
       logger.warn('Warning message');
 
@@ -76,7 +76,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('outputs DEBUG log using PlainFormat and ConsoleLogger', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.DEBUG);
+      logger.setLogLevel(AG_LOG_LEVEL.DEBUG);
 
       logger.debug('Debug message');
 
@@ -93,7 +93,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
   describe('Log output tests with multiple arguments', () => {
     it('logs message containing object and string', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.INFO);
+      logger.setLogLevel(AG_LOG_LEVEL.INFO);
 
       const userData = { userId: 123, userName: 'testUser' };
       logger.info('User data', userData, ' additional info');
@@ -107,7 +107,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('logs message containing an array', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.DEBUG);
+      logger.setLogLevel(AG_LOG_LEVEL.DEBUG);
 
       const items = ['item1', 'item2', 'item3'];
       logger.debug('Items to process', items);
@@ -127,7 +127,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
   describe('Log level filtering tests', () => {
     it('does not output DEBUG logs when level is INFO', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.INFO);
+      logger.setLogLevel(AG_LOG_LEVEL.INFO);
 
       logger.debug('Debug message');
       logger.info('Info message');
@@ -138,7 +138,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('does not output INFO/WARN logs when level is ERROR', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.ERROR);
+      logger.setLogLevel(AG_LOG_LEVEL.ERROR);
 
       logger.info('Info message');
       logger.warn('Warning message');
@@ -151,7 +151,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('does not output any logs when level is OFF', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.OFF);
+      logger.setLogLevel(AG_LOG_LEVEL.OFF);
 
       logger.error('Error message');
       logger.info('Info message');
@@ -167,7 +167,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
   describe('Error handling tests', () => {
     it('throws error when logging circular reference objects', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.INFO);
+      logger.setLogLevel(AG_LOG_LEVEL.INFO);
 
       const circularObj: { name: string; self?: unknown } = { name: 'test' };
       circularObj.self = circularObj;
@@ -185,7 +185,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
   describe('Full integration scenario tests', () => {
     it('logs a sequence from app start to error occurrence', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.DEBUG);
+      logger.setLogLevel(AG_LOG_LEVEL.DEBUG);
 
       // Application start
       logger.info('Starting application');
@@ -224,7 +224,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('verifies log method (log) functionality', () => {
       const logger = getLogger(ConsoleLogger, PlainFormat);
-      logger.setLogLevel(AgLogLevelCode.INFO);
+      logger.setLogLevel(AG_LOG_LEVEL.INFO);
 
       logger.log('General log message');
 

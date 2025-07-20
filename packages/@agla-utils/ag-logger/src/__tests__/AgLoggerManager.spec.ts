@@ -10,9 +10,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // constants
-import { AgLogLevelCode } from '../../shared/types';
+import { AG_LOG_LEVEL } from '../../shared/types';
 // types
-import type { AgLogLevel } from '../../shared/types';
+import type { AgTLogLevel } from '../../shared/types';
 
 // test target
 import { AgLoggerManager } from '../AgLoggerManager.class';
@@ -67,13 +67,13 @@ describe('AgLoggerManager', () => {
     it('initially sets all log levels to NullLogger', () => {
       const manager = AgLoggerManager.getInstance();
 
-      const offLogger = manager.getLogger(AgLogLevelCode.OFF);
-      const fatalLogger = manager.getLogger(AgLogLevelCode.FATAL);
-      const errorLogger = manager.getLogger(AgLogLevelCode.ERROR);
-      const warnLogger = manager.getLogger(AgLogLevelCode.WARN);
-      const infoLogger = manager.getLogger(AgLogLevelCode.INFO);
-      const debugLogger = manager.getLogger(AgLogLevelCode.DEBUG);
-      const traceLogger = manager.getLogger(AgLogLevelCode.TRACE);
+      const offLogger = manager.getLogger(AG_LOG_LEVEL.OFF);
+      const fatalLogger = manager.getLogger(AG_LOG_LEVEL.FATAL);
+      const errorLogger = manager.getLogger(AG_LOG_LEVEL.ERROR);
+      const warnLogger = manager.getLogger(AG_LOG_LEVEL.WARN);
+      const infoLogger = manager.getLogger(AG_LOG_LEVEL.INFO);
+      const debugLogger = manager.getLogger(AG_LOG_LEVEL.DEBUG);
+      const traceLogger = manager.getLogger(AG_LOG_LEVEL.TRACE);
 
       expect(typeof offLogger).toBe('function');
       expect(typeof fatalLogger).toBe('function');
@@ -87,7 +87,7 @@ describe('AgLoggerManager', () => {
     it('accepts default logger when getting instance', () => {
       const manager = AgLoggerManager.getInstance(mockDefaultLogger);
 
-      const infoLogger = manager.getLogger(AgLogLevelCode.INFO);
+      const infoLogger = manager.getLogger(AG_LOG_LEVEL.INFO);
       infoLogger('test message');
 
       expect(mockDefaultLogger).toHaveBeenCalledWith('test message');
@@ -102,15 +102,15 @@ describe('AgLoggerManager', () => {
 
     it('accepts logger map when getting instance', () => {
       const loggerMap = {
-        [AgLogLevelCode.ERROR]: mockErrorLogger,
-        [AgLogLevelCode.WARN]: mockWarnLogger,
+        [AG_LOG_LEVEL.ERROR]: mockErrorLogger,
+        [AG_LOG_LEVEL.WARN]: mockWarnLogger,
       };
 
       const manager = AgLoggerManager.getInstance(mockDefaultLogger, undefined, loggerMap);
 
-      const errorLogger = manager.getLogger(AgLogLevelCode.ERROR);
-      const warnLogger = manager.getLogger(AgLogLevelCode.WARN);
-      const infoLogger = manager.getLogger(AgLogLevelCode.INFO);
+      const errorLogger = manager.getLogger(AG_LOG_LEVEL.ERROR);
+      const warnLogger = manager.getLogger(AG_LOG_LEVEL.WARN);
+      const infoLogger = manager.getLogger(AG_LOG_LEVEL.INFO);
 
       errorLogger('error message');
       warnLogger('warn message');
@@ -123,17 +123,17 @@ describe('AgLoggerManager', () => {
 
     it('accepts all options when getting instance', () => {
       const loggerMap = {
-        [AgLogLevelCode.FATAL]: mockFatalLogger,
-        [AgLogLevelCode.ERROR]: mockErrorLogger,
+        [AG_LOG_LEVEL.FATAL]: mockFatalLogger,
+        [AG_LOG_LEVEL.ERROR]: mockErrorLogger,
       };
 
       const manager = AgLoggerManager.getInstance(mockDefaultLogger, mockFormatter, loggerMap);
 
       expect(manager.getFormatter()).toBe(mockFormatter);
 
-      const fatalLogger = manager.getLogger(AgLogLevelCode.FATAL);
-      const errorLogger = manager.getLogger(AgLogLevelCode.ERROR);
-      const infoLogger = manager.getLogger(AgLogLevelCode.INFO);
+      const fatalLogger = manager.getLogger(AG_LOG_LEVEL.FATAL);
+      const errorLogger = manager.getLogger(AG_LOG_LEVEL.ERROR);
+      const infoLogger = manager.getLogger(AG_LOG_LEVEL.INFO);
 
       fatalLogger('fatal message');
       errorLogger('error message');
@@ -154,7 +154,7 @@ describe('AgLoggerManager', () => {
     it('returns logger function for specified log level', () => {
       const manager = AgLoggerManager.getInstance(mockDefaultLogger);
 
-      const logger = manager.getLogger(AgLogLevelCode.INFO);
+      const logger = manager.getLogger(AG_LOG_LEVEL.INFO);
       expect(typeof logger).toBe('function');
 
       logger('test message');
@@ -164,7 +164,7 @@ describe('AgLoggerManager', () => {
     it('returns default logger if log level does not exist', () => {
       const manager = AgLoggerManager.getInstance(mockDefaultLogger);
 
-      const logger = manager.getLogger(999 as AgLogLevel);
+      const logger = manager.getLogger(999 as AgTLogLevel);
       expect(logger).toBe(mockDefaultLogger);
     });
   });
@@ -198,9 +198,9 @@ describe('AgLoggerManager', () => {
     it('sets logger for specified log level', () => {
       const manager = AgLoggerManager.getInstance();
 
-      manager.setLogger(AgLogLevelCode.ERROR, mockErrorLogger);
+      manager.setLogger(AG_LOG_LEVEL.ERROR, mockErrorLogger);
 
-      const errorLogger = manager.getLogger(AgLogLevelCode.ERROR);
+      const errorLogger = manager.getLogger(AG_LOG_LEVEL.ERROR);
       errorLogger('error message');
 
       expect(mockErrorLogger).toHaveBeenCalledWith('error message');
@@ -209,9 +209,9 @@ describe('AgLoggerManager', () => {
     it('sets default logger if null is specified', () => {
       const manager = AgLoggerManager.getInstance(mockDefaultLogger);
 
-      manager.setLogger(AgLogLevelCode.ERROR, null);
+      manager.setLogger(AG_LOG_LEVEL.ERROR, null);
 
-      const errorLogger = manager.getLogger(AgLogLevelCode.ERROR);
+      const errorLogger = manager.getLogger(AG_LOG_LEVEL.ERROR);
       errorLogger('error message');
 
       expect(mockDefaultLogger).toHaveBeenCalledWith('error message');
@@ -228,7 +228,7 @@ describe('AgLoggerManager', () => {
 
       manager.setLogger({ defaultLogger: mockDefaultLogger });
 
-      const infoLogger = manager.getLogger(AgLogLevelCode.INFO);
+      const infoLogger = manager.getLogger(AG_LOG_LEVEL.INFO);
       infoLogger('info message');
 
       expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
@@ -247,14 +247,14 @@ describe('AgLoggerManager', () => {
       const manager = AgLoggerManager.getInstance();
 
       const loggerMap = {
-        [AgLogLevelCode.ERROR]: mockErrorLogger,
-        [AgLogLevelCode.WARN]: mockWarnLogger,
+        [AG_LOG_LEVEL.ERROR]: mockErrorLogger,
+        [AG_LOG_LEVEL.WARN]: mockWarnLogger,
       };
 
       manager.setLogger({ loggerMap });
 
-      const errorLogger = manager.getLogger(AgLogLevelCode.ERROR);
-      const warnLogger = manager.getLogger(AgLogLevelCode.WARN);
+      const errorLogger = manager.getLogger(AG_LOG_LEVEL.ERROR);
+      const warnLogger = manager.getLogger(AG_LOG_LEVEL.WARN);
 
       errorLogger('error message');
       warnLogger('warn message');
@@ -267,8 +267,8 @@ describe('AgLoggerManager', () => {
       const manager = AgLoggerManager.getInstance();
 
       const loggerMap = {
-        [AgLogLevelCode.FATAL]: mockFatalLogger,
-        [AgLogLevelCode.DEBUG]: mockDebugLogger,
+        [AG_LOG_LEVEL.FATAL]: mockFatalLogger,
+        [AG_LOG_LEVEL.DEBUG]: mockDebugLogger,
       };
 
       manager.setLogger({
@@ -279,9 +279,9 @@ describe('AgLoggerManager', () => {
 
       expect(manager.getFormatter()).toBe(mockFormatter);
 
-      const fatalLogger = manager.getLogger(AgLogLevelCode.FATAL);
-      const debugLogger = manager.getLogger(AgLogLevelCode.DEBUG);
-      const infoLogger = manager.getLogger(AgLogLevelCode.INFO);
+      const fatalLogger = manager.getLogger(AG_LOG_LEVEL.FATAL);
+      const debugLogger = manager.getLogger(AG_LOG_LEVEL.DEBUG);
+      const infoLogger = manager.getLogger(AG_LOG_LEVEL.INFO);
 
       fatalLogger('fatal message');
       debugLogger('debug message');
@@ -296,7 +296,7 @@ describe('AgLoggerManager', () => {
       const manager = AgLoggerManager.getInstance();
 
       const loggerMap = {
-        [AgLogLevelCode.ERROR]: mockErrorLogger,
+        [AG_LOG_LEVEL.ERROR]: mockErrorLogger,
       };
 
       manager.setLogger({
@@ -304,9 +304,9 @@ describe('AgLoggerManager', () => {
         loggerMap,
       });
 
-      const errorLogger = manager.getLogger(AgLogLevelCode.ERROR);
-      const infoLogger = manager.getLogger(AgLogLevelCode.INFO);
-      const warnLogger = manager.getLogger(AgLogLevelCode.WARN);
+      const errorLogger = manager.getLogger(AG_LOG_LEVEL.ERROR);
+      const infoLogger = manager.getLogger(AG_LOG_LEVEL.INFO);
+      const warnLogger = manager.getLogger(AG_LOG_LEVEL.WARN);
 
       errorLogger('error message');
       infoLogger('info message');
@@ -327,13 +327,13 @@ describe('AgLoggerManager', () => {
     it('can update settings after getInstance', () => {
       const manager = AgLoggerManager.getInstance(mockDefaultLogger);
 
-      manager.setLogger(AgLogLevelCode.ERROR, mockErrorLogger);
+      manager.setLogger(AG_LOG_LEVEL.ERROR, mockErrorLogger);
       manager.setLogger({ formatter: mockFormatter });
 
       expect(manager.getFormatter()).toBe(mockFormatter);
 
-      const errorLogger = manager.getLogger(AgLogLevelCode.ERROR);
-      const infoLogger = manager.getLogger(AgLogLevelCode.INFO);
+      const errorLogger = manager.getLogger(AG_LOG_LEVEL.ERROR);
+      const infoLogger = manager.getLogger(AG_LOG_LEVEL.INFO);
 
       errorLogger('error message');
       infoLogger('info message');
@@ -346,15 +346,15 @@ describe('AgLoggerManager', () => {
       const manager = AgLoggerManager.getInstance();
 
       manager.setLogger({ defaultLogger: mockDefaultLogger });
-      manager.setLogger(AgLogLevelCode.ERROR, mockErrorLogger);
+      manager.setLogger(AG_LOG_LEVEL.ERROR, mockErrorLogger);
       manager.setLogger({ formatter: mockFormatter });
 
       const secondMockLogger = vi.fn();
-      manager.setLogger(AgLogLevelCode.WARN, secondMockLogger);
+      manager.setLogger(AG_LOG_LEVEL.WARN, secondMockLogger);
 
-      const errorLogger = manager.getLogger(AgLogLevelCode.ERROR);
-      const warnLogger = manager.getLogger(AgLogLevelCode.WARN);
-      const infoLogger = manager.getLogger(AgLogLevelCode.INFO);
+      const errorLogger = manager.getLogger(AG_LOG_LEVEL.ERROR);
+      const warnLogger = manager.getLogger(AG_LOG_LEVEL.WARN);
+      const infoLogger = manager.getLogger(AG_LOG_LEVEL.INFO);
 
       errorLogger('error message');
       warnLogger('warn message');

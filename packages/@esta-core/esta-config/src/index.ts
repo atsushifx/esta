@@ -6,5 +6,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// import all
-export {};
+// Export types
+export type { EstaConfig, PartialEstaConfig } from '../shared/types/estaConfig.types';
+export type { LogLevelSymbol } from './logLevel';
+
+// Export functions
+export { defaultEstaConfig } from './defaults';
+
+// Export constants
+export { LogLevelSymbolMap } from './logLevel';

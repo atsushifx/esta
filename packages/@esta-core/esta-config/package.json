@@ -48,6 +48,7 @@
   },
   "dependencies": {
     "valibot": "^1.1.0",
+    "@agla-utils/ag-logger": "workspace:*",
     "@esta-utils/config-loader": "workspace:*"
   }
 }

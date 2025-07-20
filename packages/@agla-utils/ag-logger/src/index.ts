@@ -15,8 +15,11 @@
  * various logger and formatter plugins, and utility functions.
  */
 
+// constants
+export { AG_LOG_LEVEL } from '../shared/types';
+
 // types
-export { AgLogLevel, AgLogLevelCode } from '../shared/types';
+export type { AgTLogLevel, AgTLogLevelLabel } from '../shared/types';
 
 // logger main
 export { AgLogger, getLogger } from './AgLogger.class';

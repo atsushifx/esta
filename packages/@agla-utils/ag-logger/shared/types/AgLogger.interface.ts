@@ -7,7 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // type
-import type { AgLogLevel, AgLogMessage } from './AgLogger.types';
+import type { AgLogMessage } from './AgLogger.types';
+import type { AgTLogLevel } from './LogLevel.types';
 
 // --- interfaces ---
 /**
@@ -29,4 +30,4 @@ export type AgFormatFunction = (logMessage: AgLogMessage) => string;
  *
  * @template T - The type of logging function. Defaults to `AgLoggerFunction`.
  */
-export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<AgLogLevel, T | null>;
+export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<AgTLogLevel, T | null>;

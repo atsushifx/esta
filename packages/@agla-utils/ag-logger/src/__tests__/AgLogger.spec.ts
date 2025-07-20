@@ -10,7 +10,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // constants
-import { AgLogLevelCode } from '../../shared/types';
+import { AG_LOG_LEVEL } from '../../shared/types';
 
 // test target
 import { AgLogger } from '../AgLogger.class';
@@ -63,7 +63,7 @@ describe('AgLogger', () => {
 
     it('should not output verbose log when verbose is false', () => {
       const logger = AgLogger.getInstance(mockLogger, mockFormatter);
-      logger.setLogLevel(AgLogLevelCode.INFO);
+      logger.setLogLevel(AG_LOG_LEVEL.INFO);
       logger.setVerbose(false);
 
       logger.verbose('test message');
@@ -73,7 +73,7 @@ describe('AgLogger', () => {
 
     it('should output verbose log when verbose is true', () => {
       const logger = AgLogger.getInstance(mockLogger, mockFormatter);
-      logger.setLogLevel(AgLogLevelCode.INFO);
+      logger.setLogLevel(AG_LOG_LEVEL.INFO);
       logger.setVerbose(true);
 
       logger.verbose('test message');
@@ -83,7 +83,7 @@ describe('AgLogger', () => {
 
     it('should output other log levels normally when verbose is false', () => {
       const logger = AgLogger.getInstance(mockLogger, mockFormatter);
-      logger.setLogLevel(AgLogLevelCode.TRACE);
+      logger.setLogLevel(AG_LOG_LEVEL.TRACE);
       logger.setVerbose(false);
 
       logger.debug('debug message');

@@ -7,8 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgLogLevel } from '../../../shared/types';
-import { AgLogLevelCode } from '../../../shared/types';
+import { AG_LOG_LEVEL } from '../../../shared/types';
+import type { AgTLogLevel } from '../../../shared/types';
 
 /**
  * Mock logger for E2E testing that captures log messages in arrays.
@@ -26,52 +26,52 @@ export class E2eMockLogger {
   ];
 
   fatal(message: string): void {
-    this.messages[AgLogLevelCode.FATAL].push(message);
+    this.messages[AG_LOG_LEVEL.FATAL].push(message);
   }
 
   error(message: string): void {
-    this.messages[AgLogLevelCode.ERROR].push(message);
+    this.messages[AG_LOG_LEVEL.ERROR].push(message);
   }
 
   warn(message: string): void {
-    this.messages[AgLogLevelCode.WARN].push(message);
+    this.messages[AG_LOG_LEVEL.WARN].push(message);
   }
 
   info(message: string): void {
-    this.messages[AgLogLevelCode.INFO].push(message);
+    this.messages[AG_LOG_LEVEL.INFO].push(message);
   }
 
   debug(message: string): void {
-    this.messages[AgLogLevelCode.DEBUG].push(message);
+    this.messages[AG_LOG_LEVEL.DEBUG].push(message);
   }
 
   trace(message: string): void {
-    this.messages[AgLogLevelCode.TRACE].push(message);
+    this.messages[AG_LOG_LEVEL.TRACE].push(message);
   }
 
-  getMessages(logLevel: AgLogLevel): string[] {
+  getMessages(logLevel: AgTLogLevel): string[] {
     return [...this.messages[logLevel]];
   }
 
-  getLastMessage(logLevel: AgLogLevel): string | null {
+  getLastMessage(logLevel: AgTLogLevel): string | null {
     const levelMessages = this.messages[logLevel];
     return levelMessages[levelMessages.length - 1] || null;
   }
 
-  clearMessages(logLevel: AgLogLevel): void {
+  clearMessages(logLevel: AgTLogLevel): void {
     this.messages[logLevel] = [];
   }
 
   // Legacy methods for backward compatibility
   getErrorMessages(): string[] {
-    return this.getMessages(AgLogLevelCode.ERROR);
+    return this.getMessages(AG_LOG_LEVEL.ERROR);
   }
 
   getLastErrorMessage(): string | null {
-    return this.getLastMessage(AgLogLevelCode.ERROR);
+    return this.getLastMessage(AG_LOG_LEVEL.ERROR);
   }
 
   clearErrorMessages(): void {
-    this.clearMessages(AgLogLevelCode.ERROR);
+    this.clearMessages(AG_LOG_LEVEL.ERROR);
   }
 }

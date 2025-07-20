@@ -10,9 +10,9 @@
 import { describe, expect, it } from 'vitest';
 
 // constants
-import { AgLogLevelCode } from '../../../../shared/types';
+import { AG_LOG_LEVEL } from '../../../../shared/types';
 // type
-import type { AgLogMessage } from '../../../../shared/types';
+import type { AgLogMessage } from '../../../../shared/types/AgLogger.types';
 
 // test unit
 import { JsonFormat } from '../JsonFormat';
@@ -25,7 +25,7 @@ describe('JsonFormat', () => {
    */
   it('formats a basic log message as JSON', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.INFO,
+      logLevel: AG_LOG_LEVEL.INFO,
       timestamp: new Date('2025-01-01T12:00:00.000Z'),
       message: 'Test message',
       args: [],
@@ -45,7 +45,7 @@ describe('JsonFormat', () => {
    */
   it('formats a log message with arguments as JSON', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.ERROR,
+      logLevel: AG_LOG_LEVEL.ERROR,
       timestamp: new Date('2025-06-22T15:30:45.123Z'),
       message: 'An error occurred',
       args: [{ userId: 123, action: 'login' }],
@@ -65,7 +65,7 @@ describe('JsonFormat', () => {
    */
   it('formats multiple arguments as a JSON array', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.DEBUG,
+      logLevel: AG_LOG_LEVEL.DEBUG,
       timestamp: new Date('2025-03-15T09:15:30.500Z'),
       message: 'Debug info',
       args: [
@@ -99,12 +99,12 @@ describe('JsonFormat', () => {
     };
 
     const testCases = [
-      { level: AgLogLevelCode.FATAL, expected: 'FATAL' },
-      { level: AgLogLevelCode.ERROR, expected: 'ERROR' },
-      { level: AgLogLevelCode.WARN, expected: 'WARN' },
-      { level: AgLogLevelCode.INFO, expected: 'INFO' },
-      { level: AgLogLevelCode.DEBUG, expected: 'DEBUG' },
-      { level: AgLogLevelCode.TRACE, expected: 'TRACE' },
+      { level: AG_LOG_LEVEL.FATAL, expected: 'FATAL' },
+      { level: AG_LOG_LEVEL.ERROR, expected: 'ERROR' },
+      { level: AG_LOG_LEVEL.WARN, expected: 'WARN' },
+      { level: AG_LOG_LEVEL.INFO, expected: 'INFO' },
+      { level: AG_LOG_LEVEL.DEBUG, expected: 'DEBUG' },
+      { level: AG_LOG_LEVEL.TRACE, expected: 'TRACE' },
     ];
 
     testCases.forEach(({ level, expected }) => {
@@ -119,7 +119,7 @@ describe('JsonFormat', () => {
    */
   it('formats correctly even with an empty message', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.WARN,
+      logLevel: AG_LOG_LEVEL.WARN,
       timestamp: new Date('2025-12-31T23:59:59.999Z'),
       message: '',
       args: [{ warning: 'empty message' }],
@@ -142,7 +142,7 @@ describe('JsonFormat', () => {
     circularObj.self = circularObj;
 
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.INFO,
+      logLevel: AG_LOG_LEVEL.INFO,
       timestamp: new Date('2025-01-01T12:00:00.000Z'),
       message: 'circular reference test',
       args: [circularObj],
@@ -156,7 +156,7 @@ describe('JsonFormat', () => {
    */
   it('outputs valid JSON string without newlines', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.INFO,
+      logLevel: AG_LOG_LEVEL.INFO,
       timestamp: new Date('2025-01-01T12:00:00.000Z'),
       message: 'Test',
       args: [{ key: 'value' }],
