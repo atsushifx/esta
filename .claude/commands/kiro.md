@@ -27,8 +27,8 @@ SDD では、Claude Code (laude)は、以下の条件で開発をします。
 
 <!-- textlint-disable ja-technical-writing/sentence-length -->
 
-- `docs/.ccKiro/`内に spec ごとのディレクトリを作成し、必要なドキュメントを作成
-- `spec`は`<namespace>`,`<module>`名からなり、`./docs/.ccKiro/<namespace>/<module>/`ディレクトリを作成
+- `docs/.cc-kiro/`内に spec ごとのディレクトリを作成し、必要なドキュメントを作成
+- `spec`は`<namespace>`,`<module>`名からなり、`./docs/.cc-kiro/<namespace>/<module>/`ディレクトリを作成
 - `spec`ディレクトリ内には、要件定義ドキュメント(`*.requirement.md`)、仕様ドキュメント(`*.spec.md`)、
   詳細設計ドキュメント(`*.design.md`)、タスクドキュメント(`*.tasks.md`)を作成
 - SDD では、以下の各フェーズに基づいてドキュメントの作成、プログラミングをする
@@ -61,10 +61,25 @@ SDD では、Claude Code (laude)は、以下の条件で開発をします。
 kiro は、以下のサブコマンドを受け入れ、実行する。
 
 - `init`:
-  事前準備フェーズを実行する。 パラメータ `<namespace>/<module>`から `./docs/.ccKiro/<namespace>/<module>/`ディレクトリを作成する。
+  事前準備フェーズを実行する。 パラメータ `<namespace>/<module>`から `./docs/.cc-kiro/<namespace>/<module>/`ディレクトリを作成する。
 
 - `requirement`, `req`:
   要件定義フェーズを実行する。上記の「要件定義フェーズ」を実行し、「要件定義ドキュメント」を作成する。
+
+- `spec', 'design':
+  設計フェーズを実行する。上記の「設計フェーズ」を実行し、「仕様ドキュメント」「詳細設計ドキュメント」を作成する。
+
+- `task', 'tasks', 't'':
+  タスクフェーズを実行する。上記の「タスクェーズ」を実行し、「タスクドキュメント」を作成する。
+
+- `code`, `c`:
+  実装フェーズを実行する。上記の「実装フェーズ」を実行し、コードを作成する。
+  コーディングは、以下の条件で実行する:
+  - t-wada 式 TDD で開発する
+  - BDD出開発する。すなわち (`Describe`, `It`) を使用する
+  - 1つの機能に対し実装すべき機能をタスクリストに落とし、1つのタスクずつテストファーストで開発する
+  - 1つのタスクに対し、失敗で終わるテストからはじめ、最低限の実装を満たすようにプログラミングをする。
+  - `Red → Green → Refactoring`のサイクルをまもり、最後に徹底的にリファクタリングして質の良いコードを作成する)
 
 ### ドキュメント作成
 
@@ -94,6 +109,10 @@ kiro は、以下のサブコマンドを受け入れ、実行する。
   ```
 
 - 上記フロントマターの`header`, `title`や日付などは、作成する仕様、ドキュメントにあわせてふさわしいモノの変更する
+- 見出しレベルは H2('##')よりはじまり、順次 H3,H4とさがる。これはフロントマターに`title`があるため。
+- AI らしさを消すため、`**<item>**:`のような強調＋項目のタイトルなどの作成は避ける。
+- `textlint --config .\configs\textlintrc.yaml <document>`を実行し、問題があれば修正する。
+- `markdownlint-cli2 .\configs\.markdownlint.yaml '<document>'`を実行し、問題があれば修正する。
 
 ### 実装詳細
 
