@@ -27,8 +27,8 @@ SDD では、Claude Code (laude)は、以下の条件で開発をします。
 
 <!-- textlint-disable ja-technical-writing/sentence-length -->
 
-- `docs/.ccKiro/`内に spec ごとのディレクトリを作成し、必要なドキュメントを作成
-- `spec`は`<namespace>`,`<module>`名からなり、`./docs/.ccKiro/<namespace>/<module>/`ディレクトリを作成
+- `docs/.cc-kiro/`内に spec ごとのディレクトリを作成し、必要なドキュメントを作成
+- `spec`は`<namespace>`,`<module>`名からなり、`./docs/.cc-kiro/<namespace>/<module>/`ディレクトリを作成
 - `spec`ディレクトリ内には、要件定義ドキュメント(`*.requirement.md`)、仕様ドキュメント(`*.spec.md`)、
   詳細設計ドキュメント(`*.design.md`)、タスクドキュメント(`*.tasks.md`)を作成
 - SDD では、以下の各フェーズに基づいてドキュメントの作成、プログラミングをする
@@ -61,7 +61,7 @@ SDD では、Claude Code (laude)は、以下の条件で開発をします。
 kiro は、以下のサブコマンドを受け入れ、実行する。
 
 - `init`:
-  事前準備フェーズを実行する。 パラメータ `<namespace>/<module>`から `./docs/.ccKiro/<namespace>/<module>/`ディレクトリを作成する。
+  事前準備フェーズを実行する。 パラメータ `<namespace>/<module>`から `./docs/.cc-kiro/<namespace>/<module>/`ディレクトリを作成する。
 
 - `requirement`, `req`:
   要件定義フェーズを実行する。上記の「要件定義フェーズ」を実行し、「要件定義ドキュメント」を作成する。
