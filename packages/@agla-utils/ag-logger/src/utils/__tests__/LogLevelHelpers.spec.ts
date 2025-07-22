@@ -10,8 +10,8 @@ import { describe, expect, it } from 'vitest';
 
 // Import helper functions
 import { AG_LOG_LEVEL } from '../../../shared/types';
-import type { AgTLogLevel } from '../../../shared/types';
-import { AgToLabel } from '../LogLevelHelpers';
+import type { AgTLogLevel, AgTLogLevelLabel } from '../../../shared/types';
+import { AgToLabel, AgToLogLevel } from '../LogLevelHelpers';
 
 describe('LogLevel Helper Functions', () => {
   describe('AgToLabel function', () => {
@@ -74,6 +74,20 @@ describe('LogLevel Helper Functions', () => {
 
       // Should complete in reasonable time (less than 100ms for 1000 operations)
       expect(duration).toBeLessThan(100);
+    });
+  });
+
+  describe('AgToLogLevel function', () => {
+    it('converts "INFO" to AG_LOG_LEVEL.INFO', () => {
+      expect(AgToLogLevel('INFO')).toBe(AG_LOG_LEVEL.INFO);
+    });
+
+    it('converts "ERROR" to AG_LOG_LEVEL.ERROR', () => {
+      expect(AgToLogLevel('ERROR')).toBe(AG_LOG_LEVEL.ERROR);
+    });
+
+    it('throws error for invalid label "UNKNOWN"', () => {
+      expect(() => AgToLogLevel('UNKNOWN' as AgTLogLevelLabel)).toThrow('Invalid log level label: UNKNOWN');
     });
   });
 });

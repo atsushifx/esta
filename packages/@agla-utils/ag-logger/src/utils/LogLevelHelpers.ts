@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { AG_LOG_LEVEL, AG_LOG_LEVEL_TO_LABEL_MAP } from '../../shared/types';
+import { AG_LABEL_TO_LOG_LEVEL_MAP, AG_LOG_LEVEL, AG_LOG_LEVEL_TO_LABEL_MAP } from '../../shared/types';
 import type { AgTLogLevel, AgTLogLevelLabel } from '../../shared/types';
 
 /**
@@ -21,4 +21,17 @@ export const AgToLabel = (level: AgTLogLevel): AgTLogLevelLabel => {
   }
 
   return AG_LOG_LEVEL_TO_LABEL_MAP[level];
+};
+
+/**
+ * Convert string label to numeric log level
+ * @param label - String label for the log level
+ * @returns Numeric log level
+ */
+export const AgToLogLevel = (label: AgTLogLevelLabel): AgTLogLevel => {
+  const level = AG_LABEL_TO_LOG_LEVEL_MAP[label];
+  if (level === undefined) {
+    throw new Error(`Invalid log level label: ${label}`);
+  }
+  return level;
 };
