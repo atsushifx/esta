@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import { AG_LOG_LEVEL } from '../../shared/types';
+import { AG_LOGLEVEL } from '../../shared/types';
 import type { AgTLogLevel } from '../../shared/types';
 
 /**
@@ -26,27 +26,27 @@ export class E2eMockLogger {
   ];
 
   fatal(message: string): void {
-    this.messages[AG_LOG_LEVEL.FATAL].push(message);
+    this.messages[AG_LOGLEVEL.FATAL].push(message);
   }
 
   error(message: string): void {
-    this.messages[AG_LOG_LEVEL.ERROR].push(message);
+    this.messages[AG_LOGLEVEL.ERROR].push(message);
   }
 
   warn(message: string): void {
-    this.messages[AG_LOG_LEVEL.WARN].push(message);
+    this.messages[AG_LOGLEVEL.WARN].push(message);
   }
 
   info(message: string): void {
-    this.messages[AG_LOG_LEVEL.INFO].push(message);
+    this.messages[AG_LOGLEVEL.INFO].push(message);
   }
 
   debug(message: string): void {
-    this.messages[AG_LOG_LEVEL.DEBUG].push(message);
+    this.messages[AG_LOGLEVEL.DEBUG].push(message);
   }
 
   trace(message: string): void {
-    this.messages[AG_LOG_LEVEL.TRACE].push(message);
+    this.messages[AG_LOGLEVEL.TRACE].push(message);
   }
 
   getMessages(logLevel: AgTLogLevel): string[] {
@@ -64,14 +64,14 @@ export class E2eMockLogger {
 
   // Legacy methods for backward compatibility
   getErrorMessages(): string[] {
-    return this.getMessages(AG_LOG_LEVEL.ERROR);
+    return this.getMessages(AG_LOGLEVEL.ERROR);
   }
 
   getLastErrorMessage(): string | null {
-    return this.getLastMessage(AG_LOG_LEVEL.ERROR);
+    return this.getLastMessage(AG_LOGLEVEL.ERROR);
   }
 
   clearErrorMessages(): void {
-    this.clearMessages(AG_LOG_LEVEL.ERROR);
+    this.clearMessages(AG_LOGLEVEL.ERROR);
   }
 }

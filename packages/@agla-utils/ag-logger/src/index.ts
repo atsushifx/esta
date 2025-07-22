@@ -16,7 +16,7 @@
  */
 
 // constants
-export { AG_LOG_LEVEL } from '../shared/types';
+export { AG_LOGLEVEL } from '../shared/types';
 
 // types
 export type { AgTLogLevel, AgTLogLevelLabel } from '../shared/types';

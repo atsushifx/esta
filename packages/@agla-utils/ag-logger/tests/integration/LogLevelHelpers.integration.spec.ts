@@ -10,7 +10,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 // ログレベル定数 - テストで使用するログレベル定義
-import { AG_LOG_LEVEL } from '../../shared/types';
+import { AG_LOGLEVEL } from '../../shared/types';
 import type { AgTLogLevelLabel } from '../../shared/types';
 // テスト対象 - メインAgLoggerクラスとgetLogger関数
 import { AgLogger, getLogger } from '../../src/AgLogger.class';
@@ -71,13 +71,13 @@ describe('LogLevel Helper Functions Integration Tests', () => {
 
       // Test various string labels converted to numeric levels
       const testCases: Array<{ label: AgTLogLevelLabel; expectedLevel: number }> = [
-        { label: 'OFF', expectedLevel: AG_LOG_LEVEL.OFF },
-        { label: 'FATAL', expectedLevel: AG_LOG_LEVEL.FATAL },
-        { label: 'ERROR', expectedLevel: AG_LOG_LEVEL.ERROR },
-        { label: 'WARN', expectedLevel: AG_LOG_LEVEL.WARN },
-        { label: 'INFO', expectedLevel: AG_LOG_LEVEL.INFO },
-        { label: 'DEBUG', expectedLevel: AG_LOG_LEVEL.DEBUG },
-        { label: 'TRACE', expectedLevel: AG_LOG_LEVEL.TRACE },
+        { label: 'OFF', expectedLevel: AG_LOGLEVEL.OFF },
+        { label: 'FATAL', expectedLevel: AG_LOGLEVEL.FATAL },
+        { label: 'ERROR', expectedLevel: AG_LOGLEVEL.ERROR },
+        { label: 'WARN', expectedLevel: AG_LOGLEVEL.WARN },
+        { label: 'INFO', expectedLevel: AG_LOGLEVEL.INFO },
+        { label: 'DEBUG', expectedLevel: AG_LOGLEVEL.DEBUG },
+        { label: 'TRACE', expectedLevel: AG_LOGLEVEL.TRACE },
       ];
 
       testCases.forEach(({ label, expectedLevel }) => {
@@ -93,7 +93,7 @@ describe('LogLevel Helper Functions Integration Tests', () => {
         vi.clearAllMocks();
         logger.info('test message');
 
-        if (expectedLevel >= AG_LOG_LEVEL.INFO) {
+        if (expectedLevel >= AG_LOGLEVEL.INFO) {
           expect(mockLogger).toHaveBeenCalled();
           expect(mockFormatter).toHaveBeenCalled();
         } else {
@@ -115,7 +115,7 @@ describe('LogLevel Helper Functions Integration Tests', () => {
       }).toThrow('Invalid log level label: INVALID');
 
       // Verify logger remains functional after error
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
       logger.info('recovery test');
       expect(mockLogger).toHaveBeenCalled();
     });
@@ -141,7 +141,7 @@ describe('LogLevel Helper Functions Integration Tests', () => {
         // Test logging behavior at each level
         logger.info('test message');
 
-        const shouldLog = numericLevel >= AG_LOG_LEVEL.INFO;
+        const shouldLog = numericLevel >= AG_LOGLEVEL.INFO;
         if (shouldLog) {
           expect(mockLogger).toHaveBeenCalled();
         } else {
@@ -178,16 +178,16 @@ describe('LogLevel Helper Functions Integration Tests', () => {
       });
 
       const logger = getLogger(mockLogger, labelFormatter);
-      logger.setLogLevel(AG_LOG_LEVEL.TRACE); // Allow all levels
+      logger.setLogLevel(AG_LOGLEVEL.TRACE); // Allow all levels
 
       // Test all log levels with their expected labels
       const logMethods = [
-        { method: 'fatal', level: AG_LOG_LEVEL.FATAL, expectedLabel: 'FATAL' },
-        { method: 'error', level: AG_LOG_LEVEL.ERROR, expectedLabel: 'ERROR' },
-        { method: 'warn', level: AG_LOG_LEVEL.WARN, expectedLabel: 'WARN' },
-        { method: 'info', level: AG_LOG_LEVEL.INFO, expectedLabel: 'INFO' },
-        { method: 'debug', level: AG_LOG_LEVEL.DEBUG, expectedLabel: 'DEBUG' },
-        { method: 'trace', level: AG_LOG_LEVEL.TRACE, expectedLabel: 'TRACE' },
+        { method: 'fatal', level: AG_LOGLEVEL.FATAL, expectedLabel: 'FATAL' },
+        { method: 'error', level: AG_LOGLEVEL.ERROR, expectedLabel: 'ERROR' },
+        { method: 'warn', level: AG_LOGLEVEL.WARN, expectedLabel: 'WARN' },
+        { method: 'info', level: AG_LOGLEVEL.INFO, expectedLabel: 'INFO' },
+        { method: 'debug', level: AG_LOGLEVEL.DEBUG, expectedLabel: 'DEBUG' },
+        { method: 'trace', level: AG_LOGLEVEL.TRACE, expectedLabel: 'TRACE' },
       ] as const;
 
       logMethods.forEach(({ method, expectedLabel }) => {
@@ -230,10 +230,10 @@ describe('LogLevel Helper Functions Integration Tests', () => {
       });
 
       const logger = getLogger(mockLogger, consistencyFormatter);
-      logger.setLogLevel(AG_LOG_LEVEL.TRACE);
+      logger.setLogLevel(AG_LOGLEVEL.TRACE);
 
       // Test round-trip conversion for all levels
-      const allLevels = Object.values(AG_LOG_LEVEL);
+      const allLevels = Object.values(AG_LOGLEVEL);
       allLevels.slice(1).forEach((level) => { // Skip OFF level as it doesn't log
         vi.clearAllMocks();
 
@@ -241,7 +241,7 @@ describe('LogLevel Helper Functions Integration Tests', () => {
         logger.setLogLevel(level);
         logger.info('round-trip test');
 
-        if (level >= AG_LOG_LEVEL.INFO) {
+        if (level >= AG_LOGLEVEL.INFO) {
           expect(consistencyFormatter).toHaveBeenCalled();
           expect(mockLogger).toHaveBeenCalled();
         }
@@ -286,8 +286,8 @@ describe('LogLevel Helper Functions Integration Tests', () => {
         infoLogger,
         dualFormatter,
         {
-          [AG_LOG_LEVEL.ERROR]: errorLogger,
-          [AG_LOG_LEVEL.DEBUG]: debugLogger,
+          [AG_LOGLEVEL.ERROR]: errorLogger,
+          [AG_LOGLEVEL.DEBUG]: debugLogger,
         },
       );
 
@@ -341,8 +341,8 @@ describe('LogLevel Helper Functions Integration Tests', () => {
         logger.debug(`Debug message ${index + 1}`);
 
         // Verify behavior based on new level
-        const infoShouldLog = newLevel >= AG_LOG_LEVEL.INFO;
-        const debugShouldLog = newLevel >= AG_LOG_LEVEL.DEBUG;
+        const infoShouldLog = newLevel >= AG_LOGLEVEL.INFO;
+        const debugShouldLog = newLevel >= AG_LOGLEVEL.DEBUG;
 
         const logCallCount = (infoShouldLog ? 1 : 0) + (debugShouldLog ? 1 : 0);
         expect(mockLogger).toHaveBeenCalledTimes(logCallCount);

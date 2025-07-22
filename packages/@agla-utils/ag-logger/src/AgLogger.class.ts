@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import { AG_LOG_LEVEL } from '../shared/types';
+import { AG_LOGLEVEL } from '../shared/types';
 import type { AgTLogLevel } from '../shared/types';
 // interfaces
 import type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from '../shared/types/AgLogger.interface';
@@ -26,7 +26,7 @@ import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
  */
 export class AgLogger {
   private static _instance: AgLogger | undefined;
-  private static _logLevel: AgTLogLevel = AG_LOG_LEVEL.OFF;
+  private static _logLevel: AgTLogLevel = AG_LOGLEVEL.OFF;
   private _loggerManager: AgLoggerManager;
   private _verbose: boolean = false;
 
@@ -65,7 +65,7 @@ export class AgLogger {
    * @returns True if the level should be logged; otherwise false.
    */
   private isOutputLevel(level: AgTLogLevel): boolean {
-    if (AgLogger._logLevel === AG_LOG_LEVEL.OFF) {
+    if (AgLogger._logLevel === AG_LOGLEVEL.OFF) {
       return false;
     }
     return level <= AgLogger._logLevel;
@@ -148,37 +148,37 @@ export class AgLogger {
 
   /** Logs a message at FATAL level. */
   fatal(...args: unknown[]): void {
-    this.logWithLevel(AG_LOG_LEVEL.FATAL, ...args);
+    this.logWithLevel(AG_LOGLEVEL.FATAL, ...args);
   }
 
   /** Logs a message at ERROR level. */
   error(...args: unknown[]): void {
-    this.logWithLevel(AG_LOG_LEVEL.ERROR, ...args);
+    this.logWithLevel(AG_LOGLEVEL.ERROR, ...args);
   }
 
   /** Logs a message at WARN level. */
   warn(...args: unknown[]): void {
-    this.logWithLevel(AG_LOG_LEVEL.WARN, ...args);
+    this.logWithLevel(AG_LOGLEVEL.WARN, ...args);
   }
 
   /** Logs a message at INFO level. */
   info(...args: unknown[]): void {
-    this.logWithLevel(AG_LOG_LEVEL.INFO, ...args);
+    this.logWithLevel(AG_LOGLEVEL.INFO, ...args);
   }
 
   /** Logs a message at DEBUG level. */
   debug(...args: unknown[]): void {
-    this.logWithLevel(AG_LOG_LEVEL.DEBUG, ...args);
+    this.logWithLevel(AG_LOGLEVEL.DEBUG, ...args);
   }
 
   /** Logs a message at TRACE level. */
   trace(...args: unknown[]): void {
-    this.logWithLevel(AG_LOG_LEVEL.TRACE, ...args);
+    this.logWithLevel(AG_LOGLEVEL.TRACE, ...args);
   }
 
   /** General log method logging at INFO level. */
   log(...args: unknown[]): void {
-    this.logWithLevel(AG_LOG_LEVEL.INFO, ...args);
+    this.logWithLevel(AG_LOGLEVEL.INFO, ...args);
   }
 
   /** Verbose log method that only outputs when verbose flag is true. */
@@ -194,7 +194,7 @@ export class AgLogger {
    */
   static resetSingleton(): void {
     AgLogger._instance = undefined;
-    AgLogger._logLevel = AG_LOG_LEVEL.OFF;
+    AgLogger._logLevel = AG_LOGLEVEL.OFF;
   }
 }
 

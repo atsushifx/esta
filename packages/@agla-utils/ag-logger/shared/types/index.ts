@@ -6,7 +6,7 @@
 // https://opensource.org/licenses/MIT
 
 // constants
-export { AG_LABEL_TO_LOG_LEVEL_MAP, AG_LOG_LEVEL, AG_LOG_LEVEL_TO_LABEL_MAP } from './LogLevel.types';
+export { AG_LABEL_TO_LOGLEVEL_MAP, AG_LOGLEVEL, AG_LOGLEVEL_TO_LABEL_MAP } from './LogLevel.types';
 
 // types
 export type { AgLogMessage } from './AgLogger.types';

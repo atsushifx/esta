@@ -8,7 +8,7 @@
 
 // --- modules
 // constants
-import { AG_LOG_LEVEL } from '../../../shared/types';
+import { AG_LOGLEVEL } from '../../../shared/types';
 // types
 import type { AgLoggerFunction, AgLoggerMap } from '../../../shared/types/AgLogger.interface';
 
@@ -30,23 +30,23 @@ export const ConsoleLogger: AgLoggerFunction = (formattedLogMessage: string) => 
  * Uses appropriate console methods per log level for better log categorization.
  */
 export const ConsoleLoggerMap: AgLoggerMap = {
-  [AG_LOG_LEVEL.OFF]: NullLogger,
-  [AG_LOG_LEVEL.FATAL]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.OFF]: NullLogger,
+  [AG_LOGLEVEL.FATAL]: (formattedMessage: string) => {
     console.error(formattedMessage);
   },
-  [AG_LOG_LEVEL.ERROR]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.ERROR]: (formattedMessage: string) => {
     console.error(formattedMessage);
   },
-  [AG_LOG_LEVEL.WARN]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.WARN]: (formattedMessage: string) => {
     console.warn(formattedMessage);
   },
-  [AG_LOG_LEVEL.INFO]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.INFO]: (formattedMessage: string) => {
     console.info(formattedMessage);
   },
-  [AG_LOG_LEVEL.DEBUG]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.DEBUG]: (formattedMessage: string) => {
     console.debug(formattedMessage);
   },
-  [AG_LOG_LEVEL.TRACE]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.TRACE]: (formattedMessage: string) => {
     console.debug(formattedMessage);
   },
 };
