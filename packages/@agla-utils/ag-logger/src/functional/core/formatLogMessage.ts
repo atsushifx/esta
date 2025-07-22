@@ -7,6 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 import type { AgTLogLevel } from '../../../shared/types';
+import { AgToLabel } from '../../utils/LogLevelHelpers';
 
 export type LogMessage = {
   readonly level: string;
@@ -16,41 +17,60 @@ export type LogMessage = {
 };
 
 // Helper functions (pure functions)
-const convertLogLevel = (level: AgTLogLevel): string => {
-  const levelMap: Record<AgTLogLevel, string> = {
-    0: 'OFF',
-    1: 'FATAL',
-    2: 'ERROR',
-    3: 'WARN',
-    4: 'INFO',
-    5: 'DEBUG',
-    6: 'TRACE',
-  };
-  return levelMap[level] ?? 'INFO';
+
+/**
+ * Checks if an argument should be included in the log message text.
+ * Primitive types are concatenated into the message, while complex types are stored separately.
+ *
+ * @param arg - The argument to check
+ * @returns True if the argument is a primitive type that belongs in the message
+ */
+const isMessageArgument = (arg: unknown): arg is string | number | boolean | symbol => {
+  const argType = typeof arg;
+  return ['string', 'number', 'boolean', 'symbol'].includes(argType);
 };
 
-const isStringifiable = (arg: unknown): arg is string | number | boolean | symbol => {
-  const type = typeof arg;
-  return ['string', 'number', 'boolean', 'symbol'].includes(type);
-};
-
+/**
+ * Checks if an argument is a valid timestamp string.
+ *
+ * @param arg - The argument to check
+ * @returns True if the argument is a valid date string
+ */
 const isTimestamp = (arg: unknown): arg is string => {
   if (typeof arg !== 'string') { return false; }
   const timestamp = new Date(arg);
   return !isNaN(timestamp.getTime());
 };
 
+/**
+ * Extracts the message string from arguments by filtering stringifiable values.
+ *
+ * @param args - Array of arguments to process
+ * @returns Concatenated string message
+ */
 const extractMessage = (args: readonly unknown[]): string => {
   return args
-    .filter(isStringifiable)
+    .filter(isMessageArgument)
     .map((arg) => String(arg).trim())
     .join(' ');
 };
 
+/**
+ * Extracts non-message arguments for structured data storage.
+ *
+ * @param args - Array of arguments to process
+ * @returns Array of complex arguments that don't belong in the message text (objects, arrays, etc.)
+ */
 const extractArgs = (args: readonly unknown[]): readonly unknown[] => {
-  return args.filter((arg) => !isStringifiable(arg));
+  return args.filter((arg) => !isMessageArgument(arg));
 };
 
+/**
+ * Parses timestamp from the first argument if present, otherwise uses current time.
+ *
+ * @param args - Array of arguments to check for timestamp
+ * @returns Tuple of [timestamp, remaining arguments]
+ */
 const parseTimestamp = (args: readonly unknown[]): [Date, readonly unknown[]] => {
   if (args.length > 0 && isTimestamp(args[0])) {
     return [new Date(args[0]), args.slice(1)];
@@ -74,7 +94,7 @@ export const formatLogMessage = (
   const [timestamp, remainingArgs] = parseTimestamp(args);
 
   const result: LogMessage = {
-    level: convertLogLevel(level),
+    level: AgToLabel(level),
     message: extractMessage(remainingArgs),
     timestamp,
     args: Object.freeze([...extractArgs(remainingArgs)]),

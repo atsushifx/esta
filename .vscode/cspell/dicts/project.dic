@@ -19,6 +19,7 @@ GHAexecutor
 jqlang
 jsonlint
 LOCALAPPDATA
+LOGLEVEL
 mdast
 mikefarah
 picklist
@@ -31,4 +32,3 @@ tëst
 tsup
 userid
 Yedidia
-extname

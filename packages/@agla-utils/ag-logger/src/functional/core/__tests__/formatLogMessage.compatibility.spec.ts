@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 import { describe, expect, it } from 'vitest';
-import { AG_LOG_LEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '../../../../shared/types';
 import { AgLoggerGetMessage } from '../../../utils/AgLoggerGetMessage';
 import { formatLogMessage } from '../formatLogMessage';
 
@@ -18,7 +18,7 @@ import { formatLogMessage } from '../formatLogMessage';
 describe('formatLogMessage compatibility with AgLoggerGetMessage', () => {
   describe('Basic message formatting equivalence', () => {
     it('should produce equivalent output for simple string messages', () => {
-      const level = AG_LOG_LEVEL.INFO;
+      const level = AG_LOGLEVEL.INFO;
       const args = ['userid=', 'u1029165'];
 
       const legacy = AgLoggerGetMessage(level, ...args);
@@ -29,7 +29,7 @@ describe('formatLogMessage compatibility with AgLoggerGetMessage', () => {
     });
 
     it('should produce equivalent output for template strings', () => {
-      const level = AG_LOG_LEVEL.DEBUG;
+      const level = AG_LOGLEVEL.DEBUG;
       const userid = 'u1029165';
       const args = [`userid=${userid}`];
 
@@ -41,7 +41,7 @@ describe('formatLogMessage compatibility with AgLoggerGetMessage', () => {
     });
 
     it('should produce equivalent output for mixed primitive arguments', () => {
-      const level = AG_LOG_LEVEL.ERROR;
+      const level = AG_LOGLEVEL.ERROR;
       const args = ['number:', 123, ' string:', 'abc', ' boolean:', true];
 
       const legacy = AgLoggerGetMessage(level, ...args);
@@ -52,7 +52,7 @@ describe('formatLogMessage compatibility with AgLoggerGetMessage', () => {
     });
 
     it('should produce equivalent output with object arguments', () => {
-      const level = AG_LOG_LEVEL.TRACE;
+      const level = AG_LOGLEVEL.TRACE;
       const args = ['user:', { name: 'John Doe' }];
 
       const legacy = AgLoggerGetMessage(level, ...args);
@@ -65,7 +65,7 @@ describe('formatLogMessage compatibility with AgLoggerGetMessage', () => {
 
   describe('Timestamp handling equivalence', () => {
     it('should produce equivalent output with valid timestamp string', () => {
-      const level = AG_LOG_LEVEL.FATAL;
+      const level = AG_LOGLEVEL.FATAL;
       const timestampStr = '2025-07-22T02:45:00.000Z';
       const args = [timestampStr, 'test message'];
 
@@ -78,7 +78,7 @@ describe('formatLogMessage compatibility with AgLoggerGetMessage', () => {
     });
 
     it('should produce equivalent output with complex timestamp scenario', () => {
-      const level = AG_LOG_LEVEL.DEBUG;
+      const level = AG_LOGLEVEL.DEBUG;
       const timestampStr = '2025-07-22T02:45:00.000Z';
       const args = [timestampStr, 'user:', 'john', { id: 123 }];
 
@@ -95,7 +95,7 @@ describe('formatLogMessage compatibility with AgLoggerGetMessage', () => {
     it('should maintain same log level value (numeric)', () => {
       const args = ['test message'];
 
-      Object.values(AG_LOG_LEVEL).forEach((level) => {
+      Object.values(AG_LOGLEVEL).forEach((level) => {
         if (typeof level === 'number') {
           const legacy = AgLoggerGetMessage(level, ...args);
           const functional = formatLogMessage(level, ...args);
@@ -110,7 +110,7 @@ describe('formatLogMessage compatibility with AgLoggerGetMessage', () => {
 
   describe('Edge cases equivalence', () => {
     it('should handle empty arguments equivalently', () => {
-      const level = AG_LOG_LEVEL.INFO;
+      const level = AG_LOGLEVEL.INFO;
       const args: unknown[] = [];
 
       const legacy = AgLoggerGetMessage(level, ...args);
@@ -121,7 +121,7 @@ describe('formatLogMessage compatibility with AgLoggerGetMessage', () => {
     });
 
     it('should handle null and undefined arguments equivalently', () => {
-      const level = AG_LOG_LEVEL.WARN;
+      const level = AG_LOGLEVEL.WARN;
       const args = ['test', null, undefined, 'message'];
 
       const legacy = AgLoggerGetMessage(level, ...args);

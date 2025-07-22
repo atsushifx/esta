@@ -10,7 +10,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 // ログレベル定数 - テストで使用するログレベル定義
-import { AG_LOG_LEVEL } from '../../shared/types';
+import { AG_LOGLEVEL } from '../../shared/types';
 // テスト対象 - メインAgLoggerクラスとgetLogger関数
 import { AgLogger, getLogger } from '../../src/AgLogger.class';
 // テスト対象 - ロガー・フォーマッター管理クラス
@@ -78,11 +78,11 @@ describe('AgLogger Integration Tests', () => {
       const logger1 = getLogger();
       const logger2 = getLogger();
 
-      logger1.setLogLevel(AG_LOG_LEVEL.DEBUG);
-      expect(logger2.getLogLevel()).toBe(AG_LOG_LEVEL.DEBUG);
+      logger1.setLogLevel(AG_LOGLEVEL.DEBUG);
+      expect(logger2.getLogLevel()).toBe(AG_LOGLEVEL.DEBUG);
 
-      logger2.setLogLevel(AG_LOG_LEVEL.ERROR);
-      expect(logger1.getLogLevel()).toBe(AG_LOG_LEVEL.ERROR);
+      logger2.setLogLevel(AG_LOGLEVEL.ERROR);
+      expect(logger1.getLogLevel()).toBe(AG_LOGLEVEL.ERROR);
     });
 
     it('should share logger manager configuration across instances', () => {
@@ -91,7 +91,7 @@ describe('AgLogger Integration Tests', () => {
       const mockFormatter = vi.fn().mockReturnValue('formatted message');
 
       const logger1 = getLogger(mockLogger, mockFormatter);
-      logger1.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger1.setLogLevel(AG_LOGLEVEL.INFO);
 
       const logger2 = getLogger();
       logger2.info('test message');
@@ -121,7 +121,7 @@ describe('AgLogger Integration Tests', () => {
       const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
       logger.info('test message', { key: 'value' });
 
       expect(consoleSpy).toHaveBeenCalledTimes(1);
@@ -144,7 +144,7 @@ describe('AgLogger Integration Tests', () => {
       const mockLogger = vi.fn();
 
       const logger = getLogger(mockLogger, PlainFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.WARN);
+      logger.setLogLevel(AG_LOGLEVEL.WARN);
       logger.warn('warning message', 'additional info');
 
       expect(mockLogger).toHaveBeenCalledTimes(1);
@@ -159,7 +159,7 @@ describe('AgLogger Integration Tests', () => {
       const mockLogger = vi.fn();
 
       const logger = getLogger(mockLogger, NullFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
       logger.info('test message');
 
       // NullFormat returns empty string, so logger should not be called
@@ -191,12 +191,12 @@ describe('AgLogger Integration Tests', () => {
         infoLogger,
         PlainFormat,
         {
-          [AG_LOG_LEVEL.ERROR]: errorLogger,
-          [AG_LOG_LEVEL.DEBUG]: debugLogger,
+          [AG_LOGLEVEL.ERROR]: errorLogger,
+          [AG_LOGLEVEL.DEBUG]: debugLogger,
         },
       );
 
-      logger.setLogLevel(AG_LOG_LEVEL.DEBUG);
+      logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
       logger.error('error message');
       logger.warn('warn message');
@@ -221,7 +221,7 @@ describe('AgLogger Integration Tests', () => {
         defaultLogger: firstLogger,
         formatter: PlainFormat,
       });
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       // Second configuration - should override first
       logger.setLogger({
@@ -262,14 +262,14 @@ describe('AgLogger Integration Tests', () => {
         infoLogger,
         JsonFormat,
         {
-          [AG_LOG_LEVEL.ERROR]: errorLogger,
-          [AG_LOG_LEVEL.WARN]: warnLogger,
-          [AG_LOG_LEVEL.DEBUG]: debugLogger,
+          [AG_LOGLEVEL.ERROR]: errorLogger,
+          [AG_LOGLEVEL.WARN]: warnLogger,
+          [AG_LOGLEVEL.DEBUG]: debugLogger,
         },
       );
 
       // Set to WARN level - should filter out INFO and DEBUG
-      logger.setLogLevel(AG_LOG_LEVEL.WARN);
+      logger.setLogLevel(AG_LOGLEVEL.WARN);
 
       logger.error('error message');
       logger.warn('warn message');
@@ -288,7 +288,7 @@ describe('AgLogger Integration Tests', () => {
       const mockFormatter = vi.fn();
 
       const logger = getLogger(mockLogger, mockFormatter);
-      logger.setLogLevel(AG_LOG_LEVEL.OFF);
+      logger.setLogLevel(AG_LOGLEVEL.OFF);
 
       logger.fatal('fatal message');
       logger.error('error message');
@@ -321,7 +321,7 @@ describe('AgLogger Integration Tests', () => {
       const mockFormatter = vi.fn().mockReturnValue('formatted verbose message');
 
       const logger = getLogger(mockLogger, mockFormatter);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       // Test verbose off (default)
       logger.verbose('verbose message when off');
@@ -340,7 +340,7 @@ describe('AgLogger Integration Tests', () => {
       const mockLogger = vi.fn();
 
       const logger1 = getLogger(mockLogger, PlainFormat);
-      logger1.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger1.setLogLevel(AG_LOGLEVEL.INFO);
       logger1.setVerbose(true);
 
       const logger2 = getLogger();
@@ -371,7 +371,7 @@ describe('AgLogger Integration Tests', () => {
       const mockFormatter = vi.fn().mockReturnValue('formatted');
 
       const logger = getLogger(mockLogger, mockFormatter);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       // Test with various undefined/null combinations
       logger.info(undefined);
@@ -389,7 +389,7 @@ describe('AgLogger Integration Tests', () => {
       });
 
       const logger = getLogger(throwingLogger, PlainFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       // Should not throw - system should handle logger errors gracefully
       expect(() => {
@@ -412,7 +412,7 @@ describe('AgLogger Integration Tests', () => {
       const emptyFormatter = vi.fn().mockReturnValue('');
 
       const logger = getLogger(mockLogger, emptyFormatter);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
       logger.info('test message');
 
       expect(emptyFormatter).toHaveBeenCalled();

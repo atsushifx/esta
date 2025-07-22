@@ -61,18 +61,14 @@ const formatLogMessage = (
 #### 1. ログレベル変換
 
 ```typescript
-// AgTLogLevel (数値) → LogLevel (文字列ラベル) 変換
-const convertLogLevel = (level: AgTLogLevel): LogLevel => {
-  const levelMap: Record<AgTLogLevel, LogLevel> = {
-    [AG_LOG_LEVEL.FATAL]: 'FATAL',
-    [AG_LOG_LEVEL.ERROR]: 'ERROR',
-    [AG_LOG_LEVEL.WARN]: 'WARN',
-    [AG_LOG_LEVEL.INFO]: 'INFO',
-    [AG_LOG_LEVEL.DEBUG]: 'DEBUG',
-    [AG_LOG_LEVEL.TRACE]: 'TRACE',
-  };
-  return levelMap[level] ?? 'INFO';
-};
+// 実装は LogLevelHelpers.ts を参照
+import { AgToLabel, AgToLogLevel } from '../../src/utils/LogLevelHelpers';
+
+// AgTLogLevel (数値) → AgTLogLevelLabel (文字列ラベル) 変換
+// AgToLabel(level: AgTLogLevel): AgTLogLevelLabel
+
+// AgTLogLevel (数値) → AgTLogLevel (数値、同じ値) 変換
+// AgToLogLevel(level: AgTLogLevel): AgTLogLevel
 ```
 
 Note: `/shared/types/LogLevel.types.ts` はこのままでいいとおもう
@@ -110,7 +106,7 @@ export const formatLogMessage = (
   ...args: readonly unknown[]
 ): LogMessage => {
   return Object.freeze({
-    level: convertLogLevel(level),
+    level: AgToLogLevel(level),
     message: extractMessage(args),
     timestamp: new Date(),
     args: Object.freeze(extractArgs(args)),

@@ -10,7 +10,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 // ログレベル定数 - E2Eテストで使用するログレベル定義
-import { AG_LOG_LEVEL } from '../../shared/types';
+import { AG_LOGLEVEL } from '../../shared/types';
 // テスト対象 - getLogger関数（ロガー取得のエントリーポイント）
 import { getLogger } from '../../src/AgLogger.class';
 // プラグイン - JSON形式フォーマッター（構造化ログ用）
@@ -66,7 +66,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('outputs INFO log as JSON with JsonFormat and ConsoleLogger', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       logger.info('Test message');
 
@@ -84,7 +84,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('outputs ERROR log as JSON with JsonFormat and ConsoleLogger', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.ERROR);
+      logger.setLogLevel(AG_LOGLEVEL.ERROR);
 
       logger.error('Error message');
 
@@ -102,7 +102,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('outputs WARN log as JSON with JsonFormat and ConsoleLogger', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.WARN);
+      logger.setLogLevel(AG_LOGLEVEL.WARN);
 
       logger.warn('Warning message');
 
@@ -120,7 +120,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('outputs DEBUG log as JSON with JsonFormat and ConsoleLogger', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.DEBUG);
+      logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
       logger.debug('Debug message');
 
@@ -153,7 +153,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('logs JSON message containing object and string', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       const userData = { userId: 123, userName: 'testUser' };
       logger.info('User info', userData, ' additional info');
@@ -173,7 +173,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('logs JSON message containing array', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.DEBUG);
+      logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
       const items = ['item1', 'item2', 'item3'];
       logger.debug('Processing items', items);
@@ -193,7 +193,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('logs JSON message containing number and boolean', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       logger.info('Status update', 42, true, null);
 
@@ -228,7 +228,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('does not output DEBUG logs when level is INFO', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       logger.debug('Debug message');
       logger.info('Info message');
@@ -244,7 +244,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('does not output INFO/WARN logs when level is ERROR', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.ERROR);
+      logger.setLogLevel(AG_LOGLEVEL.ERROR);
 
       logger.info('Info message');
       logger.warn('Warning message');
@@ -262,7 +262,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('does not output any logs when level is OFF', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.OFF);
+      logger.setLogLevel(AG_LOGLEVEL.OFF);
 
       logger.error('Error message');
       logger.info('Info message');
@@ -289,7 +289,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('does not include args property when args array is empty', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       logger.info('Simple message');
 
@@ -308,7 +308,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('correctly outputs deeply nested complex objects in JSON', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       const complexData = {
         user: {
@@ -360,7 +360,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('outputs a sequence of JSON logs from application start to error', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.DEBUG);
+      logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
       // Application start
       logger.info('Application is starting');
@@ -425,7 +425,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     it('verifies JSON output for generic log method (log)', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOG_LEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       logger.log('General log message');
 

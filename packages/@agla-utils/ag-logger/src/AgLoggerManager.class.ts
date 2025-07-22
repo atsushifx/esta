@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import { AG_LOG_LEVEL } from '../shared/types';
+import { AG_LOGLEVEL } from '../shared/types';
 import type { AgTLogLevel } from '../shared/types';
 import type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from '../shared/types/AgLogger.interface';
 
@@ -29,13 +29,13 @@ export class AgLoggerManager {
     this.defaultLogger = NullLogger;
     this.formatter = NullFormat;
     this.loggerMap = {
-      [AG_LOG_LEVEL.OFF]: NullLogger,
-      [AG_LOG_LEVEL.FATAL]: NullLogger,
-      [AG_LOG_LEVEL.ERROR]: NullLogger,
-      [AG_LOG_LEVEL.WARN]: NullLogger,
-      [AG_LOG_LEVEL.INFO]: NullLogger,
-      [AG_LOG_LEVEL.DEBUG]: NullLogger,
-      [AG_LOG_LEVEL.TRACE]: NullLogger,
+      [AG_LOGLEVEL.OFF]: NullLogger,
+      [AG_LOGLEVEL.FATAL]: NullLogger,
+      [AG_LOGLEVEL.ERROR]: NullLogger,
+      [AG_LOGLEVEL.WARN]: NullLogger,
+      [AG_LOGLEVEL.INFO]: NullLogger,
+      [AG_LOGLEVEL.DEBUG]: NullLogger,
+      [AG_LOGLEVEL.TRACE]: NullLogger,
     };
   }
 
@@ -103,8 +103,8 @@ export class AgLoggerManager {
     const targetLogger = defaultLogger ?? this.defaultLogger;
 
     // Set all log levels to the default logger
-    Object.keys(AG_LOG_LEVEL).forEach((key) => {
-      const levelCode = AG_LOG_LEVEL[key as keyof typeof AG_LOG_LEVEL];
+    Object.keys(AG_LOGLEVEL).forEach((key) => {
+      const levelCode = AG_LOGLEVEL[key as keyof typeof AG_LOGLEVEL];
       this.loggerMap[levelCode] = targetLogger;
     });
 

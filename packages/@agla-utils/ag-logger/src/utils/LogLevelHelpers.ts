@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { AG_LOG_LEVEL, AG_LOG_LEVEL_TO_LABEL_MAP } from '../../shared/types';
+import { AG_LOGLEVEL, AG_LOGLEVEL_TO_LABEL_MAP } from '../../shared/types';
 import type { AgTLogLevel, AgTLogLevelLabel } from '../../shared/types';
 
 /**
@@ -16,9 +16,18 @@ import type { AgTLogLevel, AgTLogLevelLabel } from '../../shared/types';
  * @throws Error if log level is invalid
  */
 export const AgToLabel = (level: AgTLogLevel): AgTLogLevelLabel => {
-  if (typeof level !== 'number' || level < AG_LOG_LEVEL.OFF || level > AG_LOG_LEVEL.TRACE || !Number.isInteger(level)) {
+  if (typeof level !== 'number' || level < AG_LOGLEVEL.OFF || level > AG_LOGLEVEL.TRACE || !Number.isInteger(level)) {
     throw new Error(`Invalid log level: ${level}`);
   }
 
-  return AG_LOG_LEVEL_TO_LABEL_MAP[level];
+  return AG_LOGLEVEL_TO_LABEL_MAP[level];
+};
+
+/**
+ * Convert numeric log level to numeric log level (identity function for consistency)
+ * @param level - Numeric log level
+ * @returns The same numeric log level
+ */
+export const AgToLogLevel = (level: AgTLogLevel): AgTLogLevel => {
+  return level;
 };

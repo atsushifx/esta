@@ -10,7 +10,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ログレベル定数 - テストで使用するログレベル定義
-import { AG_LOG_LEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '../../../../shared/types';
 
 // テスト対象 - コンソール出力ロガープラグインの実装
 import { ConsoleLogger, ConsoleLoggerMap } from '../ConsoleLogger';
@@ -117,15 +117,15 @@ describe('ConsoleLogger', () => {
      * Tests that the OFF level returns NullLogger.
      */
     it('returns NullLogger for OFF level', () => {
-      expect(ConsoleLoggerMap[AG_LOG_LEVEL.OFF]).toBeDefined();
-      expect(typeof ConsoleLoggerMap[AG_LOG_LEVEL.OFF]).toBe('function');
+      expect(ConsoleLoggerMap[AG_LOGLEVEL.OFF]).toBeDefined();
+      expect(typeof ConsoleLoggerMap[AG_LOGLEVEL.OFF]).toBe('function');
     });
 
     /**
      * Tests that console.error is called for FATAL level.
      */
     it('calls console.error for FATAL level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOG_LEVEL.FATAL];
+      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.FATAL];
       expect(logFunction).toBeDefined();
 
       logFunction!('test fatal message');
@@ -136,7 +136,7 @@ describe('ConsoleLogger', () => {
      * Tests that console.error is called for ERROR level.
      */
     it('calls console.error for ERROR level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOG_LEVEL.ERROR];
+      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.ERROR];
       expect(logFunction).toBeDefined();
 
       logFunction!('test error message');
@@ -147,7 +147,7 @@ describe('ConsoleLogger', () => {
      * Tests that console.warn is called for WARN level.
      */
     it('calls console.warn for WARN level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOG_LEVEL.WARN];
+      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.WARN];
       expect(logFunction).toBeDefined();
 
       logFunction!('test warn message');
@@ -158,7 +158,7 @@ describe('ConsoleLogger', () => {
      * Tests that console.info is called for INFO level.
      */
     it('calls console.info for INFO level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOG_LEVEL.INFO];
+      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.INFO];
       expect(logFunction).toBeDefined();
 
       logFunction!('test info message');
@@ -169,7 +169,7 @@ describe('ConsoleLogger', () => {
      * Tests that console.debug is called for DEBUG level.
      */
     it('calls console.debug for DEBUG level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOG_LEVEL.DEBUG];
+      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.DEBUG];
       expect(logFunction).toBeDefined();
 
       logFunction!('test debug message');
@@ -180,7 +180,7 @@ describe('ConsoleLogger', () => {
      * Tests that console.debug is called for TRACE level.
      */
     it('calls console.debug for TRACE level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOG_LEVEL.TRACE];
+      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.TRACE];
       expect(logFunction).toBeDefined();
 
       logFunction!('test trace message');
@@ -191,7 +191,7 @@ describe('ConsoleLogger', () => {
      * Tests that the logger correctly processes a formatted message.
      */
     it('correctly processes a formatted message', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOG_LEVEL.INFO];
+      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.INFO];
       const formattedMessage = 'formatted log message';
       logFunction!(formattedMessage);
       expect(mockConsole.info).toHaveBeenCalledWith(formattedMessage);

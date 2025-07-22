@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 
 // constants
-import { AG_LOG_LEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '../../../../shared/types';
 // types
 import type { AgLogMessage } from '../../../../shared/types/AgLogger.types';
 
@@ -23,7 +23,7 @@ describe('NullFormat', () => {
    */
   it('returns an empty string regardless of arguments', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AG_LOG_LEVEL.INFO,
+      logLevel: AG_LOGLEVEL.INFO,
       timestamp: new Date(),
       message: 'test message',
       args: [],
@@ -36,7 +36,7 @@ describe('NullFormat', () => {
    */
   it('returns an empty string even with multiple arguments', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AG_LOG_LEVEL.WARN,
+      logLevel: AG_LOGLEVEL.WARN,
       timestamp: new Date(),
       message: 'msg1 msg2',
       args: [123, true, { data: 'test' }],
@@ -54,12 +54,12 @@ describe('NullFormat', () => {
       args: [],
     };
 
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOG_LEVEL.OFF })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOG_LEVEL.FATAL })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOG_LEVEL.ERROR })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOG_LEVEL.WARN })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOG_LEVEL.INFO })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOG_LEVEL.DEBUG })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOG_LEVEL.TRACE })).toBe('');
+    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.OFF })).toBe('');
+    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.FATAL })).toBe('');
+    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.ERROR })).toBe('');
+    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.WARN })).toBe('');
+    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.INFO })).toBe('');
+    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.DEBUG })).toBe('');
+    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.TRACE })).toBe('');
   });
 });

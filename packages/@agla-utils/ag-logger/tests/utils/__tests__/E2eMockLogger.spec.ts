@@ -10,7 +10,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 // constants
-import { AG_LOG_LEVEL } from '../../../shared/types';
+import { AG_LOGLEVEL } from '../../../shared/types';
 
 // test target
 import { E2eMockLogger } from '../E2eMockLogger';
@@ -67,9 +67,9 @@ describe('E2eMockLogger', () => {
       mockLogger.error('Error 1');
       mockLogger.error('Error 2');
 
-      expect(mockLogger.getLastMessage(AG_LOG_LEVEL.FATAL)).toBe('Fatal 2');
-      expect(mockLogger.getLastMessage(AG_LOG_LEVEL.ERROR)).toBe('Error 2');
-      expect(mockLogger.getLastMessage(AG_LOG_LEVEL.WARN)).toBeNull();
+      expect(mockLogger.getLastMessage(AG_LOGLEVEL.FATAL)).toBe('Fatal 2');
+      expect(mockLogger.getLastMessage(AG_LOGLEVEL.ERROR)).toBe('Error 2');
+      expect(mockLogger.getLastMessage(AG_LOGLEVEL.WARN)).toBeNull();
     });
 
     it('should get messages for each level using unified method', () => {
@@ -77,20 +77,20 @@ describe('E2eMockLogger', () => {
       mockLogger.error('Error message');
       mockLogger.warn('Warn message');
 
-      expect(mockLogger.getMessages(AG_LOG_LEVEL.FATAL)).toEqual(['Fatal message']);
-      expect(mockLogger.getMessages(AG_LOG_LEVEL.ERROR)).toEqual(['Error message']);
-      expect(mockLogger.getMessages(AG_LOG_LEVEL.WARN)).toEqual(['Warn message']);
-      expect(mockLogger.getMessages(AG_LOG_LEVEL.INFO)).toEqual([]);
+      expect(mockLogger.getMessages(AG_LOGLEVEL.FATAL)).toEqual(['Fatal message']);
+      expect(mockLogger.getMessages(AG_LOGLEVEL.ERROR)).toEqual(['Error message']);
+      expect(mockLogger.getMessages(AG_LOGLEVEL.WARN)).toEqual(['Warn message']);
+      expect(mockLogger.getMessages(AG_LOGLEVEL.INFO)).toEqual([]);
     });
 
     it('should clear messages for specific level using unified method', () => {
       mockLogger.fatal('Fatal message');
       mockLogger.error('Error message');
 
-      mockLogger.clearMessages(AG_LOG_LEVEL.FATAL);
+      mockLogger.clearMessages(AG_LOGLEVEL.FATAL);
 
-      expect(mockLogger.getMessages(AG_LOG_LEVEL.FATAL)).toEqual([]);
-      expect(mockLogger.getMessages(AG_LOG_LEVEL.ERROR)).toEqual(['Error message']);
+      expect(mockLogger.getMessages(AG_LOGLEVEL.FATAL)).toEqual([]);
+      expect(mockLogger.getMessages(AG_LOGLEVEL.ERROR)).toEqual(['Error message']);
     });
   });
 });

@@ -9,31 +9,31 @@
 import { describe, expect, it } from 'vitest';
 
 // Import helper functions
-import { AG_LOG_LEVEL } from '../../../shared/types';
+import { AG_LOGLEVEL } from '../../../shared/types';
 import type { AgTLogLevel } from '../../../shared/types';
 import { AgToLabel } from '../LogLevelHelpers';
 
 describe('LogLevel Helper Functions', () => {
   describe('AgToLabel function', () => {
     it('should convert numeric log level to uppercase string', () => {
-      expect(AgToLabel(AG_LOG_LEVEL.OFF)).toBe('OFF');
-      expect(AgToLabel(AG_LOG_LEVEL.FATAL)).toBe('FATAL');
-      expect(AgToLabel(AG_LOG_LEVEL.ERROR)).toBe('ERROR');
-      expect(AgToLabel(AG_LOG_LEVEL.WARN)).toBe('WARN');
-      expect(AgToLabel(AG_LOG_LEVEL.INFO)).toBe('INFO');
-      expect(AgToLabel(AG_LOG_LEVEL.DEBUG)).toBe('DEBUG');
-      expect(AgToLabel(AG_LOG_LEVEL.TRACE)).toBe('TRACE');
+      expect(AgToLabel(AG_LOGLEVEL.OFF)).toBe('OFF');
+      expect(AgToLabel(AG_LOGLEVEL.FATAL)).toBe('FATAL');
+      expect(AgToLabel(AG_LOGLEVEL.ERROR)).toBe('ERROR');
+      expect(AgToLabel(AG_LOGLEVEL.WARN)).toBe('WARN');
+      expect(AgToLabel(AG_LOGLEVEL.INFO)).toBe('INFO');
+      expect(AgToLabel(AG_LOGLEVEL.DEBUG)).toBe('DEBUG');
+      expect(AgToLabel(AG_LOGLEVEL.TRACE)).toBe('TRACE');
     });
 
     it('should maintain compatibility with expected string format', () => {
       // Test that labels match expected format
-      expect(AgToLabel(AG_LOG_LEVEL.OFF)).toBe('OFF');
-      expect(AgToLabel(AG_LOG_LEVEL.FATAL)).toBe('FATAL');
-      expect(AgToLabel(AG_LOG_LEVEL.ERROR)).toBe('ERROR');
-      expect(AgToLabel(AG_LOG_LEVEL.WARN)).toBe('WARN');
-      expect(AgToLabel(AG_LOG_LEVEL.INFO)).toBe('INFO');
-      expect(AgToLabel(AG_LOG_LEVEL.DEBUG)).toBe('DEBUG');
-      expect(AgToLabel(AG_LOG_LEVEL.TRACE)).toBe('TRACE');
+      expect(AgToLabel(AG_LOGLEVEL.OFF)).toBe('OFF');
+      expect(AgToLabel(AG_LOGLEVEL.FATAL)).toBe('FATAL');
+      expect(AgToLabel(AG_LOGLEVEL.ERROR)).toBe('ERROR');
+      expect(AgToLabel(AG_LOGLEVEL.WARN)).toBe('WARN');
+      expect(AgToLabel(AG_LOGLEVEL.INFO)).toBe('INFO');
+      expect(AgToLabel(AG_LOGLEVEL.DEBUG)).toBe('DEBUG');
+      expect(AgToLabel(AG_LOGLEVEL.TRACE)).toBe('TRACE');
     });
 
     it('should handle invalid log levels gracefully', () => {
@@ -46,16 +46,16 @@ describe('LogLevel Helper Functions', () => {
 
     it('should return consistent format', () => {
       // All returned strings should be uppercase
-      Object.values(AG_LOG_LEVEL).forEach((level) => {
+      Object.values(AG_LOGLEVEL).forEach((level) => {
         const label = AgToLabel(level);
         expect(label).toBe(label.toUpperCase());
         expect(label).toMatch(/^[A-Z]+$/);
       });
     });
 
-    it('should handle all AG_LOG_LEVEL values', () => {
+    it('should handle all AG_LOGLEVEL values', () => {
       // Test all known log level values
-      Object.entries(AG_LOG_LEVEL).forEach(([key, value]) => {
+      Object.entries(AG_LOGLEVEL).forEach(([key, value]) => {
         const stringLabel = AgToLabel(value);
         expect(stringLabel).toBe(key);
       });
@@ -66,7 +66,7 @@ describe('LogLevel Helper Functions', () => {
 
       // Perform many lookups
       for (let i = 0; i < 1000; i++) {
-        AgToLabel(AG_LOG_LEVEL.INFO);
+        AgToLabel(AG_LOGLEVEL.INFO);
       }
 
       const endTime = Date.now();

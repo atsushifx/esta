@@ -10,7 +10,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 // constants
-import { AG_LOG_LEVEL } from '../../shared/types';
+import { AG_LOGLEVEL } from '../../shared/types';
 import type { AgTLogLevel } from '../../shared/types';
 // test targets
 import { AgLoggerManager } from '../../src/AgLoggerManager.class';
@@ -59,7 +59,7 @@ describe('AgLoggerManager Integration Tests', () => {
 
       // Both should have the same configuration
       expect(manager1.getFormatter()).toBe(manager2.getFormatter());
-      expect(manager1.getLogger(AG_LOG_LEVEL.INFO)).toBe(manager2.getLogger(AG_LOG_LEVEL.INFO));
+      expect(manager1.getLogger(AG_LOGLEVEL.INFO)).toBe(manager2.getLogger(AG_LOGLEVEL.INFO));
     });
 
     it('should update configuration only on first initialization with parameters', () => {
@@ -76,8 +76,8 @@ describe('AgLoggerManager Integration Tests', () => {
       // since getInstance allows configuration updates
       expect(manager1.getFormatter()).toBe(secondFormatter);
       expect(manager2.getFormatter()).toBe(secondFormatter);
-      expect(manager1.getLogger(AG_LOG_LEVEL.INFO)).toBe(secondLogger);
-      expect(manager2.getLogger(AG_LOG_LEVEL.INFO)).toBe(secondLogger);
+      expect(manager1.getLogger(AG_LOGLEVEL.INFO)).toBe(secondLogger);
+      expect(manager2.getLogger(AG_LOGLEVEL.INFO)).toBe(secondLogger);
     });
   });
 
@@ -93,24 +93,24 @@ describe('AgLoggerManager Integration Tests', () => {
       const debugLogger = vi.fn();
 
       const loggerMap = {
-        [AG_LOG_LEVEL.OFF]: NullLogger,
-        [AG_LOG_LEVEL.FATAL]: errorLogger,
-        [AG_LOG_LEVEL.ERROR]: errorLogger,
-        [AG_LOG_LEVEL.WARN]: defaultLogger,
-        [AG_LOG_LEVEL.INFO]: defaultLogger,
-        [AG_LOG_LEVEL.DEBUG]: debugLogger,
-        [AG_LOG_LEVEL.TRACE]: debugLogger,
+        [AG_LOGLEVEL.OFF]: NullLogger,
+        [AG_LOGLEVEL.FATAL]: errorLogger,
+        [AG_LOGLEVEL.ERROR]: errorLogger,
+        [AG_LOGLEVEL.WARN]: defaultLogger,
+        [AG_LOGLEVEL.INFO]: defaultLogger,
+        [AG_LOGLEVEL.DEBUG]: debugLogger,
+        [AG_LOGLEVEL.TRACE]: debugLogger,
       };
 
       const manager = AgLoggerManager.getInstance(defaultLogger, PlainFormat, loggerMap);
 
-      expect(manager.getLogger(AG_LOG_LEVEL.OFF)).toBe(NullLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.FATAL)).toBe(errorLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.ERROR)).toBe(errorLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.WARN)).toBe(defaultLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.INFO)).toBe(defaultLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.DEBUG)).toBe(debugLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.TRACE)).toBe(debugLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.OFF)).toBe(NullLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.FATAL)).toBe(errorLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(errorLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.WARN)).toBe(defaultLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(defaultLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.DEBUG)).toBe(debugLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.TRACE)).toBe(debugLogger);
     });
 
     it('should handle partial logger map correctly', () => {
@@ -120,21 +120,21 @@ describe('AgLoggerManager Integration Tests', () => {
       const debugLogger = vi.fn();
 
       const partialLoggerMap = {
-        [AG_LOG_LEVEL.ERROR]: errorLogger,
-        [AG_LOG_LEVEL.DEBUG]: debugLogger,
+        [AG_LOGLEVEL.ERROR]: errorLogger,
+        [AG_LOGLEVEL.DEBUG]: debugLogger,
       };
 
       const manager = AgLoggerManager.getInstance(defaultLogger, PlainFormat, partialLoggerMap);
 
       // Specified levels should use custom loggers
-      expect(manager.getLogger(AG_LOG_LEVEL.ERROR)).toBe(errorLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.DEBUG)).toBe(debugLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(errorLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.DEBUG)).toBe(debugLogger);
 
       // Non-specified levels should use default logger
-      expect(manager.getLogger(AG_LOG_LEVEL.FATAL)).toBe(defaultLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.WARN)).toBe(defaultLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.INFO)).toBe(defaultLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.TRACE)).toBe(defaultLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.FATAL)).toBe(defaultLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.WARN)).toBe(defaultLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(defaultLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.TRACE)).toBe(defaultLogger);
     });
 
     it('should fallback to default logger for missing map entries', () => {
@@ -143,7 +143,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const manager = AgLoggerManager.getInstance(defaultLogger, PlainFormat);
 
       // All levels should return the default logger
-      Object.values(AG_LOG_LEVEL).forEach((level) => {
+      Object.values(AG_LOGLEVEL).forEach((level) => {
         if (typeof level === 'number') {
           expect(manager.getLogger(level)).toBe(defaultLogger);
         }
@@ -215,31 +215,31 @@ describe('AgLoggerManager Integration Tests', () => {
         formatter: firstFormatter,
       });
 
-      expect(manager.getLogger(AG_LOG_LEVEL.INFO)).toBe(firstLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(firstLogger);
       expect(manager.getFormatter()).toBe(firstFormatter);
 
       // Update only formatter
       const secondFormatter = vi.fn().mockReturnValue('second');
       manager.setLogger({ formatter: secondFormatter });
 
-      expect(manager.getLogger(AG_LOG_LEVEL.INFO)).toBe(firstLogger); // Should remain
+      expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(firstLogger); // Should remain
       expect(manager.getFormatter()).toBe(secondFormatter); // Should update
 
       // Update only default logger
       const secondLogger = vi.fn();
       manager.setLogger({ defaultLogger: secondLogger });
 
-      expect(manager.getLogger(AG_LOG_LEVEL.INFO)).toBe(secondLogger); // Should update
+      expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(secondLogger); // Should update
       expect(manager.getFormatter()).toBe(secondFormatter); // Should remain
 
       // Update with partial logger map
       const errorLogger = vi.fn();
       manager.setLogger({
-        loggerMap: { [AG_LOG_LEVEL.ERROR]: errorLogger },
+        loggerMap: { [AG_LOGLEVEL.ERROR]: errorLogger },
       });
 
-      expect(manager.getLogger(AG_LOG_LEVEL.ERROR)).toBe(errorLogger); // Should use custom
-      expect(manager.getLogger(AG_LOG_LEVEL.INFO)).toBe(secondLogger); // Should remain default
+      expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(errorLogger); // Should use custom
+      expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(secondLogger); // Should remain default
       expect(manager.getFormatter()).toBe(secondFormatter); // Should remain
     });
 
@@ -249,14 +249,14 @@ describe('AgLoggerManager Integration Tests', () => {
       const customLogger = vi.fn();
 
       // Test legacy single-level logger setting
-      manager.setLogger(AG_LOG_LEVEL.ERROR, customLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.ERROR)).toBe(customLogger);
+      manager.setLogger(AG_LOGLEVEL.ERROR, customLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(customLogger);
 
       // Test legacy null logger setting (should use default)
       const defaultLogger = vi.fn();
       manager.setLogger({ defaultLogger });
-      manager.setLogger(AG_LOG_LEVEL.INFO, null);
-      expect(manager.getLogger(AG_LOG_LEVEL.INFO)).toBe(defaultLogger);
+      manager.setLogger(AG_LOGLEVEL.INFO, null);
+      expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(defaultLogger);
     });
 
     it('should maintain state consistency during complex updates', () => {
@@ -273,15 +273,15 @@ describe('AgLoggerManager Integration Tests', () => {
         defaultLogger,
         formatter,
         loggerMap: {
-          [AG_LOG_LEVEL.ERROR]: errorLogger,
-          [AG_LOG_LEVEL.DEBUG]: debugLogger,
+          [AG_LOGLEVEL.ERROR]: errorLogger,
+          [AG_LOGLEVEL.DEBUG]: debugLogger,
         },
       });
 
       // Verify initial state
-      expect(manager.getLogger(AG_LOG_LEVEL.ERROR)).toBe(errorLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.DEBUG)).toBe(debugLogger);
-      expect(manager.getLogger(AG_LOG_LEVEL.INFO)).toBe(defaultLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(errorLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.DEBUG)).toBe(debugLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(defaultLogger);
       expect(manager.getFormatter()).toBe(formatter);
 
       // Update default logger - should affect ALL levels since loggerMap gets rebuilt
@@ -290,9 +290,9 @@ describe('AgLoggerManager Integration Tests', () => {
 
       // When default logger is updated, all levels get the new default logger
       // Only levels explicitly in loggerMap would override this
-      expect(manager.getLogger(AG_LOG_LEVEL.ERROR)).toBe(newDefaultLogger); // Updated to new default
-      expect(manager.getLogger(AG_LOG_LEVEL.DEBUG)).toBe(newDefaultLogger); // Updated to new default
-      expect(manager.getLogger(AG_LOG_LEVEL.INFO)).toBe(newDefaultLogger); // Updated to new default
+      expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(newDefaultLogger); // Updated to new default
+      expect(manager.getLogger(AG_LOGLEVEL.DEBUG)).toBe(newDefaultLogger); // Updated to new default
+      expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(newDefaultLogger); // Updated to new default
       expect(manager.getFormatter()).toBe(formatter); // Should remain
     });
   });
@@ -319,7 +319,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const manager = AgLoggerManager.getInstance(defaultLogger, PlainFormat, {});
 
       // Should use default logger for all levels
-      Object.values(AG_LOG_LEVEL).forEach((level) => {
+      Object.values(AG_LOGLEVEL).forEach((level) => {
         if (typeof level === 'number') {
           expect(manager.getLogger(level)).toBe(defaultLogger);
         }
@@ -334,12 +334,12 @@ describe('AgLoggerManager Integration Tests', () => {
       manager.setLogger({
         defaultLogger,
         loggerMap: {
-          [AG_LOG_LEVEL.ERROR]: undefined,
+          [AG_LOGLEVEL.ERROR]: undefined,
         },
       });
 
       // Should fallback to default logger when map value is undefined
-      expect(manager.getLogger(AG_LOG_LEVEL.ERROR)).toBe(defaultLogger);
+      expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(defaultLogger);
     });
 
     it('should handle multiple rapid configuration changes', () => {
@@ -358,7 +358,7 @@ describe('AgLoggerManager Integration Tests', () => {
       });
 
       // Should have final configuration
-      expect(manager.getLogger(AG_LOG_LEVEL.INFO)).toBe(loggers[4]);
+      expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(loggers[4]);
       expect(manager.getFormatter()).toBe(formatters[4]);
     });
   });
