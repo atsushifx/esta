@@ -6,15 +6,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// vitest
+// テストフレームワーク - テストの実行、アサーション、モック機能を提供
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// constants
+// ログレベル定数 - テストで使用するログレベル定義
 import { AG_LOG_LEVEL } from '../../shared/types';
-// types
+// 型定義 - AgLoggerManagerで使用するログレベル型
 import type { AgTLogLevel } from '../../shared/types';
 
-// test target
+// テスト対象 - AgLoggerManagerクラスのシングルトン実装
 import { AgLoggerManager } from '../AgLoggerManager.class';
 
 // mock functions for testing
@@ -26,9 +26,19 @@ const mockDebugLogger = vi.fn();
 const mockFormatter = vi.fn();
 
 /**
- * Unit tests for AgLoggerManager singleton class.
- * Tests singleton behavior, logger and formatter retrieval,
- * and various ways to set and update loggers and formatters.
+ * AgLoggerManagerクラスのユニットテストスイート
+ *
+ * @description シングルトンパターンによるロガー・フォーマッター管理機能を検証する
+ * インスタンス取得、ロガー/フォーマッター設定・取得、設定更新機能をテスト
+ *
+ * @testType Unit Test
+ * @testTarget AgLoggerManager Class
+ * @coverage
+ * - シングルトンインスタンス取得・管理
+ * - ロガー・フォーマッターの設定・取得
+ * - デフォルト・レベル別ロガー管理
+ * - 設定更新機能（legacy形式・options形式）
+ * - 複合設定シナリオ
  */
 describe('AgLoggerManager', () => {
   /**
@@ -50,10 +60,17 @@ describe('AgLoggerManager', () => {
   });
 
   /**
-   * Tests for the static method getInstance.
-   * Checks singleton property, initial default logger setup,
-   * and handling of input parameters such as default logger,
-   * formatter, and logger map.
+   * getInstance静的メソッドのテストスイート
+   *
+   * @description シングルトンインスタンス取得の動作を検証する
+   * 同一インスタンスの取得保証、初期ロガー設定、パラメータ処理を確認
+   *
+   * @testFocus Singleton Instance Management
+   * @scenarios
+   * - 同一インスタンス取得の保証
+   * - デフォルトロガー・フォーマッター・ロガーマップ設定
+   * - パラメータ組み合わせ処理
+   * - 初期状態でのNullLogger設定
    */
   describe('getInstance', () => {
     it('returns the singleton instance', () => {
@@ -146,9 +163,16 @@ describe('AgLoggerManager', () => {
   });
 
   /**
-   * Tests for getLogger method.
-   * Ensures logger function is returned for valid levels,
-   * and default logger is returned for unknown levels.
+   * getLoggerメソッドのテストスイート
+   *
+   * @description ログレベルに対応するロガー関数取得を検証する
+   * 有効レベルでの適切なロガー返却、無効レベルでのデフォルト返却を確認
+   *
+   * @testFocus Logger Function Retrieval
+   * @scenarios
+   * - 指定ログレベルのロガー関数取得
+   * - 未知ログレベルでのデフォルトロガー返却
+   * - ロガー関数の実行可能性
    */
   describe('getLogger', () => {
     it('returns logger function for specified log level', () => {
@@ -170,9 +194,16 @@ describe('AgLoggerManager', () => {
   });
 
   /**
-   * Tests for getFormatter method.
-   * Ensures configured formatter is returned,
-   * or defaults to NullFormat formatter.
+   * getFormatterメソッドのテストスイート
+   *
+   * @description フォーマッター取得機能を検証する
+   * 設定済みフォーマッターの取得、未設定時のNullFormat返却を確認
+   *
+   * @testFocus Formatter Retrieval
+   * @scenarios
+   * - 設定済みフォーマッターの取得
+   * - デフォルトNullFormatフォーマッターの取得
+   * - フォーマッター関数の実行可能性
    */
   describe('getFormatter', () => {
     it('returns the configured formatter', () => {
@@ -191,8 +222,16 @@ describe('AgLoggerManager', () => {
   });
 
   /**
-   * Tests for setLogger method in legacy form.
-   * Sets logger for specified log level or defaults when null is given.
+   * setLoggerメソッド（legacy形式）のテストスイート
+   *
+   * @description レガシー形式でのロガー設定機能を検証する
+   * ログレベル指定でのロガー設定、null指定でのデフォルト設定を確認
+   *
+   * @testFocus Legacy Logger Setting
+   * @scenarios
+   * - 指定ログレベルへのロガー設定
+   * - null指定でのデフォルトロガー設定
+   * - 設定後のロガー取得・実行
    */
   describe('setLogger - legacy form', () => {
     it('sets logger for specified log level', () => {
@@ -219,8 +258,18 @@ describe('AgLoggerManager', () => {
   });
 
   /**
-   * Tests for setLogger method in options form.
-   * Updates default logger, formatter, logger map, or all simultaneously.
+   * setLoggerメソッド（options形式）のテストスイート
+   *
+   * @description options形式でのロガー設定機能を検証する
+   * デフォルトロガー、フォーマッター、ロガーマップの個別・一括更新を確認
+   *
+   * @testFocus Options-based Logger Setting
+   * @scenarios
+   * - デフォルトロガーの更新
+   * - フォーマッターの更新
+   * - ロガーマップの更新
+   * - 全オプション同時更新
+   * - 複数オプション組み合わせ更新
    */
   describe('setLogger - options form', () => {
     it('updates default logger', () => {
@@ -319,9 +368,17 @@ describe('AgLoggerManager', () => {
   });
 
   /**
-   * Tests complex scenarios.
-   * Ensures settings can be updated after instance creation,
-   * and multiple setLogger calls work without errors.
+   * 複合シナリオのテストスイート
+   *
+   * @description 実用的な複合設定シナリオを検証する
+   * インスタンス作成後の設定更新、複数setLogger呼び出しの動作を確認
+   *
+   * @testFocus Complex Configuration Scenarios
+   * @scenarios
+   * - getInstance後の設定更新
+   * - 複数setLogger呼び出しの組み合わせ
+   * - legacy形式とoptions形式の混在使用
+   * - 設定変更の累積効果
    */
   describe('Complex scenarios', () => {
     it('can update settings after getInstance', () => {

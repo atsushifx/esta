@@ -32,7 +32,7 @@ describe('AgLoggerGetMessage', () => {
       const userid = 'u1029165';
       const result = AgLoggerGetMessage(AG_LOG_LEVEL.INFO, 'userid=', userid);
       expect(result.logLevel).toEqual(AG_LOG_LEVEL.INFO);
-      expect(result.message).toEqual('userid=u1029165');
+      expect(result.message).toEqual('userid= u1029165');
       expect(result.args).toEqual([]);
     });
 
@@ -56,7 +56,7 @@ describe('AgLoggerGetMessage', () => {
       const dtTime = '10:30:00';
       const result = AgLoggerGetMessage(AG_LOG_LEVEL.WARN, 'date:', dtDate, ' time:', dtTime);
       expect(result.logLevel).toEqual(AG_LOG_LEVEL.WARN);
-      expect(result.message).toEqual('date:2022-06-10 time:10:30:00');
+      expect(result.message).toEqual('date: 2022-06-10 time: 10:30:00');
       expect(result.args).toEqual([]);
     });
 
@@ -66,7 +66,7 @@ describe('AgLoggerGetMessage', () => {
     it('handles primitive types', () => {
       const result = AgLoggerGetMessage(AG_LOG_LEVEL.ERROR, 'number:', 123, ' string:', 'abc', ' boolean:', true);
       expect(result.logLevel).toEqual(AG_LOG_LEVEL.ERROR);
-      expect(result.message).toEqual('number:123 string:abc boolean:true');
+      expect(result.message).toEqual('number: 123 string: abc boolean: true');
       expect(result.args).toEqual([]);
     });
   });
@@ -124,7 +124,7 @@ describe('AgLoggerGetMessage', () => {
       const result = AgLoggerGetMessage(AG_LOG_LEVEL.DEBUG, timestampStr, 'user:', 'john', { id: 123 });
 
       expect(result.logLevel).toEqual(AG_LOG_LEVEL.DEBUG);
-      expect(result.message).toEqual('user:john');
+      expect(result.message).toEqual('user: john');
       expect(result.timestamp).toEqual(new Date(timestampStr));
       expect(result.args).toEqual([{ id: 123 }]);
     });

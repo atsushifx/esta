@@ -6,19 +6,36 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// vitest
+// テストフレームワーク - テストの実行とアサーション機能を提供
 import { describe, expect, it } from 'vitest';
 
-// constants
+// ログレベル定数 - テストで使用するログレベル定義
 import { AG_LOG_LEVEL } from '../../../../shared/types';
-// type
+// 型定義 - ログメッセージの構造を定義する型
 import type { AgLogMessage } from '../../../../shared/types/AgLogger.types';
 
-// test unit
+// テスト対象 - JSON形式フォーマッタープラグインの実装
 import { JsonFormat } from '../JsonFormat';
 
 // test main
 
+/**
+ * JsonFormatプラグインのユニットテストスイート
+ *
+ * @description JSON形式でのログメッセージフォーマット機能を検証する
+ * 基本メッセージのJSON化、複数引数処理、全ログレベル対応、
+ * エラーハンドリング、出力の妥当性をテスト
+ *
+ * @testType Unit Test
+ * @testTarget JsonFormat Plugin
+ * @coverage
+ * - 基本ログメッセージのJSON構造化
+ * - 引数・配列・オブジェクトの適切なシリアライゼーション
+ * - 全ログレベルでの正確なレベル表示
+ * - タイムスタンプの正確な形式
+ * - 循環参照でのエラー処理
+ * - 有効なJSON文字列の出力保証
+ */
 describe('JsonFormat', () => {
   /**
    * Tests basic message formatting into JSON.

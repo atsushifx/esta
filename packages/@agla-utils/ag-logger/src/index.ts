@@ -26,7 +26,6 @@ export { AgLogger, getLogger } from './AgLogger.class';
 
 // plugins: logger
 export { ConsoleLogger } from './plugins/logger/ConsoleLogger';
-export { E2eMockLogger } from './plugins/logger/E2eMockLogger';
 export { NullLogger } from './plugins/logger/NullLogger';
 
 // plugins: format

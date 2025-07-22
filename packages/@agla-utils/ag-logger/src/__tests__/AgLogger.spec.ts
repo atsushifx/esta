@@ -6,13 +6,13 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// vitest
+// テストフレームワーク - テストの実行、アサーション、モック機能を提供
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// constants
+// ログレベル定数 - テストで使用するログレベルの定義
 import { AG_LOG_LEVEL } from '../../shared/types';
 
-// test target
+// テスト対象 - AgLoggerクラスのメイン実装
 import { AgLogger } from '../AgLogger.class';
 
 // mock functions for testing
@@ -20,8 +20,18 @@ const mockLogger = vi.fn();
 const mockFormatter = vi.fn().mockImplementation((msg) => msg);
 
 /**
- * Unit tests for AgLogger class.
- * Tests singleton behavior, log level filtering, and verbose functionality.
+ * AgLoggerクラスのユニットテストスイート
+ *
+ * @description シングルトンパターンの動作、ログレベルフィルタリング、
+ * verbose機能などの核となる機能を検証する
+ *
+ * @testType Unit Test
+ * @testTarget AgLogger Class
+ * @coverage
+ * - シングルトンインスタンスの一意性
+ * - verbose機能のON/OFF制御
+ * - ログレベル設定とフィルタリング
+ * - 設定の永続化
  */
 describe('AgLogger', () => {
   /**
@@ -43,8 +53,18 @@ describe('AgLogger', () => {
   });
 
   /**
-   * Tests for verbose functionality.
-   * Checks that verbose mode controls log output.
+   * verbose機能のテストスイート
+   *
+   * @description verbose モードがログ出力を制御する機能を検証する
+   * verbose設定の取得・更新、verbose無効時の出力抑制、
+   * verbose有効時の出力許可、他のログレベルへの影響なしを確認
+   *
+   * @testFocus Verbose Mode Control
+   * @scenarios
+   * - verbose状態の取得・設定
+   * - verbose無効時のログ出力抑制
+   * - verbose有効時のログ出力許可
+   * - 他のログレベル出力への影響なし
    */
   describe('verbose functionality', () => {
     it('should have setVerbose method that returns current verbose state', () => {

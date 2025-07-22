@@ -6,14 +6,16 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// vitest
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+// テストフレームワーク - テストの実行、アサーション、モック機能を提供
+import { describe, expect, it, vi } from 'vitest';
 
-// constants
+// ログレベル定数 - E2Eテストで使用するログレベル定義
 import { AG_LOG_LEVEL } from '../../shared/types';
-// test targets
+// テスト対象 - getLogger関数（ロガー取得のエントリーポイント）
 import { getLogger } from '../../src/AgLogger.class';
+// プラグイン - 人間可読な平文フォーマッター
 import { PlainFormat } from '../../src/plugins/format/PlainFormat';
+// プラグイン - コンソール出力ロガー
 import { ConsoleLogger } from '../../src/plugins/logger/ConsoleLogger';
 
 // mock console methods
@@ -26,21 +28,42 @@ const mockConsole = {
 };
 
 /**
- * End-to-end tests for AgLogger covering parameter omission in getLogger calls
- * and setLogger method functionality.
+ * AgLogger E2Eテストスイート - パラメーター省略とsetLogger機能
+ *
+ * @description getLogger呼び出しでのパラメーター省略と
+ * setLoggerメソッド機能をカバーするE2Eテスト
+ * 設定継承、動的設定変更、シングルトン動作を実環境で検証
+ *
+ * @testType End-to-End Test
+ * @testTarget AgLogger Configuration Management
+ * @realWorldScenarios
+ * - アプリケーション内でのロガー設定管理
+ * - ライブラリ間でのロガー共有
+ * - 動的ログ設定変更
+ * - 設定ファイルや環境変数による設定更新
  */
 describe('AgLogger E2E Tests - Parameter Omission and setLogger', () => {
-  beforeEach(() => {
+  const setupTestContext = (): void => {
     vi.clearAllMocks();
     Object.assign(console, mockConsole);
-  });
+  };
 
   /**
-   * Tests that after initial configuration,
-   * omitting all parameters in getLogger reuses previous settings.
+   * getLoggerパラメーター省略動作テストスイート
+   *
+   * @description 初期設定後のgetLoggerでの全パラメーター省略時に
+   * 以前の設定が再利用されることをテストする
+   * 設定継承、シングルトン動作、部分省略時の動作を検証
+   *
+   * @testFocus Parameter Omission Behavior
+   * @scenarios
+   * - 初期設定後の全パラメーター省略時の設定継承
+   * - 部分パラメーター省略時の既存設定使用
+   * - 複数getLogger呼び出しでのシングルトン動作確認
    */
   describe('Parameter omission behavior in getLogger', () => {
     it('uses previous settings when all parameters are omitted after initial setup', () => {
+      setupTestContext();
       // Initial setup
       const logger1 = getLogger(ConsoleLogger, PlainFormat);
       logger1.setLogLevel(AG_LOG_LEVEL.INFO);
@@ -60,6 +83,7 @@ describe('AgLogger E2E Tests - Parameter Omission and setLogger', () => {
     });
 
     it('uses previous settings when only partial parameters are omitted', () => {
+      setupTestContext();
       // Initial setup
       getLogger(ConsoleLogger, PlainFormat);
 
@@ -74,6 +98,7 @@ describe('AgLogger E2E Tests - Parameter Omission and setLogger', () => {
     });
 
     it('ensures singleton behavior', () => {
+      setupTestContext();
       const logger1 = getLogger(ConsoleLogger, PlainFormat);
       const logger2 = getLogger();
       const logger3 = getLogger(ConsoleLogger);
@@ -84,10 +109,20 @@ describe('AgLogger E2E Tests - Parameter Omission and setLogger', () => {
   });
 
   /**
-   * Tests setLogger method's ability to update logger and formatter settings.
+   * setLoggerメソッド機能テストスイート
+   *
+   * @description setLoggerメソッドのロガーやフォーマッター設定更新能力をテストする
+   * 全設定同時更新、部分設定更新、個別コンポーネント更新の動作を検証
+   *
+   * @testFocus setLogger Method Functionality
+   * @scenarios
+   * - 全設定の同時更新（defaultLogger + formatter）
+   * - 部分設定の別々更新（formatterのみ、defaultLoggerのみ）
+   * - 設定変更後のログ出力品質確認
    */
   describe('setLogger method functionality', () => {
     it('updates all settings at once via setLogger', () => {
+      setupTestContext();
       const logger = getLogger(ConsoleLogger, PlainFormat);
       logger.setLogLevel(AG_LOG_LEVEL.INFO);
 
@@ -105,6 +140,7 @@ describe('AgLogger E2E Tests - Parameter Omission and setLogger', () => {
     });
 
     it('updates partial settings via setLogger', () => {
+      setupTestContext();
       const logger = getLogger(ConsoleLogger, PlainFormat);
       logger.setLogLevel(AG_LOG_LEVEL.INFO);
 
@@ -121,6 +157,7 @@ describe('AgLogger E2E Tests - Parameter Omission and setLogger', () => {
     });
 
     it('updates only defaultLogger via setLogger', () => {
+      setupTestContext();
       const logger = getLogger(ConsoleLogger, PlainFormat);
       logger.setLogLevel(AG_LOG_LEVEL.INFO);
 
@@ -138,10 +175,22 @@ describe('AgLogger E2E Tests - Parameter Omission and setLogger', () => {
   });
 
   /**
-   * Tests combined usage scenarios of settings changes and parameter omission.
+   * 統合シナリオテストスイート
+   *
+   * @description 設定変更とパラメーター省略の組み合わせ使用シナリオをテストする
+   * 実用的なアプリケーションでの設定管理パターンを再現し、
+   * 組み合わせシナリオでの動作を検証
+   *
+   * @testFocus Combined Usage Scenarios
+   * @scenarios
+   * - 設定変更 + パラメーター省略の組み合わせ
+   * - 複数setLogger呼び出しでの設定上書き動作
+   * - インスタンス同一性の保持と設定共有
+   * - 継続的なログ出力品質の保証
    */
   describe('Integration scenario tests', () => {
     it('combines setting changes and parameter omission', () => {
+      setupTestContext();
       // Initial setup
       const logger1 = getLogger(ConsoleLogger, PlainFormat);
       logger1.setLogLevel(AG_LOG_LEVEL.INFO);
@@ -169,6 +218,7 @@ describe('AgLogger E2E Tests - Parameter Omission and setLogger', () => {
     });
 
     it('overwrites settings via multiple setLogger calls', () => {
+      setupTestContext();
       const logger = getLogger(ConsoleLogger, PlainFormat);
       logger.setLogLevel(AG_LOG_LEVEL.INFO);
 

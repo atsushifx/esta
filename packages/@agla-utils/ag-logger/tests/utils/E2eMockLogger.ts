@@ -1,4 +1,4 @@
-// src/plugins/logger/E2eMockLogger.ts
+// tests/utils/E2eMockLogger.ts
 // @(#) : E2E Mock Logger Implementation
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -7,8 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import { AG_LOG_LEVEL } from '../../../shared/types';
-import type { AgTLogLevel } from '../../../shared/types';
+import { AG_LOG_LEVEL } from '../../shared/types';
+import type { AgTLogLevel } from '../../shared/types';
 
 /**
  * Mock logger for E2E testing that captures log messages in arrays.

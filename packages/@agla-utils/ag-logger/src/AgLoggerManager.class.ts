@@ -161,4 +161,12 @@ export class AgLoggerManager {
       }
     }
   }
+
+  /**
+   * Resets the singleton instance.
+   * This method is intended for testing purposes to ensure clean state between tests.
+   */
+  static resetSingleton(): void {
+    AgLoggerManager.instance = undefined;
+  }
 }

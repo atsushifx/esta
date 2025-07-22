@@ -45,7 +45,7 @@ export const AgLoggerGetMessage = (logLevel: AgTLogLevel, ...args: unknown[]): A
   const argsPrm: unknown[] = [];
   args2.forEach((arg) => {
     if (isArgToString(arg)) {
-      argsStr.push(String(arg));
+      argsStr.push(String(arg).trim());
     } else {
       argsPrm.push(arg);
     }
@@ -54,7 +54,7 @@ export const AgLoggerGetMessage = (logLevel: AgTLogLevel, ...args: unknown[]): A
   return {
     logLevel,
     timestamp,
-    message: argsStr.join(''),
+    message: argsStr.join(' '),
     args: argsPrm,
   };
 };

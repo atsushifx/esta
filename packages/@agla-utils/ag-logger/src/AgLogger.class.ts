@@ -187,6 +187,15 @@ export class AgLogger {
       this.log(...args);
     }
   }
+
+  /**
+   * Resets the singleton instance and log level.
+   * This method is intended for testing purposes to ensure clean state between tests.
+   */
+  static resetSingleton(): void {
+    AgLogger._instance = undefined;
+    AgLogger._logLevel = AG_LOG_LEVEL.OFF;
+  }
 }
 
 /**

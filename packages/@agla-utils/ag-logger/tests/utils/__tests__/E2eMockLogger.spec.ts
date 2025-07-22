@@ -1,4 +1,4 @@
-// src/plugins/logger/__tests__/E2eMockLogger.spec.ts
+// tests/utils/__tests__/E2eMockLogger.spec.ts
 // @(#) : E2eMockLogger Unit Test
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -10,7 +10,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 // constants
-import { AG_LOG_LEVEL } from '../../../../shared/types';
+import { AG_LOG_LEVEL } from '../../../shared/types';
 
 // test target
 import { E2eMockLogger } from '../E2eMockLogger';
