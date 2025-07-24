@@ -26,6 +26,10 @@ export default mergeConfig(baseConfig, {
       'tests/e2e/**/*.test.ts',
       'tests/e2e/**/*.spec.ts',
     ],
+    exclude: [
+      '**/__tests__/+.spec.ts',
+      '**/__tests__/+.test.ts',
+    ],
     caches: {
       dir: path.resolve(__dirname, '../../../.cache/vitest-cache/e2e/'),
     },

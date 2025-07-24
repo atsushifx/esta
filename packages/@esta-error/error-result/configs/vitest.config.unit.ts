@@ -22,8 +22,8 @@ export default mergeConfig(baseConfig, {
   test: {
     include: [
       // Unit Test (develop test) exec only sub repositories
-      'src/**/*.test.ts',
-      'src/**/*.spec.ts',
+      'src/**/__tests__/*.test.ts',
+      'src/**/__tests__/*.spec.ts',
     ],
     caches: {
       dir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),

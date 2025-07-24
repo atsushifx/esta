@@ -25,6 +25,10 @@ export default mergeConfig(baseConfig, {
       'tests/integration/**/*.test.ts',
       'tests/integration/**/*.spec.ts',
     ],
+    exclude: [
+      '**/__tests__/+.spec.ts',
+      '**/__tests__/+.test.ts',
+    ],
     caches: {
       dir: path.resolve(__dirname, '../../../.cache/vitest-cache/integration/'),
     },

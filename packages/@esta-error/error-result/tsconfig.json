@@ -3,8 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@shared/*": ["../../../shared/packages/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
