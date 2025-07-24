@@ -32,7 +32,7 @@ ESTAシステムでは、用途に応じて2つのエラーハンドリングパ
 // 基本ユーティリティの例
 export function validatePath(path: string): [string, ErrorResult | undefined] {
   if (!path) {
-    return [undefined, new ErrorResult('INVALID_PATH', 'Path is required')];
+    return [undefined, errorResult.error('INVALID_PATH', 'Path is required')];
   }
 
   const normalized = path.normalize();
@@ -187,47 +187,19 @@ export class EstaError extends Error {
       },
     );
   }
-
-  /**
-   * 設定エラーの作成
-   */
-  static config(message: string, context?: Record<string, unknown>): EstaError {
-    return new EstaError('CONFIG_ERROR', message, context);
-  }
-
-  /**
-   * バリデーションエラーの作成
-   */
-  static validation(message: string, context?: Record<string, unknown>): EstaError {
-    return new EstaError('VALIDATION_ERROR', message, context);
-  }
-
-  /**
-   * ネットワークエラーの作成
-   */
-  static network(message: string, context?: Record<string, unknown>): EstaError {
-    return new EstaError('NETWORK_ERROR', message, context);
-  }
-
-  /**
-   * ファイルシステムエラーの作成
-   */
-  static filesystem(message: string, context?: Record<string, unknown>): EstaError {
-    return new EstaError('FILESYSTEM_ERROR', message, context);
-  }
-
-  /**
-   * インストールエラーの作成
-   */
-  static installation(message: string, context?: Record<string, unknown>): EstaError {
-    return new EstaError('INSTALLATION_ERROR', message, context);
-  }
 }
 ```
 
-## ErrorResult クラス仕様
+## ErrorResult ファクトリー仕様
 
-### 基本定義
+### 基本コンセプト
+
+ErrorResultファクトリーは、エラータプル作成を簡素化し、以下の使い分けを行います：
+
+1. **通常のエラー処理**: `errorResult.error()`/`errorResult.fatal()`でタプル用ErrorResultを作成
+2. **システム重大エラー**: 既存の`errorExit`/`fatalExit`でthrowして即座に終了
+
+### ErrorResult型定義
 
 ```typescript
 export class ErrorResult extends Error {
@@ -255,9 +227,6 @@ export class ErrorResult extends Error {
     }
   }
 
-  /**
-   * エラーのJSON表現を取得
-   */
   toJSON(): ErrorResultJSON {
     return {
       name: this.name,
@@ -269,94 +238,103 @@ export class ErrorResult extends Error {
     };
   }
 
-  /**
-   * EstaErrorへの変換
-   */
-  toEstaError(): EstaError {
-    return new EstaError(this.code, this.message, this.context);
-  }
-
-  /**
-   * 回復可能性の判定
-   */
   isRecoverable(): boolean {
     return this.recoverable;
   }
 }
-```
 
-### 関連型定義
-
-```typescript
 export interface ErrorResultOptions {
   recoverable?: boolean;
 }
-
-export interface ErrorResultJSON {
-  name: string;
-  code: string;
-  message: string;
-  context?: Record<string, unknown>;
-  timestamp: string;
-  recoverable: boolean;
-}
 ```
 
-### 静的メソッド
+### ファクトリー実装
 
 ```typescript
-export class ErrorResult extends Error {
-  // ... 既存の実装 ...
-
+class ErrorResultFactory {
   /**
-   * 回復不可能なエラーの作成
+   * 回復可能なエラーを作成（タプル用）
+   * @param code エラーコード
+   * @param message エラーメッセージ
+   * @param context コンテキスト情報
+   * @returns ErrorResult
    */
-  static fatal(code: string, message: string, context?: Record<string, unknown>): ErrorResult {
-    return new ErrorResult(code, message, context, { recoverable: false });
+  error(code: string, message: string, context?: Record<string, unknown>): ErrorResult {
+    return new ErrorResult(code, message, context, { recoverable: true });
   }
 
   /**
-   * パスエラーの作成
+   * 致命的エラーを作成（タプル用）
+   * @param code エラーコード
+   * @param message エラーメッセージ
+   * @param context コンテキスト情報
+   * @returns ErrorResult
    */
-  static invalidPath(path: string, reason?: string): ErrorResult {
-    return new ErrorResult(
-      'INVALID_PATH',
-      reason ?? 'Invalid path provided',
-      { path },
+  fatal(code: string, message: string, context?: Record<string, unknown>): ErrorResult {
+    const error = new ErrorResult(code, message, context, { recoverable: false });
+    fatalExit(error.message, ExitCode.EXEC_FAILURE);
+  }
+}
+
+export const errorResult = new ErrorResultFactory();
+```
+
+### 使用例パターン
+
+```typescript
+// パターン1: タプル型での通常エラー処理
+export function validatePath(path: string): [string, ErrorResult | undefined] {
+  if (!path) {
+    return [undefined, errorResult.error('INVALID_PATH', 'Path is required')];
+  }
+
+  const normalized = path.normalize();
+  return [normalized, undefined];
+}
+
+// パターン2: システム重大エラーでの即座終了
+export function processConfiguration(config: unknown): ConfigResult {
+  if (!isValidConfig(config)) {
+    // 通常のバリデーションエラー - タプルで返す
+    const [result, error] = validateConfig(config);
+    if (error) {
+      return [undefined, error];
+    }
+  }
+
+  try {
+    return parseConfig(config);
+  } catch (e) {
+    // システム重大エラー - 即座に終了
+    fatalExit('Configuration parsing failed', ExitCode.EXEC_FAILURE);
+  }
+}
+
+// パターン3: エラーチェーンの活用
+export async function installTool(config: ToolConfig): Promise<InstallResult> {
+  const [validConfig, validationError] = validateToolConfig(config);
+  if (validationError) {
+    // EstaErrorでエラーチェーンを作成
+    throw EstaError.validation(
+      'Tool configuration validation failed',
+      { config, errors: validationError.toJSON() },
     );
   }
 
-  /**
-   * ファイル未発見エラーの作成
-   */
-  static fileNotFound(path: string): ErrorResult {
-    return new ErrorResult(
-      'FILE_NOT_FOUND',
-      'File not found',
-      { path },
-    );
-  }
-
-  /**
-   * 権限エラーの作成
-   */
-  static permissionDenied(path: string, operation: string): ErrorResult {
-    return new ErrorResult(
-      'PERMISSION_DENIED',
-      `Permission denied for ${operation}`,
-      { path, operation },
-    );
-  }
-
-  /**
-   * 検証エラーの作成
-   */
-  static validationFailed(field: string, value: unknown, rule: string): ErrorResult {
-    return new ErrorResult(
-      'VALIDATION_FAILED',
-      `Validation failed for field '${field}': ${rule}`,
-      { field, value, rule },
-    );
+  try {
+    return await performInstallation(validConfig);
+  } catch (error) {
+    if (isCriticalSystemError(error)) {
+      // システム重大エラー
+      fatalExit('Critical installation failure', ExitCode.EXEC_FAILURE);
+    } else {
+      // 通常のインストールエラー - チェーン
+      const estaError = EstaError.installation(
+        `Failed to install tool: ${config.name}`,
+        { config },
+      );
+      throw error instanceof Error ? estaError.chain(error) : estaError;
+    }
   }
 }
 ```
@@ -365,17 +343,19 @@ export class ErrorResult extends Error {
 
 ### 基本パターン
 
+タプル型エラーハンドリングは維持し、`errorResult`ファクトリーで簡単に作成できるようにします：
+
 ```typescript
 // タプル型の定義
 export type TupleResult<T, E = ErrorResult> = [T, undefined] | [undefined, E];
 
-// 使用例
+// ファクトリーを使用した簡単な作成
 export function parseJson<T>(jsonString: string): TupleResult<T> {
   try {
     const parsed = JSON.parse(jsonString);
     return [parsed, undefined];
   } catch (error) {
-    return [undefined, ErrorResult.validationFailed('json', jsonString, 'valid JSON required')];
+    return [undefined, errorResult.error('INVALID_JSON', 'Invalid JSON format', { jsonString })];
   }
 }
 
@@ -388,69 +368,6 @@ if (error) {
 
 // result は確実に MyType 型
 console.log(result.someProperty);
-```
-
-### ヘルパー関数
-
-```typescript
-/**
- * タプル結果の成功判定
- */
-export function isSuccess<T, E>(result: TupleResult<T, E>): result is [T, undefined] {
-  return result[1] === undefined;
-}
-
-/**
- * タプル結果の失敗判定
- */
-export function isError<T, E>(result: TupleResult<T, E>): result is [undefined, E] {
-  return result[1] !== undefined;
-}
-
-/**
- * タプル結果の値取得（throw版）
- */
-export function unwrap<T, E extends Error>(result: TupleResult<T, E>): T {
-  if (isError(result)) {
-    throw result[1];
-  }
-  return result[0];
-}
-
-/**
- * タプル結果の値取得（デフォルト値版）
- */
-export function unwrapOr<T, E>(result: TupleResult<T, E>, defaultValue: T): T {
-  return isSuccess(result) ? result[0] : defaultValue;
-}
-
-/**
- * タプル結果のマッピング
- */
-export function mapResult<T, U, E>(
-  result: TupleResult<T, E>,
-  mapper: (value: T) => U,
-): TupleResult<U, E> {
-  return isSuccess(result) ? [mapper(result[0]), undefined] : result;
-}
-
-/**
- * 複数のタプル結果の結合
- */
-export function combineResults<T extends readonly unknown[], E>(
-  ...results: { [K in keyof T]: TupleResult<T[K], E> }
-): TupleResult<T, E> {
-  const values: unknown[] = [];
-
-  for (const result of results) {
-    if (isError(result)) {
-      return result;
-    }
-    values.push(result[0]);
-  }
-
-  return [values as T, undefined];
-}
 ```
 
 ## 互換性レイヤー
@@ -905,21 +822,24 @@ export class EstaError extends Error {
 
 ## 実装優先順位
 
-### Phase 1a: 基本クラス実装
+### Phase 1a: 基本実装
 
-1. EstaError クラス基本実装
-2. ErrorResult クラス基本実装
-3. 基本的なテスト
+1. `ErrorResult`クラスの実装
+2. `ErrorResultFactory`クラスとファクトリー関数の実装
+3. `errorResult`シングルトンの作成
+4. タプル型ヘルパー関数の実装
+5. 基本的なテスト
 
-### Phase 1b: ヘルパー・ユーティリティ
+### Phase 1b: 統合とエラーチェーン
 
-1. タプル型ヘルパー関数
-2. エラーコード標準化
-3. 互換性レイヤー
+1. `EstaError`との連携パターン
+2. エラーチェーン機能の維持と改善
+3. 既存の`errorExit`/`fatalExit`との統合パターン
+4. 統合テスト
 
 ### Phase 1c: 高度な機能
 
-1. エラーチェーン機能
-2. 国際化対応
+1. エラーコード標準化
+2. 互換性レイヤーの実装
 3. パフォーマンス最適化
-4. セキュリティ強化
+4. セキュリティ強化とドキュメント完成
