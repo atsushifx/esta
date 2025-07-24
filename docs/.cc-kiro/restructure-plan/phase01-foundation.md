@@ -6,6 +6,8 @@ sidebar_position: 1
 
 # Phase 1: Foundation Packages
 
+> **Note**: このフェーズの実装では **t-wad式TDD（Test-Driven Development）** を採用します。テストファーストで実装を進め、品質と設計の確実性を保証します。
+
 # Phase 1: 基盤パッケージ作成
 
 ## 実行コマンド

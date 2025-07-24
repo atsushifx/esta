@@ -4,6 +4,8 @@ description: エンドユーザー向け統合パッケージと包括的テス�
 sidebar_position: 4
 ---
 
+> **Note**: このフェーズの実装では **t-wad式TDD（Test-Driven Development）** を採用します。テストファーストで実装を進め、品質と設計の確実性を保証します。
+
 # Phase 4: 統合レイヤー作成とテスト強化 - 詳細設計書
 
 **Version**: 1.0\

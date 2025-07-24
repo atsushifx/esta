@@ -4,6 +4,8 @@ description: @esta-error/error-handler パッケージの詳細設計と統一�
 sidebar_position: 1.1
 ---
 
+> **Note**: このサブフェーズの実装では **t-wad式TDD（Test-Driven Development）** を採用します。テストファーストで実装を進め、品質と設計の確実性を保証します。
+
 # Phase 1.1: @esta-error/error-handler パッケージ仕様書
 
 ## 概要
