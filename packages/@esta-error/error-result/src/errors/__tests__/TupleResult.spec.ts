@@ -111,7 +111,7 @@ describe('TupleResult', () => {
      */
     describe('successful callback conversion', () => {
       it('should convert successful callback to success tuple', async () => {
-        const fn = (callback: (error: Error | null, result?: string) => void) => {
+        const fn = (callback: (error: Error | null, result?: string) => void): void => {
           callback(null, 'success');
         };
 
@@ -127,7 +127,7 @@ describe('TupleResult', () => {
      */
     describe('error callback conversion', () => {
       it('should convert error callback to error tuple', async () => {
-        const fn = (callback: (error: Error | null, result?: string) => void) => {
+        const fn = (callback: (error: Error | null, result?: string) => void): void => {
           callback(new Error('Callback failed'));
         };
 

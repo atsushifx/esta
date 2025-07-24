@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // Type definitions for ErrorResult class
-import type { ErrorResultJSON, ErrorResultOptions } from '../../shared/types';
+import type { ErrorResultJSON } from '../../shared/types';
 
 /**
  * ErrorResult class extends Error to provide structured error handling

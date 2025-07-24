@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // モックを事前に設定
-vi.mock('@esta-core/error-handler', () => ({
+vi.mock('@esta-error/error-handler', () => ({
   fatalExit: vi.fn(() => {
     throw new Error('Fatal exit called');
   }),
@@ -13,7 +13,7 @@ vi.mock('@shared/constants', () => ({
   },
 }));
 
-import { fatalExit } from '@esta-core/error-handler';
+import { fatalExit } from '@esta-error/error-handler';
 import { errorResult } from '../handlers/ErrorResultFactory';
 
 describe('errorResult singleton', () => {

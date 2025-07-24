@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // Fatal error handler utility
-import { fatalExit } from '@esta-core/error-handler';
+import { fatalExit } from '@esta-error/error-handler';
 // Exit code constants
 import { ExitCode } from '@shared/constants';
 // ErrorResult class for error handling

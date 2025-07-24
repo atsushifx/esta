@@ -47,7 +47,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@esta-core/error-handler": "workspace:*",
+    "@esta-error/error-handler": "workspace:*",
     "@shared/constants": "workspace:*"
   },
   "devDependencies": {}

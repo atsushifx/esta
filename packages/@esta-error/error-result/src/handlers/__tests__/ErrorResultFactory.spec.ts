@@ -10,7 +10,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // モックを事前に設定
-vi.mock('@esta-core/error-handler', () => ({
+vi.mock('@esta-error/error-handler', () => ({
   fatalExit: vi.fn(() => {
     throw new Error('Fatal exit called');
   }),
@@ -23,7 +23,7 @@ vi.mock('@shared/constants', () => ({
 }));
 
 // Fatal error handler utility
-import { fatalExit } from '@esta-core/error-handler';
+import { fatalExit } from '@esta-error/error-handler';
 // Error codes and factory class
 import { ERROR_CODES, ErrorResultFactory } from '../..';
 
@@ -84,7 +84,7 @@ describe('ErrorResultFactory', () => {
           factory.fatal(ERROR_CODES.TEST_ERROR, 'Fatal message');
         }).toThrow('Fatal exit called');
 
-        expect(fatalExit).toHaveBeenCalledWith('Fatal message', 1);
+        expect(fatalExit).toHaveBeenCalledWith(1, 'Fatal message');
       });
     });
   });
