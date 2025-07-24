@@ -2,6 +2,9 @@
 appleboy
 aquasec
 casey
+centos
+chdir
+cloc
 dandavison
 DEVMODE
 dîrëctørÿ
@@ -19,9 +22,11 @@ GHAexecutor
 jqlang
 jsonlint
 LOCALAPPDATA
+madge
 mdast
 mikefarah
 picklist
+readdir
 REGPATH
 sharkdp
 stylelintcache
@@ -31,4 +36,3 @@ tëst
 tsup
 userid
 Yedidia
-extname
