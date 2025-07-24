@@ -1,0 +1,8 @@
+export const ERROR_CODES = {
+  PROMISE_REJECTED: 'PROMISE_REJECTED',
+  CALLBACK_ERROR: 'CALLBACK_ERROR',
+  CUSTOM_ERROR: 'CUSTOM_ERROR',
+  TEST_ERROR: 'TEST_ERROR',
+} as const;
+
+export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
