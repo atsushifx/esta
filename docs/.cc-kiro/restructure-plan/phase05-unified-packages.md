@@ -4,6 +4,8 @@ description: パフォーマンス最適化と包括的ドキュメント整備�
 sidebar_position: 5
 ---
 
+> **Note**: このフェーズの実装では **t-wad式TDD（Test-Driven Development）** を採用します。テストファーストで実装を進め、品質と設計の確実性を保証します。
+
 # Phase 5: 最適化・ドキュメント整備・クリーンアップ - 詳細設計書
 
 **Version**: 1.0\

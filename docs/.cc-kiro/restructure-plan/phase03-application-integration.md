@@ -4,6 +4,8 @@ description: アプリケーションレイヤーの統合とGitHub Actions機�
 sidebar_position: 3
 ---
 
+> **Note**: このフェーズの実装では **t-wad式TDD（Test-Driven Development）** を採用します。テストファーストで実装を進め、品質と設計の確実性を保証します。
+
 # Phase 3: アクション・システムパッケージ整理 - 詳細設計書
 
 **Version**: 1.0\

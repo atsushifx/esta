@@ -1,5 +1,5 @@
-// src: ./fatalExit.ts
-// @(#): 致命的エラー終了関数
+// src: ./errorExit.ts
+// @(#): 非致命的エラー終了関数
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -16,18 +16,18 @@ import { ExitError } from './error/ExitError';
 import { formatErrorMessage } from './utils/exitCodeUtils';
 
 /**
- * 致命的エラーでアプリケーションを終了
- * エラーをログに記録して致命的ExitErrorをスロー
+ * 非致命的エラーでアプリケーションを終了
+ * エラーをログに記録してExitErrorをスロー
  * @param code 終了コード
  * @param message エラーメッセージ
- * @throws ExitError 常に致命的ExitErrorをスロー
+ * @throws ExitError 常にExitErrorをスロー
  */
-export const fatalExit = (
+export const errorExit = (
   code: TExitCode,
   message: string,
 ): never => {
   const logger = getLogger();
-  const formattedMessage = formatErrorMessage('FATAL', code, message);
-  logger.fatal(formattedMessage);
-  throw new ExitError(code, message, true);
+  const formattedMessage = formatErrorMessage('ERROR', code, message);
+  logger.error(formattedMessage);
+  throw new ExitError(code, message);
 };

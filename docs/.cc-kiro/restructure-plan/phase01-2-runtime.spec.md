@@ -4,6 +4,8 @@ description: @esta-runtime パッケージの詳細設計と実装仕様（エ�
 sidebar_position: 1.2
 ---
 
+> **Note**: このサブフェーズの実装では **t-wad式TDD（Test-Driven Development）** を採用します。テストファーストで実装を進め、品質と設計の確実性を保証します。
+
 # Phase 1.2: @esta-runtime パッケージ仕様書
 
 ## 概要

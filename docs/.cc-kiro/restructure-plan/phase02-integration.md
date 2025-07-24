@@ -6,6 +6,8 @@ sidebar_position: 2
 
 # Phase 2: Integration Packages
 
+> **Note**: このフェーズの実装では **t-wad式TDD（Test-Driven Development）** を採用します。テストファーストで実装を進め、品質と設計の確実性を保証します。
+
 # Phase 2: 機能統合パッケージ作成
 
 ## 実行コマンド
