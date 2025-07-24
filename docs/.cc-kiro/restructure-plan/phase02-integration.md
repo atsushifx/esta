@@ -1,3 +1,9 @@
+---
+title: Phase 2 - 機能統合パッケージ作成
+description: 重複している機能パッケージの統合とクロスプラットフォーム対応の実現
+sidebar_position: 2
+---
+
 # Phase 2: Integration Packages
 
 # Phase 2: 機能統合パッケージ作成
