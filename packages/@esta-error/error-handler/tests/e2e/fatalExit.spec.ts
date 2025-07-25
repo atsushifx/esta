@@ -1,5 +1,5 @@
 import { AgLogLevelCode, E2eMockLogger, getLogger, PlainFormat } from '@agla-utils/ag-logger';
-import { ExitCode } from '@shared/constants';
+import { EXIT_CODE } from '@shared/constants';
 import type { TExitCode } from '@shared/constants';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { ExitError } from '../../src/error/ExitError';
@@ -30,34 +30,34 @@ describe('fatalExit E2E Tests', () => {
     it('デフォルトのエラーコードで致命的エラーログを出力し、ExitErrorを投げる', () => {
       const testMessage = 'Critical system failure';
 
-      expect(() => fatalExit(testMessage)).toThrow(ExitError);
+      expect(() => fatalExit(EXIT_CODE.EXEC_FAILURE, testMessage)).toThrow(ExitError);
 
       const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
       expect(logMessage).toContain('[FATAL(1)] General execution failure: Critical system failure in');
       expect(logMessage).toMatch(/in \w+/);
 
       try {
-        fatalExit(testMessage);
+        fatalExit(EXIT_CODE.EXEC_FAILURE, testMessage);
       } catch (error) {
         expect(error).toBeInstanceOf(ExitError);
-        expect((error as ExitError).code).toBe(ExitCode.EXEC_FAILURE);
+        expect((error as ExitError).code).toBe(EXIT_CODE.EXEC_FAILURE);
         expect((error as ExitError).message).toBe(testMessage);
         expect((error as ExitError).isFatal()).toBe(true);
       }
     });
 
     it('指定されたエラーコードで致命的エラーログを出力し、ExitErrorを投げる', () => {
-      const testCode = ExitCode.INVALID_ARGS;
+      const testCode = EXIT_CODE.INVALID_ARGS;
       const testMessage = 'Invalid configuration file';
 
-      expect(() => fatalExit(testMessage, testCode)).toThrow(ExitError);
+      expect(() => fatalExit(testCode, testMessage)).toThrow(ExitError);
 
       const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
       expect(logMessage).toContain('[FATAL(13)] Invalid command line arguments: Invalid configuration file in');
       expect(logMessage).toMatch(/in \w+/);
 
       try {
-        fatalExit(testMessage, testCode);
+        fatalExit(testCode, testMessage);
       } catch (error) {
         expect(error).toBeInstanceOf(ExitError);
         expect((error as ExitError).code).toBe(testCode);
@@ -70,14 +70,14 @@ describe('fatalExit E2E Tests', () => {
       const testCode = 999 as TExitCode;
       const testMessage = 'Unknown critical error';
 
-      expect(() => fatalExit(testMessage, testCode)).toThrow(ExitError);
+      expect(() => fatalExit(testCode, testMessage)).toThrow(ExitError);
 
       const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
       expect(logMessage).toContain('[FATAL(999)] Unknown error: Unknown critical error in');
       expect(logMessage).toMatch(/in \w+/);
 
       try {
-        fatalExit(testMessage, testCode);
+        fatalExit(testCode, testMessage);
       } catch (error) {
         expect(error).toBeInstanceOf(ExitError);
         expect((error as ExitError).code).toBe(testCode);
@@ -88,13 +88,13 @@ describe('fatalExit E2E Tests', () => {
 
     it('複数回呼び出しでも正常に動作する', () => {
       const testCases = [
-        { code: ExitCode.INVALID_ARGS, message: 'First fatal error' },
-        { code: ExitCode.EXEC_FAILURE, message: 'Second fatal error' },
-        { code: ExitCode.FILE_IO_ERROR, message: 'Third fatal error' },
+        { code: EXIT_CODE.INVALID_ARGS, message: 'First fatal error' },
+        { code: EXIT_CODE.EXEC_FAILURE, message: 'Second fatal error' },
+        { code: EXIT_CODE.FILE_IO_ERROR, message: 'Third fatal error' },
       ];
 
       testCases.forEach(({ code, message }) => {
-        expect(() => fatalExit(message, code)).toThrow(ExitError);
+        expect(() => fatalExit(code, message)).toThrow(ExitError);
       });
 
       const fatalMessages = mockLogger.getMessages(AgLogLevelCode.FATAL);
@@ -107,7 +107,7 @@ describe('fatalExit E2E Tests', () => {
     it('空のメッセージでも正常に動作する', () => {
       const testMessage = '';
 
-      expect(() => fatalExit(testMessage)).toThrow(ExitError);
+      expect(() => fatalExit(EXIT_CODE.EXEC_FAILURE, testMessage)).toThrow(ExitError);
 
       const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
       expect(logMessage).toContain('[FATAL(1)] General execution failure:');
@@ -115,10 +115,10 @@ describe('fatalExit E2E Tests', () => {
     });
 
     it('長いメッセージでも正常に動作する', () => {
-      const testCode = ExitCode.EXEC_FAILURE;
+      const testCode = EXIT_CODE.EXEC_FAILURE;
       const testMessage = 'B'.repeat(1000);
 
-      expect(() => fatalExit(testMessage, testCode)).toThrow(ExitError);
+      expect(() => fatalExit(testCode, testMessage)).toThrow(ExitError);
 
       const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
       expect(logMessage).toContain(`[FATAL(1)] General execution failure: ${testMessage} in`);
@@ -130,7 +130,7 @@ describe('fatalExit E2E Tests', () => {
     it('getLoggerが正しく呼び出される', () => {
       const testMessage = 'Test fatal message';
 
-      expect(() => fatalExit(testMessage)).toThrow(ExitError);
+      expect(() => fatalExit(EXIT_CODE.EXEC_FAILURE, testMessage)).toThrow(ExitError);
 
       const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
       expect(logMessage).toContain('[FATAL(1)] General execution failure: Test fatal message in');
@@ -140,7 +140,7 @@ describe('fatalExit E2E Tests', () => {
     it('logger.fatalが正しいフォーマットで呼び出される', () => {
       const testMessage = 'critical-config.json not found';
 
-      expect(() => fatalExit(testMessage)).toThrow(ExitError);
+      expect(() => fatalExit(EXIT_CODE.EXEC_FAILURE, testMessage)).toThrow(ExitError);
 
       const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
       expect(logMessage).toContain('[FATAL(1)] General execution failure: critical-config.json not found in');
@@ -153,7 +153,7 @@ describe('fatalExit E2E Tests', () => {
       const testMessage = 'Test fatal message';
 
       try {
-        fatalExit(testMessage);
+        fatalExit(EXIT_CODE.EXEC_FAILURE, testMessage);
       } catch (error) {
         expect((error as ExitError).isFatal()).toBe(true);
       }
@@ -162,7 +162,7 @@ describe('fatalExit E2E Tests', () => {
     it('logger.fatalメソッドが使用される（logger.errorではない）', () => {
       const testMessage = 'Test fatal message';
 
-      expect(() => fatalExit(testMessage)).toThrow(ExitError);
+      expect(() => fatalExit(EXIT_CODE.EXEC_FAILURE, testMessage)).toThrow(ExitError);
 
       const logMessage = mockLogger.getLastMessage(AgLogLevelCode.FATAL);
       expect(logMessage).toContain('[FATAL(1)] General execution failure: Test fatal message in');
