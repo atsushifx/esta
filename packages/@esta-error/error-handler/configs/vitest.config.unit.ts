@@ -29,6 +29,9 @@ export default mergeConfig(baseConfig, {
     caches: {
       dir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),
     },
+    sequence: {
+      concurrent: false, // Unit tests are run sequentially to avoid conflicts
+    },
   },
   resolve: {
     alias: {
