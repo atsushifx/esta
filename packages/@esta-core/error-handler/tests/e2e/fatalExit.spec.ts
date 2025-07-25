@@ -1,5 +1,5 @@
 import { AgLogLevelCode, E2eMockLogger, getLogger, PlainFormat } from '@agla-utils/ag-logger';
-import { ExitCode } from '@shared/constants';
+import { EXIT_CODE } from '@shared/constants';
 import type { TExitCode } from '@shared/constants';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { ExitError } from '../../src/error/ExitError';
@@ -26,8 +26,8 @@ describe('fatalExit E2E Tests', () => {
     });
   });
 
-  describe('致命的エラーログ出力とExitError例外の統合テスト', () => {
-    it('デフォルトのエラーコードで致命的エラーログを出力し、ExitErrorを投げる', () => {
+  describe('致命的なエラーの処理', () => {
+    it('デフォルトエラーコードで致命的エラーをログ出力し、ExitErrorを投げる', () => {
       const testMessage = 'Critical system failure';
 
       expect(() => fatalExit(testMessage)).toThrow(ExitError);
@@ -40,14 +40,14 @@ describe('fatalExit E2E Tests', () => {
         fatalExit(testMessage);
       } catch (error) {
         expect(error).toBeInstanceOf(ExitError);
-        expect((error as ExitError).code).toBe(ExitCode.EXEC_FAILURE);
+        expect((error as ExitError).code).toBe(EXIT_CODE.EXEC_FAILURE);
         expect((error as ExitError).message).toBe(testMessage);
         expect((error as ExitError).isFatal()).toBe(true);
       }
     });
 
-    it('指定されたエラーコードで致命的エラーログを出力し、ExitErrorを投げる', () => {
-      const testCode = ExitCode.INVALID_ARGS;
+    it('持E��されたエラーコードで致命皁E��ラーログを�E力し、ExitErrorを投げる', () => {
+      const testCode = EXIT_CODE.INVALID_ARGS;
       const testMessage = 'Invalid configuration file';
 
       expect(() => fatalExit(testMessage, testCode)).toThrow(ExitError);
@@ -66,7 +66,7 @@ describe('fatalExit E2E Tests', () => {
       }
     });
 
-    it('未定義のエラーコードでも致命的エラーログを出力し、ExitErrorを投げる', () => {
+    it('未定義のエラーコードでも�E命皁E��ラーログを�E力し、ExitErrorを投げる', () => {
       const testCode = 999 as TExitCode;
       const testMessage = 'Unknown critical error';
 
@@ -88,9 +88,9 @@ describe('fatalExit E2E Tests', () => {
 
     it('複数回呼び出しでも正常に動作する', () => {
       const testCases = [
-        { code: ExitCode.INVALID_ARGS, message: 'First fatal error' },
-        { code: ExitCode.EXEC_FAILURE, message: 'Second fatal error' },
-        { code: ExitCode.FILE_IO_ERROR, message: 'Third fatal error' },
+        { code: EXIT_CODE.INVALID_ARGS, message: 'First fatal error' },
+        { code: EXIT_CODE.EXEC_FAILURE, message: 'Second fatal error' },
+        { code: EXIT_CODE.FILE_IO_ERROR, message: 'Third fatal error' },
       ];
 
       testCases.forEach(({ code, message }) => {
@@ -115,7 +115,7 @@ describe('fatalExit E2E Tests', () => {
     });
 
     it('長いメッセージでも正常に動作する', () => {
-      const testCode = ExitCode.EXEC_FAILURE;
+      const testCode = EXIT_CODE.EXEC_FAILURE;
       const testMessage = 'B'.repeat(1000);
 
       expect(() => fatalExit(testMessage, testCode)).toThrow(ExitError);
@@ -148,7 +148,7 @@ describe('fatalExit E2E Tests', () => {
     });
   });
 
-  describe('errorExitとの違いの確認', () => {
+  describe('errorExitとの違いのテスト', () => {
     it('fatalExitで生成されるExitErrorのisFatalはtrueである', () => {
       const testMessage = 'Test fatal message';
 
@@ -159,7 +159,7 @@ describe('fatalExit E2E Tests', () => {
       }
     });
 
-    it('logger.fatalメソッドが使用される（logger.errorではない）', () => {
+    it('logger.fatalメソッドが使用される -> logger.errorではない', () => {
       const testMessage = 'Test fatal message';
 
       expect(() => fatalExit(testMessage)).toThrow(ExitError);

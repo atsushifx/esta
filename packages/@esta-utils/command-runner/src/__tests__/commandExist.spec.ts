@@ -10,7 +10,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // internal modules
 import { getPlatform, PLATFORM_TYPE } from '@esta-utils/get-platform';
-import { ExitCode } from '@shared/constants';
+import { EXIT_CODE } from '@shared/constants';
 // test target
 import { commandExist } from '../commandExist';
 import { runCommand } from '../runCommand';
@@ -37,7 +37,7 @@ describe('commandExist', () => {
     });
 
     it('should return true when command exists on Windows', async () => {
-      mockRunCommand.mockResolvedValue(ExitCode.SUCCESS);
+      mockRunCommand.mockResolvedValue(EXIT_CODE.SUCCESS);
 
       const result = await commandExist('node');
       expect(result).toBe(true);
@@ -45,7 +45,7 @@ describe('commandExist', () => {
     });
 
     it('should return false when command does not exist on Windows', async () => {
-      mockRunCommand.mockResolvedValue(ExitCode.EXEC_FAILURE);
+      mockRunCommand.mockResolvedValue(EXIT_CODE.EXEC_FAILURE);
 
       const result = await commandExist('nonexistent-command');
       expect(result).toBe(false);
@@ -53,7 +53,7 @@ describe('commandExist', () => {
     });
 
     it('should return false when spawn error occurs on Windows', async () => {
-      mockRunCommand.mockResolvedValue(ExitCode.EXEC_FAILURE);
+      mockRunCommand.mockResolvedValue(EXIT_CODE.EXEC_FAILURE);
 
       const result = await commandExist('test-command');
       expect(result).toBe(false);
@@ -66,7 +66,7 @@ describe('commandExist', () => {
     });
 
     it('should return true when command exists on Linux', async () => {
-      mockRunCommand.mockResolvedValue(ExitCode.SUCCESS);
+      mockRunCommand.mockResolvedValue(EXIT_CODE.SUCCESS);
 
       const result = await commandExist('ls');
       expect(result).toBe(true);
@@ -74,7 +74,7 @@ describe('commandExist', () => {
     });
 
     it('should return false when command does not exist on Linux', async () => {
-      mockRunCommand.mockResolvedValue(ExitCode.EXEC_FAILURE);
+      mockRunCommand.mockResolvedValue(EXIT_CODE.EXEC_FAILURE);
 
       const result = await commandExist('nonexistent-command');
       expect(result).toBe(false);
@@ -82,7 +82,7 @@ describe('commandExist', () => {
     });
 
     it('should return false when spawn error occurs on Linux', async () => {
-      mockRunCommand.mockResolvedValue(ExitCode.EXEC_FAILURE);
+      mockRunCommand.mockResolvedValue(EXIT_CODE.EXEC_FAILURE);
 
       const result = await commandExist('test-command');
       expect(result).toBe(false);
@@ -90,7 +90,7 @@ describe('commandExist', () => {
 
     it('should work with macOS platform', async () => {
       mockGetPlatform.mockReturnValue(PLATFORM_TYPE.MACOS);
-      mockRunCommand.mockResolvedValue(ExitCode.SUCCESS);
+      mockRunCommand.mockResolvedValue(EXIT_CODE.SUCCESS);
 
       const result = await commandExist('ls');
       expect(result).toBe(true);
@@ -101,7 +101,7 @@ describe('commandExist', () => {
   describe('edge cases', () => {
     it('should handle empty command string', async () => {
       mockGetPlatform.mockReturnValue(PLATFORM_TYPE.LINUX);
-      mockRunCommand.mockResolvedValue(ExitCode.EXEC_FAILURE);
+      mockRunCommand.mockResolvedValue(EXIT_CODE.EXEC_FAILURE);
 
       const result = await commandExist('');
       expect(result).toBe(false);
@@ -110,7 +110,7 @@ describe('commandExist', () => {
 
     it('should handle commands with spaces', async () => {
       mockGetPlatform.mockReturnValue(PLATFORM_TYPE.WINDOWS);
-      mockRunCommand.mockResolvedValue(ExitCode.SUCCESS);
+      mockRunCommand.mockResolvedValue(EXIT_CODE.SUCCESS);
 
       const result = await commandExist('my command');
       expect(result).toBe(true);
@@ -119,7 +119,7 @@ describe('commandExist', () => {
 
     it('should handle unknown platform as Linux', async () => {
       mockGetPlatform.mockReturnValue(PLATFORM_TYPE.UNKNOWN);
-      mockRunCommand.mockResolvedValue(ExitCode.SUCCESS);
+      mockRunCommand.mockResolvedValue(EXIT_CODE.SUCCESS);
 
       const result = await commandExist('ls');
       expect(result).toBe(true);

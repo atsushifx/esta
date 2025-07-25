@@ -1,5 +1,5 @@
 import { AgLogLevelCode, E2eMockLogger, getLogger, PlainFormat } from '@agla-utils/ag-logger';
-import { ExitCode } from '@shared/constants';
+import { EXIT_CODE } from '@shared/constants';
 import type { TExitCode } from '@shared/constants';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { ExitError } from '../../src/error/ExitError';
@@ -28,15 +28,14 @@ describe('errorExit E2E Tests', () => {
 
   describe('エラーログ出力とExitError例外の統合テスト', () => {
     it('正常なエラーコードでエラーログを出力し、ExitErrorを投げる', () => {
-      const testCode = ExitCode.INVALID_ARGS;
+      const testCode = EXIT_CODE.INVALID_ARGS;
       const testMessage = 'Invalid argument provided';
 
       expect(() => errorExit(testCode, testMessage)).toThrow(ExitError);
 
       const logMessage = mockLogger.getLastMessage(AgLogLevelCode.ERROR);
       expect(logMessage).toContain('[ERROR(13)] Invalid command line arguments: Invalid argument provided in');
-      // 実際の呼び出し元の関数名またはファイル名が含まれることを確認
-      expect(logMessage).toMatch(/in \w+/);
+      // 実際の呼び出し�Eの関数名また�Eファイル名が含まれることを確誁E      expect(logMessage).toMatch(/in \w+/);
 
       try {
         errorExit(testCode, testMessage);
@@ -48,7 +47,7 @@ describe('errorExit E2E Tests', () => {
       }
     });
 
-    it('未定義のエラーコードでもエラーログを出力し、ExitErrorを投げる', () => {
+    it('未定義のエラーコードでもエラーログを�E力し、ExitErrorを投げる', () => {
       const testCode = 999 as TExitCode;
       const testMessage = 'Unknown error scenario';
 
@@ -70,9 +69,9 @@ describe('errorExit E2E Tests', () => {
 
     it('複数回呼び出しでも正常に動作する', () => {
       const testCases = [
-        { code: ExitCode.INVALID_ARGS, message: 'First error' },
-        { code: ExitCode.EXEC_FAILURE, message: 'Second error' },
-        { code: ExitCode.FILE_IO_ERROR, message: 'Third error' },
+        { code: EXIT_CODE.INVALID_ARGS, message: 'First error' },
+        { code: EXIT_CODE.EXEC_FAILURE, message: 'Second error' },
+        { code: EXIT_CODE.FILE_IO_ERROR, message: 'Third error' },
       ];
 
       testCases.forEach(({ code, message }) => {
@@ -87,7 +86,7 @@ describe('errorExit E2E Tests', () => {
     });
 
     it('空のメッセージでも正常に動作する', () => {
-      const testCode = ExitCode.INVALID_ARGS;
+      const testCode = EXIT_CODE.INVALID_ARGS;
       const testMessage = '';
 
       expect(() => errorExit(testCode, testMessage)).toThrow(ExitError);
@@ -98,7 +97,7 @@ describe('errorExit E2E Tests', () => {
     });
 
     it('長いメッセージでも正常に動作する', () => {
-      const testCode = ExitCode.EXEC_FAILURE;
+      const testCode = EXIT_CODE.EXEC_FAILURE;
       const testMessage = 'A'.repeat(1000);
 
       expect(() => errorExit(testCode, testMessage)).toThrow(ExitError);
@@ -111,7 +110,7 @@ describe('errorExit E2E Tests', () => {
 
   describe('agLoggerとの統合テスト', () => {
     it('getLoggerが正しく呼び出される', () => {
-      const testCode = ExitCode.INVALID_ARGS;
+      const testCode = EXIT_CODE.INVALID_ARGS;
       const testMessage = 'Test message';
 
       expect(() => errorExit(testCode, testMessage)).toThrow(ExitError);
@@ -122,7 +121,7 @@ describe('errorExit E2E Tests', () => {
     });
 
     it('logger.errorが正しいフォーマットで呼び出される', () => {
-      const testCode = ExitCode.FILE_IO_ERROR;
+      const testCode = EXIT_CODE.FILE_IO_ERROR;
       const testMessage = 'config.json not found';
 
       expect(() => errorExit(testCode, testMessage)).toThrow(ExitError);
