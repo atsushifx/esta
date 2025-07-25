@@ -1,13 +1,12 @@
 // src: ./__tests__/handleExitError.spec.ts
-// @(#): handleExitError関数のユニットテスト
-//
+// @(#): handleExitError関数のユニットテスチE//
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
 // constants
-import { ExitCode } from '@shared/constants';
+import { EXIT_CODE } from '@shared/constants';
 // test framework
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // modules
@@ -41,7 +40,7 @@ describe('handleExitError', () => {
     });
 
     it('should call core.setFailed for non-fatal error', async () => {
-      const error = new ExitError(ExitCode.INVALID_ARGS, 'Test error message', false);
+      const error = new ExitError(EXIT_CODE.INVALID_ARGS, 'Test error message', false);
       const core = await import('@actions/core');
 
       handleExitError(error);
@@ -50,7 +49,7 @@ describe('handleExitError', () => {
     });
 
     it('should call core.setFailed for fatal error', async () => {
-      const error = new ExitError(ExitCode.EXEC_FAILURE, 'Fatal error', true);
+      const error = new ExitError(EXIT_CODE.EXEC_FAILURE, 'Fatal error', true);
       const core = await import('@actions/core');
 
       handleExitError(error);
@@ -69,35 +68,35 @@ describe('handleExitError', () => {
     });
 
     it('should call process.exit for non-fatal error', () => {
-      const error = new ExitError(ExitCode.INVALID_ARGS, 'CLI error message', false);
+      const error = new ExitError(EXIT_CODE.INVALID_ARGS, 'CLI error message', false);
 
       handleExitError(error);
 
-      expect(mockProcessExit).toHaveBeenCalledWith(ExitCode.INVALID_ARGS);
+      expect(mockProcessExit).toHaveBeenCalledWith(EXIT_CODE.INVALID_ARGS);
     });
 
     it('should call process.exit for fatal error', () => {
-      const error = new ExitError(ExitCode.EXEC_FAILURE, 'Fatal CLI error', true);
+      const error = new ExitError(EXIT_CODE.EXEC_FAILURE, 'Fatal CLI error', true);
 
       handleExitError(error);
 
-      expect(mockProcessExit).toHaveBeenCalledWith(ExitCode.EXEC_FAILURE);
+      expect(mockProcessExit).toHaveBeenCalledWith(EXIT_CODE.EXEC_FAILURE);
     });
 
     it('should call process.exit with correct code for SUCCESS', () => {
-      const error = new ExitError(ExitCode.SUCCESS, 'Success message', false);
+      const error = new ExitError(EXIT_CODE.SUCCESS, 'Success message', false);
 
       handleExitError(error);
 
-      expect(mockProcessExit).toHaveBeenCalledWith(ExitCode.SUCCESS);
+      expect(mockProcessExit).toHaveBeenCalledWith(EXIT_CODE.SUCCESS);
     });
 
     it('should call process.exit with correct code for UNKNOWN_ERROR', () => {
-      const error = new ExitError(ExitCode.UNKNOWN_ERROR, 'Unknown error', true);
+      const error = new ExitError(EXIT_CODE.UNKNOWN_ERROR, 'Unknown error', true);
 
       handleExitError(error);
 
-      expect(mockProcessExit).toHaveBeenCalledWith(ExitCode.UNKNOWN_ERROR);
+      expect(mockProcessExit).toHaveBeenCalledWith(EXIT_CODE.UNKNOWN_ERROR);
     });
   });
 });

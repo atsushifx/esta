@@ -47,8 +47,8 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@agla-utils/ag-logger": "workspace:*",
-    "@shared/constants": "workspace:*"
+    "@shared/constants": "workspace:*",
+    "@agla-utils/ag-logger": "workspace:*"
   },
   "devDependencies": {}
 }

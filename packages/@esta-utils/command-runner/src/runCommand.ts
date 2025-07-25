@@ -1,5 +1,5 @@
 // src/runCommand.ts
-// @(#) : コマンド実行ユーティリティ
+// @(#) : コマンド実行ユーチE��リチE��
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -8,37 +8,34 @@
 
 import { getPlatform } from '@esta-utils/get-platform';
 import type { PLATFORM_TYPE } from '@esta-utils/get-platform';
-import { ExitCode } from '@shared/constants';
+import { EXIT_CODE } from '@shared/constants';
 import { spawn } from 'child_process';
 import { PLATFORM_SHELL_MAP } from '../shared/constants/shell';
 
 /**
- * 引数を適切にエスケープしてコマンドラインを作成する
+ * 引数を適刁E��エスケープしてコマンドラインを作�Eする
  * @param command - 実行するコマンド名
- * @param args - コマンドの引数配列
- * @returns エスケープされたコマンドライン文字列
+ * @param args - コマンド�E引数配�E
+ * @returns エスケープされたコマンドライン斁E���E
  */
 export const createCommandLine = (command: string, args: string[]): string => {
   const quotedArgs = args.map((arg) => `"${arg}"`);
   const commandLine = [command, ...quotedArgs].join(' ');
 
-  // 安全のためコマンドライン全体をバッククォートで囲む
+  // 安�Eのためコマンドライン全体をバッククォートで囲む
   return `\`${commandLine}\``;
 };
 
 /**
- * プラットフォームに応じてコマンドを実行する
- * @param command - 実行するコマンド名
- * @param args - コマンドの引数配列
- * @param platform - プラットフォーム（省略時は自動検出、主にテスト用）
- * @param timeoutMs - タイムアウト時間（ミリ秒）。デフォルト: 10000ms (10秒)
- * @returns コマンドの実行結果（成功時は0、失敗時は0以外）
- */
+ * プラチE��フォームに応じてコマンドを実行すめE * @param command - 実行するコマンド名
+ * @param args - コマンド�E引数配�E
+ * @param platform - プラチE��フォーム�E�省略時�E自動検�E、主にチE��ト用�E�E * @param timeoutMs - タイムアウト時間（ミリ秒）。デフォルチE 10000ms (10私E
+ * @returns コマンド�E実行結果�E��E功時は0、失敗時は0以外！E */
 export const runCommand = (
   command: string,
   args: string[] = [],
   platform: PLATFORM_TYPE = getPlatform(),
-  timeoutMs: number = 10_000, // デフォルト: 10秒
+  timeoutMs: number = 10_000, // デフォルトタイムアウト: 10秒 (10000ミリ秒)
 ): Promise<number> =>
   new Promise((resolve) => {
     const shellConfig = PLATFORM_SHELL_MAP[platform];
@@ -58,17 +55,17 @@ export const runCommand = (
     };
 
     cmd.on('close', (code) => {
-      resolveOnce(code ?? ExitCode.EXEC_FAILURE);
+      resolveOnce(code ?? EXIT_CODE.EXEC_FAILURE);
     });
 
     cmd.on('error', () => {
-      resolveOnce(ExitCode.EXEC_FAILURE);
+      resolveOnce(EXIT_CODE.EXEC_FAILURE);
     });
 
     if (timeoutMs > 0) {
       timeoutHandle = setTimeout(() => {
         cmd.kill('SIGTERM');
-        resolveOnce(ExitCode.TIMEOUT);
+        resolveOnce(EXIT_CODE.TIMEOUT);
       }, timeoutMs);
     }
   });

@@ -1,6 +1,5 @@
 // src/core/config/__tests__/loadConfig.spec.ts
-// @(#) : loadConfig.ts関数のテスト
-//
+// @(#) : loadConfig.ts関数のチE��チE//
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
@@ -12,8 +11,9 @@ import { describe, expect, it, vi } from 'vitest';
 // lib
 import { existsSync } from 'node:fs';
 // internal module
-import { errorExit, ExitCode } from '@esta-core/error-handler';
+import { errorExit } from '@esta-core/error-handler';
 import { loadConfig as loadConfigFile } from '@esta-utils/config-loader';
+import { EXIT_CODE } from '@shared/constants';
 
 // type
 import type { PartialToolsConfig } from '@/shared/types/toolsConfig.types';
@@ -30,13 +30,11 @@ const mockLoadConfigFile = vi.mocked(loadConfigFile);
 const mockErrorExit = vi.mocked(errorExit);
 
 /**
- * 設定ローダー関数の単体テスト
- * ファイル読み込み、バリデーション、エラーハンドリングのモックベーステスト
+ * 設定ローダー関数の単体テスト * ファイル読み込み、バリデーション、エラーハンドリングのモックベーステスト
  */
 describe('loadConfig.ts functions', () => {
   /**
-   * メインローダー関数のテスト
-   * 設定ファイルの読み込みとパーシャル設定の生成を検証
+   * メインローダー関数のテスト * 設定ファイルの読み込みとパーシャル設定の検証
    */
   describe('loadToolsConfig', () => {
     /**
@@ -71,8 +69,8 @@ describe('loadConfig.ts functions', () => {
         expect(result.defaultTempDir).toBeUndefined();
       });
 
-      it('完全な設定ファイルを読み込んで成功する', async () => {
-        // Given: 完全な設定ファイルが存在する
+      it('完�Eな設定ファイルを読み込んで成功する', async () => {
+        // Given: 有効な設定ファイルが存在する
         const configPath = '/path/to/complete-config.json';
         const mockConfig: PartialToolsConfig = {
           defaultInstallDir: '/custom/bin',
@@ -122,7 +120,7 @@ describe('loadConfig.ts functions', () => {
      * ファイル不存在、フォーマットエラー、アクセスエラーの適切な処理を検証
      */
     describe('異常系', () => {
-      it('設定ファイルが存在しない場合は空オブジェクトを返す', async () => {
+      it('設定ファイルが存在しない場合、空オブジェクトを返す', async () => {
         // Given: 設定ファイルが存在しない
         const configPath = '/path/to/nonexistent.json';
         mockExistsSync.mockReturnValue(false);
@@ -135,7 +133,7 @@ describe('loadConfig.ts functions', () => {
         expect(mockErrorExit).not.toHaveBeenCalled();
       });
 
-      it('設定ファイルの読み込みに失敗した場合は空オブジェクトを返す', async () => {
+      it('設定ファイルの読み込みに失敗した場合、空オブジェクトを返す', async () => {
         // Given: 設定ファイルは存在するが読み込みに失敗する
         const configPath = '/path/to/config.json';
         mockExistsSync.mockReturnValue(true);
@@ -149,7 +147,7 @@ describe('loadConfig.ts functions', () => {
         expect(mockErrorExit).not.toHaveBeenCalled();
       });
 
-      it('設定ファイルの内容が無効な場合は成功する（スキーマが許可しているため）', async () => {
+      it('無効な設定ファイルの場合、成功するがスキーマが許可していないためエラーを返す', async () => {
         // Given: 無効な設定ファイル
         const configPath = '/path/to/invalid-config.json';
         const invalidConfig = {
@@ -168,12 +166,12 @@ describe('loadConfig.ts functions', () => {
         // When: 設定ファイルを読み込む
         const result = await loadToolsConfig(configPath);
 
-        // Then: 成功する（スキーマが許可しているため）
+        // Then: 成功するがスキーマが許可していないためエラーを返す
         expect(result.tools!).toHaveLength(1);
         expect(result.tools![0].installer).toBe('invalid');
       });
 
-      it('無効なJSONファイルを読み込んだ場合はerrorExitを呼び出す', async () => {
+      it('無効なJSONファイルを読み込んだ場合、errorExitを呼び出す', async () => {
         // Given: 無効なJSONファイルを読み込む
         const configPath = '/path/to/invalid-json.json';
         const jsonError = new SyntaxError('Unexpected token in JSON');
@@ -186,12 +184,12 @@ describe('loadConfig.ts functions', () => {
         // When & Then: 設定ファイルを読み込む
         await expect(loadToolsConfig(configPath)).rejects.toThrow('errorExit called');
         expect(mockErrorExit).toHaveBeenCalledWith(
-          ExitCode.VALIDATION_FAILED,
+          EXIT_CODE.VALIDATION_FAILED,
           expect.stringContaining('Configuration validation failed: Unexpected token in JSON'),
         );
       });
 
-      it('loadConfigFile が例外を投げた場合はerrorExitを呼び出す', async () => {
+      it('loadConfigFile が例外を投げた場合、errorExitを呼び出す', async () => {
         // Given: loadConfigFile が例外を投げる
         const configPath = '/path/to/config.json';
         const error = new Error('File read error');
@@ -204,12 +202,12 @@ describe('loadConfig.ts functions', () => {
         // When & Then: 設定ファイルを読み込む
         await expect(loadToolsConfig(configPath)).rejects.toThrow('errorExit called');
         expect(mockErrorExit).toHaveBeenCalledWith(
-          ExitCode.VALIDATION_FAILED,
+          EXIT_CODE.VALIDATION_FAILED,
           'Configuration validation failed: File read error',
         );
       });
 
-      it('不明なエラーの場合はerrorExitを呼び出す', async () => {
+      it('不明なエラーの場合、errorExitを呼び出す', async () => {
         // Given: 不明なエラーが発生する
         const configPath = '/path/to/config.json';
         mockExistsSync.mockReturnValue(true);
@@ -221,7 +219,7 @@ describe('loadConfig.ts functions', () => {
         // When & Then: 設定ファイルを読み込む
         await expect(loadToolsConfig(configPath)).rejects.toThrow('errorExit called');
         expect(mockErrorExit).toHaveBeenCalledWith(
-          ExitCode.VALIDATION_FAILED,
+          EXIT_CODE.VALIDATION_FAILED,
           'Configuration validation failed: Unknown error',
         );
       });
@@ -229,17 +227,15 @@ describe('loadConfig.ts functions', () => {
   });
 
   /**
-   * 設定完全性チェッカー関数のテスト
-   * 部分設定が完全設定かどうかの判定ロジックを検証
+   * 設定完了性チェック関数のテスト   * 部分的な設定が完了設定かどうかの判定ロジックを検証
    */
   describe('isCompleteConfig', () => {
     /**
-     * 正常系テスト
-     * 完全な設定の正しい識別を検証
+     * 正常系テスト   * 完了な設定が正しい識別を検証
      */
     describe('正常系', () => {
-      it('完全な設定の場合はtrueを返す', () => {
-        // Given: 完全な設定
+      it('完了な設定の場合はtrueを返す', () => {
+        // Given: 完了菜設定の婆愛
         const completeConfig: PartialToolsConfig = {
           defaultInstallDir: '/custom/bin',
           defaultTempDir: '/custom/tmp',
@@ -259,15 +255,15 @@ describe('loadConfig.ts functions', () => {
         expect(result).toBe(true);
       });
 
-      it('空のツール配列を持つ完全な設定の場合はtrueを返す', () => {
-        // Given: 空のツール配列を持つ完全な設定
+      it('空のツール配列を持つ完了な設定の場合はtrueを返す', () => {
+        // Given: 空のツール配列を持つ完了な設定
         const completeConfig: PartialToolsConfig = {
           defaultInstallDir: '/custom/bin',
           defaultTempDir: '/custom/tmp',
           tools: [],
         };
 
-        // When: 完全な設定かチェックする
+        // When: 完全な設定かチェック する
         const result = isCompleteConfig(completeConfig);
 
         // Then: trueを返す
@@ -277,7 +273,7 @@ describe('loadConfig.ts functions', () => {
 
     /**
      * 異常系テスト
-     * 不完全や無効な設定の正しい識別を検証
+     * 不完全な設定での正しい識別を検証
      */
     describe('異常系', () => {
       it('部分的な設定の場合はfalseを返す', () => {
@@ -334,7 +330,7 @@ describe('loadConfig.ts functions', () => {
       });
 
       it('無効な設定の場合はfalseを返す', () => {
-        // Given: 無効な設定
+        // Given: 無効な設定（実際に無効なパスを指定）
         const invalidConfig = {
           defaultInstallDir: '/custom/bin',
           defaultTempDir: '/custom/tmp',
@@ -350,7 +346,7 @@ describe('loadConfig.ts functions', () => {
         // When: 完全な設定かチェックする
         const result = isCompleteConfig(invalidConfig);
 
-        // Then: trueを返す（スキーマが許可しているため）
+        // Then: trueを返すスキーマが許可しているため
         expect(result).toBe(true);
       });
     });
@@ -358,12 +354,12 @@ describe('loadConfig.ts functions', () => {
 
   /**
    * 設定バリデーション関数のテスト
-   * 完全設定のスキーマバリデーションと型安全性を検証
+   * 完全設定スキーマバリデーションと型安全性を検証
    */
   describe('validateCompleteConfig', () => {
     /**
      * 正常系テスト
-     * 有効な完全設定のバリデーション成功を検証
+     * 有効な完全設定バリデーション成功を検証
      */
     describe('正常系', () => {
       it('有効な完全設定を検証して返す', () => {
@@ -381,7 +377,7 @@ describe('loadConfig.ts functions', () => {
           ],
         };
 
-        // When: 完全設定として検証する
+        // When: 完全 設定として検証する
         const result = validateCompleteConfig(validConfig);
 
         // Then: 検証済み設定を返す
@@ -411,7 +407,7 @@ describe('loadConfig.ts functions', () => {
 
     /**
      * 異常系テスト
-     * 不完全や無効な設定でのバリデーションエラーを検証
+     * 不完全または無効な設定でのバリデーションエラーを検証
      */
     describe('異常系', () => {
       it('部分的な設定の場合は例外を投げる', () => {
@@ -434,11 +430,11 @@ describe('loadConfig.ts functions', () => {
       });
 
       it('無効な設定の場合は例外を投げる', () => {
-        // Given: 無効な設定（実際に無効なパス）
+        // Given: 無効な設定（実際に無効なパスを指定）
         const invalidConfig = {
           defaultInstallDir: '/custom/bin',
           defaultTempDir: '/custom/tmp',
-          tools: 'invalid', // 配列でない
+          tools: 'invalid', // 配列でなければならない
         } as unknown as PartialToolsConfig;
         mockErrorExit.mockImplementation(() => {
           throw new Error('Configuration validation failed');

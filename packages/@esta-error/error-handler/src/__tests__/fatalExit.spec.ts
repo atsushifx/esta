@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // constants
-import { ExitCode } from '@shared/constants';
+import { EXIT_CODE } from '@shared/constants';
 // test framework
 import { describe, expect, it } from 'vitest';
 // classes
@@ -18,26 +18,26 @@ import { fatalExit } from '../fatalExit';
 describe('fatalExit', () => {
   it('should throw ExitError with fatal=true and default code', () => {
     expect(() => {
-      fatalExit(ExitCode.EXEC_FAILURE, 'test fatal error');
+      fatalExit(EXIT_CODE.EXEC_FAILURE, 'test fatal error');
     }).toThrow(ExitError);
 
     try {
-      fatalExit(ExitCode.EXEC_FAILURE, 'test fatal error');
+      fatalExit(EXIT_CODE.EXEC_FAILURE, 'test fatal error');
     } catch (error) {
       expect(error).toBeInstanceOf(ExitError);
       expect((error as ExitError).isFatal()).toBe(true);
-      expect((error as ExitError).code).toBe(ExitCode.EXEC_FAILURE);
+      expect((error as ExitError).code).toBe(EXIT_CODE.EXEC_FAILURE);
       expect((error as ExitError).message).toBe('test fatal error');
     }
   });
 
   it('should throw ExitError with fatal=true and custom code', () => {
     try {
-      fatalExit(ExitCode.CONFIG_ERROR, 'config not found');
+      fatalExit(EXIT_CODE.CONFIG_ERROR, 'config not found');
     } catch (error) {
       expect(error).toBeInstanceOf(ExitError);
       expect((error as ExitError).isFatal()).toBe(true);
-      expect((error as ExitError).code).toBe(ExitCode.CONFIG_ERROR);
+      expect((error as ExitError).code).toBe(EXIT_CODE.CONFIG_ERROR);
       expect((error as ExitError).message).toBe('config not found');
     }
   });
