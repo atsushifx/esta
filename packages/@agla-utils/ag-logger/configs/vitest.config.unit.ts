@@ -26,9 +26,7 @@ export default mergeConfig(baseConfig, {
       '**/__tests__/*.test.ts',
       '**/__tests__/*.spec.ts',
     ],
-    caches: {
-      dir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),
-    },
+    cacheDir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),
     // sequential test execution to avoid singleton state conflicts
     sequence: {
       concurrent: false,

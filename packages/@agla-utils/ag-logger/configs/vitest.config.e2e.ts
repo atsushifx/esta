@@ -30,9 +30,7 @@ export default mergeConfig(baseConfig, {
     exclude: [
       '**/__tests__/*',
     ],
-    caches: {
-      dir: path.resolve(__dirname, '../../../.cache/vitest-cache/e2e/'),
-    },
+    cachesDir: path.resolve(__dirname, '../../../.cache/vitest-cache/e2e/'),
     // parallel test
     sequence: {
       concurrent: true,

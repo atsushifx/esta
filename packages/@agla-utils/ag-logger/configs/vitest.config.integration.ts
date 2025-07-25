@@ -1,5 +1,5 @@
-// src: shared/common/configs/vitest.config.integration.ts
-// @(#) : vitest config for integration test
+// src: shared/common/configs/vitest.config.ci.ts
+// @(#) : vitest config for CI test
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -29,9 +29,7 @@ export default mergeConfig(baseConfig, {
     exclude: [
       '**/__tests__/*',
     ],
-    caches: {
-      dir: path.resolve(__dirname, '../../../.cache/vitest-cache/integration/'),
-    },
+    cacheDir: path.resolve(__dirname, '../../../.cache/vitest-cache/ci/'),
     // parallel test
     sequence: {
       concurrent: true,
