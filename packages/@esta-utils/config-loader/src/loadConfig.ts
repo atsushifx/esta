@@ -1,5 +1,5 @@
 // src: ./loadConfig.ts
-// @(#): 設定ファイル読み込みユーティリティ
+// @(#): 設定ファイル読み込みユーチE��リチE��
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -12,22 +12,21 @@ import { extname } from 'path';
 
 // error handling
 import { errorExit } from '@esta-core/error-handler';
-import { ExitCode } from '@shared/constants';
+import { EXIT_CODE } from '@shared/constants';
 
 // types
 import { TSearchConfigFileType } from '../shared/types/searchFileType.types';
 
 /**
- * loadConfig関数のオプション設定
- */
+ * loadConfig関数のオプション設宁E */
 export type LoadConfigOptions = {
-  /** 設定ファイルのベース名（拡張子なし）または複数のベース名の配列 */
+  /** 設定ファイルのベース名 (拡張子なし) またはベース名一覧 */
   baseNames: string | readonly string[];
-  /** アプリケーション名（検索ディレクトリの構築に使用、デフォルト: process.cwd()） */
+  /** アプリケーション名（検索ディレクトリの構築に使用、デフォルト: process.cwd() */
   appName?: string;
-  /** 検索タイプ（PROJECT、USER、または SYSTEM、デフォルト: USER） */
+  /** 検索タイプ PROJECT、USER、または SYSTEM、デフォルト: USER */
   searchType?: TSearchConfigFileType;
-  /** 検索ベースディレクトリ（指定された場合、このディレクトリから検索を開始） */
+  /** 検索ベースディレクトリを指定された場合、このディレクトリから検索を開始 */
   baseDirectory?: string;
 };
 
@@ -36,13 +35,11 @@ import { parseConfig } from './parseConfig';
 import { findConfigFile } from './search/findConfigFile';
 
 /**
- * エラーがファイル I/O エラーかどうかを判定します
- *
+ * エラーがファイル I/O エラーかどぁE��を判定しまぁE *
  * @param error 判定対象のエラー
- * @returns ファイル I/O エラーの場合は true
+ * @returns ファイル I/O エラーの場合�E true
  *
- * @throws なし
- */
+ * @throws なぁE */
 const isFileIOError = (error: Error): boolean => {
   const nodeError = error as NodeJS.ErrnoException;
 
@@ -51,12 +48,12 @@ const isFileIOError = (error: Error): boolean => {
     'ENOENT', // ファイルまたはディレクトリが存在しない
     'EACCES', // アクセス権限エラー
     'EPERM', // 操作が許可されていない
-    'EISDIR', // ディレクトリに対する不正な操作
-    'ENOTDIR', // ディレクトリではない
+    'EISDIR', // ディレクトリに対する不正な走査
+    'ENOTDIR', // チェック対象がディレクトリではない
     'EMFILE', // ファイルハンドル上限
-    'ENFILE', // システムファイルテーブル満杯
-    'ENOSPC', // デバイス容量不足
-    'EROFS', // 読み取り専用ファイルシステム
+    'ENFILE', // システムファイル数上限
+    'ENOSPC', // ディスク容量不足
+    'EROFS', // 読み取り専用ファイル
     'ELOOP', // シンボリックリンクのループ
     'ENAMETOOLONG', // ファイル名が長すぎる
   ];
@@ -65,27 +62,28 @@ const isFileIOError = (error: Error): boolean => {
 };
 
 /**
- * 設定ファイルを読み込み、解析して設定オブジェクトを返します
- *
- * @template T 設定オブジェクトの型
+ * 設定ファイルを読み込み、解析して設定オブジェクトを返しまぁE *
+ * @template T 設定オブジェクト�E垁E
  * @param options 設定オプション
- * @returns 解析された設定オブジェクト、設定ファイルが見つからない場合はnull
+ * @returns 解析された設定オブジェクト、設定ファイルが見つからない場合 null
  *
- * @throws {ExitError} ファイル I/O エラーが発生した場合（エラーコード: FILE_IO_ERROR）
- * @throws {ExitError} 設定ファイルの解析に失敗した場合（エラーコード: CONFIG_ERROR）
- * @throws {ExitError} 不明なエラーが発生した場合（エラーコード: UNKNOWN_ERROR）
+ * @throws {ExitError} ファイル I/O エラーが発生した場合（エラーコード EXIT_CODE.FILE_IO_ERROR)
+ * @throws {ExitError} 設定ファイルが見つからない場合（エラーコード EXIT_CODE.CONFIG_FILE_NOT_FOUND)
+ * @throws {ExitError} 設定ファイルの解析に失敗した場合（エラーコード EXIT_CODE.CONFIG_PARSE_ERROR)
+ * @throws {ExitError} 設定ファイルの解析に失敗した場合（エラーコード EXIT_CODE.CONFIG_ERROR)
+ * @throws {ExitError} 不明なエラーが発生した場合（エラーコード EXIT_CODE.UNKNOWN_ERROR)
  *
  * @example
  * ```typescript
- * // オブジェクト形式（推奨）
- * const config1 = await loadConfig({
+ *  // オブジェクト形式（推奨
+ * const config1 = await loadConfig({})
  *   baseNames: 'myapp',
  *   appName: 'myapp',
  *   searchType: TSearchConfigFileType.USER
  * });
  *
- * // 複数の設定ファイルから検索（優先順位順）
- * const config2 = await loadConfig({
+ * // 優先された設定ファイルから検索
+ *  const config2 = await loadConfig({
  *   baseNames: ['estarc', 'esta.config'],
  *   appName: 'myapp'
  * });
@@ -112,7 +110,7 @@ export const loadConfig = async <T = object>(options: LoadConfigOptions): Promis
 
   const baseNameArray = Array.isArray(actualOptions.baseNames) ? actualOptions.baseNames : [actualOptions.baseNames];
 
-  // baseDirectoryが指定された場合は、それを使用して検索
+  // baseDirectoryが指定された場合�E、それを使用して検索
   const configFilePath = findConfigFile(
     baseNameArray,
     actualOptions.appName,
@@ -131,18 +129,17 @@ export const loadConfig = async <T = object>(options: LoadConfigOptions): Promis
     return await parseConfig<T>(extension, rawContent);
   } catch (error) {
     if (error instanceof Error) {
-      // ファイル I/O エラーの検出
+      // ファイル I/O エラーの検�E
       if (isFileIOError(error)) {
         errorExit(
-          ExitCode.FILE_IO_ERROR,
+          EXIT_CODE.FILE_IO_ERROR,
           `File I/O error accessing config file '${configFilePath}': ${error.message}`,
         );
       }
-      // その他のエラーは設定エラーとして扱う
-      errorExit(ExitCode.CONFIG_ERROR, `Failed to parse config file '${configFilePath}': ${error.message}`);
+      // そ�E他�Eエラーは設定エラーとして扱ぁE      errorExit(EXIT_CODE.CONFIG_ERROR, `Failed to parse config file '${configFilePath}': ${error.message}`);
     }
-    // 不明なエラー
-    errorExit(ExitCode.UNKNOWN_ERROR, `Unknown error occurred while loading config file '${configFilePath}'`);
+    // 不�Eなエラー
+    errorExit(EXIT_CODE.UNKNOWN_ERROR, `Unknown error occurred while loading config file '${configFilePath}'`);
   }
 };
 

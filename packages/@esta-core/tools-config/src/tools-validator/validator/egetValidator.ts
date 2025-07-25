@@ -1,5 +1,5 @@
 // src/tools-validator/validator/egetValidator.ts
-// @(#) : eget installer用ツールエントリーの検証機能
+// @(#) : eget installer用チE�Eルエントリーの検証機�E
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -7,7 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // error handling utilities
-import { errorExit, ExitCode } from '@esta-core/error-handler';
+import { errorExit } from '@esta-core/error-handler';
+import { EXIT_CODE } from '@shared/constants';
 // valibot schema validation utilities
 import { object, optional, pipe, record, safeParse, string, transform } from 'valibot';
 // validation constants and error messages
@@ -18,15 +19,13 @@ import type { ToolEntry } from '@/shared/types/toolsConfig.types';
 import { chkValidOptions, isValidGitHubRepoFormat, isValidSemverOrLatest } from '../utils/validatorUtils';
 
 /**
- * eget用ツールエントリー型
- */
+ * eget用チE�Eルエントリー垁E */
 export type EgetToolEntry = ToolEntry & {
   installer: 'eget';
 };
 
 /**
- * eget用ツールエントリーのスキーマ
- */
+ * eget用チE�EルエントリーのスキーチE */
 export const EgetToolEntrySchema = object({
   installer: pipe(
     string(),
@@ -65,7 +64,7 @@ export const EgetToolEntrySchema = object({
         // eget用オプションの検証
         const errorMessage = chkValidOptions(options, VALID_EGET_OPTIONS);
         if (errorMessage) {
-          errorExit(ExitCode.VALIDATION_FAILED, VALIDATION_ERROR_MESSAGES.INVALID_OPTIONS + ': ' + errorMessage);
+          errorExit(EXIT_CODE.VALIDATION_FAILED, VALIDATION_ERROR_MESSAGES.INVALID_OPTIONS + ': ' + errorMessage);
         }
         return options;
       }),
@@ -74,25 +73,23 @@ export const EgetToolEntrySchema = object({
 });
 
 /**
- * 単一のeget用ツールエントリーの検証
- * @param entry 検証するツールエントリー
- * @returns 検証済みのeget用ツールエントリー
- * @throws 検証に失敗した場合はプロセスを終了
- */
+ * 単一のeget用チE�Eルエントリーの検証
+ * @param entry 検証するチE�Eルエントリー
+ * @returns 検証済みのeget用チE�Eルエントリー
+ * @throws 検証に失敗した場合�Eプロセスを終亁E */
 export const validateEgetToolEntry = (entry: ToolEntry): EgetToolEntry => {
   const result = safeParse(EgetToolEntrySchema, entry);
   if (!result.success) {
     const errorMessages = result.issues.map((issue) => issue.message).join(', ');
-    errorExit(ExitCode.VALIDATION_FAILED, `Invalid tool entry: ${errorMessages}`);
+    errorExit(EXIT_CODE.VALIDATION_FAILED, `Invalid tool entry: ${errorMessages}`);
   }
   return result.output as EgetToolEntry;
 };
 
 /**
- * ToolEntryがeget用エントリーかどうかを判定
- *
- * @param entry 判定対象のツールエントリー
- * @returns eget用エントリーかどうか
+ * ToolEntryがeget用エントリーかどぁE��を判宁E *
+ * @param entry 判定対象のチE�Eルエントリー
+ * @returns eget用エントリーかどぁE��
  */
 export const isEgetToolEntry = (entry: ToolEntry): entry is EgetToolEntry => {
   return entry.installer === 'eget';

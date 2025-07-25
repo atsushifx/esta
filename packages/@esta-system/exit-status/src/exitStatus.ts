@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { ExitCode } from '@esta-core/error-handler';
+import { EXIT_CODE } from '@shared/constants';
 
 /**
  * Exit status manager that maintains a single exit status across the application.
@@ -52,7 +52,7 @@ export class ExitStatus {
    * ```
    */
   static set(status: number): void {
-    if (status != ExitCode.SUCCESS && status > 0) {
+    if (status != EXIT_CODE.SUCCESS && status > 0) {
       ExitStatus._status = status;
     }
   }

@@ -1,5 +1,5 @@
 // src/core/config/loadConfig.ts
-// @(#) : 設定ファイル読み込み機能
+// @(#) : 設定ファイル読み込み機�E
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -14,21 +14,22 @@ import { parse } from 'valibot';
 // validation error messages
 import { VALIDATION_ERROR_MESSAGES } from '@/internal/constants';
 // error handling utilities
-import { errorExit, ExitCode } from '@esta-core/error-handler';
+import { errorExit } from '@esta-core/error-handler';
 // configuration file loading utilities
 import { loadConfig as loadConfigFile, TSearchConfigFileType } from '@esta-utils/config-loader';
+import { EXIT_CODE } from '@shared/constants';
 // validation schemas
-import { CompleteToolsConfigSchema, ToolsConfigSchema } from '@/internal/schemas';
+import { CompleteToolsConfigSchema } from '@/internal/schemas';
 // tools configuration types
 import type { PartialToolsConfig, ToolsConfig } from '@/shared/types/toolsConfig.types';
 
 /**
- * 設定ファイルを読み込む（validated済み）
+ * 設定ファイルを読み込み、検証し、Validation済み
  * @param configPath 設定ファイルのパス
  * @returns 検証済み読み込み結果
  */
 export const loadToolsConfig = async (configPath: string): Promise<PartialToolsConfig> => {
-  // 指定されたファイルが存在しない場合は空オブジェクトを返す
+  // パラメータのファイルが存在しない場合は、空オブジェクトを返す
   if (!existsSync(configPath)) {
     return {};
   }
@@ -45,17 +46,17 @@ export const loadToolsConfig = async (configPath: string): Promise<PartialToolsC
       baseDirectory: configDirPath,
     });
 
-    // 設定ファイルが見つからない場合は空オブジェクトを返す
+    // 設定ファイルが見つからない場合、空オブジェクトを返す
     if (fileConfig === null) {
       return {};
     }
 
-    // 設定を正規化（部分設定でも全て正規化される）
-    const normalizedConfig = parse(ToolsConfigSchema, fileConfig);
+    // 設定を正規化
+    const normalizedConfig = parse(CompleteToolsConfigSchema, fileConfig);
     return normalizedConfig;
   } catch (error) {
     errorExit(
-      ExitCode.VALIDATION_FAILED,
+      EXIT_CODE.VALIDATION_FAILED,
       `${VALIDATION_ERROR_MESSAGES.CONFIG_VALIDATION_FAILED}: ${
         error instanceof Error ? error.message : 'Unknown error'
       }`,
@@ -66,7 +67,7 @@ export const loadToolsConfig = async (configPath: string): Promise<PartialToolsC
 /**
  * 完全な設定かどうかをチェック
  * @param config 設定
- * @returns 完全な設定の場合はtrue
+ * @returns 完全な設定の場合true、それ以外はfalse
  */
 export const isCompleteConfig = (config: PartialToolsConfig): config is ToolsConfig => {
   try {
@@ -87,7 +88,7 @@ export const validateCompleteConfig = (config: PartialToolsConfig): ToolsConfig 
     return parse(CompleteToolsConfigSchema, config) as ToolsConfig;
   } catch (error) {
     errorExit(
-      ExitCode.VALIDATION_FAILED,
+      EXIT_CODE.VALIDATION_FAILED,
       `${VALIDATION_ERROR_MESSAGES.CONFIG_VALIDATION_FAILED}: ${
         error instanceof Error ? error.message : 'Unknown error'
       }`,
