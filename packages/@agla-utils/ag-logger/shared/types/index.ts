@@ -5,8 +5,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// constants
+export { AG_LABEL_TO_LOGLEVEL_MAP, AG_LOGLEVEL, AG_LOGLEVEL_TO_LABEL_MAP } from './LogLevel.types';
+
 // types
-export * from './AgLogger.types';
+export type { AgLogMessage } from './AgLogger.types';
+export type { AgTLogLevel, AgTLogLevelLabel } from './LogLevel.types';
 
 // Interface
-export * from './AgLogger.interface';
+export type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from './AgLogger.interface';

@@ -7,10 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 // types
+import { AG_LOGLEVEL } from '../shared/types';
+import type { AgTLogLevel } from '../shared/types';
 import type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from '../shared/types/AgLogger.interface';
-import type { AgLogLevel } from '../shared/types/AgLogger.types';
-// code
-import { AgLogLevelCode } from '../shared/types/AgLogger.types';
 
 // plugins
 import { NullFormat } from '@/plugins/format/NullFormat';
@@ -30,13 +29,13 @@ export class AgLoggerManager {
     this.defaultLogger = NullLogger;
     this.formatter = NullFormat;
     this.loggerMap = {
-      [AgLogLevelCode.OFF]: NullLogger,
-      [AgLogLevelCode.FATAL]: NullLogger,
-      [AgLogLevelCode.ERROR]: NullLogger,
-      [AgLogLevelCode.WARN]: NullLogger,
-      [AgLogLevelCode.INFO]: NullLogger,
-      [AgLogLevelCode.DEBUG]: NullLogger,
-      [AgLogLevelCode.TRACE]: NullLogger,
+      [AG_LOGLEVEL.OFF]: NullLogger,
+      [AG_LOGLEVEL.FATAL]: NullLogger,
+      [AG_LOGLEVEL.ERROR]: NullLogger,
+      [AG_LOGLEVEL.WARN]: NullLogger,
+      [AG_LOGLEVEL.INFO]: NullLogger,
+      [AG_LOGLEVEL.DEBUG]: NullLogger,
+      [AG_LOGLEVEL.TRACE]: NullLogger,
     };
   }
 
@@ -79,7 +78,7 @@ export class AgLoggerManager {
    * @param logLevel - The log level to get the logger for.
    * @returns The logger function for the specified log level.
    */
-  getLogger(logLevel: AgLogLevel): AgLoggerFunction {
+  getLogger(logLevel: AgTLogLevel): AgLoggerFunction {
     return this.loggerMap[logLevel] ?? this.defaultLogger;
   }
 
@@ -104,15 +103,15 @@ export class AgLoggerManager {
     const targetLogger = defaultLogger ?? this.defaultLogger;
 
     // Set all log levels to the default logger
-    Object.keys(AgLogLevelCode).forEach((key) => {
-      const levelCode = AgLogLevelCode[key as keyof typeof AgLogLevelCode];
+    Object.keys(AG_LOGLEVEL).forEach((key) => {
+      const levelCode = AG_LOGLEVEL[key as keyof typeof AG_LOGLEVEL];
       this.loggerMap[levelCode] = targetLogger;
     });
 
     // Override specific log levels with provided loggers
     if (loggerMap) {
       Object.keys(loggerMap).forEach((key) => {
-        const levelCode = parseInt(key) as AgLogLevel;
+        const levelCode = parseInt(key) as AgTLogLevel;
         if (loggerMap[levelCode] !== undefined) {
           this.loggerMap[levelCode] = loggerMap[levelCode]!;
         }
@@ -129,14 +128,14 @@ export class AgLoggerManager {
    * @param logLevelOrOptions - Either a log level or an options object.
    * @param logFunction - Logger function or null (optional, only for log level overload).
    */
-  setLogger(logLevel: AgLogLevel, logFunction: AgLoggerFunction | null): void;
+  setLogger(logLevel: AgTLogLevel, logFunction: AgLoggerFunction | null): void;
   setLogger(options: {
     defaultLogger?: AgLoggerFunction;
     formatter?: AgFormatFunction;
     loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
   }): void;
   setLogger(
-    logLevelOrOptions: AgLogLevel | {
+    logLevelOrOptions: AgTLogLevel | {
       defaultLogger?: AgLoggerFunction;
       formatter?: AgFormatFunction;
       loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
@@ -161,5 +160,13 @@ export class AgLoggerManager {
         this.updateLogMap(options.defaultLogger, options.loggerMap);
       }
     }
+  }
+
+  /**
+   * Resets the singleton instance.
+   * This method is intended for testing purposes to ensure clean state between tests.
+   */
+  static resetSingleton(): void {
+    AgLoggerManager.instance = undefined;
   }
 }

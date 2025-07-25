@@ -6,19 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-/** Log level code definitions based on AWS CloudWatch Logs convention */
-export const AgLogLevelCode = {
-  OFF: 0,
-  FATAL: 1,
-  ERROR: 2,
-  WARN: 3,
-  INFO: 4,
-  DEBUG: 5,
-  TRACE: 6,
-} as const;
-
-/** Value type of `AgLogLevelCode` */
-export type AgLogLevel = typeof AgLogLevelCode[keyof typeof AgLogLevelCode];
+import type { AgTLogLevel } from './LogLevel.types';
 
 /**
  * Parsed result from logging input arguments.
@@ -30,7 +18,7 @@ export type AgLogMessage = {
    * Uses numeric levels based on AWS CloudWatch Logs convention:
    * OFF (0), FATAL (1), ERROR (2), WARN (3), INFO (4), DEBUG (5), TRACE (6).
    */
-  logLevel: AgLogLevel;
+  logLevel: AgTLogLevel;
 
   /**
    * Timestamp for the log entry.

@@ -10,7 +10,7 @@
 import type { AgLogMessage } from '../../../shared/types';
 
 // utilities
-import { AgLoggerGetLabel } from '../../utils/AgLoggerHelpers';
+import { AgToLabel } from '../../utils/LogLevelHelpers';
 
 /**
  * Formats a log message into a JSON string.
@@ -21,7 +21,7 @@ import { AgLoggerGetLabel } from '../../utils/AgLoggerHelpers';
 export const JsonFormat = (logMessage: AgLogMessage): string => {
   const logEntry = {
     timestamp: logMessage.timestamp.toISOString(),
-    level: AgLoggerGetLabel(logMessage.logLevel),
+    level: AgToLabel(logMessage.logLevel),
     message: logMessage.message,
     ...(logMessage.args.length > 0 && { args: logMessage.args }),
   };

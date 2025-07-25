@@ -23,11 +23,24 @@ export default mergeConfig(baseConfig, {
   test: {
     include: [
       // Unit Test (develop test) exec only sub repositories
-      'src/**/*.test.ts',
-      'src/**/*.spec.ts',
+      '**/__tests__/*.test.ts',
+      '**/__tests__/*.spec.ts',
     ],
     caches: {
       dir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),
+    },
+    // sequential test execution to avoid singleton state conflicts
+    sequence: {
+      concurrent: false,
+    },
+    //
+    coverage: {
+      reporter: ['text'],
+      exclude: [
+        '**/node_modules/**',
+        'configs/**',
+        'tests/**',
+      ],
     },
   },
   resolve: {

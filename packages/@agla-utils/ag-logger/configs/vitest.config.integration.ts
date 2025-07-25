@@ -26,8 +26,15 @@ export default mergeConfig(baseConfig, {
       'tests/integration/**/*.test.ts',
       'tests/integration/**/*.spec.ts',
     ],
+    exclude: [
+      '**/__tests__/*',
+    ],
     caches: {
       dir: path.resolve(__dirname, '../../../.cache/vitest-cache/integration/'),
+    },
+    // parallel test
+    sequence: {
+      concurrent: true,
     },
   },
   resolve: {
