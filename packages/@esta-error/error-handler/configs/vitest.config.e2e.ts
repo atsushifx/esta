@@ -30,6 +30,9 @@ export default mergeConfig(baseConfig, {
     caches: {
       dir: path.resolve(__dirname, '../../../.cache/vitest-cache/e2e/'),
     },
+    sequence: {
+      concurrent: true,
+    },
   },
   resolve: {
     alias: {
