@@ -135,22 +135,18 @@ importers:
 
   packages/@esta-error/error-handler:
     dependencies:
+      '@actions/core':
+        specifier: ^1.10.1
+        version: 1.11.1
       '@agla-utils/ag-logger':
         specifier: workspace:*
         version: link:../../@agla-utils/ag-logger
+      '@esta-core/feature-flags':
+        specifier: workspace:*
+        version: link:../../@esta-core/feature-flags
       '@shared/constants':
         specifier: workspace:*
         version: link:../../../shared/packages/constants
-    devDependencies:
-      '@actions/core':
-        specifier: ^1.11.1
-        version: 1.11.1
-      '@actions/exec':
-        specifier: ^1.1.1
-        version: 1.1.1
-      '@actions/http-client':
-        specifier: ^2.2.3
-        version: 2.2.3
 
   packages/@esta-error/error-result:
     dependencies:
