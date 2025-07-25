@@ -10,7 +10,7 @@
  * POSIX準拠の終了コード定義
  * 詳細は docs/detailed-design/exit-codes.md を参照
  */
-export const ExitCode = {
+export const EXIT_CODE = {
   // 標準終了コード (0-1)
   SUCCESS: 0,
   EXEC_FAILURE: 1,
@@ -28,25 +28,25 @@ export const ExitCode = {
   TIMEOUT: 124,
 } as const;
 
-export type TExitCode = typeof ExitCode[keyof typeof ExitCode];
+export type TExitCode = typeof EXIT_CODE[keyof typeof EXIT_CODE];
 
 /**
  * 終了コードに対応するエラーメッセージ定義
  */
-export const ExitCodeErrorMessage = {
+export const EXIT_CODE_ERROR_MESSAGE = {
   // 標準終了コード (0-1)
-  [ExitCode.SUCCESS]: 'Operation completed successfully',
-  [ExitCode.EXEC_FAILURE]: 'General execution failure',
+  [EXIT_CODE.SUCCESS]: 'Operation completed successfully',
+  [EXIT_CODE.EXEC_FAILURE]: 'General execution failure',
 
   // @esta-core独自の終了コード (11-99)
-  [ExitCode.CONFIG_ERROR]: 'Configuration Error',
-  [ExitCode.COMMAND_EXECUTION_ERROR]: 'Command execution failed',
-  [ExitCode.INVALID_ARGS]: 'Invalid command line arguments',
-  [ExitCode.VALIDATION_FAILED]: 'Input validation failed',
-  [ExitCode.FILE_IO_ERROR]: 'File I/O operation failed',
-  [ExitCode.INTERNAL_LOGIC_ERROR]: 'Internal logic error occurred',
-  [ExitCode.UNKNOWN_ERROR]: 'Unknown error',
+  [EXIT_CODE.CONFIG_ERROR]: 'Configuration Error',
+  [EXIT_CODE.COMMAND_EXECUTION_ERROR]: 'Command execution failed',
+  [EXIT_CODE.INVALID_ARGS]: 'Invalid command line arguments',
+  [EXIT_CODE.VALIDATION_FAILED]: 'Input validation failed',
+  [EXIT_CODE.FILE_IO_ERROR]: 'File I/O operation failed',
+  [EXIT_CODE.INTERNAL_LOGIC_ERROR]: 'Internal logic error occurred',
+  [EXIT_CODE.UNKNOWN_ERROR]: 'Unknown error',
 
   // システム終了コード (124)
-  [ExitCode.TIMEOUT]: 'Command execution timed out',
+  [EXIT_CODE.TIMEOUT]: 'Command execution timed out',
 } as const;

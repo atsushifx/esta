@@ -12,7 +12,7 @@ import * as process from 'process';
 
 // -- constants definitions --
 /**
- * @constant AgDir_WORKSPACE_DIR
+ * @constant ESTA_WORKSPACE_DIR
  * @description
  * GitHub Actions 上での作業ディレクトリ、およびローカル実行時の基準ディレクトリ。
  *
@@ -21,12 +21,12 @@ import * as process from 'process';
  *
  * 主にパス解決やインストールパスの構築時に参照される。
  */
-export const AgDir_WORKSPACE_DIR = process.env.GITHUB_WORKSPACE ?? process.cwd();
+export const ESTA_WORKSPACE_DIR = process.env.GITHUB_WORKSPACE ?? process.cwd();
 
 /**
- * @constant AgDir_WINGET_INSTALL_DIR
+ * @constant ESTA_WINGET_INSTALL_DIR
  * @description
  * `winget` がインストールしたツールの実行可能ファイルへのリンク (ショートカット) が配置されるディレクトリ。
  * easy-setup-tools-action では、ここからデフォルトインストールディレクトリにリンクをコピーする
  */
-export const AgDir_WINGET_INSTALL_DIR = path.join(process.env.LOCALAPPDATA ?? '', 'Microsoft', 'Winget', 'links');
+export const ESTA_WINGET_INSTALL_DIR = path.join(process.env.LOCALAPPDATA ?? '', 'Microsoft', 'Winget', 'links');
