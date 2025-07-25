@@ -6,26 +6,43 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// vitest
+// テストフレームワーク - テストの実行とアサーション機能を提供
 import { describe, expect, it } from 'vitest';
 
-// constants
-import { AgLogLevelCode } from '../../../../shared/types';
-// type
-import type { AgLogMessage } from '../../../../shared/types';
+// ログレベル定数 - テストで使用するログレベル定義
+import { AG_LOGLEVEL } from '../../../../shared/types';
+// 型定義 - ログメッセージの構造を定義する型
+import type { AgLogMessage } from '../../../../shared/types/AgLogger.types';
 
-// test unit
+// テスト対象 - JSON形式フォーマッタープラグインの実装
 import { JsonFormat } from '../JsonFormat';
 
 // test main
 
+/**
+ * JsonFormatプラグインのユニットテストスイート
+ *
+ * @description JSON形式でのログメッセージフォーマット機能を検証する
+ * 基本メッセージのJSON化、複数引数処理、全ログレベル対応、
+ * エラーハンドリング、出力の妥当性をテスト
+ *
+ * @testType Unit Test
+ * @testTarget JsonFormat Plugin
+ * @coverage
+ * - 基本ログメッセージのJSON構造化
+ * - 引数・配列・オブジェクトの適切なシリアライゼーション
+ * - 全ログレベルでの正確なレベル表示
+ * - タイムスタンプの正確な形式
+ * - 循環参照でのエラー処理
+ * - 有効なJSON文字列の出力保証
+ */
 describe('JsonFormat', () => {
   /**
    * Tests basic message formatting into JSON.
    */
   it('formats a basic log message as JSON', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.INFO,
+      logLevel: AG_LOGLEVEL.INFO,
       timestamp: new Date('2025-01-01T12:00:00.000Z'),
       message: 'Test message',
       args: [],
@@ -45,7 +62,7 @@ describe('JsonFormat', () => {
    */
   it('formats a log message with arguments as JSON', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.ERROR,
+      logLevel: AG_LOGLEVEL.ERROR,
       timestamp: new Date('2025-06-22T15:30:45.123Z'),
       message: 'An error occurred',
       args: [{ userId: 123, action: 'login' }],
@@ -65,7 +82,7 @@ describe('JsonFormat', () => {
    */
   it('formats multiple arguments as a JSON array', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.DEBUG,
+      logLevel: AG_LOGLEVEL.DEBUG,
       timestamp: new Date('2025-03-15T09:15:30.500Z'),
       message: 'Debug info',
       args: [
@@ -99,12 +116,12 @@ describe('JsonFormat', () => {
     };
 
     const testCases = [
-      { level: AgLogLevelCode.FATAL, expected: 'FATAL' },
-      { level: AgLogLevelCode.ERROR, expected: 'ERROR' },
-      { level: AgLogLevelCode.WARN, expected: 'WARN' },
-      { level: AgLogLevelCode.INFO, expected: 'INFO' },
-      { level: AgLogLevelCode.DEBUG, expected: 'DEBUG' },
-      { level: AgLogLevelCode.TRACE, expected: 'TRACE' },
+      { level: AG_LOGLEVEL.FATAL, expected: 'FATAL' },
+      { level: AG_LOGLEVEL.ERROR, expected: 'ERROR' },
+      { level: AG_LOGLEVEL.WARN, expected: 'WARN' },
+      { level: AG_LOGLEVEL.INFO, expected: 'INFO' },
+      { level: AG_LOGLEVEL.DEBUG, expected: 'DEBUG' },
+      { level: AG_LOGLEVEL.TRACE, expected: 'TRACE' },
     ];
 
     testCases.forEach(({ level, expected }) => {
@@ -119,7 +136,7 @@ describe('JsonFormat', () => {
    */
   it('formats correctly even with an empty message', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.WARN,
+      logLevel: AG_LOGLEVEL.WARN,
       timestamp: new Date('2025-12-31T23:59:59.999Z'),
       message: '',
       args: [{ warning: 'empty message' }],
@@ -142,7 +159,7 @@ describe('JsonFormat', () => {
     circularObj.self = circularObj;
 
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.INFO,
+      logLevel: AG_LOGLEVEL.INFO,
       timestamp: new Date('2025-01-01T12:00:00.000Z'),
       message: 'circular reference test',
       args: [circularObj],
@@ -156,7 +173,7 @@ describe('JsonFormat', () => {
    */
   it('outputs valid JSON string without newlines', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AgLogLevelCode.INFO,
+      logLevel: AG_LOGLEVEL.INFO,
       timestamp: new Date('2025-01-01T12:00:00.000Z'),
       message: 'Test',
       args: [{ key: 'value' }],

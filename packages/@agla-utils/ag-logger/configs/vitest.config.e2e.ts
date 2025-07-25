@@ -14,7 +14,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // system config
-import { mergeConfig } from 'vitest/config';
+import { coverageConfigDefaults, mergeConfig } from 'vitest/config';
 
 // shared base config
 import baseConfig from '../../../../base/configs/vitest.config.base';
@@ -27,8 +27,15 @@ export default mergeConfig(baseConfig, {
       'tests/e2e/**/*.test.ts',
       'tests/e2e/**/*.spec.ts',
     ],
+    exclude: [
+      '**/__tests__/*',
+    ],
     caches: {
       dir: path.resolve(__dirname, '../../../.cache/vitest-cache/e2e/'),
+    },
+    // parallel test
+    sequence: {
+      concurrent: true,
     },
   },
   resolve: {

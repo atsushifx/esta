@@ -112,6 +112,18 @@ importers:
         specifier: workspace:*
         version: link:../../../shared/packages/constants
 
+  packages/@esta-core/esta-config:
+    dependencies:
+      '@agla-utils/ag-logger':
+        specifier: workspace:*
+        version: link:../../@agla-utils/ag-logger
+      '@esta-utils/config-loader':
+        specifier: workspace:*
+        version: link:../../@esta-utils/config-loader
+      valibot:
+        specifier: ^1.1.0
+        version: 1.1.0(typescript@5.8.3)
+
   packages/@esta-core/feature-flags:
     devDependencies:
       '@shared/constants':
@@ -141,16 +153,6 @@ importers:
       '@shared/constants':
         specifier: workspace:*
         version: link:../../../shared/packages/constants
-    devDependencies:
-      '@actions/core':
-        specifier: ^1.11.1
-        version: 1.11.1
-      '@actions/exec':
-        specifier: ^1.1.1
-        version: 1.1.1
-      '@actions/http-client':
-        specifier: ^2.2.3
-        version: 2.2.3
 
   packages/@esta-error/error-result:
     dependencies:
