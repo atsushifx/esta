@@ -30,4 +30,15 @@ describe('errorExit', () => {
       expect((error as ExitError).message).toBe('invalid arguments');
     }
   });
+
+  it('should use EXEC_FAILURE as default code when only message provided', () => {
+    try {
+      errorExit('test error without code');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ExitError);
+      expect((error as ExitError).isFatal()).toBe(false);
+      expect((error as ExitError).code).toBe(EXIT_CODE.EXEC_FAILURE);
+      expect((error as ExitError).message).toBe('test error without code');
+    }
+  });
 });

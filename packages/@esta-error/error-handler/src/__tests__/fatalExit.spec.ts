@@ -41,4 +41,15 @@ describe('fatalExit', () => {
       expect((error as ExitError).message).toBe('config not found');
     }
   });
+
+  it('should use EXEC_FAILURE as default code when only message provided', () => {
+    try {
+      fatalExit('test fatal error without code');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ExitError);
+      expect((error as ExitError).isFatal()).toBe(true);
+      expect((error as ExitError).code).toBe(EXIT_CODE.EXEC_FAILURE);
+      expect((error as ExitError).message).toBe('test fatal error without code');
+    }
+  });
 });

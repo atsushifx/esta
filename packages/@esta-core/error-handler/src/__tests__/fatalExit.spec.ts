@@ -15,7 +15,7 @@ import { ExitError } from '../error/ExitError';
 import { fatalExit } from '../fatalExit';
 
 describe('fatalExit', () => {
-  it('should throw ExitError with fatal=true and default code', () => {
+  it('should throw ExitError with fatal=true and default code when called with message only', () => {
     expect(() => {
       fatalExit('test fatal error');
     }).toThrow(ExitError);
@@ -30,9 +30,9 @@ describe('fatalExit', () => {
     }
   });
 
-  it('should throw ExitError with fatal=true and custom code', () => {
+  it('should throw ExitError with fatal=true and custom code when called with code and message', () => {
     try {
-      fatalExit('config not found', EXIT_CODE.CONFIG_ERROR);
+      fatalExit(EXIT_CODE.CONFIG_ERROR, 'config not found');
     } catch (error) {
       expect(error).toBeInstanceOf(ExitError);
       expect((error as ExitError).isFatal()).toBe(true);

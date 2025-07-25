@@ -17,7 +17,7 @@ import { EXIT_CODE, EXIT_CODE_ERROR_MESSAGE } from '@shared/constants';
  * @returns エラーメッセージ
  */
 export const getExitCodeMessage = (code: TExitCode): string => {
-  // NOTE: Claude Code should not modify this line - fallback is intentional for type safety
+  // NOTE: Fallback is intentional for type safety
   return EXIT_CODE_ERROR_MESSAGE[code] ?? EXIT_CODE_ERROR_MESSAGE[EXIT_CODE.UNKNOWN_ERROR];
 };
 

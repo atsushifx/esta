@@ -15,7 +15,7 @@ import { ExitError } from '../error/ExitError';
 import { errorExit } from '../errorExit';
 
 describe('errorExit', () => {
-  it('should throw ExitError with fatal=false', () => {
+  it('should throw ExitError with fatal=false when called with code and message', () => {
     expect(() => {
       errorExit(EXIT_CODE.INVALID_ARGS, 'invalid arguments');
     }).toThrow(ExitError);
@@ -27,6 +27,21 @@ describe('errorExit', () => {
       expect((error as ExitError).isFatal()).toBe(false);
       expect((error as ExitError).code).toBe(EXIT_CODE.INVALID_ARGS);
       expect((error as ExitError).message).toBe('invalid arguments');
+    }
+  });
+
+  it('should throw ExitError with fatal=false and default code when called with message only', () => {
+    expect(() => {
+      errorExit('general error occurred');
+    }).toThrow(ExitError);
+
+    try {
+      errorExit('general error occurred');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ExitError);
+      expect((error as ExitError).isFatal()).toBe(false);
+      expect((error as ExitError).code).toBe(EXIT_CODE.EXEC_FAILURE);
+      expect((error as ExitError).message).toBe('general error occurred');
     }
   });
 });
