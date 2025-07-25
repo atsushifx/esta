@@ -1,5 +1,5 @@
 // src: ./__tests__/loadConfig.illegal_config.spec.ts
-// loadConfig エラーハンドリングテスト
+// loadConfig エラーハンドリングのE2Eテスト
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -9,19 +9,19 @@
 import * as fs from 'fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ExitCode } from '@shared/constants';
+import { EXIT_CODE } from '@shared/constants';
 
 import { TSearchConfigFileType } from '../../shared/types/searchFileType.types';
 import { loadConfig } from '../loadConfig';
 
-// fs.readFileSyncをモック
+// fs.readFileSyncをMock
 vi.mock('fs', () => ({
   readFileSync: vi.fn(),
   writeFileSync: vi.fn(),
   unlinkSync: vi.fn(),
 }));
 
-// findConfigFileをモック
+// findConfigFileをMock
 vi.mock('../search/findConfigFile', () => ({
   findConfigFile: vi.fn(),
 }));
@@ -31,10 +31,7 @@ const { findConfigFile } = await import('../search/findConfigFile');
 const mockFindConfigFile = vi.mocked(findConfigFile);
 
 /**
- * @fileoverview loadConfig関数のエラーハンドリングユニットテスト
- *
- * このテストスイートは、loadConfig関数の様々なエラーケースでの動作を検証し、
- * 適切なExitErrorとエラーコードが投げられることを確認します。
+ * loadConfig関数のエラーハンドリングユニットテスト
  *
  * @module loadConfig.illegal_config.spec
  */
@@ -45,7 +42,6 @@ describe('loadConfig - エラーハンドリング', () => {
 
   /**
    * @description ファイル I/O エラーのハンドリングテスト
-   *
    * ファイルシステム関連のエラー（ENOENT、EACCESなど）が
    * FILE_IO_ERRORとして適切に処理されることを検証します。
    */
@@ -67,7 +63,7 @@ describe('loadConfig - エラーハンドリング', () => {
         }),
       ).rejects.toThrow(
         expect.objectContaining({
-          code: ExitCode.FILE_IO_ERROR,
+          code: EXIT_CODE.FILE_IO_ERROR,
           message: expect.stringContaining('File I/O error accessing config file'),
         }),
       );
@@ -90,13 +86,13 @@ describe('loadConfig - エラーハンドリング', () => {
         }),
       ).rejects.toThrow(
         expect.objectContaining({
-          code: ExitCode.FILE_IO_ERROR,
+          code: EXIT_CODE.FILE_IO_ERROR,
           message: expect.stringContaining('File I/O error accessing config file'),
         }),
       );
     });
 
-    it('その他のファイルI/Oエラーの場合にFILE_IO_ERRORをthrowすべき', async () => {
+    it('その他ファイルI/Oエラーの場合にFILE_IO_ERRORをthrowすべき', async () => {
       const testPath = '/test/config.json';
       mockFindConfigFile.mockReturnValue(testPath);
 
@@ -116,7 +112,7 @@ describe('loadConfig - エラーハンドリング', () => {
           }),
         ).rejects.toThrow(
           expect.objectContaining({
-            code: ExitCode.FILE_IO_ERROR,
+            code: EXIT_CODE.FILE_IO_ERROR,
           }),
         );
       }
@@ -125,7 +121,6 @@ describe('loadConfig - エラーハンドリング', () => {
 
   /**
    * @description 設定ファイルパースエラーのハンドリングテスト
-   *
    * 不正なJSON、YAML、TypeScriptスクリプトなどの解析エラーが
    * CONFIG_ERRORとして適切に処理されることを検証します。
    */
@@ -142,7 +137,7 @@ describe('loadConfig - エラーハンドリング', () => {
         }),
       ).rejects.toThrow(
         expect.objectContaining({
-          code: ExitCode.CONFIG_ERROR,
+          code: EXIT_CODE.CONFIG_ERROR,
           message: expect.stringContaining('Failed to parse config file'),
         }),
       );
@@ -160,7 +155,7 @@ describe('loadConfig - エラーハンドリング', () => {
         }),
       ).rejects.toThrow(
         expect.objectContaining({
-          code: ExitCode.CONFIG_ERROR,
+          code: EXIT_CODE.CONFIG_ERROR,
           message: expect.stringContaining('Failed to parse config file'),
         }),
       );
@@ -178,7 +173,7 @@ describe('loadConfig - エラーハンドリング', () => {
         }),
       ).rejects.toThrow(
         expect.objectContaining({
-          code: ExitCode.CONFIG_ERROR,
+          code: EXIT_CODE.CONFIG_ERROR,
           message: expect.stringContaining('Failed to parse config file'),
         }),
       );
@@ -196,7 +191,7 @@ describe('loadConfig - エラーハンドリング', () => {
         }),
       ).rejects.toThrow(
         expect.objectContaining({
-          code: ExitCode.CONFIG_ERROR,
+          code: EXIT_CODE.CONFIG_ERROR,
           message: expect.stringContaining('Failed to parse config file'),
         }),
       );
@@ -204,17 +199,16 @@ describe('loadConfig - エラーハンドリング', () => {
   });
 
   /**
-   * @description 不明なエラーのハンドリングテスト
-   *
-   * Errorオブジェクトではない例外や予期しないエラーが
+   * @description 不正なエラーのハンドリングテスト
+   * Errorオブジェクトではない外や予期しないエラーが
    * UNKNOWN_ERRORとして適切に処理されることを検証します。
    */
-  describe('不明なエラー', () => {
+  describe('不正なエラー', () => {
     it('予期しないエラーの場合にUNKNOWN_ERRORをthrowすべき', async () => {
       const testPath = '/test/config.json';
       mockFindConfigFile.mockReturnValue(testPath);
       mockReadFileSync.mockImplementation(() => {
-        throw 'string error'; // Error オブジェクトではない例外
+        throw 'string error'; // Error オブジェクトではない
       });
 
       await expect(
@@ -224,7 +218,7 @@ describe('loadConfig - エラーハンドリング', () => {
         }),
       ).rejects.toThrow(
         expect.objectContaining({
-          code: ExitCode.UNKNOWN_ERROR,
+          code: EXIT_CODE.UNKNOWN_ERROR,
           message: expect.stringContaining('Unknown error occurred'),
         }),
       );
@@ -233,7 +227,6 @@ describe('loadConfig - エラーハンドリング', () => {
 
   /**
    * @description 設定ファイルが見つからない場合の動作テスト
-   *
    * 設定ファイルが存在しない場合に、エラーを投げずに
    * nullを返す正常な動作を検証します。
    */
