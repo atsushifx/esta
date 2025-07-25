@@ -13,13 +13,31 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { AG_LOGLEVEL } from '../../../shared/types';
 
 // test target
-import { E2eMockLogger } from '../E2eMockLogger';
+import { E2eMockLogger } from '@/plugins/logger/E2eMockLogger';
 
 describe('E2eMockLogger', () => {
   let mockLogger: E2eMockLogger;
 
   beforeEach(() => {
-    mockLogger = new E2eMockLogger();
+    mockLogger = new E2eMockLogger('test-id');
+  });
+
+  describe('testID管理: IDの切り替えと管理', () => {
+    it('should allow switching to different test ID after construction', () => {
+      mockLogger.endTest('test-id');
+      mockLogger.startTest('new-test-id');
+
+      expect(() => mockLogger.info('test message')).not.toThrow();
+      expect(mockLogger.getCurrentTestId()).toBe('new-test-id');
+      expect(mockLogger.getMessages(AG_LOGLEVEL.INFO)).toEqual(['test message']);
+    });
+
+    it('should throw error when trying to log after ending current test', () => {
+      mockLogger.endTest('test-id');
+
+      expect(() => mockLogger.info('test message')).toThrow('No active test. Call startTest() before logging.');
+      expect(mockLogger.getCurrentTestId()).toBeNull();
+    });
   });
 
   describe('基本機能: errorメッセージを配列に保存できる', () => {
