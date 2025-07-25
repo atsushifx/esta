@@ -138,9 +138,9 @@ describe('EstaError', () => {
 
   describe('Context Handling', () => {
     it('should handle null context gracefully', () => {
-      const error = new EstaError('TEST_ERROR', 'Test message', null as Record<string, unknown> | null);
+      const error = new EstaError('TEST_ERROR', 'Test message', undefined);
 
-      expect(error.context).toBeNull();
+      expect(error.context).toBeUndefined();
     });
 
     it('should handle context with null values', () => {
@@ -173,7 +173,7 @@ describe('EstaError', () => {
       const error = new EstaError('TEST_ERROR', 'Test message', context);
 
       expect(error.context).toEqual(context);
-      expect((error.context as Record<string, unknown>)?.level1?.level2?.level3?.value).toBe('deep value');
+      expect((error.context as typeof context).level1.level2.level3.value).toBe('deep value');
     });
 
     it('should handle circular reference in context', () => {
@@ -232,8 +232,8 @@ describe('EstaError', () => {
 
       // Error's context should still reference the same object
       expect(error.context).toBe(context);
-      expect((error.context as Record<string, unknown>)?.value).toBe('modified');
-      expect((error.context as Record<string, unknown>)?.nested.prop).toBe('changed');
+      expect((error.context as Record<string, unknown>).value).toBe('modified');
+      expect((error.context as typeof context).nested.prop).toBe('changed');
     });
   });
 

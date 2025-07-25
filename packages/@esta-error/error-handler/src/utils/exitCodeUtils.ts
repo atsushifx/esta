@@ -9,7 +9,7 @@
 // types
 import type { TExitCode } from '@shared/constants';
 // constants
-import { ExitCode, ExitCodeErrorMessage } from '@shared/constants';
+import { EXIT_CODE, EXIT_CODE_ERROR_MESSAGE } from '@shared/constants';
 
 /**
  * 終了コードに対応するエラーメッセージを取得
@@ -18,7 +18,7 @@ import { ExitCode, ExitCodeErrorMessage } from '@shared/constants';
  */
 export const getExitCodeMessage = (code: TExitCode): string => {
   // NOTE: Claude Code should not modify this line - fallback is intentional for type safety
-  return ExitCodeErrorMessage[code] ?? ExitCodeErrorMessage[ExitCode.UNKNOWN_ERROR];
+  return EXIT_CODE_ERROR_MESSAGE[code] ?? EXIT_CODE_ERROR_MESSAGE[EXIT_CODE.UNKNOWN_ERROR];
 };
 
 /**

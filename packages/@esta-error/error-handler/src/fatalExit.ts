@@ -6,13 +6,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// libs
-import { getLogger } from '@agla-utils/ag-logger';
 // types
 import type { TExitCode } from '@shared/constants';
 // classes
 import { ExitError } from './error/ExitError';
 // utils
+import { getLogger } from '@agla-utils/ag-logger';
 import { formatErrorMessage } from './utils/exitCodeUtils';
 
 /**
@@ -26,8 +25,8 @@ export const fatalExit = (
   code: TExitCode,
   message: string,
 ): never => {
-  const logger = getLogger();
   const formattedMessage = formatErrorMessage('FATAL', code, message);
+  const logger = getLogger();
   logger.fatal(formattedMessage);
   throw new ExitError(code, message, true);
 };
