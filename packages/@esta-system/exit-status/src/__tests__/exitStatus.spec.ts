@@ -7,9 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 // constants
-import { ExitCode } from '@esta-core/error-handler';
+import { EXIT_CODE } from '@shared/constants';
 // Testing framework - test utilities
-import { beforeEach, describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 // test target
 import { ExitStatus } from '../exitStatus';
 
@@ -30,23 +30,23 @@ describe('ExitStatus', () => {
    * Tests core methods: set(), get(), and reset()
    */
   describe('基本機能', () => {
-    test('set()で非ゼロ値を設定できる', () => {
+    it('set()で非ゼロ値を設定できる', () => {
       ExitStatus.set(1);
       expect(ExitStatus.get()).toBe(1);
     });
 
-    test('get()で設定された値を取得できる', () => {
+    it('get()で設定された値を取得できる', () => {
       ExitStatus.set(42);
       expect(ExitStatus.get()).toBe(42);
     });
 
-    test('reset()で値を0にリセットできる', () => {
+    it('reset()で値をリセットできる', () => {
       ExitStatus.set(5);
       ExitStatus.reset();
       expect(ExitStatus.get()).toBe(0);
     });
 
-    test('set(0)で0を設定してもstatusが0のまま', () => {
+    it('set(0)で0を設定してもstatusは変わらない', () => {
       ExitStatus.set(0);
       expect(ExitStatus.get()).toBe(0);
     });
@@ -59,25 +59,25 @@ describe('ExitStatus', () => {
    * multiple value handling, and constant integration.
    */
   describe('仕様固有の動作', () => {
-    test('一度非ゼロ値を設定したら、0を設定しても変更されない', () => {
+    it('一度非ゼロ値を設定したら、ゼロを設定しても変更されない', () => {
       ExitStatus.set(1);
       ExitStatus.set(0);
       expect(ExitStatus.get()).toBe(1);
     });
 
-    test('複数の非ゼロ値を設定した場合、最後の値が保持される', () => {
+    it('複数の非ゼロ値を設定した場合、最後の値が保持される', () => {
       ExitStatus.set(1);
       ExitStatus.set(2);
       expect(ExitStatus.get()).toBe(2);
     });
 
-    test('負の終了コードは設定されない', () => {
+    it('負の終了コードは設定されない', () => {
       ExitStatus.set(-1);
       expect(ExitStatus.get()).toBe(0);
     });
 
-    test('ExitCode.SUCCESS定数が0として正しく動作する', () => {
-      ExitStatus.set(ExitCode.SUCCESS);
+    it('EXIT_CODE.SUCCESS定数として正しく動作する', () => {
+      ExitStatus.set(EXIT_CODE.SUCCESS);
       expect(ExitStatus.get()).toBe(0);
     });
   });
@@ -89,14 +89,14 @@ describe('ExitStatus', () => {
    * robust behavior under various conditions.
    */
   describe('エッジケース', () => {
-    test('連続してreset()を呼んでも問題ない', () => {
+    it('連続してreset()を呼んでも問題ない', () => {
       ExitStatus.set(1);
       ExitStatus.reset();
       ExitStatus.reset();
       expect(ExitStatus.get()).toBe(0);
     });
 
-    test('大きな終了コード値も正しく処理される', () => {
+    it('大きな終了コード値も正しく処理される', () => {
       ExitStatus.set(255);
       expect(ExitStatus.get()).toBe(255);
     });
