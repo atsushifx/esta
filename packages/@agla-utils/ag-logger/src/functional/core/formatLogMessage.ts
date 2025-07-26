@@ -51,8 +51,9 @@ const isTimestamp = (arg: unknown): arg is string => {
 const extractMessage = (args: readonly unknown[]): string => {
   return args
     .filter(isMessageArgument)
-    .map((arg) => String(arg).trim())
-    .join(' ');
+    .map((arg) => String(arg))
+    .join(' ')
+    .trim(); // 最終結果のみtrim
 };
 
 /**

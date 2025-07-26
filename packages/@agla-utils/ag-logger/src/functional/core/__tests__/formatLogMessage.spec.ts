@@ -120,6 +120,28 @@ describe('formatLogMessage', () => {
       expect(result.message).toBe('Testing values');
       expect(result.args).toEqual([null, undefined]);
     });
+
+    it('should handle empty string arguments - E2E test case verification', () => {
+      const result = formatLogMessage(
+        AG_LOGLEVEL.WARN,
+        'Empty structures test',
+        {},
+        [],
+        '',
+      );
+
+      // デバッグ出力
+      console.log('=== E2E Test Case Debug ===');
+      console.log('Message:', JSON.stringify(result.message));
+      console.log('Message length:', result.message.length);
+      console.log('Args:', JSON.stringify(result.args));
+      console.log('Args length:', result.args.length);
+
+      // 空文字列は文字列型なのでメッセージに含まれるが、
+      // 最終的にtrim()されるので末尾空白は削除される
+      expect(result.message).toBe('Empty structures test');
+      expect(result.args).toEqual([{}, []]);
+    });
   });
 
   describe('Timestamp handling (compatible with AgLoggerGetMessage)', () => {
