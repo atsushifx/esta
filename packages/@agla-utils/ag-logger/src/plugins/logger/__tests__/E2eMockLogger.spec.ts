@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 
 // constants
-import { AG_LOGLEVEL } from '../../../shared/types';
+import { AG_LOGLEVEL } from '../../../../shared/types';
 
 // test target
 import { E2eMockLogger } from '@/plugins/logger/E2eMockLogger';
