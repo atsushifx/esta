@@ -6,11 +6,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// Node.js built-in modules
-import { randomUUID } from 'node:crypto';
-import { basename } from 'node:path';
-
 // internal modules
+import { createTestId, getNormalizedBasename } from '../../utils/testIdUtils';
 import { MockLogger } from './MockLogger';
 
 // types
@@ -29,7 +26,7 @@ export class E2eMockLogger {
 
   constructor(identifier?: string) {
     const trimmedIdentifier = typeof identifier === 'string' ? identifier.trim() : '';
-    this.testIdentifier = trimmedIdentifier || 'E2eDefault';
+    this.testIdentifier = trimmedIdentifier ? getNormalizedBasename(trimmedIdentifier) : 'e2edefault';
     this.currentTestId = null;
     this.mockLoggers = new Map<string, MockLogger>();
   }
@@ -52,14 +49,15 @@ export class E2eMockLogger {
    * Start a new test with the given ID.
    * Creates a new MockLogger instance and binds it to the testId.
    */
-  startTest(testId: string): void {
-    if (!testId || typeof testId !== 'string') {
-      throw new Error('testId is required and must be a non-empty string');
-    }
+  startTest(testId: string = ''): void {
+    const trimmedTestId = testId.trim();
+    const finalTestId = trimmedTestId === ''
+      ? createTestId(this.testIdentifier)
+      : trimmedTestId;
 
     // Create new MockLogger instance for this test
-    this.mockLoggers.set(testId, new MockLogger());
-    this.currentTestId = testId;
+    this.mockLoggers.set(finalTestId, new MockLogger());
+    this.currentTestId = finalTestId;
   }
 
   /**
@@ -206,33 +204,3 @@ export class E2eMockLogger {
     };
   }
 }
-
-/**
- * Utility function to create a unique test ID for parallel test execution.
- * Uses timestamp and random string to guarantee uniqueness across all test runs.
- *
- * @param identifier - Can be app name, test file basename, or custom identifier
- * @returns Unique test ID in format: {identifier}-{timestamp}-{randomString}
- *
- * @example
- * // Using app name
- * createTestId('ag-logger') // → 'ag-logger-1643723400-abc123'
- *
- * // Using test file path
- * createTestId(__filename) // → 'AgLogger.spec-1643723400-def456'
- *
- * // Using custom identifier
- * createTestId('integration-test') // → 'integration-test-1643723400-ghi789'
- */
-export const createTestId = (identifier: string = 'test'): string => {
-  const timestamp = Date.now();
-  const randomString = randomUUID().replace(/-/g, '').substring(0, 8).toLowerCase();
-
-  // If identifier looks like a file path, extract basename without extension
-  if (identifier.includes('/') || identifier.includes('\\') || identifier.includes('.')) {
-    const fileBasename = basename(identifier, '.ts').replace('.spec', '').replace('.test', '');
-    return `${fileBasename}-${timestamp}-${randomString}`;
-  }
-
-  return `${identifier}-${timestamp}-${randomString}`;
-};

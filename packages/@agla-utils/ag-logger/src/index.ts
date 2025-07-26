@@ -26,7 +26,7 @@ export { AgLogger, getLogger } from './AgLogger.class';
 
 // plugins: logger
 export { ConsoleLogger } from './plugins/logger/ConsoleLogger';
-export { createTestId, E2eMockLogger } from './plugins/logger/E2eMockLogger';
+export { E2eMockLogger } from './plugins/logger/E2eMockLogger';
 export { MockLogger } from './plugins/logger/MockLogger';
 export { NullLogger } from './plugins/logger/NullLogger';
 
@@ -37,3 +37,4 @@ export { PlainFormat } from './plugins/format/PlainFormat';
 
 // utilities
 export { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
+export { createTestId } from './utils/testIdUtils';
