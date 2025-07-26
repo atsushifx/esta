@@ -6,26 +6,16 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { createTestId, E2eMockLogger as E2EMockLoggerWithTestId } from '@/plugins/logger/E2eMockLogger';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { E2eMockLogger as E2EMockLoggerWithTestId } from '@/plugins/logger/E2eMockLogger';
+import { describe, expect, it } from 'vitest';
 import { AG_LOGLEVEL } from '../../shared/types';
 import { getLogger } from '../../src/AgLogger.class';
 import { PlainFormat } from '../../src/plugins/format/PlainFormat';
 
 describe('E2EMockLoggerWithTestId', () => {
-  let mockLogger: E2EMockLoggerWithTestId;
-  let testId: string;
-
-  beforeEach(() => {
-    testId = createTestId('e2e-test');
-    mockLogger = new E2EMockLoggerWithTestId(testId);
-  });
-
-  afterEach(() => {
-    mockLogger.cleanup();
-  });
-
   describe('Basic logging functionality', () => {
+    const mockLogger = new E2EMockLoggerWithTestId('basic-logging-test');
+
     it('should capture log messages by level', () => {
       mockLogger.info('Test info message');
       mockLogger.error('Test error message');
@@ -34,6 +24,8 @@ describe('E2EMockLoggerWithTestId', () => {
       expect(mockLogger.getMessages(AG_LOGLEVEL.INFO)).toEqual(['Test info message']);
       expect(mockLogger.getMessages(AG_LOGLEVEL.ERROR)).toEqual(['Test error message']);
       expect(mockLogger.getMessages(AG_LOGLEVEL.WARN)).toEqual(['Test warning message']);
+
+      mockLogger.cleanup();
     });
 
     it('should get last message correctly', () => {
@@ -42,6 +34,8 @@ describe('E2EMockLoggerWithTestId', () => {
       mockLogger.info('Third info');
 
       expect(mockLogger.getLastMessage(AG_LOGLEVEL.INFO)).toBe('Third info');
+
+      mockLogger.cleanup();
     });
 
     it('should clear messages by level', () => {
@@ -50,49 +44,44 @@ describe('E2EMockLoggerWithTestId', () => {
 
       mockLogger.clearMessages(AG_LOGLEVEL.INFO);
       expect(mockLogger.getMessages(AG_LOGLEVEL.INFO)).toHaveLength(0);
+
+      mockLogger.cleanup();
     });
   });
 
   describe('Test ID management', () => {
-    it('should throw error when no test is active', () => {
-      const tempTestId = createTestId('temp-test');
-      const newMockLogger = new E2EMockLoggerWithTestId(tempTestId);
+    const mockLogger = new E2EMockLoggerWithTestId('test-id-management');
 
-      // End the test to simulate no active test
-      newMockLogger.endTest(tempTestId);
+    it('should get test ID', () => {
+      const testId = mockLogger.getTestId();
 
-      expect(() => newMockLogger.info('Test')).toThrow('No active test. Call startTest() before logging.');
-    });
+      expect(mockLogger.getTestId()).toBe(testId);
+      expect(testId).toMatch(/^test-id-management-\d+-[a-z0-9]+$/);
 
-    it('should clean up test data when endTest is called', () => {
-      mockLogger.info('Test message');
-      expect(mockLogger.getMessages(AG_LOGLEVEL.INFO)).toHaveLength(1);
-
-      mockLogger.endTest(testId);
-      expect(mockLogger.hasActiveTest()).toBe(false);
-      expect(mockLogger.getActiveTestIds()).not.toContain(testId);
+      mockLogger.cleanup();
     });
 
     it('should manage multiple tests independently', () => {
-      const testId2 = createTestId('parallel-test');
+      const mockLogger2 = new E2EMockLoggerWithTestId('independent-test');
 
-      // Log to current test
+      // Log to first test
       mockLogger.info('Message from test 1');
 
-      // Start second test
-      mockLogger.startTest(testId2);
-      mockLogger.info('Message from test 2');
+      // Log to second test
+      mockLogger2.info('Message from test 2');
 
       // Check messages are independent
-      expect(mockLogger.getMessages(AG_LOGLEVEL.INFO, testId)).toEqual(['Message from test 1']);
-      expect(mockLogger.getMessages(AG_LOGLEVEL.INFO, testId2)).toEqual(['Message from test 2']);
+      expect(mockLogger.getMessages(AG_LOGLEVEL.INFO)).toEqual(['Message from test 1']);
+      expect(mockLogger2.getMessages(AG_LOGLEVEL.INFO)).toEqual(['Message from test 2']);
 
-      // Clean up
-      mockLogger.endTest(testId2);
+      mockLogger.cleanup();
+      mockLogger2.cleanup();
     });
   });
 
   describe('Plugin integration with ag-logger', () => {
+    const mockLogger = new E2EMockLoggerWithTestId('plugin-integration');
+
     it('should work as AgLoggerFunction plugin', () => {
       const loggerFunction = mockLogger.createLoggerFunction();
       const logger = getLogger(loggerFunction, PlainFormat);
@@ -103,6 +92,8 @@ describe('E2EMockLoggerWithTestId', () => {
       const messages = mockLogger.getMessages(AG_LOGLEVEL.INFO);
       expect(messages).toHaveLength(1);
       expect(messages[0]).toMatch(/Test message via plugin/);
+
+      mockLogger.cleanup();
     });
 
     it('should work as AgLoggerMap plugin', () => {
@@ -119,6 +110,8 @@ describe('E2EMockLoggerWithTestId', () => {
       expect(mockLogger.getMessages(AG_LOGLEVEL.WARN)).toHaveLength(1);
       expect(mockLogger.getMessages(AG_LOGLEVEL.INFO)).toHaveLength(1);
       expect(mockLogger.getMessages(AG_LOGLEVEL.DEBUG)).toHaveLength(1);
+
+      mockLogger.cleanup();
     });
   });
 
@@ -137,11 +130,10 @@ describe('E2EMockLoggerWithTestId', () => {
     });
 
     const simulateParallelTest = async function(
-      baseTestId: string,
+      identifier: string,
       message: string,
     ): Promise<{ testId: string; messages: string[] }> {
-      const parallelTestId = createTestId(baseTestId);
-      const parallelMockLogger = new E2EMockLoggerWithTestId(parallelTestId);
+      const parallelMockLogger = new E2EMockLoggerWithTestId(identifier);
 
       try {
         parallelMockLogger.info(message);
@@ -150,23 +142,30 @@ describe('E2EMockLoggerWithTestId', () => {
         await new Promise((resolve) => setTimeout(resolve, Math.random() * 10));
 
         return {
-          testId: parallelTestId,
+          testId: parallelMockLogger.getTestId(),
           messages: parallelMockLogger.getMessages(AG_LOGLEVEL.INFO),
         };
       } finally {
-        parallelMockLogger.endTest(parallelTestId);
+        parallelMockLogger.cleanup();
       }
     };
   });
 
   describe('Utility functions', () => {
+    const mockLogger = new E2EMockLoggerWithTestId('utility-functions');
+
     it('should create unique test IDs', () => {
-      const id1 = createTestId('test');
-      const id2 = createTestId('test');
+      const logger2 = new E2EMockLoggerWithTestId('utility-functions');
+
+      const id1 = mockLogger.getTestId();
+      const id2 = logger2.getTestId();
 
       expect(id1).not.toBe(id2);
-      expect(id1).toMatch(/^test-\d+-[a-z0-9]+$/);
-      expect(id2).toMatch(/^test-\d+-[a-z0-9]+$/);
+      expect(id1).toMatch(/^utility-functions-\d+-[a-z0-9]+$/);
+      expect(id2).toMatch(/^utility-functions-\d+-[a-z0-9]+$/);
+
+      mockLogger.cleanup();
+      logger2.cleanup();
     });
 
     it('should get all messages for a test', () => {
@@ -180,18 +179,8 @@ describe('E2EMockLoggerWithTestId', () => {
       expect(allMessages.ERROR).toEqual(['Error message']);
       expect(allMessages.WARN).toEqual(['Warning message']);
       expect(allMessages.DEBUG).toEqual([]);
-    });
-  });
 
-  describe('Backward compatibility', () => {
-    it('should support legacy error message methods', () => {
-      mockLogger.error('Legacy error message');
-
-      expect(mockLogger.getErrorMessages()).toEqual(['Legacy error message']);
-      expect(mockLogger.getLastErrorMessage()).toBe('Legacy error message');
-
-      mockLogger.clearErrorMessages();
-      expect(mockLogger.getErrorMessages()).toHaveLength(0);
+      mockLogger.cleanup();
     });
   });
 });

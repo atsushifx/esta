@@ -1,5 +1,5 @@
 // src/plugins/logger/E2eMockLogger.ts
-// @(#) : E2E Mock Logger Implementation with Parallel Test Support
+// @(#) : E2E Mock Logger Implementation with Test ID Encapsulation
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -16,12 +16,10 @@ import type { AgLoggerFunction, AgLoggerMap, AgTLogLevel } from '../../../shared
 
 /**
  * Mock logger for E2E testing that captures log messages in arrays.
- * Supports both single-test mode and parallel test execution with test IDs.
- *
- * This class merges the functionality of the original E2eMockLogger and
- * E2EMockLoggerWithTestId to provide a unified solution for all testing scenarios.
+ * Each instance is tied to a specific test identifier for complete isolation.
  */
 export class E2eMockLogger {
+  private testId: string | null;
   private messages: string[][] = [
     [], // OFF (0) - not used for actual logging
     [], // FATAL (1)
@@ -32,192 +30,138 @@ export class E2eMockLogger {
     [], // TRACE (6)
   ];
 
-  private testBuffers: Map<string, string[][]> = new Map();
-  private currentTestId: string | null = null;
-
-  constructor(testId: string) {
-    this.startTest(testId);
+  constructor(identifier: string) {
+    if (typeof identifier !== 'string') {
+      throw new Error('identifier is required and must be a string');
+    }
+    const trimmedIdentifier = identifier.trim();
+    const finalIdentifier = trimmedIdentifier || 'default';
+    this.testId = createTestId(finalIdentifier);
+    // Ensure clean state on instantiation
+    this.cleanup();
   }
 
   /**
-   * Start a new test with the given test ID for parallel execution.
-   * Creates an independent buffer for this test.
+   * Get the test ID for this logger instance.
+   */
+  getTestId(): string {
+    return this.testId ?? '';
+  }
+
+  /**
+   * Get the current test ID for this logger instance.
+   */
+  getCurrentTestId(): string | null {
+    return this.testId;
+  }
+
+  /**
+   * Start a new test with the given ID.
    */
   startTest(testId: string): void {
-    this.currentTestId = testId;
-    this.testBuffers.set(testId, [
-      [], // OFF (0) - not used for actual logging
-      [], // FATAL (1)
-      [], // ERROR (2)
-      [], // WARN (3)
-      [], // INFO (4)
-      [], // DEBUG (5)
-      [], // TRACE (6)
-    ]);
+    if (!testId || typeof testId !== 'string') {
+      throw new Error('testId is required and must be a non-empty string');
+    }
+    this.testId = testId;
+    this.cleanup();
   }
 
   /**
-   * End the test and clean up its buffer.
-   * Removes all log data for the specified test ID.
+   * End the current test.
    */
-  endTest(testId: string): void {
-    this.testBuffers.delete(testId);
-    if (this.currentTestId === testId) {
-      this.currentTestId = null;
+  endTest(testId?: string): void {
+    if (testId && !this.testId?.includes(testId)) {
+      throw new Error(`Cannot end test '${testId}': current test is '${this.testId}'`);
     }
-  }
-
-  /**
-   * Get the appropriate buffer for logging.
-   * Returns test-specific buffer if testId is active, otherwise default buffer.
-   */
-  private getBuffer(): string[][] {
-    if (this.currentTestId) {
-      const buffer = this.testBuffers.get(this.currentTestId);
-      if (!buffer) {
-        throw new Error(`Buffer not found for test ID: ${this.currentTestId}`);
-      }
-      return buffer;
-    }
-    return this.messages;
-  }
-
-  /**
-   * Check if logging is allowed in the current context.
-   * Always requires an active test for E2E scenarios.
-   */
-  private checkLoggingAllowed(): void {
-    if (!this.currentTestId) {
-      throw new Error('No active test. Call startTest() before logging.');
-    }
+    this.testId = null;
   }
 
   // Logger methods
   fatal(message: string): void {
-    this.checkLoggingAllowed();
-    const buffer = this.getBuffer();
-    buffer[AG_LOGLEVEL.FATAL].push(message);
+    this.validateActiveTest();
+    this.messages[AG_LOGLEVEL.FATAL].push(message);
   }
 
   error(message: string): void {
-    this.checkLoggingAllowed();
-    const buffer = this.getBuffer();
-    buffer[AG_LOGLEVEL.ERROR].push(message);
+    this.validateActiveTest();
+    this.messages[AG_LOGLEVEL.ERROR].push(message);
   }
 
   warn(message: string): void {
-    this.checkLoggingAllowed();
-    const buffer = this.getBuffer();
-    buffer[AG_LOGLEVEL.WARN].push(message);
+    this.validateActiveTest();
+    this.messages[AG_LOGLEVEL.WARN].push(message);
   }
 
   info(message: string): void {
-    this.checkLoggingAllowed();
-    const buffer = this.getBuffer();
-    buffer[AG_LOGLEVEL.INFO].push(message);
+    this.validateActiveTest();
+    this.messages[AG_LOGLEVEL.INFO].push(message);
   }
 
   debug(message: string): void {
-    this.checkLoggingAllowed();
-    const buffer = this.getBuffer();
-    buffer[AG_LOGLEVEL.DEBUG].push(message);
+    this.validateActiveTest();
+    this.messages[AG_LOGLEVEL.DEBUG].push(message);
   }
 
   trace(message: string): void {
-    this.checkLoggingAllowed();
-    const buffer = this.getBuffer();
-    buffer[AG_LOGLEVEL.TRACE].push(message);
-  }
-
-  // Query methods
-  getMessages(logLevel: AgTLogLevel, testId?: string): string[] {
-    if (testId) {
-      const buffer = this.testBuffers.get(testId);
-      if (!buffer) {
-        throw new Error(`Buffer not found for test ID: ${testId}`);
-      }
-      return [...buffer[logLevel]];
-    }
-
-    const buffer = this.getBuffer();
-    return [...buffer[logLevel]];
-  }
-
-  getLastMessage(logLevel: AgTLogLevel, testId?: string): string | null {
-    const messages = this.getMessages(logLevel, testId);
-    return messages[messages.length - 1] || null;
-  }
-
-  clearMessages(logLevel: AgTLogLevel, testId?: string): void {
-    if (testId) {
-      const buffer = this.testBuffers.get(testId);
-      if (!buffer) {
-        throw new Error(`Buffer not found for test ID: ${testId}`);
-      }
-      buffer[logLevel] = [];
-      return;
-    }
-
-    const buffer = this.getBuffer();
-    buffer[logLevel] = [];
+    this.validateActiveTest();
+    this.messages[AG_LOGLEVEL.TRACE].push(message);
   }
 
   /**
-   * Get all messages for all log levels for the specified test or current context.
+   * Validate that there is an active test before logging.
    */
-  getAllMessages(testId?: string): { [K in keyof typeof AG_LOGLEVEL]: string[] } {
-    let buffer: string[][];
-
-    if (testId) {
-      const testBuffer = this.testBuffers.get(testId);
-      if (!testBuffer) {
-        throw new Error(`Buffer not found for test ID: ${testId}`);
-      }
-      buffer = testBuffer;
-    } else {
-      buffer = this.getBuffer();
+  private validateActiveTest(): void {
+    if (!this.testId) {
+      throw new Error('No active test. Call startTest() before logging.');
     }
+  }
 
+  // Query methods
+  getMessages(logLevel: AgTLogLevel): string[] {
+    return [...this.messages[logLevel]];
+  }
+
+  getLastMessage(logLevel: AgTLogLevel): string | null {
+    const messages = this.getMessages(logLevel);
+    return messages[messages.length - 1] || null;
+  }
+
+  clearMessages(logLevel: AgTLogLevel): void {
+    this.messages[logLevel] = [];
+  }
+
+  // Error-specific convenience methods
+  getErrorMessages(): string[] {
+    return this.getMessages(AG_LOGLEVEL.ERROR);
+  }
+
+  getLastErrorMessage(): string | null {
+    return this.getLastMessage(AG_LOGLEVEL.ERROR);
+  }
+
+  clearErrorMessages(): void {
+    this.clearMessages(AG_LOGLEVEL.ERROR);
+  }
+
+  /**
+   * Get all messages for all log levels.
+   */
+  getAllMessages(): { [K in keyof typeof AG_LOGLEVEL]: string[] } {
     return {
-      OFF: [...buffer[AG_LOGLEVEL.OFF]],
-      FATAL: [...buffer[AG_LOGLEVEL.FATAL]],
-      ERROR: [...buffer[AG_LOGLEVEL.ERROR]],
-      WARN: [...buffer[AG_LOGLEVEL.WARN]],
-      INFO: [...buffer[AG_LOGLEVEL.INFO]],
-      DEBUG: [...buffer[AG_LOGLEVEL.DEBUG]],
-      TRACE: [...buffer[AG_LOGLEVEL.TRACE]],
+      OFF: [...this.messages[AG_LOGLEVEL.OFF]],
+      FATAL: [...this.messages[AG_LOGLEVEL.FATAL]],
+      ERROR: [...this.messages[AG_LOGLEVEL.ERROR]],
+      WARN: [...this.messages[AG_LOGLEVEL.WARN]],
+      INFO: [...this.messages[AG_LOGLEVEL.INFO]],
+      DEBUG: [...this.messages[AG_LOGLEVEL.DEBUG]],
+      TRACE: [...this.messages[AG_LOGLEVEL.TRACE]],
     };
   }
 
   /**
-   * Check if a test is currently active.
-   */
-  hasActiveTest(): boolean {
-    return this.currentTestId !== null;
-  }
-
-  /**
-   * Get the current test ID.
-   */
-  getCurrentTestId(): string | null {
-    return this.currentTestId;
-  }
-
-  /**
-   * Get list of all active test IDs.
-   */
-  getActiveTestIds(): string[] {
-    return Array.from(this.testBuffers.keys());
-  }
-
-  /**
-   * Clean up all test buffers and reset to single-test mode.
-   * Useful for afterEach cleanup in tests.
+   * Clean up all messages for this test.
    */
   cleanup(): void {
-    this.testBuffers.clear();
-    this.currentTestId = null;
-    // Reset default buffer
     this.messages = [
       [], // OFF (0)
       [], // FATAL (1)
@@ -230,7 +174,7 @@ export class E2eMockLogger {
   }
 
   /**
-   * Create AgLoggerFunction for the current test or default context.
+   * Create AgLoggerFunction for this test.
    * This can be used as a plugin for ag-logger.
    */
   createLoggerFunction(): AgLoggerFunction {
@@ -241,7 +185,7 @@ export class E2eMockLogger {
   }
 
   /**
-   * Create AgLoggerMap for the current test or default context.
+   * Create AgLoggerMap for this test.
    * This provides level-specific logging functions.
    */
   createLoggerMap(): AgLoggerMap {
@@ -254,19 +198,6 @@ export class E2eMockLogger {
       [AG_LOGLEVEL.DEBUG]: (message: string) => this.debug(message),
       [AG_LOGLEVEL.TRACE]: (message: string) => this.trace(message),
     };
-  }
-
-  // Legacy methods for backward compatibility
-  getErrorMessages(testId?: string): string[] {
-    return this.getMessages(AG_LOGLEVEL.ERROR, testId);
-  }
-
-  getLastErrorMessage(testId?: string): string | null {
-    return this.getLastMessage(AG_LOGLEVEL.ERROR, testId);
-  }
-
-  clearErrorMessages(testId?: string): void {
-    this.clearMessages(AG_LOGLEVEL.ERROR, testId);
   }
 }
 
@@ -298,16 +229,4 @@ export const createTestId = (identifier: string = 'test'): string => {
   }
 
   return `${identifier}-${timestamp}-${randomString}`;
-};
-
-/**
- * Convenience function to create test ID from the current test file.
- * Uses import.meta.url or __filename to automatically determine the test file name.
- *
- * @example
- * // In a test file named 'AgLogger.integration.spec.ts'
- * const testId = createTestIdFromFile(import.meta.url); // → 'AgLogger.integration-{uuid}'
- */
-export const createTestIdFromFile = (fileUrl: string): string => {
-  return createTestId(fileUrl);
 };
