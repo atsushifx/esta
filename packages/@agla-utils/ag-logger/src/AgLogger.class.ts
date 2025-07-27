@@ -31,7 +31,7 @@ export class AgLogger {
   private _verbose: boolean = false;
 
   private constructor() {
-    this._loggerManager = AgLoggerManager.getLogger();
+    this._loggerManager = AgLoggerManager.getManager();
   }
 
   /**

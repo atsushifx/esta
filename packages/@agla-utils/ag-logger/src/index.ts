@@ -23,6 +23,7 @@ export type { AgTLogLevel, AgTLogLevelLabel } from '../shared/types';
 
 // logger main
 export { AgLogger, getLogger } from './AgLogger.class';
+export { AgLoggerManager } from './AgLoggerManager.class';
 
 // plugins: logger
 export { ConsoleLogger } from './plugins/logger/ConsoleLogger';
