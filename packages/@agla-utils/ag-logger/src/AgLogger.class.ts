@@ -117,8 +117,9 @@ export class AgLogger {
       const formatter = this._loggerManager.getFormatter();
       const formattedMessage = formatter(logMessage);
 
-      // Do not log if formatter returns an empty string
-      if (formattedMessage === '') {
+      // Only block logging if the formatter explicitly returns empty string
+      // and the original message had actual content (not just empty args)
+      if (formattedMessage === '' && logMessage.message !== '' && args.length > 0) {
         return;
       }
 
