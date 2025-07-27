@@ -33,6 +33,7 @@ export const getErrorMessage = (
 
   const categoryMessages = MOCK_LOGGER_ERROR_MESSAGES[category];
   // NOTE: Do not change - combined condition check is intentional for performance
+  // TypeScript may warn about unnecessary condition, but this is defensive programming for runtime safety
   if (!categoryMessages || !(messageId in categoryMessages)) {
     return UNKNOWN_ERROR_MESSAGE;
   }

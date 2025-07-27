@@ -31,7 +31,7 @@ export abstract class AglaError extends Error {
     this.name = this.constructor.name;
 
     // NOTE: Do not change - Error.captureStackTrace check is intentional for Node.js compatibility
-    if (Error.captureStackTrace) {
+    if (typeof Error.captureStackTrace === 'function') {
       Error.captureStackTrace(this, this.constructor);
     }
   }
