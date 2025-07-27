@@ -102,7 +102,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('accepts default logger when getting instance', () => {
-      const manager = AgLoggerManager.getManager(mockDefaultLogger);
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
       const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
       infoLogger('test message');
@@ -111,7 +111,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('accepts formatter when getting instance', () => {
-      const manager = AgLoggerManager.getManager(undefined, mockFormatter);
+      const manager = AgLoggerManager.getManager({ formatter: mockFormatter });
 
       const formatter = manager.getFormatter();
       expect(formatter).toBe(mockFormatter);
@@ -123,7 +123,7 @@ describe('AgLoggerManager', () => {
         [AG_LOGLEVEL.WARN]: mockWarnLogger,
       };
 
-      const manager = AgLoggerManager.getManager(mockDefaultLogger, undefined, loggerMap);
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger, loggerMap: loggerMap });
 
       const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
       const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
@@ -144,7 +144,11 @@ describe('AgLoggerManager', () => {
         [AG_LOGLEVEL.ERROR]: mockErrorLogger,
       };
 
-      const manager = AgLoggerManager.getManager(mockDefaultLogger, mockFormatter, loggerMap);
+      const manager = AgLoggerManager.getManager({
+        defaultLogger: mockDefaultLogger,
+        formatter: mockFormatter,
+        loggerMap: loggerMap,
+      });
 
       expect(manager.getFormatter()).toBe(mockFormatter);
 
@@ -176,7 +180,7 @@ describe('AgLoggerManager', () => {
    */
   describe('getLogger', () => {
     it('returns logger function for specified log level', () => {
-      const manager = AgLoggerManager.getManager(mockDefaultLogger);
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
       const logger = manager.getLogger(AG_LOGLEVEL.INFO);
       expect(typeof logger).toBe('function');
@@ -186,7 +190,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('returns default logger if log level does not exist', () => {
-      const manager = AgLoggerManager.getManager(mockDefaultLogger);
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
       const logger = manager.getLogger(999 as AgTLogLevel);
       expect(logger).toBe(mockDefaultLogger);
@@ -207,7 +211,7 @@ describe('AgLoggerManager', () => {
    */
   describe('getFormatter', () => {
     it('returns the configured formatter', () => {
-      const manager = AgLoggerManager.getManager(undefined, mockFormatter);
+      const manager = AgLoggerManager.getManager({ formatter: mockFormatter });
 
       const formatter = manager.getFormatter();
       expect(formatter).toBe(mockFormatter);
@@ -222,38 +226,33 @@ describe('AgLoggerManager', () => {
   });
 
   /**
-   * setManagerメソッド（legacy形式）のテストスイート
+   * setManagerメソッド（options形式のみ）のテストスイート
    *
-   * @description レガシー形式でのロガー設定機能を検証する
-   * ログレベル指定でのロガー設定、null指定でのデフォルト設定を確認
-   *
-   * @testFocus Legacy Logger Setting
-   * @scenarios
-   * - 指定ログレベルへのロガー設定
-   * - null指定でのデフォルトロガー設定
-   * - 設定後のロガー取得・実行
+   * @description options形式でのロガー設定機能を検証する
+   * legacy形式は削除されsetLogFunctionWithLevelに分離されたことを確認
    */
-  describe('setManager - legacy form', () => {
-    it('sets logger for specified log level', () => {
+  describe('setManager - options only', () => {
+    it('should only accept options object, not legacy form', () => {
       const manager = AgLoggerManager.getManager();
 
-      manager.setManager(AG_LOGLEVEL.ERROR, mockErrorLogger);
-
-      const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-      errorLogger('error message');
-
-      expect(mockErrorLogger).toHaveBeenCalledWith('error message');
+      // Runtime: setManager now only accepts options object
+      expect(typeof manager.setManager).toBe('function');
     });
 
-    it('sets default logger if null is specified', () => {
-      const manager = AgLoggerManager.getManager(mockDefaultLogger);
+    it('updates options correctly', () => {
+      const manager = AgLoggerManager.getManager();
 
-      manager.setManager(AG_LOGLEVEL.ERROR, null);
+      manager.setManager({
+        defaultLogger: mockDefaultLogger,
+        formatter: mockFormatter,
+      });
 
-      const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-      errorLogger('error message');
+      expect(manager.getFormatter()).toBe(mockFormatter);
 
-      expect(mockDefaultLogger).toHaveBeenCalledWith('error message');
+      const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+      infoLogger('info message');
+
+      expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
     });
   });
 
@@ -371,20 +370,19 @@ describe('AgLoggerManager', () => {
    * 複合シナリオのテストスイート
    *
    * @description 実用的な複合設定シナリオを検証する
-   * インスタンス作成後の設定更新、複数setManager呼び出しの動作を確認
+   * setManager（options）とsetLogFunctionWithLevelの組み合わせ動作を確認
    *
    * @testFocus Complex Configuration Scenarios
    * @scenarios
    * - getLogger後の設定更新
-   * - 複数setManager呼び出しの組み合わせ
-   * - legacy形式とoptions形式の混在使用
+   * - setManagerとsetLogFunctionWithLevelの組み合わせ
    * - 設定変更の累積効果
    */
   describe('Complex scenarios', () => {
     it('can update settings after getLogger', () => {
-      const manager = AgLoggerManager.getManager(mockDefaultLogger);
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
-      manager.setManager(AG_LOGLEVEL.ERROR, mockErrorLogger);
+      manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
       manager.setManager({ formatter: mockFormatter });
 
       expect(manager.getFormatter()).toBe(mockFormatter);
@@ -399,15 +397,15 @@ describe('AgLoggerManager', () => {
       expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
     });
 
-    it('can call setManager multiple times without issue', () => {
+    it('can combine setManager and setLogFunctionWithLevel calls', () => {
       const manager = AgLoggerManager.getManager();
 
       manager.setManager({ defaultLogger: mockDefaultLogger });
-      manager.setManager(AG_LOGLEVEL.ERROR, mockErrorLogger);
+      manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
       manager.setManager({ formatter: mockFormatter });
 
       const secondMockLogger = vi.fn();
-      manager.setManager(AG_LOGLEVEL.WARN, secondMockLogger);
+      manager.setLogFunctionWithLevel(AG_LOGLEVEL.WARN, secondMockLogger);
 
       const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
       const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
@@ -421,6 +419,124 @@ describe('AgLoggerManager', () => {
       expect(secondMockLogger).toHaveBeenCalledWith('warn message');
       expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
       expect(manager.getFormatter()).toBe(mockFormatter);
+    });
+  });
+
+  /**
+   * setLogFunctionWithLevelメソッドのテストスイート
+   *
+   * @description 個別ログレベルへの特定ロガー関数設定機能を検証する
+   * 指定レベルへのロガー設定、他レベルへの影響なしを確認
+   *
+   * @testFocus Specific Logger Function Setting
+   * @scenarios
+   * - 指定ログレベルへの特定ロガー関数設定
+   * - 他ログレベルに影響しないこと
+   * - 複数レベルへの個別設定
+   */
+  describe('setLogFunctionWithLevel', () => {
+    it('sets specific logger function for specified log level', () => {
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+
+      manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+
+      const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+      errorLogger('error message');
+
+      expect(mockErrorLogger).toHaveBeenCalledWith('error message');
+    });
+
+    it('does not affect other log levels', () => {
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+
+      manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+
+      const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+      const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
+      const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+
+      errorLogger('error message');
+      warnLogger('warn message');
+      infoLogger('info message');
+
+      expect(mockErrorLogger).toHaveBeenCalledWith('error message');
+      expect(mockDefaultLogger).toHaveBeenCalledWith('warn message');
+      expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
+    });
+
+    it('allows setting different functions for multiple levels', () => {
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+
+      manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+      manager.setLogFunctionWithLevel(AG_LOGLEVEL.WARN, mockWarnLogger);
+
+      const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+      const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
+      const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+
+      errorLogger('error message');
+      warnLogger('warn message');
+      infoLogger('info message');
+
+      expect(mockErrorLogger).toHaveBeenCalledWith('error message');
+      expect(mockWarnLogger).toHaveBeenCalledWith('warn message');
+      expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
+    });
+  });
+
+  /**
+   * setDefaultLogFunctionメソッドのテストスイート
+   *
+   * @description 個別ログレベルのデフォルトロガー設定機能を検証する
+   * 特定レベルをデフォルトロガーに戻す機能を確認
+   *
+   * @testFocus Default Logger Function Setting
+   * @scenarios
+   * - 指定ログレベルをデフォルトロガーに設定
+   * - 既存の特定ロガーからデフォルトロガーへの変更
+   * - 他レベルに影響しないこと
+   */
+  describe('setDefaultLogFunction', () => {
+    it('sets log level to use default logger', () => {
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+
+      manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+      manager.setDefaultLogFunction(AG_LOGLEVEL.ERROR);
+
+      const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+      errorLogger('error message');
+
+      expect(mockDefaultLogger).toHaveBeenCalledWith('error message');
+      expect(mockErrorLogger).not.toHaveBeenCalled();
+    });
+
+    it('does not affect other log levels', () => {
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+
+      manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+      manager.setLogFunctionWithLevel(AG_LOGLEVEL.WARN, mockWarnLogger);
+      manager.setDefaultLogFunction(AG_LOGLEVEL.ERROR);
+
+      const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+      const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
+
+      errorLogger('error message');
+      warnLogger('warn message');
+
+      expect(mockDefaultLogger).toHaveBeenCalledWith('error message');
+      expect(mockWarnLogger).toHaveBeenCalledWith('warn message');
+      expect(mockErrorLogger).not.toHaveBeenCalled();
+    });
+
+    it('works even when no custom logger was previously set', () => {
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+
+      manager.setDefaultLogFunction(AG_LOGLEVEL.INFO);
+
+      const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+      infoLogger('info message');
+
+      expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
     });
   });
 });
