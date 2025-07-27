@@ -133,7 +133,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       const userData = { userId: 123, userName: 'testUser' };
-      logger.info('User data', userData, ' additional info');
+      logger.info('User data', userData, 'additional info');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];

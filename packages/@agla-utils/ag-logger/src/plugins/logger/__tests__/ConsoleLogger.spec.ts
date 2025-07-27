@@ -24,19 +24,17 @@ const mockConsole = {
 };
 
 /**
- * ConsoleLoggerプラグインのユニットテストスイート
+ * ConsoleLoggerプラグインの包括的ユニットテストスイート
  *
- * @description コンソール出力ロガーの動作を検証する
- * デフォルトConsoleLogger関数とConsoleLoggerMapの動作、
- * 引数委譲、レベル別コンソールメソッド呼び出しを確認
+ * @description ConsoleLoggerの全機能を効率的に検証
+ * デフォルトロガー、レベル別マッピング、エラー処理を包括的にテスト
  *
  * @testType Unit Test
  * @testTarget ConsoleLogger Plugin
  * @coverage
- * - デフォルトConsoleLogger関数の動作
- * - ConsoleLoggerMapのレベル別ログ出力
- * - 引数の適切な委譲
- * - 各ログレベルでの適切なconsoleメソッド呼び出し
+ * - 正常系: 基本動作、レベルマッピング
+ * - 異常系: エラー処理
+ * - エッジケース: 境界値、特殊入力
  */
 describe('ConsoleLogger', () => {
   beforeEach(() => {
@@ -45,156 +43,129 @@ describe('ConsoleLogger', () => {
   });
 
   /**
-   * デフォルトConsoleLogger関数の動作テストスイート
+   * 正常系テスト: 基本機能
    *
-   * @description デフォルトのConsoleLogger関数の基本動作を検証する
-   * console.logへの引数委譲、空文字列・単一引数処理、メッセージ保持を確認
-   *
-   * @testFocus Default ConsoleLogger Function
-   * @scenarios
-   * - console.logへの引数委譲
-   * - 空文字列での動作
-   * - 単一引数での動作
-   * - メッセージ内容の保持
+   * @description ConsoleLoggerの基本機能が正常に動作することを検証
    */
-  describe('default ConsoleLogger function', () => {
-    beforeEach(() => {
-      vi.spyOn(console, 'log').mockImplementation(() => {});
+  describe('正常系: Basic Functionality', () => {
+    /**
+     * デフォルトConsoleLogger関数のテスト
+     *
+     * @description console.logへの引数委譲を検証
+     */
+    describe('Default ConsoleLogger Function', () => {
+      beforeEach(() => {
+        vi.spyOn(console, 'log').mockImplementation(() => {});
+      });
+
+      it('should delegate to console.log correctly', () => {
+        const testCases = [
+          'test message',
+          '',
+          'single message',
+          'multiple word message',
+        ];
+
+        testCases.forEach((message) => {
+          ConsoleLogger(message);
+          expect(console.log).toHaveBeenCalledWith(message);
+        });
+
+        expect(console.log).toHaveBeenCalledTimes(testCases.length);
+      });
     });
 
     /**
-     * Ensures console.log is called with the provided arguments.
+     * ConsoleLoggerMapのテスト
+     *
+     * @description ログレベルとconsoleメソッドのマッピングを検証
      */
-    it('calls console.log with the given arguments', () => {
-      ConsoleLogger('test message');
-      expect(console.log).toHaveBeenCalledWith('test message');
-    });
+    describe('ConsoleLoggerMap', () => {
+      it('should map log levels to correct console methods', () => {
+        const testCases = [
+          { level: AG_LOGLEVEL.OFF, expectFunction: true }, // NullLogger
+          { level: AG_LOGLEVEL.FATAL, method: 'error' },
+          { level: AG_LOGLEVEL.ERROR, method: 'error' },
+          { level: AG_LOGLEVEL.WARN, method: 'warn' },
+          { level: AG_LOGLEVEL.INFO, method: 'info' },
+          { level: AG_LOGLEVEL.DEBUG, method: 'debug' },
+          { level: AG_LOGLEVEL.TRACE, method: 'debug' },
+        ];
 
-    /**
-     * Ensures console.log is called correctly with an empty string.
-     */
-    it('works with empty string', () => {
-      ConsoleLogger('');
-      expect(console.log).toHaveBeenCalledWith('');
-    });
+        testCases.forEach(({ level, method }) => {
+          const logFunction = ConsoleLoggerMap[level];
+          expect(logFunction).toBeDefined();
+          expect(typeof logFunction).toBe('function');
 
-    /**
-     * Ensures console.log works with a single argument.
-     */
-    it('works with a single argument', () => {
-      ConsoleLogger('single message');
-      expect(console.log).toHaveBeenCalledWith('single message');
-    });
+          if (method) {
+            logFunction!(`test ${method} message`);
+            expect(mockConsole[method as keyof typeof mockConsole]).toHaveBeenCalledTimes(1);
+            vi.clearAllMocks();
+          }
+        });
+      });
 
-    /**
-     * Ensures the string message is preserved and logged once.
-     */
-    it('preserves string message', () => {
-      const testMessage = 'test message';
-      ConsoleLogger(testMessage);
-      expect(console.log).toHaveBeenCalledWith(testMessage);
-      expect(console.log).toHaveBeenCalledTimes(1);
+      it('should handle formatted messages correctly', () => {
+        const testMessage = 'formatted log message';
+        const infoLogger = ConsoleLoggerMap[AG_LOGLEVEL.INFO];
+
+        infoLogger!(testMessage);
+        expect(mockConsole.info).toHaveBeenCalledWith(testMessage);
+      });
     });
   });
 
   /**
-   * ConsoleLoggerMapの動作テストスイート
+   * 異常系テスト: エラー処理
    *
-   * @description ログレベルとコンソールメソッドのマッピング動作を検証する
-   * 各ログレベルでの適切なconsoleメソッド呼び出し、フォーマット済みメッセージ処理を確認
-   *
-   * @testFocus Log Level to Console Method Mapping
-   * @scenarios
-   * - OFFレベル（NullLogger）の動作
-   * - FATAL/ERRORレベル（console.error）の呼び出し
-   * - WARNレベル（console.warn）の呼び出し
-   * - INFOレベル（console.info）の呼び出し
-   * - DEBUG/TRACEレベル（console.debug）の呼び出し
-   * - フォーマット済みメッセージの処理
+   * @description エラー状況での動作を検証
    */
-  describe('ConsoleLogger Map', () => {
-    /**
-     * Tests that the OFF level returns NullLogger.
-     */
-    it('returns NullLogger for OFF level', () => {
-      expect(ConsoleLoggerMap[AG_LOGLEVEL.OFF]).toBeDefined();
-      expect(typeof ConsoleLoggerMap[AG_LOGLEVEL.OFF]).toBe('function');
+  describe('異常系: Error Handling', () => {
+    it('should handle console method throwing errors', () => {
+      const throwingConsole = vi.spyOn(console, 'error').mockImplementation(() => {
+        throw new Error('Console error');
+      });
+
+      const errorLogger = ConsoleLoggerMap[AG_LOGLEVEL.ERROR];
+      expect(() => errorLogger!('test')).toThrow('Console error');
+
+      throwingConsole.mockRestore();
+    });
+  });
+
+  /**
+   * エッジケース: 境界値と特殊条件
+   *
+   * @description 境界値や特殊な入力での動作を検証
+   */
+  describe('エッジケース: Edge Cases', () => {
+    it('should handle undefined and null messages', () => {
+      vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      ConsoleLogger(undefined as unknown as string);
+      ConsoleLogger(null as unknown as string);
+
+      expect(console.log).toHaveBeenCalledWith(undefined);
+      expect(console.log).toHaveBeenCalledWith(null);
     });
 
-    /**
-     * Tests that console.error is called for FATAL level.
-     */
-    it('calls console.error for FATAL level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.FATAL];
-      expect(logFunction).toBeDefined();
+    it('should handle very long messages', () => {
+      vi.spyOn(console, 'info').mockImplementation(() => {});
 
-      logFunction!('test fatal message');
-      expect(mockConsole.error).toHaveBeenCalledTimes(1);
+      const longMessage = 'a'.repeat(10000);
+      const infoLogger = ConsoleLoggerMap[AG_LOGLEVEL.INFO];
+
+      infoLogger!(longMessage);
+      expect(console.info).toHaveBeenCalledWith(longMessage);
     });
 
-    /**
-     * Tests that console.error is called for ERROR level.
-     */
-    it('calls console.error for ERROR level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.ERROR];
-      expect(logFunction).toBeDefined();
+    it('should handle special characters in messages', () => {
+      vi.spyOn(console, 'log').mockImplementation(() => {});
 
-      logFunction!('test error message');
-      expect(mockConsole.error).toHaveBeenCalledTimes(1);
-    });
+      const specialMessage = '\n\t\r\\"\'';
+      ConsoleLogger(specialMessage);
 
-    /**
-     * Tests that console.warn is called for WARN level.
-     */
-    it('calls console.warn for WARN level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.WARN];
-      expect(logFunction).toBeDefined();
-
-      logFunction!('test warn message');
-      expect(mockConsole.warn).toHaveBeenCalledTimes(1);
-    });
-
-    /**
-     * Tests that console.info is called for INFO level.
-     */
-    it('calls console.info for INFO level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.INFO];
-      expect(logFunction).toBeDefined();
-
-      logFunction!('test info message');
-      expect(mockConsole.info).toHaveBeenCalledTimes(1);
-    });
-
-    /**
-     * Tests that console.debug is called for DEBUG level.
-     */
-    it('calls console.debug for DEBUG level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.DEBUG];
-      expect(logFunction).toBeDefined();
-
-      logFunction!('test debug message');
-      expect(mockConsole.debug).toHaveBeenCalledTimes(1);
-    });
-
-    /**
-     * Tests that console.debug is called for TRACE level.
-     */
-    it('calls console.debug for TRACE level', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.TRACE];
-      expect(logFunction).toBeDefined();
-
-      logFunction!('test trace message');
-      expect(mockConsole.debug).toHaveBeenCalledTimes(1);
-    });
-
-    /**
-     * Tests that the logger correctly processes a formatted message.
-     */
-    it('correctly processes a formatted message', () => {
-      const logFunction = ConsoleLoggerMap[AG_LOGLEVEL.INFO];
-      const formattedMessage = 'formatted log message';
-      logFunction!(formattedMessage);
-      expect(mockConsole.info).toHaveBeenCalledWith(formattedMessage);
+      expect(console.log).toHaveBeenCalledWith(specialMessage);
     });
   });
 });

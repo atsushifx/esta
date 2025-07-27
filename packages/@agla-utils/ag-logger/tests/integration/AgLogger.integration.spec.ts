@@ -11,379 +11,320 @@ import { describe, expect, it, vi } from 'vitest';
 
 // ログレベル定数 - テストで使用するログレベル定義
 import { AG_LOGLEVEL } from '../../shared/types';
+
+// Type definitions for vitest mocks
+type TVitestMock = ReturnType<typeof vi.fn>;
 // テスト対象 - メインAgLoggerクラスとgetLogger関数
 import { AgLogger, getLogger } from '../../src/AgLogger.class';
 // テスト対象 - ロガー・フォーマッター管理クラス
 import { AgLoggerManager } from '../../src/AgLoggerManager.class';
-// フォーマッタープラグイン - JSON形式でのログフォーマット
+// フォーマッタープラグイン
 import { JsonFormat } from '../../src/plugins/format/JsonFormat';
-// フォーマッタープラグイン - 出力なしのダミーフォーマット
 import { NullFormat } from '../../src/plugins/format/NullFormat';
-// フォーマッタープラグイン - 人間可読な平文フォーマット
 import { PlainFormat } from '../../src/plugins/format/PlainFormat';
-// ロガープラグイン - コンソール出力ロガー
+// ロガープラグイン
 import { ConsoleLogger } from '../../src/plugins/logger/ConsoleLogger';
 
 /**
- * AgLoggerコンポーネントの統合テストスイート
+ * AgLoggerコンポーネントの包括的統合テストスイート
  *
- * @description AgLogger、AgLoggerManager、ロガー、フォーマッター間の相互作用を検証する
- * コンポーネントが正しく連携して動作することを確認。
- * シングルトン動作、マネージャー状態一貫性、複合設定シナリオをテスト
+ * @description AgLoggerエコシステム全体の統合動作を検証
+ * コンポーネント間連携、設定管理、プラグイン統合、エラー処理を包括的にテスト
  *
  * @testType Integration Test
  * @testTarget AgLogger + AgLoggerManager + Plugins
  * @coverage
- * - シングルトンインスタンス間の一貫性
- * - ロガー・フォーマッター組み合わせ統合
- * - 設定管理とコンポーネント連携
- * - ログレベルフィルタリング統合
- * - verbose機能統合
- * - エラー処理とエッジケース統合
+ * - 正常系: 基本統合、プラグイン組み合わせ、設定管理
+ * - 異常系: エラー処理、システム安定性、復旧機能
+ * - エッジケース: 複合設定、状態遷移、境界条件
  */
 describe('AgLogger Integration Tests', () => {
   const setupTestContext = (): void => {
     vi.clearAllMocks();
-    // Reset singleton instances for clean test state
     AgLogger.resetSingleton();
     AgLoggerManager.resetSingleton();
   };
 
   /**
-   * シングルトンとマネージャー統合テストスイート
+   * 正常系テスト: 基本統合機能
    *
-   * @description 複数ロガーインスタンスと設定間でのシングルトン動作と
-   * マネージャー状態一貫性を検証する
-   * インスタンス同一性、設定共有、マネージャー設定連携を確認
-   *
-   * @testFocus Singleton Pattern Integration
-   * @scenarios
-   * - 複数getLogger呼び出しでのインスタンス同一性
-   * - ログレベル設定のインスタンス間共有
-   * - ロガーマネージャー設定のインスタンス間共有
+   * @description コンポーネント間の基本的な連携動作を検証
    */
-  describe('Singleton and Manager Integration', () => {
-    it('should maintain singleton behavior across multiple getLogger calls', () => {
-      setupTestContext();
-      const logger1 = getLogger();
-      const logger2 = getLogger();
-      const logger3 = AgLogger.getInstance();
+  describe('正常系: Basic Integration', () => {
+    /**
+     * シングルトン統合のテスト
+     *
+     * @description シングルトンパターンの統合動作を検証
+     */
+    describe('Singleton Integration', () => {
+      it('should maintain singleton consistency across all entry points', () => {
+        setupTestContext();
 
-      expect(logger1).toBe(logger2);
-      expect(logger2).toBe(logger3);
-    });
+        const logger1 = getLogger();
+        const logger2 = AgLogger.getInstance();
+        const logger3 = getLogger();
 
-    it('should share log level configuration across all instances', () => {
-      setupTestContext();
-      const logger1 = getLogger();
-      const logger2 = getLogger();
-
-      logger1.setLogLevel(AG_LOGLEVEL.DEBUG);
-      expect(logger2.getLogLevel()).toBe(AG_LOGLEVEL.DEBUG);
-
-      logger2.setLogLevel(AG_LOGLEVEL.ERROR);
-      expect(logger1.getLogLevel()).toBe(AG_LOGLEVEL.ERROR);
-    });
-
-    it('should share logger manager configuration across instances', () => {
-      setupTestContext();
-      const mockLogger = vi.fn();
-      const mockFormatter = vi.fn().mockReturnValue('formatted message');
-
-      const logger1 = getLogger(mockLogger, mockFormatter);
-      logger1.setLogLevel(AG_LOGLEVEL.INFO);
-
-      const logger2 = getLogger();
-      logger2.info('test message');
-
-      expect(mockFormatter).toHaveBeenCalled();
-      expect(mockLogger).toHaveBeenCalledWith('formatted message');
-    });
-  });
-
-  /**
-   * ロガー・フォーマッター統合テストスイート
-   *
-   * @description 各種ロガーとフォーマッターの組み合わせ統合を検証する
-   * 異なるプラグイン組み合わせで正しく連携して動作することを確認
-   * データフロー、フォーマット互換性、出力品質をテスト
-   *
-   * @testFocus Plugin Combination Integration
-   * @scenarios
-   * - ConsoleLogger + JsonFormat組み合わせ
-   * - E2eMockLogger + PlainFormat組み合わせ
-   * - NullFormatと任意ロガーの組み合わせ
-   * - フォーマット出力の正確性検証
-   */
-  describe('Logger and Formatter Integration', () => {
-    it('should integrate ConsoleLogger with JsonFormat correctly', () => {
-      setupTestContext();
-      const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
-
-      const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
-      logger.info('test message', { key: 'value' });
-
-      expect(consoleSpy).toHaveBeenCalledTimes(1);
-      const [logOutput] = consoleSpy.mock.calls[0];
-
-      // Verify JSON format output
-      expect(() => JSON.parse(logOutput)).not.toThrow();
-      const parsedLog = JSON.parse(logOutput);
-      expect(parsedLog).toMatchObject({
-        level: 'INFO',
-        message: 'test message',
-        args: [{ key: 'value' }],
+        expect(logger1).toBe(logger2);
+        expect(logger2).toBe(logger3);
       });
 
-      consoleSpy.mockRestore();
-    });
+      it('should share state and configuration across instances', () => {
+        setupTestContext();
 
-    it('should integrate mockLogger with PlainFormat correctly', () => {
-      setupTestContext();
-      const mockLogger = vi.fn();
+        const logger1 = getLogger();
+        const logger2 = getLogger();
 
-      const logger = getLogger(mockLogger, PlainFormat);
-      logger.setLogLevel(AG_LOGLEVEL.WARN);
-      logger.warn('warning message', 'additional info');
+        // ログレベル設定の共有
+        logger1.setLogLevel(AG_LOGLEVEL.DEBUG);
+        expect(logger2.getLogLevel()).toBe(AG_LOGLEVEL.DEBUG);
 
-      expect(mockLogger).toHaveBeenCalledTimes(1);
-      const [logOutput] = mockLogger.mock.calls[0];
+        // verbose設定の共有
+        logger1.setVerbose(true);
+        expect(logger2.setVerbose()).toBe(true);
 
-      // Verify PlainFormat output structure
-      expect(logOutput).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z \[WARN\] warning message additional info$/);
-    });
+        // ロガーマネージャー設定の共有
+        const mockLogger = vi.fn();
+        const mockFormatter = vi.fn().mockReturnValue('shared format');
 
-    it('should handle NullFormat with any logger correctly', () => {
-      setupTestContext();
-      const mockLogger = vi.fn();
+        logger1.setLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger2.setLogLevel(AG_LOGLEVEL.INFO);
+        logger2.info('test message');
 
-      const logger = getLogger(mockLogger, NullFormat);
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
-      logger.info('test message');
-
-      // NullFormat returns empty string, so logger should not be called
-      expect(mockLogger).not.toHaveBeenCalled();
-    });
-  });
-
-  /**
-   * 複合設定統合テストスイート
-   *
-   * @description 部分的ロガーマップや混在ロガー・フォーマッター組み合わせの
-   * 複合設定シナリオを検証する
-   * 部分ロガーマップ、設定継承、複数設定更新、設定保持を確認
-   *
-   * @testFocus Complex Configuration Scenarios
-   * @scenarios
-   * - 部分ロガーマップでのレベル別ロガー使い分け
-   * - 複数setLogger呼び出し後の設定保持
-   * - 設定更新の累積効果と上書き動作
-   */
-  describe('Complex Configuration Integration', () => {
-    it('should handle partial logger map with different loggers per level', () => {
-      setupTestContext();
-      const errorLogger = vi.fn();
-      const infoLogger = vi.fn();
-      const debugLogger = vi.fn();
-
-      const logger = getLogger(
-        infoLogger,
-        PlainFormat,
-        {
-          [AG_LOGLEVEL.ERROR]: errorLogger,
-          [AG_LOGLEVEL.DEBUG]: debugLogger,
-        },
-      );
-
-      logger.setLogLevel(AG_LOGLEVEL.DEBUG);
-
-      logger.error('error message');
-      logger.warn('warn message');
-      logger.info('info message');
-      logger.debug('debug message');
-
-      expect(errorLogger).toHaveBeenCalledTimes(1);
-      expect(infoLogger).toHaveBeenCalledTimes(2); // warn and info
-      expect(debugLogger).toHaveBeenCalledTimes(1);
-    });
-
-    it('should maintain configuration after multiple setLogger calls', () => {
-      setupTestContext();
-      const firstLogger = vi.fn();
-      const secondLogger = vi.fn();
-      const thirdFormatter = vi.fn().mockReturnValue('third format');
-
-      const logger = getLogger();
-
-      // First configuration
-      logger.setLogger({
-        defaultLogger: firstLogger,
-        formatter: PlainFormat,
+        expect(mockFormatter).toHaveBeenCalled();
+        expect(mockLogger).toHaveBeenCalledWith('shared format');
       });
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
+    });
 
-      // Second configuration - should override first
-      logger.setLogger({
-        defaultLogger: secondLogger,
-        formatter: thirdFormatter,
+    /**
+     * プラグイン統合のテスト
+     *
+     * @description 各種プラグインの組み合わせ統合を検証
+     */
+    describe('Plugin Integration', () => {
+      it('should integrate logger and formatter plugins correctly', () => {
+        setupTestContext();
+
+        const testCases = [
+          {
+            name: 'ConsoleLogger + JsonFormat',
+            logger: ConsoleLogger,
+            formatter: JsonFormat,
+            setupSpy: () => vi.spyOn(console, 'info').mockImplementation(() => {}),
+            verify: (spy: TVitestMock) => {
+              const [output] = spy.mock.calls[0];
+              expect(() => JSON.parse(output)).not.toThrow();
+              const parsed = JSON.parse(output);
+              expect(parsed).toMatchObject({
+                level: 'INFO',
+                message: 'test message',
+                args: [{ data: 'test' }],
+              });
+            },
+          },
+          {
+            name: 'MockLogger + PlainFormat',
+            logger: vi.fn(),
+            formatter: PlainFormat,
+            setupSpy: () => null,
+            verify: (spy: TVitestMock | null, logger: TVitestMock) => {
+              expect(logger).toHaveBeenCalledTimes(1);
+              const [output] = logger.mock.calls[0];
+              expect(output).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z \[INFO\] test message/);
+            },
+          },
+        ];
+
+        testCases.forEach(({ logger, formatter, setupSpy, verify }) => {
+          const spy = setupSpy();
+          const testLogger = getLogger(logger, formatter);
+          testLogger.setLogLevel(AG_LOGLEVEL.INFO);
+          testLogger.info('test message', { data: 'test' });
+
+          verify(spy as TVitestMock, logger as TVitestMock);
+          spy?.mockRestore();
+          setupTestContext();
+        });
       });
 
-      logger.info('test message');
+      it('should handle special plugin combinations', () => {
+        setupTestContext();
 
-      expect(firstLogger).not.toHaveBeenCalled();
-      expect(secondLogger).toHaveBeenCalledWith('third format');
-      expect(thirdFormatter).toHaveBeenCalled();
+        // NullFormat + 任意のロガー = 出力なし
+        const mockLogger = vi.fn();
+        const logger = getLogger(mockLogger, NullFormat);
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+        logger.info('test message');
+
+        expect(mockLogger).not.toHaveBeenCalled();
+      });
     });
-  });
 
-  /**
-   * ログレベルフィルタリング統合テストスイート
-   *
-   * @description 各種ロガーやフォーマッターとの組み合わせで
-   * ログレベルフィルタリングが一貫して動作することを検証する
-   * 全コンポーネントでの一貫したフィルタリング、OFFレベル処理を確認
-   *
-   * @testFocus Log Level Filtering Integration
-   * @scenarios
-   * - 全コンポーネントでの一貫したフィルタリング
-   * - OFFレベルでの完全な出力ブロック
-   * - レベル別ロガーでの適切なフィルタリング
-   */
-  describe('Log Level Filtering Integration', () => {
-    it('should apply log level filtering consistently across all components', () => {
-      setupTestContext();
-      const errorLogger = vi.fn();
-      const warnLogger = vi.fn();
-      const infoLogger = vi.fn();
-      const debugLogger = vi.fn();
+    /**
+     * 複合設定統合のテスト
+     *
+     * @description 複雑な設定組み合わせの統合を検証
+     */
+    describe('Complex Configuration Integration', () => {
+      it('should handle partial logger maps with mixed configurations', () => {
+        setupTestContext();
 
-      const logger = getLogger(
-        infoLogger,
-        JsonFormat,
-        {
+        const errorLogger = vi.fn();
+        const warnLogger = vi.fn();
+        const defaultLogger = vi.fn();
+
+        const logger = getLogger(defaultLogger, PlainFormat, {
           [AG_LOGLEVEL.ERROR]: errorLogger,
           [AG_LOGLEVEL.WARN]: warnLogger,
-          [AG_LOGLEVEL.DEBUG]: debugLogger,
-        },
-      );
+        });
 
-      // Set to WARN level - should filter out INFO and DEBUG
-      logger.setLogLevel(AG_LOGLEVEL.WARN);
+        logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
-      logger.error('error message');
-      logger.warn('warn message');
-      logger.info('info message'); // should be filtered
-      logger.debug('debug message'); // should be filtered
+        // 各レベルでのロガー使い分けを確認
+        logger.error('error message'); // errorLogger使用
+        logger.warn('warn message'); // warnLogger使用
+        logger.info('info message'); // defaultLogger使用
+        logger.debug('debug message'); // defaultLogger使用
 
-      expect(errorLogger).toHaveBeenCalledTimes(1);
-      expect(warnLogger).toHaveBeenCalledTimes(1);
-      expect(infoLogger).not.toHaveBeenCalled();
-      expect(debugLogger).not.toHaveBeenCalled();
-    });
+        expect(errorLogger).toHaveBeenCalledTimes(1);
+        expect(warnLogger).toHaveBeenCalledTimes(1);
+        expect(defaultLogger).toHaveBeenCalledTimes(2);
+      });
 
-    it('should handle OFF log level correctly across all components', () => {
-      setupTestContext();
-      const mockLogger = vi.fn();
-      const mockFormatter = vi.fn();
+      it('should maintain configuration through multiple updates', () => {
+        setupTestContext();
 
-      const logger = getLogger(mockLogger, mockFormatter);
-      logger.setLogLevel(AG_LOGLEVEL.OFF);
+        const logger = getLogger();
+        const finalLogger = vi.fn();
+        const finalFormatter = vi.fn().mockReturnValue('final format');
 
-      logger.fatal('fatal message');
-      logger.error('error message');
-      logger.warn('warn message');
-      logger.info('info message');
-      logger.debug('debug message');
-      logger.trace('trace message');
+        // 段階的な設定更新
+        logger.setLogger({ defaultLogger: vi.fn() });
+        logger.setLogger({ loggerMap: { [AG_LOGLEVEL.ERROR]: vi.fn() } });
+        logger.setLogger({ formatter: finalFormatter });
+        logger.setLogger({ defaultLogger: finalLogger });
 
-      expect(mockLogger).not.toHaveBeenCalled();
-      expect(mockFormatter).not.toHaveBeenCalled();
-    });
-  });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+        logger.info('test message');
 
-  /**
-   * Verboseモード統合テストスイート
-   *
-   * @description verbose機能と全体ログシステムの統合を検証する
-   * verboseモードとロガー・フォーマッターの連携、状態共有、出力制御を確認
-   *
-   * @testFocus Verbose Mode Integration
-   * @scenarios
-   * - verboseモードとロガー・フォーマッターの連携
-   * - 複数インスタンス間でのverbose状態共有
-   * - verbose設定による出力制御
-   */
-  describe('Verbose Mode Integration', () => {
-    it('should integrate verbose mode with logger and formatter correctly', () => {
-      setupTestContext();
-      const mockLogger = vi.fn();
-      const mockFormatter = vi.fn().mockReturnValue('formatted verbose message');
-
-      const logger = getLogger(mockLogger, mockFormatter);
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
-
-      // Test verbose off (default)
-      logger.verbose('verbose message when off');
-      expect(mockLogger).not.toHaveBeenCalled();
-
-      // Test verbose on
-      logger.setVerbose(true);
-      logger.verbose('verbose message when on');
-
-      expect(mockFormatter).toHaveBeenCalled();
-      expect(mockLogger).toHaveBeenCalledWith('formatted verbose message');
-    });
-
-    it('should maintain verbose state across different logger instances', () => {
-      setupTestContext();
-      const mockLogger = vi.fn();
-
-      const logger1 = getLogger(mockLogger, PlainFormat);
-      logger1.setLogLevel(AG_LOGLEVEL.INFO);
-      logger1.setVerbose(true);
-
-      const logger2 = getLogger();
-      logger2.verbose('verbose from second instance');
-
-      expect(mockLogger).toHaveBeenCalled();
+        expect(finalFormatter).toHaveBeenCalled();
+        expect(finalLogger).toHaveBeenCalledWith('final format');
+      });
     });
   });
 
   /**
-   * エラー処理とエッジケース統合テストスイート
+   * 正常系テスト: 高度な機能統合
    *
-   * @description コンポーネント統合時のエラー処理とエッジケースを検証する
-   * undefined/null引数処理、ロガーエラー時のシステム安定性、
-   * 空フォーマッター処理を確認
-   *
-   * @testFocus Error Handling Integration
-   * @scenarios
-   * - undefined/null引数の安全な処理
-   * - ロガーエラー時のシステム安定性保持
-   * - 空文字列フォーマッターの適切な処理
-   * - エラー後のシステム復旧能力
+   * @description 高度な機能の統合動作を検証
    */
-  describe('Error Handling and Edge Cases', () => {
-    it('should handle undefined/null arguments gracefully across components', () => {
-      setupTestContext();
-      const mockLogger = vi.fn();
-      const mockFormatter = vi.fn().mockReturnValue('formatted');
+  describe('Advanced Feature Integration', () => {
+    /**
+     * ログレベルフィルタリング統合のテスト
+     *
+     * @description 全コンポーネントでのフィルタリング一貫性を検証
+     */
+    describe('Log Level Filtering Integration', () => {
+      it('should apply filtering consistently across all components', () => {
+        setupTestContext();
 
-      const logger = getLogger(mockLogger, mockFormatter);
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
+        const loggers = {
+          [AG_LOGLEVEL.ERROR]: vi.fn(),
+          [AG_LOGLEVEL.WARN]: vi.fn(),
+          [AG_LOGLEVEL.INFO]: vi.fn(),
+          [AG_LOGLEVEL.DEBUG]: vi.fn(),
+        };
 
-      // Test with various undefined/null combinations
-      logger.info(undefined);
-      logger.info(null);
-      logger.info('message', undefined, null);
+        const logger = getLogger(loggers[AG_LOGLEVEL.INFO], JsonFormat, loggers);
+        logger.setLogLevel(AG_LOGLEVEL.WARN);
 
-      expect(mockFormatter).toHaveBeenCalledTimes(3);
-      expect(mockLogger).toHaveBeenCalledTimes(3);
+        // フィルタリングテスト
+        logger.error('error'); // 出力される
+        logger.warn('warn'); // 出力される
+        logger.info('info'); // フィルタリングされる
+        logger.debug('debug'); // フィルタリングされる
+
+        expect(loggers[AG_LOGLEVEL.ERROR]).toHaveBeenCalledTimes(1);
+        expect(loggers[AG_LOGLEVEL.WARN]).toHaveBeenCalledTimes(1);
+        expect(loggers[AG_LOGLEVEL.INFO]).not.toHaveBeenCalled();
+        expect(loggers[AG_LOGLEVEL.DEBUG]).not.toHaveBeenCalled();
+      });
+
+      it('should handle OFF level across all components', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const mockFormatter = vi.fn();
+
+        const logger = getLogger(mockLogger, mockFormatter);
+        logger.setLogLevel(AG_LOGLEVEL.OFF);
+
+        // 全レベルでフィルタリング
+        Object.values(AG_LOGLEVEL).forEach((level) => {
+          if (typeof level === 'number') {
+            logger.setLogLevel(level);
+            logger.setLogLevel(AG_LOGLEVEL.OFF);
+            logger.info('test');
+          }
+        });
+
+        expect(mockLogger).not.toHaveBeenCalled();
+        expect(mockFormatter).not.toHaveBeenCalled();
+      });
     });
 
-    it('should maintain system stability when logger throws an error', () => {
+    /**
+     * Verbose機能統合のテスト
+     *
+     * @description verbose機能の統合動作を検証
+     */
+    describe('Verbose Mode Integration', () => {
+      it('should integrate verbose mode with full logging pipeline', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const mockFormatter = vi.fn().mockReturnValue('verbose formatted');
+
+        const logger = getLogger(mockLogger, mockFormatter);
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        // verbose無効時
+        logger.verbose('verbose off');
+        expect(mockLogger).not.toHaveBeenCalled();
+
+        // verbose有効時
+        logger.setVerbose(true);
+        logger.verbose('verbose on');
+
+        expect(mockFormatter).toHaveBeenCalled();
+        expect(mockLogger).toHaveBeenCalledWith('verbose formatted');
+      });
+
+      it('should maintain verbose state across instances and reconfigurations', () => {
+        setupTestContext();
+
+        const logger1 = getLogger();
+        logger1.setVerbose(true);
+
+        const logger2 = getLogger();
+        expect(logger2.setVerbose()).toBe(true);
+
+        // 設定変更後もverbose状態を維持
+        logger2.setLogger({ defaultLogger: vi.fn() });
+        expect(logger1.setVerbose()).toBe(true);
+      });
+    });
+  });
+
+  /**
+   * 異常系テスト: エラー処理と復旧
+   *
+   * @description エラー状況でのシステム動作を検証
+   */
+  describe('異常系: Error Handling and Recovery', () => {
+    it('should handle component errors gracefully', () => {
       setupTestContext();
+
+      // ロガーエラー
       const throwingLogger = vi.fn().mockImplementation(() => {
         throw new Error('Logger error');
       });
@@ -391,32 +332,149 @@ describe('AgLogger Integration Tests', () => {
       const logger = getLogger(throwingLogger, PlainFormat);
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
-      // Should not throw - system should handle logger errors gracefully
-      expect(() => {
-        logger.info('test message');
-      }).toThrow('Logger error');
+      expect(() => logger.info('test')).toThrow('Logger error');
 
-      // System should still be functional for subsequent calls
+      // システム復旧
       const workingLogger = vi.fn();
       logger.setLogger({ defaultLogger: workingLogger });
 
-      expect(() => {
-        logger.info('recovery test');
-      }).not.toThrow();
+      expect(() => logger.info('recovery test')).not.toThrow();
       expect(workingLogger).toHaveBeenCalled();
     });
 
-    it('should handle formatter that returns empty string correctly', () => {
+    it('should handle formatter errors gracefully', () => {
       setupTestContext();
+
       const mockLogger = vi.fn();
-      const emptyFormatter = vi.fn().mockReturnValue('');
+      const throwingFormatter = vi.fn().mockImplementation(() => {
+        throw new Error('Formatter error');
+      });
 
-      const logger = getLogger(mockLogger, emptyFormatter);
+      const logger = getLogger(mockLogger, throwingFormatter);
       logger.setLogLevel(AG_LOGLEVEL.INFO);
-      logger.info('test message');
 
-      expect(emptyFormatter).toHaveBeenCalled();
-      expect(mockLogger).not.toHaveBeenCalled(); // Should not log empty strings
+      expect(() => logger.info('test')).toThrow('Formatter error');
+    });
+
+    it('should handle mixed error scenarios', () => {
+      setupTestContext();
+
+      const mockLogger = vi.fn();
+      const errorLogger = vi.fn().mockImplementation(() => {
+        throw new Error('Error logger failed');
+      });
+
+      const logger = getLogger(mockLogger, PlainFormat, {
+        [AG_LOGLEVEL.ERROR]: errorLogger,
+      });
+
+      logger.setLogLevel(AG_LOGLEVEL.DEBUG);
+
+      // エラーレベルは失敗、他は成功
+      expect(() => logger.error('error')).toThrow('Error logger failed');
+      expect(() => logger.info('info')).not.toThrow();
+      expect(mockLogger).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  /**
+   * エッジケース: 複雑な統合シナリオ
+   *
+   * @description 複雑で特殊な統合シナリオを検証
+   */
+  describe('エッジケース: Complex Integration Scenarios', () => {
+    it('should handle rapid configuration changes', () => {
+      setupTestContext();
+
+      const loggers = [vi.fn(), vi.fn(), vi.fn()];
+      const formatters = [vi.fn().mockReturnValue('fmt1'), vi.fn().mockReturnValue('fmt2')];
+
+      const logger = getLogger();
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+      // 高速な設定変更
+      for (let i = 0; i < 100; i++) {
+        logger.setLogger({
+          defaultLogger: loggers[i % loggers.length],
+          formatter: formatters[i % formatters.length],
+        });
+      }
+
+      // 最終状態での動作確認
+      logger.info('final test');
+
+      const finalLogger = loggers[99 % loggers.length];
+      const finalFormatter = formatters[99 % formatters.length];
+
+      expect(finalLogger).toHaveBeenCalled();
+      expect(finalFormatter).toHaveBeenCalled();
+    });
+
+    it('should handle concurrent access patterns', () => {
+      setupTestContext();
+
+      const mockLogger = vi.fn();
+      const logger = getLogger(mockLogger, PlainFormat);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+      // 同時実行パターンのシミュレーション
+      const operations = [
+        () => logger.info('concurrent info'),
+        () => logger.setLogLevel(AG_LOGLEVEL.DEBUG),
+        () => logger.debug('concurrent debug'),
+        () => logger.setVerbose(true),
+        () => logger.verbose('concurrent verbose'),
+        () => logger.setLogger({ defaultLogger: mockLogger }),
+      ];
+
+      // 全操作を実行
+      operations.forEach((op) => op());
+
+      expect(mockLogger).toHaveBeenCalledTimes(3); // info, debug, verbose
+    });
+
+    it('should maintain data integrity under stress', () => {
+      setupTestContext();
+
+      const mockLogger = vi.fn();
+      const logger = getLogger(mockLogger, PlainFormat);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+      // 大量のログ出力
+      for (let i = 0; i < 1000; i++) {
+        logger.info(`stress test ${i}`);
+      }
+
+      expect(mockLogger).toHaveBeenCalledTimes(1000);
+
+      // 状態の整合性確認
+      expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.INFO);
+      expect(logger.setVerbose()).toBe(false);
+    });
+
+    it('should handle undefined/null arguments across full pipeline', () => {
+      setupTestContext();
+
+      const mockLogger = vi.fn();
+      const mockFormatter = vi.fn().mockReturnValue('formatted null/undefined');
+
+      const logger = getLogger(mockLogger, mockFormatter);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+      const testCases = [
+        [undefined],
+        [null],
+        ['message', undefined, null],
+        [null, undefined, 'mixed'],
+        [],
+      ];
+
+      testCases.forEach((args) => {
+        expect(() => logger.info(...(args as [string?, ...unknown[]]))).not.toThrow();
+      });
+
+      expect(mockLogger).toHaveBeenCalledTimes(testCases.length);
+      expect(mockFormatter).toHaveBeenCalledTimes(testCases.length);
     });
   });
 });

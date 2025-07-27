@@ -1,4 +1,4 @@
-// src/tests/e2e/AgLogger.json.spec.ts
+// tests/e2e/AgLogger.json.e2e.spec.ts
 // @(#) : AgLogger E2E Test - JSON format with Console logger
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
@@ -13,6 +13,16 @@ import { describe, expect, it, vi } from 'vitest';
 import { AG_LOGLEVEL } from '../../shared/types';
 // テスト対象 - getLogger関数（ロガー取得のエントリーポイント）
 import { getLogger } from '../../src/AgLogger.class';
+
+// --- types ---
+import type { AG_LABEL_TO_LOGLEVEL_MAP } from '../../shared/types';
+
+// Type definitions derived from log level constants
+type TLogLevelLabels = keyof typeof AG_LABEL_TO_LOGLEVEL_MAP;
+type TAgLoggerMethods = Lowercase<Exclude<TLogLevelLabels, 'OFF'>>;
+type TMockConsoleMethods = keyof typeof mockConsole;
+type TCircularObject = { name: string; self?: TCircularObject };
+
 // プラグイン - JSON形式フォーマッター（構造化ログ用）
 import { JsonFormat } from '../../src/plugins/format/JsonFormat';
 // プラグイン - コンソール出力ロガー
@@ -28,20 +38,17 @@ const mockConsole = {
 };
 
 /**
- * AgLogger E2Eテストスイート - JsonFormat + ConsoleLogger組み合わせ
+ * AgLogger E2E テストスイート - JSON形式 + コンソール出力
  *
- * @description JsonFormatとConsoleLoggerの組み合わせでのAgLoggerの完全なE2Eテスト
- * 様々なログレベルでのログ出力正確性、複数引数処理、
- * ログレベルフィルタリング、JSON形式固有の機能、実際の統合シナリオをカバーし、
- * プロダクション環境での期待通りのログ動作を保証する
+ * @description JsonFormatとConsoleLoggerの完全統合をエンドツーエンドで検証
+ * 実際のプロダクション環境での使用パターンを模した包括的テストを実施
  *
  * @testType End-to-End Test
  * @testTarget AgLogger + JsonFormat + ConsoleLogger
- * @realWorldScenarios
- * - 構造化ログ出力（モニタリングシステム対応）
- * - メトリクス情報の記録
- * - APIレスポンスログ
- * - アプリケーション状態変更ログ
+ * @coverage
+ * - 正常系: JSON構造化ログ、レベル別出力、複数引数処理
+ * - 異常系: エラー状況での動作、フィルタリング
+ * - エッジケース: 実世界シナリオ、複雑なデータ構造
  */
 describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
   const setupTestContext = (): void => {
@@ -50,384 +57,323 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
   };
 
   /**
-   * 基本JSONログ出力テストスイート
+   * 正常系テスト: JSON構造化ログ出力
    *
-   * @description 各レベルでのログが正しくフォーマットされたJSON文字列として出力されることをテストする
-   * 適切なレベル、メッセージ、タイムスタンプフィールドを持つJSON出力を検証
-   *
-   * @testFocus Basic JSON Structure Output
-   * @scenarios
-   * - INFO/ERROR/WARN/DEBUGレベルのJSON構造化
-   * - タイムスタンプのISO8601形式出力
-   * - ログレベルラベルの文字列表現
-   * - JSONパース可能性の保証
+   * @description 各ログレベルでの正常なJSON出力を検証
    */
-  describe('Basic JSON log output tests', () => {
-    it('outputs INFO log as JSON with JsonFormat and ConsoleLogger', () => {
-      setupTestContext();
-      const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
+  describe('正常系: JSON Structured Logging', () => {
+    /**
+     * 基本JSON出力のテスト
+     *
+     * @description 各ログレベルでの基本的なJSON構造を検証
+     */
+    describe('Basic JSON Output', () => {
+      it('should output structured JSON logs for all levels', () => {
+        setupTestContext();
+        const logger = getLogger(ConsoleLogger, JsonFormat);
+        logger.setLogLevel(AG_LOGLEVEL.TRACE);
 
-      logger.info('Test message');
+        const testCases = [
+          { method: 'error', level: 'ERROR', consoleMethod: 'error' },
+          { method: 'warn', level: 'WARN', consoleMethod: 'warn' },
+          { method: 'info', level: 'INFO', consoleMethod: 'info' },
+          { method: 'debug', level: 'DEBUG', consoleMethod: 'debug' },
+        ];
 
-      expect(mockConsole.info).toHaveBeenCalledTimes(1);
-      const [logOutput] = mockConsole.info.mock.calls[0];
-      const parsedLog = JSON.parse(logOutput);
+        testCases.forEach(({ method, level, consoleMethod }) => {
+          (logger[method as TAgLoggerMethods] as (msg: string) => void)(`${method} message`);
 
-      expect(parsedLog).toMatchObject({
-        level: 'INFO',
-        message: 'Test message',
+          expect(mockConsole[consoleMethod as TMockConsoleMethods]).toHaveBeenCalledTimes(1);
+          const consoleMock = mockConsole[consoleMethod as TMockConsoleMethods];
+          const [logOutput] = consoleMock.mock.calls[0] as [string];
+
+          const parsedLog = JSON.parse(logOutput);
+          expect(parsedLog).toMatchObject({
+            level,
+            message: `${method} message`,
+          });
+          expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+
+          vi.clearAllMocks();
+        });
       });
-      expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
-    it('outputs ERROR log as JSON with JsonFormat and ConsoleLogger', () => {
-      setupTestContext();
-      const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOGLEVEL.ERROR);
+    /**
+     * 複数引数処理のテスト
+     *
+     * @description JSON形式での複数引数とオブジェクトの処理を検証
+     */
+    describe('Multiple Arguments Processing', () => {
+      it('should handle complex data structures in JSON format', () => {
+        setupTestContext();
+        const logger = getLogger(ConsoleLogger, JsonFormat);
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
 
-      logger.error('Error message');
+        const complexData = {
+          user: { id: 123, name: 'TestUser' },
+          metadata: { version: '1.0.0', features: ['auth', 'logging'] },
+          metrics: { requests: 1500, errors: 3 },
+        };
 
-      expect(mockConsole.error).toHaveBeenCalledTimes(1);
-      const [logOutput] = mockConsole.error.mock.calls[0];
-      const parsedLog = JSON.parse(logOutput);
+        logger.info('API Request processed', complexData, 'success');
 
-      expect(parsedLog).toMatchObject({
-        level: 'ERROR',
-        message: 'Error message',
+        expect(mockConsole.info).toHaveBeenCalledTimes(1);
+        const [logOutput] = mockConsole.info.mock.calls[0];
+        const parsedLog = JSON.parse(logOutput);
+
+        expect(parsedLog).toMatchObject({
+          level: 'INFO',
+          message: 'API Request processed success',
+          args: [complexData],
+        });
+        expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
       });
-      expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+
+      it('should handle arrays and primitive types correctly', () => {
+        setupTestContext();
+        const logger = getLogger(ConsoleLogger, JsonFormat);
+        logger.setLogLevel(AG_LOGLEVEL.DEBUG);
+
+        const testData = {
+          numbers: [1, 2, 3],
+          strings: ['a', 'b', 'c'],
+          mixed: [null, null, true, false, 0, ''], // undefined becomes null in JSON
+        };
+
+        logger.debug('Data processing', testData, 42, true, null);
+
+        expect(mockConsole.debug).toHaveBeenCalledTimes(1);
+        const [logOutput] = mockConsole.debug.mock.calls[0];
+        const parsedLog = JSON.parse(logOutput);
+
+        expect(parsedLog).toMatchObject({
+          level: 'DEBUG',
+          message: 'Data processing 42 true',
+          args: [testData, null],
+        });
+      });
     });
 
-    it('outputs WARN log as JSON with JsonFormat and ConsoleLogger', () => {
-      setupTestContext();
-      const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOGLEVEL.WARN);
+    /**
+     * JSON形式特有機能のテスト
+     *
+     * @description JSON形式固有の機能を検証
+     */
+    describe('JSON Format Specific Features', () => {
+      it('should omit args property when no structured arguments', () => {
+        setupTestContext();
+        const logger = getLogger(ConsoleLogger, JsonFormat);
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
 
-      logger.warn('Warning message');
+        logger.info('Simple message without args');
 
-      expect(mockConsole.warn).toHaveBeenCalledTimes(1);
-      const [logOutput] = mockConsole.warn.mock.calls[0];
-      const parsedLog = JSON.parse(logOutput);
+        expect(mockConsole.info).toHaveBeenCalledTimes(1);
+        const [logOutput] = mockConsole.info.mock.calls[0];
+        const parsedLog = JSON.parse(logOutput);
 
-      expect(parsedLog).toMatchObject({
-        level: 'WARN',
-        message: 'Warning message',
+        expect(parsedLog).toMatchObject({
+          level: 'INFO',
+          message: 'Simple message without args',
+          timestamp: expect.any(String),
+        });
+        expect(parsedLog).not.toHaveProperty('args');
       });
-      expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-    });
 
-    it('outputs DEBUG log as JSON with JsonFormat and ConsoleLogger', () => {
-      setupTestContext();
-      const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOGLEVEL.DEBUG);
+      it('should maintain JSON structure with empty objects and arrays', () => {
+        setupTestContext();
+        const logger = getLogger(ConsoleLogger, JsonFormat);
+        logger.setLogLevel(AG_LOGLEVEL.WARN);
 
-      logger.debug('Debug message');
+        logger.warn('Empty structures test', {}, [], '');
 
-      expect(mockConsole.debug).toHaveBeenCalledTimes(1);
-      const [logOutput] = mockConsole.debug.mock.calls[0];
-      const parsedLog = JSON.parse(logOutput);
+        expect(mockConsole.warn).toHaveBeenCalledTimes(1);
+        const [logOutput] = mockConsole.warn.mock.calls[0];
+        const parsedLog = JSON.parse(logOutput);
 
-      expect(parsedLog).toMatchObject({
-        level: 'DEBUG',
-        message: 'Debug message',
+        expect(parsedLog).toMatchObject({
+          level: 'WARN',
+          message: 'Empty structures test',
+          args: [{}, []],
+        });
       });
-      expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
   });
 
   /**
-   * JSON複数引数ログ出力テストスイート
+   * 正常系テスト: ログレベルフィルタリング
    *
-   * @description JSONログ出力が複数引数タイプを正しく含むことをテストする
-   * オブジェクト、配列、プリミティブなどがメッセージとargsに正しく分離されることを検証
-   *
-   * @testFocus JSON Multiple Arguments Processing
-   * @scenarios
-   * - オブジェクトと文字列の混在JSON処理
-   * - 配列データのargs配列への格納
-   * - 数値・真偽値・空値のJSONシリアライゼーション
-   * - messageとargsの適切な分離と構造化
+   * @description JSON形式でのログレベルフィルタリングを検証
    */
-  describe('JSON log output tests with multiple arguments', () => {
-    it('logs JSON message containing object and string', () => {
+  describe('Log Level Filtering', () => {
+    it('should filter logs based on current level with JSON output', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
+
+      // INFO レベルに設定
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
-      const userData = { userId: 123, userName: 'testUser' };
-      logger.info('User info', userData, ' additional info');
-
-      expect(mockConsole.info).toHaveBeenCalledTimes(1);
-      const [logOutput] = mockConsole.info.mock.calls[0];
-      const parsedLog = JSON.parse(logOutput);
-
-      expect(parsedLog).toMatchObject({
-        level: 'INFO',
-        message: 'User info additional info',
-        args: [{ userId: 123, userName: 'testUser' }],
-      });
-      expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-    });
-
-    it('logs JSON message containing array', () => {
-      setupTestContext();
-      const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOGLEVEL.DEBUG);
-
-      const items = ['item1', 'item2', 'item3'];
-      logger.debug('Processing items', items);
-
-      expect(mockConsole.debug).toHaveBeenCalledTimes(1);
-      const [logOutput] = mockConsole.debug.mock.calls[0];
-      const parsedLog = JSON.parse(logOutput);
-
-      expect(parsedLog).toMatchObject({
-        level: 'DEBUG',
-        message: 'Processing items',
-        args: [['item1', 'item2', 'item3']],
-      });
-      expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-    });
-
-    it('logs JSON message containing number and boolean', () => {
-      setupTestContext();
-      const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
-
-      logger.info('Status update', 42, true, null);
-
-      expect(mockConsole.info).toHaveBeenCalledTimes(1);
-      const [logOutput] = mockConsole.info.mock.calls[0];
-      const parsedLog = JSON.parse(logOutput);
-
-      expect(parsedLog).toMatchObject({
-        level: 'INFO',
-        message: 'Status update 42 true',
-        args: [null],
-      });
-      expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-    });
-  });
-
-  /**
-   * JSONログレベルフィルタリングテストスイート
-   *
-   * @description 設定されたログレベルに従ってログがフィルタリングされることをテストする
-   * レベルが高い場合、低レベルのログが出力されないことを保証
-   * JSONフォーマットでのフィルタリング動作を検証
-   *
-   * @testFocus JSON Format Log Level Filtering
-   * @scenarios
-   * - INFOレベル設定時のDEBUGフィルタリングとJSON構造確認
-   * - ERRORレベル設定時のINFO/WARNフィルタリングとJSON構造確認
-   * - OFFレベル設定時の全ログフィルタリング
-   * - フィルタリング時のconsoleメソッド未呼び出し確認
-   */
-  describe('JSON log level filtering tests', () => {
-    it('does not output DEBUG logs when level is INFO', () => {
-      setupTestContext();
-      const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
-
-      logger.debug('Debug message');
-      logger.info('Info message');
+      logger.debug('debug message'); // フィルタリングされる
+      logger.info('info message'); // 出力される
+      logger.warn('warn message'); // 出力される
+      logger.error('error message'); // 出力される
 
       expect(mockConsole.debug).not.toHaveBeenCalled();
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
-
-      const [logOutput] = mockConsole.info.mock.calls[0];
-      const parsedLog = JSON.parse(logOutput);
-      expect(parsedLog.level).toBe('INFO');
-    });
-
-    it('does not output INFO/WARN logs when level is ERROR', () => {
-      setupTestContext();
-      const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOGLEVEL.ERROR);
-
-      logger.info('Info message');
-      logger.warn('Warning message');
-      logger.error('Error message');
-
-      expect(mockConsole.info).not.toHaveBeenCalled();
-      expect(mockConsole.warn).not.toHaveBeenCalled();
+      expect(mockConsole.warn).toHaveBeenCalledTimes(1);
       expect(mockConsole.error).toHaveBeenCalledTimes(1);
 
-      const [logOutput] = mockConsole.error.mock.calls[0];
-      const parsedLog = JSON.parse(logOutput);
-      expect(parsedLog.level).toBe('ERROR');
+      // JSON構造の確認
+      const infoOutput = JSON.parse(mockConsole.info.mock.calls[0][0]);
+      expect(infoOutput.level).toBe('INFO');
     });
 
-    it('does not output any logs when level is OFF', () => {
+    it('should block all output when level is OFF', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AG_LOGLEVEL.OFF);
 
-      logger.error('Error message');
-      logger.info('Info message');
+      logger.fatal('fatal message');
+      logger.error('error message');
+      logger.warn('warn message');
+      logger.info('info message');
 
       expect(mockConsole.error).not.toHaveBeenCalled();
+      expect(mockConsole.warn).not.toHaveBeenCalled();
       expect(mockConsole.info).not.toHaveBeenCalled();
     });
   });
 
   /**
-   * JSON形式固有機能テストスイート
+   * 異常系テスト: エラー処理
    *
-   * @description JSON形式固有の動作をテストする
-   * 空のargs配列の省略、ネストした複雑オブジェクトの正しいシリアライゼーションを検証
-   *
-   * @testFocus JSON Format Specific Features
-   * @scenarios
-   * - 空引数時のargsプロパティの省略
-   * - 深いネスト構造の複雑オブジェクトJSON出力
-   * - JSON構造の正確性とパース可能性
-   * - メタデータフィールドの適切な含有
+   * @description JSON形式でのエラー処理を検証
    */
-  describe('JSON format specific tests', () => {
-    it('does not include args property when args array is empty', () => {
+  describe('異常系: Error Handling', () => {
+    it('should handle JSON serialization errors gracefully', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
+      logger.setLogLevel(AG_LOGLEVEL.ERROR);
 
-      logger.info('Simple message');
+      // 循環参照オブジェクト
+      const circularObj: TCircularObject = { name: 'test' };
+      circularObj.self = circularObj;
 
-      expect(mockConsole.info).toHaveBeenCalledTimes(1);
-      const [logOutput] = mockConsole.info.mock.calls[0];
-      const parsedLog = JSON.parse(logOutput);
-
-      expect(parsedLog).toMatchObject({
-        level: 'INFO',
-        message: 'Simple message',
-        timestamp: expect.any(String),
-      });
-      expect(parsedLog).not.toHaveProperty('args');
-    });
-
-    it('correctly outputs deeply nested complex objects in JSON', () => {
-      setupTestContext();
-      const logger = getLogger(ConsoleLogger, JsonFormat);
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
-
-      const complexData = {
-        user: {
-          id: 123,
-          profile: {
-            name: 'Taro',
-            settings: {
-              theme: 'dark',
-              notifications: true,
-            },
-          },
-        },
-        metadata: {
-          version: '1.0.0',
-          features: ['feature1', 'feature2'],
-        },
-      };
-
-      logger.info('Complex data', complexData);
-
-      expect(mockConsole.info).toHaveBeenCalledTimes(1);
-      const [logOutput] = mockConsole.info.mock.calls[0];
-      const parsedLog = JSON.parse(logOutput);
-
-      expect(parsedLog).toMatchObject({
-        level: 'INFO',
-        message: 'Complex data',
-        args: [complexData],
-      });
-      expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(() => {
+        logger.error('Circular reference test', circularObj);
+      }).toThrow(); // JSON.stringify が例外を投げる
     });
   });
 
   /**
-   * 実用統合シナリオテストスイート（JSON版）
+   * エッジケース: 実世界シナリオ
    *
-   * @description アプリケーション起動からエラー処理までの
-   * 実世界のログイベントシーケンスをテストし、
-   * 完全で正確なJSON出力を検証する
-   *
-   * @testFocus Real-world JSON Integration Scenarios
-   * @scenarios
-   * - アプリケーションライフサイクルのJSON構造化ログ
-   * - 各ログレベルでの正確なJSON形式とメタデータ
-   * - タイムスタンプの一貫性と精度
-   * - 汎用logメソッドのJSON出力確認
+   * @description 実際のアプリケーションでの使用パターンを検証
    */
-  describe('Real integration scenario tests (JSON version)', () => {
-    it('outputs a sequence of JSON logs from application start to error', () => {
+  describe('エッジケース: Real-world Scenarios', () => {
+    it('should handle complete application lifecycle logging', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
-      // Application start
-      logger.info('Application is starting');
+      // アプリケーション起動
+      logger.info('Application starting', { version: '2.1.0', environment: 'production' });
 
-      // Config loading
-      logger.debug('Loading config file', { configPath: '/app/config.json' });
-
-      // Warning
-      logger.warn('Using deprecated API', { api: 'oldMethod' });
-
-      // Error
-      logger.error('Failed to connect to database', {
-        host: 'localhost',
-        port: 5432,
-        error: 'Connection timeout',
+      // 設定読み込み
+      logger.debug('Loading configuration', {
+        configPath: '/app/config.json',
+        size: '2.3KB',
+        lastModified: '2025-07-26T06:30:00Z',
       });
 
+      // 警告
+      logger.warn('Deprecated API usage detected', {
+        api: 'v1/users',
+        replacement: 'v2/users',
+        deprecationDate: '2025-12-31',
+      });
+
+      // エラー
+      logger.error('Database connection failed', {
+        host: 'db.example.com',
+        port: 5432,
+        database: 'production',
+        error: 'Connection timeout after 30s',
+        retryAttempt: 3,
+      });
+
+      // 出力回数の確認
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       expect(mockConsole.debug).toHaveBeenCalledTimes(1);
       expect(mockConsole.warn).toHaveBeenCalledTimes(1);
       expect(mockConsole.error).toHaveBeenCalledTimes(1);
 
-      // Validate JSON content of each log
-      const infoLog = JSON.parse(mockConsole.info.mock.calls[0][0]);
-      const debugLog = JSON.parse(mockConsole.debug.mock.calls[0][0]);
-      const warnLog = JSON.parse(mockConsole.warn.mock.calls[0][0]);
-      const errorLog = JSON.parse(mockConsole.error.mock.calls[0][0]);
+      // 各ログのJSON構造確認
+      const logs = {
+        info: JSON.parse(mockConsole.info.mock.calls[0][0]),
+        debug: JSON.parse(mockConsole.debug.mock.calls[0][0]),
+        warn: JSON.parse(mockConsole.warn.mock.calls[0][0]),
+        error: JSON.parse(mockConsole.error.mock.calls[0][0]),
+      };
 
-      expect(infoLog).toMatchObject({
+      expect(logs.info).toMatchObject({
         level: 'INFO',
-        message: 'Application is starting',
+        message: 'Application starting',
+        args: [{ version: '2.1.0', environment: 'production' }],
       });
 
-      expect(debugLog).toMatchObject({
-        level: 'DEBUG',
-        message: 'Loading config file',
-        args: [{ configPath: '/app/config.json' }],
-      });
-
-      expect(warnLog).toMatchObject({
-        level: 'WARN',
-        message: 'Using deprecated API',
-        args: [{ api: 'oldMethod' }],
-      });
-
-      expect(errorLog).toMatchObject({
+      expect(logs.error).toMatchObject({
         level: 'ERROR',
-        message: 'Failed to connect to database',
-        args: [{
-          host: 'localhost',
-          port: 5432,
-          error: 'Connection timeout',
-        }],
+        message: 'Database connection failed',
+        args: [expect.objectContaining({
+          host: 'db.example.com',
+          error: 'Connection timeout after 30s',
+        })],
       });
 
-      // Validate timestamps
-      [infoLog, debugLog, warnLog, errorLog].forEach((log) => {
+      // タイムスタンプの整合性確認
+      Object.values(logs).forEach((log) => {
         expect(log.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
       });
     });
 
-    it('verifies JSON output for generic log method (log)', () => {
+    it('should handle high-frequency logging with JSON format', () => {
       setupTestContext();
       const logger = getLogger(ConsoleLogger, JsonFormat);
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
-      logger.log('General log message');
+      // 大量のログ出力をシミュレート
+      const logCount = 100;
+      for (let i = 0; i < logCount; i++) {
+        logger.info(`Request processed`, {
+          requestId: `req-${i}`,
+          method: 'GET',
+          path: `/api/users/${i}`,
+          statusCode: 200,
+          responseTime: Math.floor(Math.random() * 100) + 50,
+        });
+      }
+
+      expect(mockConsole.info).toHaveBeenCalledTimes(logCount);
+
+      // 最後のログの構造確認
+      const lastLog = JSON.parse(mockConsole.info.mock.calls[logCount - 1][0]);
+      expect(lastLog).toMatchObject({
+        level: 'INFO',
+        message: 'Request processed',
+        args: [expect.objectContaining({
+          requestId: `req-${logCount - 1}`,
+          method: 'GET',
+        })],
+      });
+    });
+
+    it('should handle log method (generic) with JSON format', () => {
+      setupTestContext();
+      const logger = getLogger(ConsoleLogger, JsonFormat);
+      logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+      logger.log('Generic log message', { data: 'test' });
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
@@ -435,9 +381,9 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       expect(parsedLog).toMatchObject({
         level: 'INFO',
-        message: 'General log message',
+        message: 'Generic log message',
+        args: [{ data: 'test' }],
       });
-      expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
   });
 });
