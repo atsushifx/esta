@@ -119,38 +119,43 @@ export class AgLoggerManager {
   }
 
   /**
-   * Sets loggers or options.
-   * Supports two overloads:
-   * - Set a logger function for a specific log level.
-   * - Set options including default logger, formatter, and logger map.
+   * Sets options including default logger, formatter, and logger map.
+   * For setting individual logger functions, use setLogFunctionWithLevel.
    *
-   * @param logLevelOrOptions - Either a log level or an options object.
-   * @param logFunction - Logger function or null (optional, only for log level overload).
+   * @param options - Configuration options for logger setup.
    */
-  setManager(logLevel: AgTLogLevel, logFunction: AgLoggerFunction | null): void;
-  setManager(options: AgLoggerOptions): void;
-  setManager(
-    logLevelOrOptions: AgTLogLevel | AgLoggerOptions,
-    logFunction?: AgLoggerFunction | null,
-  ): void {
-    if (typeof logLevelOrOptions === 'number') {
-      // Old-style: setManager(logLevel, logFunction)
-      this.loggerMap[logLevelOrOptions] = logFunction ?? this.defaultLogger;
-    } else {
-      // New-style: setManager(options)
-      const options = logLevelOrOptions;
-      if (options.defaultLogger !== undefined) {
-        this.defaultLogger = options.defaultLogger;
-      }
-      if (options.formatter !== undefined) {
-        this.formatter = options.formatter;
-      }
-
-      // Update logger map if default logger or logger map provided
-      if (options.defaultLogger || options.loggerMap) {
-        this.updateLogMap(options.defaultLogger, options.loggerMap);
-      }
+  setManager(options: AgLoggerOptions): void {
+    if (options.defaultLogger !== undefined) {
+      this.defaultLogger = options.defaultLogger;
     }
+    if (options.formatter !== undefined) {
+      this.formatter = options.formatter;
+    }
+
+    // Update logger map if default logger or logger map provided
+    if (options.defaultLogger || options.loggerMap) {
+      this.updateLogMap(options.defaultLogger, options.loggerMap);
+    }
+  }
+
+  /**
+   * Sets a specific logger function for a log level.
+   * To set a level to use the default logger, use setDefaultLogFunction instead.
+   *
+   * @param logLevel - The log level to set the logger for.
+   * @param logFunction - The logger function to set.
+   */
+  setLogFunctionWithLevel(logLevel: AgTLogLevel, logFunction: AgLoggerFunction): void {
+    this.loggerMap[logLevel] = logFunction;
+  }
+
+  /**
+   * Sets a log level to use the default logger.
+   *
+   * @param logLevel - The log level to set to default logger.
+   */
+  setDefaultLogFunction(logLevel: AgTLogLevel): void {
+    this.loggerMap[logLevel] = this.defaultLogger;
   }
 
   /**

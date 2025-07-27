@@ -256,14 +256,14 @@ describe('AgLoggerManager Integration Tests', () => {
       const manager = AgLoggerManager.getManager();
       const customLogger = vi.fn();
 
-      // Test legacy single-level logger setting
-      manager.setManager(AG_LOGLEVEL.ERROR, customLogger);
+      // Test single-level logger setting with setLogFunctionWithLevel
+      manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, customLogger);
       expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(customLogger);
 
-      // Test legacy null logger setting (should use default)
+      // Test setting default logger for a level
       const defaultLogger = vi.fn();
       manager.setManager({ defaultLogger });
-      manager.setManager(AG_LOGLEVEL.INFO, null);
+      manager.setDefaultLogFunction(AG_LOGLEVEL.INFO);
       expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(defaultLogger);
     });
 
