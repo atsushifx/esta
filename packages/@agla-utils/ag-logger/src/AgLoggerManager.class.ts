@@ -48,7 +48,7 @@ export class AgLoggerManager {
    * @param loggerMap - Optional partial map of loggers by log level.
    * @returns The singleton instance of AgLoggerManager.
    */
-  static getInstance(
+  static getLogger(
     defaultLogger?: AgLoggerFunction,
     formatter?: AgFormatFunction,
     loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,

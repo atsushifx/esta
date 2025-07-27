@@ -60,7 +60,7 @@ describe('AgLoggerManager', () => {
   });
 
   /**
-   * getInstance静的メソッドのテストスイート
+   * getLogger静的メソッドのテストスイート
    *
    * @description シングルトンインスタンス取得の動作を検証する
    * 同一インスタンスの取得保証、初期ロガー設定、パラメータ処理を確認
@@ -72,17 +72,17 @@ describe('AgLoggerManager', () => {
    * - パラメータ組み合わせ処理
    * - 初期状態でのNullLogger設定
    */
-  describe('getInstance', () => {
+  describe('getLogger', () => {
     it('returns the singleton instance', () => {
-      const instance1 = AgLoggerManager.getInstance();
-      const instance2 = AgLoggerManager.getInstance();
+      const instance1 = AgLoggerManager.getLogger();
+      const instance2 = AgLoggerManager.getLogger();
 
       expect(instance1).toBe(instance2);
       expect(instance1).toBeInstanceOf(AgLoggerManager);
     });
 
     it('initially sets all log levels to NullLogger', () => {
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       const offLogger = manager.getLogger(AG_LOGLEVEL.OFF);
       const fatalLogger = manager.getLogger(AG_LOGLEVEL.FATAL);
@@ -102,7 +102,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('accepts default logger when getting instance', () => {
-      const manager = AgLoggerManager.getInstance(mockDefaultLogger);
+      const manager = AgLoggerManager.getLogger(mockDefaultLogger);
 
       const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
       infoLogger('test message');
@@ -111,7 +111,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('accepts formatter when getting instance', () => {
-      const manager = AgLoggerManager.getInstance(undefined, mockFormatter);
+      const manager = AgLoggerManager.getLogger(undefined, mockFormatter);
 
       const formatter = manager.getFormatter();
       expect(formatter).toBe(mockFormatter);
@@ -123,7 +123,7 @@ describe('AgLoggerManager', () => {
         [AG_LOGLEVEL.WARN]: mockWarnLogger,
       };
 
-      const manager = AgLoggerManager.getInstance(mockDefaultLogger, undefined, loggerMap);
+      const manager = AgLoggerManager.getLogger(mockDefaultLogger, undefined, loggerMap);
 
       const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
       const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
@@ -144,7 +144,7 @@ describe('AgLoggerManager', () => {
         [AG_LOGLEVEL.ERROR]: mockErrorLogger,
       };
 
-      const manager = AgLoggerManager.getInstance(mockDefaultLogger, mockFormatter, loggerMap);
+      const manager = AgLoggerManager.getLogger(mockDefaultLogger, mockFormatter, loggerMap);
 
       expect(manager.getFormatter()).toBe(mockFormatter);
 
@@ -176,7 +176,7 @@ describe('AgLoggerManager', () => {
    */
   describe('getLogger', () => {
     it('returns logger function for specified log level', () => {
-      const manager = AgLoggerManager.getInstance(mockDefaultLogger);
+      const manager = AgLoggerManager.getLogger(mockDefaultLogger);
 
       const logger = manager.getLogger(AG_LOGLEVEL.INFO);
       expect(typeof logger).toBe('function');
@@ -186,7 +186,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('returns default logger if log level does not exist', () => {
-      const manager = AgLoggerManager.getInstance(mockDefaultLogger);
+      const manager = AgLoggerManager.getLogger(mockDefaultLogger);
 
       const logger = manager.getLogger(999 as AgTLogLevel);
       expect(logger).toBe(mockDefaultLogger);
@@ -207,14 +207,14 @@ describe('AgLoggerManager', () => {
    */
   describe('getFormatter', () => {
     it('returns the configured formatter', () => {
-      const manager = AgLoggerManager.getInstance(undefined, mockFormatter);
+      const manager = AgLoggerManager.getLogger(undefined, mockFormatter);
 
       const formatter = manager.getFormatter();
       expect(formatter).toBe(mockFormatter);
     });
 
     it('defaults to NullFormat formatter', () => {
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       const formatter = manager.getFormatter();
       expect(typeof formatter).toBe('function');
@@ -235,7 +235,7 @@ describe('AgLoggerManager', () => {
    */
   describe('setLogger - legacy form', () => {
     it('sets logger for specified log level', () => {
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       manager.setLogger(AG_LOGLEVEL.ERROR, mockErrorLogger);
 
@@ -246,7 +246,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('sets default logger if null is specified', () => {
-      const manager = AgLoggerManager.getInstance(mockDefaultLogger);
+      const manager = AgLoggerManager.getLogger(mockDefaultLogger);
 
       manager.setLogger(AG_LOGLEVEL.ERROR, null);
 
@@ -273,7 +273,7 @@ describe('AgLoggerManager', () => {
    */
   describe('setLogger - options form', () => {
     it('updates default logger', () => {
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       manager.setLogger({ defaultLogger: mockDefaultLogger });
 
@@ -284,7 +284,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('updates formatter', () => {
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       manager.setLogger({ formatter: mockFormatter });
 
@@ -293,7 +293,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('updates logger map', () => {
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       const loggerMap = {
         [AG_LOGLEVEL.ERROR]: mockErrorLogger,
@@ -313,7 +313,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('updates all options at once', () => {
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       const loggerMap = {
         [AG_LOGLEVEL.FATAL]: mockFatalLogger,
@@ -342,7 +342,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('updates default logger and logger map simultaneously', () => {
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       const loggerMap = {
         [AG_LOGLEVEL.ERROR]: mockErrorLogger,
@@ -375,14 +375,14 @@ describe('AgLoggerManager', () => {
    *
    * @testFocus Complex Configuration Scenarios
    * @scenarios
-   * - getInstance後の設定更新
+   * - getLogger後の設定更新
    * - 複数setLogger呼び出しの組み合わせ
    * - legacy形式とoptions形式の混在使用
    * - 設定変更の累積効果
    */
   describe('Complex scenarios', () => {
-    it('can update settings after getInstance', () => {
-      const manager = AgLoggerManager.getInstance(mockDefaultLogger);
+    it('can update settings after getLogger', () => {
+      const manager = AgLoggerManager.getLogger(mockDefaultLogger);
 
       manager.setLogger(AG_LOGLEVEL.ERROR, mockErrorLogger);
       manager.setLogger({ formatter: mockFormatter });
@@ -400,7 +400,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('can call setLogger multiple times without issue', () => {
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       manager.setLogger({ defaultLogger: mockDefaultLogger });
       manager.setLogger(AG_LOGLEVEL.ERROR, mockErrorLogger);

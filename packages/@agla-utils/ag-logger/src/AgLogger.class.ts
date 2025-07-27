@@ -31,7 +31,7 @@ export class AgLogger {
   private _verbose: boolean = false;
 
   private constructor() {
-    this._loggerManager = AgLoggerManager.getInstance();
+    this._loggerManager = AgLoggerManager.getLogger();
   }
 
   /**
@@ -43,7 +43,7 @@ export class AgLogger {
    * @param loggerMap - Optional partial logger map for log levels.
    * @returns The singleton AgLogger instance.
    */
-  static getInstance(
+  static getLogger(
     defaultLogger?: AgLoggerFunction,
     formatter?: AgFormatFunction,
     loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,
@@ -218,7 +218,7 @@ export const getLogger = (
     loggerMap = ConsoleLoggerMap;
   }
 
-  return AgLogger.getInstance(defaultLogger, formatter, loggerMap);
+  return AgLogger.getLogger(defaultLogger, formatter, loggerMap);
 };
 
 export default AgLogger;

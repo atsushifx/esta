@@ -39,11 +39,11 @@ describe('AgLoggerManager Integration Tests', () => {
    * across multiple initialization scenarios.
    */
   describe('Singleton Management Integration', () => {
-    it('should maintain singleton behavior across multiple getInstance calls', () => {
+    it('should maintain singleton behavior across multiple getLogger calls', () => {
       setupTestContext();
-      const manager1 = AgLoggerManager.getInstance();
-      const manager2 = AgLoggerManager.getInstance();
-      const manager3 = AgLoggerManager.getInstance(ConsoleLogger, JsonFormat);
+      const manager1 = AgLoggerManager.getLogger();
+      const manager2 = AgLoggerManager.getLogger();
+      const manager3 = AgLoggerManager.getLogger(ConsoleLogger, JsonFormat);
 
       expect(manager1).toBe(manager2);
       expect(manager2).toBe(manager3);
@@ -54,8 +54,8 @@ describe('AgLoggerManager Integration Tests', () => {
       const mockLogger = vi.fn();
       const mockFormatter = vi.fn().mockReturnValue('test output');
 
-      const manager1 = AgLoggerManager.getInstance(mockLogger, mockFormatter);
-      const manager2 = AgLoggerManager.getInstance();
+      const manager1 = AgLoggerManager.getLogger(mockLogger, mockFormatter);
+      const manager2 = AgLoggerManager.getLogger();
 
       // Both should have the same configuration
       expect(manager1.getFormatter()).toBe(manager2.getFormatter());
@@ -69,11 +69,11 @@ describe('AgLoggerManager Integration Tests', () => {
       const firstFormatter = vi.fn().mockReturnValue('first');
       const secondFormatter = vi.fn().mockReturnValue('second');
 
-      const manager1 = AgLoggerManager.getInstance(firstLogger, firstFormatter);
-      const manager2 = AgLoggerManager.getInstance(secondLogger, secondFormatter);
+      const manager1 = AgLoggerManager.getLogger(firstLogger, firstFormatter);
+      const manager2 = AgLoggerManager.getLogger(secondLogger, secondFormatter);
 
       // Second call with parameters should still update configuration
-      // since getInstance allows configuration updates
+      // since getLogger allows configuration updates
       expect(manager1.getFormatter()).toBe(secondFormatter);
       expect(manager2.getFormatter()).toBe(secondFormatter);
       expect(manager1.getLogger(AG_LOGLEVEL.INFO)).toBe(secondLogger);
@@ -102,7 +102,7 @@ describe('AgLoggerManager Integration Tests', () => {
         [AG_LOGLEVEL.TRACE]: debugLogger,
       };
 
-      const manager = AgLoggerManager.getInstance(defaultLogger, PlainFormat, loggerMap);
+      const manager = AgLoggerManager.getLogger(defaultLogger, PlainFormat, loggerMap);
 
       expect(manager.getLogger(AG_LOGLEVEL.OFF)).toBe(NullLogger);
       expect(manager.getLogger(AG_LOGLEVEL.FATAL)).toBe(errorLogger);
@@ -124,7 +124,7 @@ describe('AgLoggerManager Integration Tests', () => {
         [AG_LOGLEVEL.DEBUG]: debugLogger,
       };
 
-      const manager = AgLoggerManager.getInstance(defaultLogger, PlainFormat, partialLoggerMap);
+      const manager = AgLoggerManager.getLogger(defaultLogger, PlainFormat, partialLoggerMap);
 
       // Specified levels should use custom loggers
       expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(errorLogger);
@@ -140,7 +140,7 @@ describe('AgLoggerManager Integration Tests', () => {
     it('should fallback to default logger for missing map entries', () => {
       setupTestContext();
       const defaultLogger = vi.fn();
-      const manager = AgLoggerManager.getInstance(defaultLogger, PlainFormat);
+      const manager = AgLoggerManager.getLogger(defaultLogger, PlainFormat);
 
       // All levels should return the default logger
       Object.values(AG_LOGLEVEL).forEach((level) => {
@@ -159,7 +159,7 @@ describe('AgLoggerManager Integration Tests', () => {
     it('should maintain formatter consistency across logger retrievals', () => {
       setupTestContext();
       const mockFormatter = vi.fn().mockReturnValue('formatted');
-      const manager = AgLoggerManager.getInstance(ConsoleLogger, mockFormatter);
+      const manager = AgLoggerManager.getLogger(ConsoleLogger, mockFormatter);
 
       const formatter1 = manager.getFormatter();
       const formatter2 = manager.getFormatter();
@@ -173,7 +173,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const firstFormatter = vi.fn().mockReturnValue('first format');
       const secondFormatter = vi.fn().mockReturnValue('second format');
 
-      const manager = AgLoggerManager.getInstance(ConsoleLogger, firstFormatter);
+      const manager = AgLoggerManager.getLogger(ConsoleLogger, firstFormatter);
       expect(manager.getFormatter()).toBe(firstFormatter);
 
       manager.setLogger({ formatter: secondFormatter });
@@ -182,7 +182,7 @@ describe('AgLoggerManager Integration Tests', () => {
 
     it('should work with different formatter types', () => {
       setupTestContext();
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       // Test with JsonFormat
       manager.setLogger({ formatter: JsonFormat });
@@ -205,7 +205,7 @@ describe('AgLoggerManager Integration Tests', () => {
   describe('Complex Configuration Integration', () => {
     it('should handle mixed configuration updates correctly', () => {
       setupTestContext();
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       // Initial configuration
       const firstLogger = vi.fn();
@@ -245,7 +245,7 @@ describe('AgLoggerManager Integration Tests', () => {
 
     it('should handle legacy setLogger method correctly', () => {
       setupTestContext();
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
       const customLogger = vi.fn();
 
       // Test legacy single-level logger setting
@@ -261,7 +261,7 @@ describe('AgLoggerManager Integration Tests', () => {
 
     it('should maintain state consistency during complex updates', () => {
       setupTestContext();
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       const defaultLogger = vi.fn();
       const errorLogger = vi.fn();
@@ -304,7 +304,7 @@ describe('AgLoggerManager Integration Tests', () => {
   describe('Error Handling and Edge Cases', () => {
     it('should handle invalid log level gracefully', () => {
       setupTestContext();
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
       const defaultLogger = vi.fn();
       manager.setLogger({ defaultLogger });
 
@@ -316,7 +316,7 @@ describe('AgLoggerManager Integration Tests', () => {
     it('should handle empty logger map correctly', () => {
       setupTestContext();
       const defaultLogger = vi.fn();
-      const manager = AgLoggerManager.getInstance(defaultLogger, PlainFormat, {});
+      const manager = AgLoggerManager.getLogger(defaultLogger, PlainFormat, {});
 
       // Should use default logger for all levels
       Object.values(AG_LOGLEVEL).forEach((level) => {
@@ -329,7 +329,7 @@ describe('AgLoggerManager Integration Tests', () => {
     it('should maintain stability when logger map has undefined values', () => {
       setupTestContext();
       const defaultLogger = vi.fn();
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       manager.setLogger({
         defaultLogger,
@@ -344,7 +344,7 @@ describe('AgLoggerManager Integration Tests', () => {
 
     it('should handle multiple rapid configuration changes', () => {
       setupTestContext();
-      const manager = AgLoggerManager.getInstance();
+      const manager = AgLoggerManager.getLogger();
 
       const loggers = Array.from({ length: 5 }, () => vi.fn());
       const formatters = [JsonFormat, PlainFormat, NullFormat, JsonFormat, PlainFormat];

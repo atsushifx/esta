@@ -61,7 +61,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const logger1 = getLogger();
-        const logger2 = AgLogger.getInstance();
+        const logger2 = AgLogger.getLogger();
         const logger3 = getLogger();
 
         expect(logger1).toBe(logger2);
