@@ -12,7 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // ログレベル定数 - テストで使用するログレベル定義
 import { AG_LOGLEVEL } from '../../shared/types';
 // 型定義 - AgLoggerManagerで使用するログレベル型
-import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions, AgLogLevel } from '../../shared/types';
+import type { AgLogLevel, AgLoggerFunction, AgFormatFunction, AgLoggerOptions } from '../../shared/types';
 
 // テスト対象 - AgLoggerManagerクラスのシングルトン実装
 import { AgLoggerManager } from '../AgLoggerManager.class';
@@ -382,503 +382,475 @@ describe('AgLoggerManager', () => {
         const logger = manager.getLogger(999 as AgLogLevel);
         expect(logger).toBe(mockDefaultLogger);
       });
-
-      it('handles negative log levels gracefully', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
-
-        const logger = manager.getLogger(-1 as AgLogLevel);
-        expect(logger).toBe(mockDefaultLogger);
-      });
     });
 
     /**
-     * エッジケース: 境界値とフォールバック
+     * フォーマッター管理機能
+     *
+     * @description フォーマッター取得、設定、更新のテスト
      */
-    describe('エッジケース: Boundary Values and Fallback', () => {
-      it('handles boundary log level values', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+    describe('Formatter Management Functionality', () => {
+      /**
+       * 正常系: 基本的なフォーマッター管理
+       */
+      describe('正常系: Basic Formatter Management', () => {
+        it('returns the configured formatter', () => {
+          const manager = AgLoggerManager.getManager({ formatter: mockFormatter });
 
-        // OFF レベル (0)
-        const offLogger = manager.getLogger(AG_LOGLEVEL.OFF);
-        expect(typeof offLogger).toBe('function');
-
-        // TRACE レベル (最高)
-        const traceLogger = manager.getLogger(AG_LOGLEVEL.TRACE);
-        expect(typeof traceLogger).toBe('function');
-
-        // 無効なレベル
-        const invalidLogger = manager.getLogger(-1 as AgLogLevel);
-        expect(invalidLogger).toBe(mockDefaultLogger);
-      });
-    });
-  });
-
-  /**
-   * フォーマッター管理機能
-   *
-   * @description フォーマッター取得、設定、更新のテスト
-   */
-  describe('Formatter Management Functionality', () => {
-    /**
-     * 正常系: 基本的なフォーマッター管理
-     */
-    describe('正常系: Basic Formatter Management', () => {
-      it('returns the configured formatter', () => {
-        const manager = AgLoggerManager.getManager({ formatter: mockFormatter });
-
-        const formatter = manager.getFormatter();
-        expect(formatter).toBe(mockFormatter);
-      });
-
-      it('defaults to NullFormat formatter', () => {
-        const manager = AgLoggerManager.getManager();
-
-        const formatter = manager.getFormatter();
-        expect(typeof formatter).toBe('function');
-      });
-
-      it('allows formatter to be updated', () => {
-        const manager = AgLoggerManager.getManager();
-        const newMockFormatter = vi.fn();
-
-        manager.setManager({ formatter: newMockFormatter });
-
-        const formatter = manager.getFormatter();
-        expect(formatter).toBe(newMockFormatter);
-      });
-    });
-
-    /**
-     * 異常系: フォーマッターエラー処理
-     */
-    describe('異常系: Formatter Error Handling', () => {
-      it('handles formatter function throwing errors', () => {
-        const throwingFormatter = vi.fn(() => {
-          throw new Error('Formatter error');
+          const formatter = manager.getFormatter();
+          expect(formatter).toBe(mockFormatter);
         });
-        const manager = AgLoggerManager.getManager({ formatter: throwingFormatter });
 
-        const formatter = manager.getFormatter();
-        const testMessage = { logLevel: 1 as AgLogLevel, timestamp: new Date(), message: 'test', args: [] };
-        expect(() => formatter(testMessage)).toThrow('Formatter error');
+        it('defaults to NullFormat formatter', () => {
+          const manager = AgLoggerManager.getManager();
+
+          const formatter = manager.getFormatter();
+          expect(typeof formatter).toBe('function');
+        });
+
+        it('allows formatter to be updated', () => {
+          const manager = AgLoggerManager.getManager();
+          const newMockFormatter = vi.fn();
+
+          manager.setManager({ formatter: newMockFormatter });
+
+          const formatter = manager.getFormatter();
+          expect(formatter).toBe(newMockFormatter);
+        });
       });
 
-      it('handles undefined formatter gracefully', () => {
-        const manager = AgLoggerManager.getManager({ formatter: undefined as AgFormatFunction | undefined });
+      /**
+       * 異常系: フォーマッターエラー処理
+       */
+      describe('異常系: Formatter Error Handling', () => {
+        it('handles formatter function throwing errors', () => {
+          const throwingFormatter = vi.fn(() => {
+            throw new Error('Formatter error');
+          });
+          const manager = AgLoggerManager.getManager({ formatter: throwingFormatter });
 
-        expect(manager).toBeInstanceOf(AgLoggerManager);
+          const formatter = manager.getFormatter();
+          const testMessage = { logLevel: 1 as AgLogLevel, timestamp: new Date(), message: 'test', args: [] };
+          expect(() => formatter(testMessage)).toThrow('Formatter error');
+        });
+
+        it('handles undefined formatter gracefully', () => {
+          const manager = AgLoggerManager.getManager({ formatter: undefined as AgFormatFunction | undefined });
+
+          expect(manager).toBeInstanceOf(AgLoggerManager);
+        });
       });
-    });
 
-    /**
-     * エッジケース: フォーマッター特殊動作
-     */
-    describe('エッジケース: Special Formatter Behaviors', () => {
-      it('handles formatter replacement multiple times', () => {
-        const manager = AgLoggerManager.getManager();
-        const formatters = [vi.fn(), vi.fn(), vi.fn()];
+      /**
+       * エッジケース: フォーマッター特殊動作
+       */
+      describe('エッジケース: Special Formatter Behaviors', () => {
+        it('handles formatter replacement multiple times', () => {
+          const manager = AgLoggerManager.getManager();
+          const formatters = [vi.fn(), vi.fn(), vi.fn()];
 
-        formatters.forEach((formatter) => {
-          manager.setManager({ formatter });
-          expect(manager.getFormatter()).toBe(formatter);
+          formatters.forEach((formatter) => {
+            manager.setManager({ formatter });
+            expect(manager.getFormatter()).toBe(formatter);
+          });
         });
       });
     });
-  });
 
-  /**
-   * 設定管理機能 (setManager)
-   *
-   * @description 設定更新、統合処理のテスト
-   */
-  describe('Configuration Management (setManager)', () => {
     /**
-     * 正常系: 基本的な設定管理
+     * 設定管理機能 (setManager)
+     *
+     * @description 設定更新、統合処理のテスト
      */
-    describe('正常系: Basic Configuration Management', () => {
-      it('updates default logger', () => {
-        const manager = AgLoggerManager.getManager();
+    describe('Configuration Management (setManager)', () => {
+      /**
+       * 正常系: 基本的な設定管理
+       */
+      describe('正常系: Basic Configuration Management', () => {
+        it('updates default logger', () => {
+          const manager = AgLoggerManager.getManager();
 
-        manager.setManager({ defaultLogger: mockDefaultLogger });
+          manager.setManager({ defaultLogger: mockDefaultLogger });
 
-        const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
-        infoLogger('info message');
+          const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+          infoLogger('info message');
 
-        expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
-      });
-
-      it('updates formatter', () => {
-        const manager = AgLoggerManager.getManager();
-
-        manager.setManager({ formatter: mockFormatter });
-
-        const formatter = manager.getFormatter();
-        expect(formatter).toBe(mockFormatter);
-      });
-
-      it('updates logger map', () => {
-        const manager = AgLoggerManager.getManager();
-
-        const loggerMap = {
-          [AG_LOGLEVEL.ERROR]: mockErrorLogger,
-          [AG_LOGLEVEL.WARN]: mockWarnLogger,
-        };
-
-        manager.setManager({ loggerMap });
-
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
-
-        errorLogger('error message');
-        warnLogger('warn message');
-
-        expect(mockErrorLogger).toHaveBeenCalledWith('error message');
-        expect(mockWarnLogger).toHaveBeenCalledWith('warn message');
-      });
-
-      it('updates all options at once', () => {
-        const manager = AgLoggerManager.getManager();
-
-        const loggerMap = {
-          [AG_LOGLEVEL.FATAL]: mockFatalLogger,
-          [AG_LOGLEVEL.DEBUG]: mockDebugLogger,
-        };
-
-        manager.setManager({
-          defaultLogger: mockDefaultLogger,
-          formatter: mockFormatter,
-          loggerMap,
+          expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
         });
 
-        expect(manager.getFormatter()).toBe(mockFormatter);
+        it('updates formatter', () => {
+          const manager = AgLoggerManager.getManager();
 
-        const fatalLogger = manager.getLogger(AG_LOGLEVEL.FATAL);
-        const debugLogger = manager.getLogger(AG_LOGLEVEL.DEBUG);
-        const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+          manager.setManager({ formatter: mockFormatter });
 
-        fatalLogger('fatal message');
-        debugLogger('debug message');
-        infoLogger('info message');
+          const formatter = manager.getFormatter();
+          expect(formatter).toBe(mockFormatter);
+        });
 
-        expect(mockFatalLogger).toHaveBeenCalledWith('fatal message');
-        expect(mockDebugLogger).toHaveBeenCalledWith('debug message');
-        expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
-      });
-    });
+        it('updates logger map', () => {
+          const manager = AgLoggerManager.getManager();
 
-    /**
-     * 異常系: 設定エラー処理
-     */
-    describe('異常系: Configuration Error Handling', () => {
-      it('handles invalid configuration objects', () => {
-        const manager = AgLoggerManager.getManager();
-
-        expect(() => manager.setManager({} as AgLoggerOptions)).not.toThrow();
-        expect(() => manager.setManager({ invalidProp: 'test' } as unknown as AgLoggerOptions)).not.toThrow();
-      });
-    });
-
-    /**
-     * エッジケース: 複雑な設定パターン
-     */
-    describe('エッジケース: Complex Configuration Patterns', () => {
-      it('handles multiple setManager calls', () => {
-        const manager = AgLoggerManager.getManager();
-
-        manager.setManager({ defaultLogger: mockDefaultLogger });
-        manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
-        manager.setManager({ formatter: mockFormatter });
-
-        const secondMockLogger = vi.fn();
-        manager.setLogFunctionWithLevel(AG_LOGLEVEL.WARN, secondMockLogger);
-
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
-        const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
-
-        errorLogger('error message');
-        warnLogger('warn message');
-        infoLogger('info message');
-
-        expect(mockErrorLogger).toHaveBeenCalledWith('error message');
-        expect(secondMockLogger).toHaveBeenCalledWith('warn message');
-        expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
-        expect(manager.getFormatter()).toBe(mockFormatter);
-      });
-    });
-  });
-
-  /**
-   * updateLogMap内部処理機能
-   *
-   * @description ログマップ更新の内部動作のテスト
-   */
-  describe('updateLogMap Internal Processing', () => {
-    /**
-     * 正常系: 基本的なマップ更新処理
-     */
-    describe('正常系: Basic Map Update Processing', () => {
-      it('should correctly merge partial logger maps with existing configuration', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
-
-        // 最初の設定
-        manager.setManager({
-          loggerMap: {
+          const loggerMap = {
             [AG_LOGLEVEL.ERROR]: mockErrorLogger,
             [AG_LOGLEVEL.WARN]: mockWarnLogger,
-          },
+          };
+
+          manager.setManager({ loggerMap });
+
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
+
+          errorLogger('error message');
+          warnLogger('warn message');
+
+          expect(mockErrorLogger).toHaveBeenCalledWith('error message');
+          expect(mockWarnLogger).toHaveBeenCalledWith('warn message');
         });
 
-        // 部分更新
-        manager.setManager({
-          loggerMap: {
-            [AG_LOGLEVEL.ERROR]: mockFatalLogger, // 上書き
-            [AG_LOGLEVEL.DEBUG]: mockDebugLogger, // 追加
-          },
+        it('updates all options at once', () => {
+          const manager = AgLoggerManager.getManager();
+
+          const loggerMap = {
+            [AG_LOGLEVEL.FATAL]: mockFatalLogger,
+            [AG_LOGLEVEL.DEBUG]: mockDebugLogger,
+          };
+
+          manager.setManager({
+            defaultLogger: mockDefaultLogger,
+            formatter: mockFormatter,
+            loggerMap,
+          });
+
+          expect(manager.getFormatter()).toBe(mockFormatter);
+
+          const fatalLogger = manager.getLogger(AG_LOGLEVEL.FATAL);
+          const debugLogger = manager.getLogger(AG_LOGLEVEL.DEBUG);
+          const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+
+          fatalLogger('fatal message');
+          debugLogger('debug message');
+          infoLogger('info message');
+
+          expect(mockFatalLogger).toHaveBeenCalledWith('fatal message');
+          expect(mockDebugLogger).toHaveBeenCalledWith('debug message');
+          expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
         });
-
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
-        const debugLogger = manager.getLogger(AG_LOGLEVEL.DEBUG);
-        const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
-
-        expect(errorLogger).toBe(mockFatalLogger); // 上書きされた
-        expect(warnLogger).toBe(mockDefaultLogger); // defaultLoggerにリセットされた
-        expect(debugLogger).toBe(mockDebugLogger); // 新規追加
-        expect(infoLogger).toBe(mockDefaultLogger); // デフォルトのまま
       });
 
-      it('should handle loggerMap priority over defaultLogger correctly', () => {
-        const manager = AgLoggerManager.getManager();
+      /**
+       * 異常系: 設定エラー処理
+       */
+      describe('異常系: Configuration Error Handling', () => {
+        it('handles invalid configuration objects', () => {
+          const manager = AgLoggerManager.getManager();
 
-        // defaultLoggerとloggerMapを同時設定
-        manager.setManager({
-          defaultLogger: mockDefaultLogger,
-          loggerMap: {
-            [AG_LOGLEVEL.ERROR]: mockErrorLogger,
-          },
+          expect(() => manager.setManager({} as AgLoggerOptions)).not.toThrow();
+          expect(() => manager.setManager({ invalidProp: 'test' } as unknown as AgLoggerOptions)).not.toThrow();
         });
-
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
-
-        expect(errorLogger).toBe(mockErrorLogger); // loggerMapが優先
-        expect(infoLogger).toBe(mockDefaultLogger); // 未設定レベルはdefaultLogger
       });
 
-      it('should apply defaultLogger to all levels before loggerMap override', () => {
-        const manager = AgLoggerManager.getManager();
-        const firstDefaultLogger = vi.fn();
-        const secondDefaultLogger = vi.fn();
+      /**
+       * エッジケース: 複雑な設定パターン
+       */
+      describe('エッジケース: Complex Configuration Patterns', () => {
+        it('handles multiple setManager calls', () => {
+          const manager = AgLoggerManager.getManager();
 
-        // 最初のdefaultLogger設定
-        manager.setManager({ defaultLogger: firstDefaultLogger });
+          manager.setManager({ defaultLogger: mockDefaultLogger });
+          manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+          manager.setManager({ formatter: mockFormatter });
 
-        // 全レベルが最初のdefaultLoggerになることを確認
-        const infoLogger1 = manager.getLogger(AG_LOGLEVEL.INFO);
-        expect(infoLogger1).toBe(firstDefaultLogger);
+          const secondMockLogger = vi.fn();
+          manager.setLogFunctionWithLevel(AG_LOGLEVEL.WARN, secondMockLogger);
 
-        // 新しいdefaultLoggerとloggerMapを同時設定
-        manager.setManager({
-          defaultLogger: secondDefaultLogger,
-          loggerMap: {
-            [AG_LOGLEVEL.ERROR]: mockErrorLogger,
-          },
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
+          const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+
+          errorLogger('error message');
+          warnLogger('warn message');
+          infoLogger('info message');
+
+          expect(mockErrorLogger).toHaveBeenCalledWith('error message');
+          expect(secondMockLogger).toHaveBeenCalledWith('warn message');
+          expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
+          expect(manager.getFormatter()).toBe(mockFormatter);
         });
-
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        const infoLogger2 = manager.getLogger(AG_LOGLEVEL.INFO);
-
-        expect(errorLogger).toBe(mockErrorLogger); // loggerMapが優先
-        expect(infoLogger2).toBe(secondDefaultLogger); // 新しいdefaultが適用
       });
     });
 
     /**
-     * 異常系: マップ更新エラー処理
+     * updateLogMap内部処理機能
+     *
+     * @description ログマップ更新の内部動作のテスト
      */
-    describe('異常系: Map Update Error Handling', () => {
-      it('should preserve unchanged levels when updating loggerMap', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+    describe('updateLogMap Internal Processing', () => {
+      /**
+       * 正常系: 基本的なマップ更新処理
+       */
+      describe('正常系: Basic Map Update Processing', () => {
+        it('should correctly merge partial logger maps with existing configuration', () => {
+          const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
-        // 初期設定
-        manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
-        manager.setLogFunctionWithLevel(AG_LOGLEVEL.WARN, mockWarnLogger);
+          // 最初の設定
+          manager.setManager({
+            loggerMap: {
+              [AG_LOGLEVEL.ERROR]: mockErrorLogger,
+              [AG_LOGLEVEL.WARN]: mockWarnLogger,
+            },
+          });
 
-        // loggerMap更新（ERRORのみ上書き）
-        manager.setManager({
-          loggerMap: {
-            [AG_LOGLEVEL.ERROR]: mockFatalLogger,
-          },
+          // 部分更新
+          manager.setManager({
+            loggerMap: {
+              [AG_LOGLEVEL.ERROR]: mockFatalLogger, // 上書き
+              [AG_LOGLEVEL.DEBUG]: mockDebugLogger, // 追加
+            },
+          });
+
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
+          const debugLogger = manager.getLogger(AG_LOGLEVEL.DEBUG);
+          const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+
+          expect(errorLogger).toBe(mockFatalLogger); // 上書きされた
+          expect(warnLogger).toBe(mockDefaultLogger); // defaultLoggerにリセットされた
+          expect(debugLogger).toBe(mockDebugLogger); // 新規追加
+          expect(infoLogger).toBe(mockDefaultLogger); // デフォルトのまま
         });
 
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
+        it('should handle loggerMap priority over defaultLogger correctly', () => {
+          const manager = AgLoggerManager.getManager();
 
-        expect(errorLogger).toBe(mockFatalLogger); // 更新された
-        expect(warnLogger).toBe(mockDefaultLogger); // リセットされた(デフォルトロガーで上書き)
-      });
-    });
+          // defaultLoggerとloggerMapを同時設定
+          manager.setManager({
+            defaultLogger: mockDefaultLogger,
+            loggerMap: {
+              [AG_LOGLEVEL.ERROR]: mockErrorLogger,
+            },
+          });
 
-    /**
-     * エッジケース: 特殊マップ更新パターン
-     */
-    describe('エッジケース: Special Map Update Patterns', () => {
-      it('should handle complex configuration scenarios', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
 
-        manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
-        manager.setManager({ formatter: mockFormatter });
-
-        expect(manager.getFormatter()).toBe(mockFormatter);
-
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
-
-        errorLogger('error message');
-        infoLogger('info message');
-
-        expect(mockErrorLogger).toHaveBeenCalledWith('error message');
-        expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
-      });
-
-      it('persists configuration across manager method calls', () => {
-        const manager = AgLoggerManager.getManager({
-          defaultLogger: mockDefaultLogger,
-          formatter: mockFormatter,
+          expect(errorLogger).toBe(mockErrorLogger); // loggerMapが優先
+          expect(infoLogger).toBe(mockDefaultLogger); // 未設定レベルはdefaultLogger
         });
 
-        manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+        it('should apply defaultLogger to all levels before loggerMap override', () => {
+          const manager = AgLoggerManager.getManager();
+          const firstDefaultLogger = vi.fn();
+          const secondDefaultLogger = vi.fn();
 
-        // 設定が保持されることを確認
-        expect(manager.getFormatter()).toBe(mockFormatter);
+          // 最初のdefaultLogger設定
+          manager.setManager({ defaultLogger: firstDefaultLogger });
 
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+          // 全レベルが最初のdefaultLoggerになることを確認
+          const infoLogger1 = manager.getLogger(AG_LOGLEVEL.INFO);
+          expect(infoLogger1).toBe(firstDefaultLogger);
 
-        expect(errorLogger).toBe(mockErrorLogger);
-        expect(infoLogger).toBe(mockDefaultLogger);
-      });
-    });
-  });
+          // 新しいdefaultLoggerとloggerMapを同時設定
+          manager.setManager({
+            defaultLogger: secondDefaultLogger,
+            loggerMap: {
+              [AG_LOGLEVEL.ERROR]: mockErrorLogger,
+            },
+          });
 
-  /**
-   * 個別ロガー設定機能
-   *
-   * @description 特定レベルへのロガー設定、リセット機能のテスト
-   */
-  describe('Individual Logger Configuration', () => {
-    /**
-     * 正常系: 基本的な個別設定
-     */
-    describe('正常系: Basic Individual Configuration', () => {
-      it('sets specific logger function for specified log level', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          const infoLogger2 = manager.getLogger(AG_LOGLEVEL.INFO);
 
-        manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
-
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        errorLogger('error message');
-
-        expect(mockErrorLogger).toHaveBeenCalledWith('error message');
+          expect(errorLogger).toBe(mockErrorLogger); // loggerMapが優先
+          expect(infoLogger2).toBe(secondDefaultLogger); // 新しいdefaultが適用
+        });
       });
 
-      it('does not affect other log levels', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+      /**
+       * 異常系: マップ更新エラー処理
+       */
+      describe('異常系: Map Update Error Handling', () => {
+        it('should preserve unchanged levels when updating loggerMap', () => {
+          const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
-        manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+          // 初期設定
+          manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+          manager.setLogFunctionWithLevel(AG_LOGLEVEL.WARN, mockWarnLogger);
 
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
-        const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+          // loggerMap更新（ERRORのみ上書き）
+          manager.setManager({
+            loggerMap: {
+              [AG_LOGLEVEL.ERROR]: mockFatalLogger,
+            },
+          });
 
-        errorLogger('error message');
-        warnLogger('warn message');
-        infoLogger('info message');
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
 
-        expect(mockErrorLogger).toHaveBeenCalledWith('error message');
-        expect(mockDefaultLogger).toHaveBeenCalledWith('warn message');
-        expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
+          expect(errorLogger).toBe(mockFatalLogger); // 更新された
+          expect(warnLogger).toBe(mockDefaultLogger); // リセットされた(デフォルトロガーで上書き)
+        });
       });
 
-      it('allows setting different functions for multiple levels', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+      /**
+       * エッジケース: 特殊マップ更新パターン
+       */
+      describe('エッジケース: Special Map Update Patterns', () => {
+        it('should handle complex configuration scenarios', () => {
+          const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
-        manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
-        manager.setLogFunctionWithLevel(AG_LOGLEVEL.WARN, mockWarnLogger);
+          manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+          manager.setManager({ formatter: mockFormatter });
 
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
-        const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+          expect(manager.getFormatter()).toBe(mockFormatter);
 
-        errorLogger('error message');
-        warnLogger('warn message');
-        infoLogger('info message');
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
 
-        expect(mockErrorLogger).toHaveBeenCalledWith('error message');
-        expect(mockWarnLogger).toHaveBeenCalledWith('warn message');
-        expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
-      });
+          errorLogger('error message');
+          infoLogger('info message');
 
-      it('resets log level to default logger', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+          expect(mockErrorLogger).toHaveBeenCalledWith('error message');
+          expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
+        });
 
-        manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
-        manager.setDefaultLogFunction(AG_LOGLEVEL.ERROR);
+        it('persists configuration across manager method calls', () => {
+          const manager = AgLoggerManager.getManager({
+            defaultLogger: mockDefaultLogger,
+            formatter: mockFormatter,
+          });
 
-        const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        errorLogger('error message');
+          manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
 
-        expect(mockDefaultLogger).toHaveBeenCalledWith('error message');
-        expect(mockErrorLogger).not.toHaveBeenCalled();
-      });
-    });
+          // 設定が保持されることを確認
+          expect(manager.getFormatter()).toBe(mockFormatter);
 
-    /**
-     * 異常系: 個別設定エラー処理
-     */
-    describe('異常系: Individual Configuration Error Handling', () => {
-      it('handles invalid log levels in setLogFunctionWithLevel', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
 
-        expect(() => manager.setLogFunctionWithLevel(-1 as AgLogLevel, mockErrorLogger)).not.toThrow();
-        expect(() => manager.setLogFunctionWithLevel(999 as AgLogLevel, mockErrorLogger)).not.toThrow();
-      });
-
-      it('handles undefined logger functions', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
-
-        expect(() => manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, undefined as unknown as AgLoggerFunction)).not
-          .toThrow();
+          expect(errorLogger).toBe(mockErrorLogger);
+          expect(infoLogger).toBe(mockDefaultLogger);
+        });
       });
     });
 
     /**
-     * エッジケース: 特殊個別設定パターン
+     * 個別ロガー設定機能
+     *
+     * @description 特定レベルへのロガー設定、リセット機能のテスト
      */
-    describe('エッジケース: Special Individual Configuration Patterns', () => {
-      it('works even when no custom logger was previously set', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+    describe('Individual Logger Configuration', () => {
+      /**
+       * 正常系: 基本的な個別設定
+       */
+      describe('正常系: Basic Individual Configuration', () => {
+        it('sets specific logger function for specified log level', () => {
+          const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
-        manager.setDefaultLogFunction(AG_LOGLEVEL.INFO);
+          manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
 
-        const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
-        infoLogger('info message');
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          errorLogger('error message');
 
-        expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
+          expect(mockErrorLogger).toHaveBeenCalledWith('error message');
+        });
+
+        it('does not affect other log levels', () => {
+          const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+
+          manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
+          const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+
+          errorLogger('error message');
+          warnLogger('warn message');
+          infoLogger('info message');
+
+          expect(mockErrorLogger).toHaveBeenCalledWith('error message');
+          expect(mockDefaultLogger).toHaveBeenCalledWith('warn message');
+          expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
+        });
+
+        it('allows setting different functions for multiple levels', () => {
+          const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+
+          manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+          manager.setLogFunctionWithLevel(AG_LOGLEVEL.WARN, mockWarnLogger);
+
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
+          const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+
+          errorLogger('error message');
+          warnLogger('warn message');
+          infoLogger('info message');
+
+          expect(mockErrorLogger).toHaveBeenCalledWith('error message');
+          expect(mockWarnLogger).toHaveBeenCalledWith('warn message');
+          expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
+        });
+
+        it('resets log level to default logger', () => {
+          const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+
+          manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, mockErrorLogger);
+          manager.setDefaultLogFunction(AG_LOGLEVEL.ERROR);
+
+          const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          errorLogger('error message');
+
+          expect(mockDefaultLogger).toHaveBeenCalledWith('error message');
+          expect(mockErrorLogger).not.toHaveBeenCalled();
+        });
       });
 
-      it('handles rapid individual logger changes', () => {
-        const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
-        const alternateLogger = vi.fn();
+      /**
+       * 異常系: 個別設定エラー処理
+       */
+      describe('異常系: Individual Configuration Error Handling', () => {
+        it('handles invalid log levels in setLogFunctionWithLevel', () => {
+          const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
-        for (let i = 0; i < 100; i++) {
-          const logger = i % 2 === 0 ? mockErrorLogger : alternateLogger;
-          manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, logger);
-        }
+          expect(() => manager.setLogFunctionWithLevel(-1 as AgLogLevel, mockErrorLogger)).not.toThrow();
+          expect(() => manager.setLogFunctionWithLevel(999 as AgLogLevel, mockErrorLogger)).not.toThrow();
+        });
 
-        const finalLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
-        expect(finalLogger).toBe(alternateLogger); // 最後に設定されたログ
+        it('handles undefined logger functions', () => {
+          const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+
+          expect(() => manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, undefined as unknown as AgLoggerFunction)).not
+            .toThrow();
+        });
+      });
+
+      /**
+       * エッジケース: 特殊個別設定パターン
+       */
+      describe('エッジケース: Special Individual Configuration Patterns', () => {
+        it('works even when no custom logger was previously set', () => {
+          const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+
+          manager.setDefaultLogFunction(AG_LOGLEVEL.INFO);
+
+          const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
+          infoLogger('info message');
+
+          expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
+        });
+
+        it('handles rapid individual logger changes', () => {
+          const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
+          const alternateLogger = vi.fn();
+
+          for (let i = 0; i < 100; i++) {
+            const logger = i % 2 === 0 ? mockErrorLogger : alternateLogger;
+            manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, logger);
+          }
+
+          const finalLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
+          expect(finalLogger).toBe(alternateLogger); // 最後に設定されたログ
+        });
       });
     });
   });

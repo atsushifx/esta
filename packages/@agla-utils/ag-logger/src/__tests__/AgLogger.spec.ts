@@ -11,6 +11,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ログレベル定数 - テストで使用するログレベルの定義
 import { AG_LOGLEVEL } from '../../shared/types';
+// 型定義 - ログレベル型（現在未使用）
+// import type { AgLogLevel } from '../../shared/types';
 import type { AgLogLevel } from '../../shared/types';
 
 // テスト対象 - AgLoggerクラスのメイン実装とgetLogger関数

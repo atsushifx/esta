@@ -19,7 +19,7 @@ import { AglaError } from './error.types';
  * @example
  * ```typescript
  * import { AgLoggerError } from './AgLoggerError.types';
- * import { AG_LOGGER_ERROR_CATEGORIES } from '../constants/agloggerError.constants';
+ * import { AG_LOGGER_ERROR_CATEGORIES } from '../constants/agLoggerError.constants';
  *
  * // Throw an error with category and message
  * throw new AgLoggerError(

@@ -8,7 +8,7 @@
 
 // types
 import { AG_LOGLEVEL } from '../shared/types';
-import type { AgTLogLevel } from '../shared/types';
+import type { AgLogLevel } from '../shared/types';
 import type {
   AgFormatFunction,
   AgLoggerFunction,
@@ -77,7 +77,7 @@ export class AgLoggerManager {
    * @param logLevel - The log level to get the logger for.
    * @returns The logger function for the specified log level.
    */
-  getLogger(logLevel: AgTLogLevel): AgLoggerFunction {
+  getLogger(logLevel: AgLogLevel): AgLoggerFunction {
     return this.loggerMap[logLevel] ?? this.defaultLogger;
   }
 
@@ -110,7 +110,7 @@ export class AgLoggerManager {
     // Override specific log levels with provided loggers
     if (loggerMap) {
       Object.keys(loggerMap).forEach((key) => {
-        const levelCode = parseInt(key) as AgTLogLevel;
+        const levelCode = parseInt(key) as AgLogLevel;
         if (loggerMap[levelCode] !== undefined) {
           this.loggerMap[levelCode] = loggerMap[levelCode]!;
         }
@@ -145,7 +145,7 @@ export class AgLoggerManager {
    * @param logLevel - The log level to set the logger for.
    * @param logFunction - The logger function to set.
    */
-  setLogFunctionWithLevel(logLevel: AgTLogLevel, logFunction: AgLoggerFunction): void {
+  setLogFunctionWithLevel(logLevel: AgLogLevel, logFunction: AgLoggerFunction): void {
     this.loggerMap[logLevel] = logFunction;
   }
 
@@ -154,7 +154,7 @@ export class AgLoggerManager {
    *
    * @param logLevel - The log level to set to default logger.
    */
-  setDefaultLogFunction(logLevel: AgTLogLevel): void {
+  setDefaultLogFunction(logLevel: AgLogLevel): void {
     this.loggerMap[logLevel] = this.defaultLogger;
   }
 

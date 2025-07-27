@@ -8,7 +8,7 @@
 
 // type
 import type { AgLogMessage } from './AgLogger.types';
-import type { AgTLogLevel } from './LogLevel.types';
+import type { AgLogLevel } from './LogLevel.types';
 
 // --- interfaces ---
 /**
@@ -62,7 +62,7 @@ export type AgFormatFunction = (logMessage: AgLogMessage) => string;
  * };
  * ```
  */
-export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<AgTLogLevel, T | null>;
+export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<AgLogLevel, T | null>;
 
 /**
  * Configuration options for AgLogger and AgLoggerManager instances.
@@ -90,6 +90,18 @@ export type AgLoggerOptions = {
    * Formatter function to format log messages before passing to logger functions.
    */
   formatter?: AgFormatFunction;
+
+  /**
+   * Log level setting that controls which log messages are output.
+   * Messages at or above this level will be processed.
+   */
+  logLevel?: AgLogLevel;
+
+  /**
+   * Verbose mode setting that controls additional diagnostic output.
+   * When enabled, verbose() method calls will produce output.
+   */
+  verbose?: boolean;
 
   /**
    * Partial map of logger functions for specific log levels.

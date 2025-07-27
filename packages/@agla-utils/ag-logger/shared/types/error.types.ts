@@ -11,8 +11,8 @@
  * Provides structured error handling with error codes and context information.
  */
 export abstract class AglaError extends Error {
-  /** The error code identifying the specific type of error. */
-  public readonly code: string;
+  /** The error type identifying the specific type of error. */
+  public readonly errorType: string;
 
   /** Optional context information providing additional details about the error. */
   public readonly context?: Record<string, unknown>;
@@ -20,13 +20,13 @@ export abstract class AglaError extends Error {
   /**
    * Creates a new AglaError instance.
    *
-   * @param code - The error code identifying the specific type of error
+   * @param errorType - The error type identifying the specific type of error
    * @param message - The human-readable error message
    * @param context - Optional context information for debugging
    */
-  constructor(code: string, message: string, context?: Record<string, unknown>) {
+  constructor(errorType: string, message: string, context?: Record<string, unknown>) {
     super(message);
-    this.code = code;
+    this.errorType = errorType;
     this.context = context;
     this.name = this.constructor.name;
 
@@ -37,12 +37,12 @@ export abstract class AglaError extends Error {
   }
 
   /**
-   * Returns a string representation of the error including code, message, and context.
+   * Returns a string representation of the error including error type, message, and context.
    *
-   * @returns A formatted string containing the error code, message, and context (if present)
+   * @returns A formatted string containing the error type, message, and context (if present)
    */
   toString(): string {
     const contextStr = this.context ? JSON.stringify(this.context) : '';
-    return `${this.code}: ${this.message}${contextStr ? ` ${contextStr}` : ''}`;
+    return `${this.errorType}: ${this.message}${contextStr ? ` ${contextStr}` : ''}`;
   }
 }

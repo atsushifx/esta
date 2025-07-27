@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgTLogLevel } from './LogLevel.types';
+import type { AgLogLevel } from './LogLevel.types';
 
 /**
  * Parsed result from logging input arguments.
@@ -31,7 +31,7 @@ export type AgLogMessage = {
    *
    * @example AG_LOGLEVEL.INFO (4)
    */
-  logLevel: AgTLogLevel;
+  logLevel: AgLogLevel;
 
   /**
    * Timestamp for the log entry.

@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 
 // Import helper functions
 import { AG_LOGLEVEL } from '../../../shared/types';
-import type { AgTLogLevel } from '../../../shared/types';
+import type { AgLogLevel } from '../../../shared/types';
 import { AgToLabel } from '../LogLevelHelpers';
 
 describe('LogLevel Helper Functions', () => {
@@ -38,10 +38,10 @@ describe('LogLevel Helper Functions', () => {
 
     it('should handle invalid log levels gracefully', () => {
       // These should either throw or return a sensible default
-      expect(() => AgToLabel(-1 as AgTLogLevel)).toThrow('Invalid log level: -1');
-      expect(() => AgToLabel(99 as AgTLogLevel)).toThrow('Invalid log level: 99');
-      expect(() => AgToLabel(null as unknown as AgTLogLevel)).toThrow('Invalid log level: null');
-      expect(() => AgToLabel(undefined as unknown as AgTLogLevel)).toThrow('Invalid log level: undefined');
+      expect(() => AgToLabel(-1 as AgLogLevel)).toThrow('Invalid log level: -1');
+      expect(() => AgToLabel(99 as AgLogLevel)).toThrow('Invalid log level: 99');
+      expect(() => AgToLabel(null as unknown as AgLogLevel)).toThrow('Invalid log level: null');
+      expect(() => AgToLabel(undefined as unknown as AgLogLevel)).toThrow('Invalid log level: undefined');
     });
 
     it('should return consistent format', () => {

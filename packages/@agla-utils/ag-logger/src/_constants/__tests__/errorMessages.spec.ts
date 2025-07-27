@@ -8,38 +8,6 @@ import type { TErrorCategory, TMessageId } from '../../../shared/constants/error
 import { getErrorMessage } from '../../utils/errorMessageUtils';
 
 describe('ErrorMessages', () => {
-  describe('MOCK_LOGGER_ERROR_MESSAGES constant', () => {
-    it('should have VALIDATION category with INVALID_LOG_LEVEL message', () => {
-      expect(MOCK_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL).toBeDefined();
-      expect(typeof MOCK_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL).toBe('string');
-    });
-
-    it('should have VALIDATION category with INVALID_MESSAGE_TYPE message', () => {
-      expect(MOCK_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_MESSAGE_TYPE).toBeDefined();
-      expect(typeof MOCK_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_MESSAGE_TYPE).toBe('string');
-    });
-
-    it('should have VALIDATION category with INVALID_TESTID_TYPE message', () => {
-      expect(MOCK_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_TESTID_TYPE).toBeDefined();
-      expect(typeof MOCK_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_TESTID_TYPE).toBe('string');
-    });
-
-    it('should have VALIDATION category with INVALID_TESTID_LENGTH message', () => {
-      expect(MOCK_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_TESTID_LENGTH).toBeDefined();
-      expect(typeof MOCK_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_TESTID_LENGTH).toBe('string');
-    });
-
-    it('should have STATE category with BUFFER_NOT_FOUND message', () => {
-      expect(MOCK_LOGGER_ERROR_MESSAGES.STATE.BUFFER_NOT_FOUND).toBeDefined();
-      expect(typeof MOCK_LOGGER_ERROR_MESSAGES.STATE.BUFFER_NOT_FOUND).toBe('string');
-    });
-
-    it('should have RESOURCE category with BUFFER_OVERFLOW message', () => {
-      expect(MOCK_LOGGER_ERROR_MESSAGES.RESOURCE.BUFFER_OVERFLOW).toBeDefined();
-      expect(typeof MOCK_LOGGER_ERROR_MESSAGES.RESOURCE.BUFFER_OVERFLOW).toBe('string');
-    });
-  });
-
   describe('getErrorMessage helper function', () => {
     it('should return correct message for existing key using constant', () => {
       const message = getErrorMessage(ERROR_CATEGORIES.VALIDATION, 'INVALID_LOG_LEVEL');

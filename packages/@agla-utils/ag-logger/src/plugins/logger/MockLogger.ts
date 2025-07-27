@@ -8,7 +8,7 @@
 
 // types
 import { AG_LOGLEVEL } from '../../../shared/types';
-import type { AgLoggerFunction, AgLoggerMap, AgTLogLevel } from '../../../shared/types';
+import type { AgLoggerFunction, AgLoggerMap, AgLogLevel } from '../../../shared/types';
 
 /**
  * Universal mock logger for unit and integration testing.
@@ -36,7 +36,7 @@ export class MockLogger {
    * @param logLevel - The log level to validate
    * @throws {Error} When log level is invalid
    */
-  private validateLogLevel(logLevel: AgTLogLevel): void {
+  private validateLogLevel(logLevel: AgLogLevel): void {
     if (typeof logLevel !== 'number' || logLevel < 0 || logLevel > 6 || !Number.isInteger(logLevel)) {
       throw new Error(`Invalid log level: ${logLevel}`);
     }
@@ -68,12 +68,12 @@ export class MockLogger {
   }
 
   // Query methods
-  getMessages(logLevel: AgTLogLevel): string[] {
+  getMessages(logLevel: AgLogLevel): string[] {
     this.validateLogLevel(logLevel);
     return [...this.messages[logLevel]];
   }
 
-  getLastMessage(logLevel: AgTLogLevel): string | null {
+  getLastMessage(logLevel: AgLogLevel): string | null {
     this.validateLogLevel(logLevel);
     const levelMessages = this.messages[logLevel];
     return levelMessages[levelMessages.length - 1] || null;
@@ -92,7 +92,7 @@ export class MockLogger {
   }
 
   // Utility methods
-  clearMessages(logLevel: AgTLogLevel): void {
+  clearMessages(logLevel: AgLogLevel): void {
     this.validateLogLevel(logLevel);
     this.messages[logLevel] = [];
   }
@@ -109,7 +109,7 @@ export class MockLogger {
     ];
   }
 
-  getMessageCount(logLevel: AgTLogLevel): number {
+  getMessageCount(logLevel: AgLogLevel): number {
     this.validateLogLevel(logLevel);
     return this.messages[logLevel].length;
   }
@@ -118,7 +118,7 @@ export class MockLogger {
     return this.messages.reduce((total, levelMessages) => total + levelMessages.length, 0);
   }
 
-  hasMessages(logLevel: AgTLogLevel): boolean {
+  hasMessages(logLevel: AgLogLevel): boolean {
     this.validateLogLevel(logLevel);
     return this.messages[logLevel].length > 0;
   }

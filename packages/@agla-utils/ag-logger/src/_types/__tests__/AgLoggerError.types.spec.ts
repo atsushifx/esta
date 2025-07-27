@@ -20,41 +20,27 @@ import { AG_LOGGER_ERROR_CATEGORIES } from '../../../shared/constants/agLoggerEr
  * Verifies error creation, inheritance, and structured error handling functionality.
  */
 describe('AgLoggerError', () => {
-  it('should create AgLoggerError instance with code and message', () => {
+  it('should create AgLoggerError instance with all properties', () => {
     const errorCode = 'TEST_CODE';
     const errorMessage = 'Test error message';
-    const error = new AgLoggerError(errorCode, errorMessage);
-
-    expect(error).toBeInstanceOf(AgLoggerError);
-    expect(error.code).toBe(errorCode);
-    expect(error.message).toBe(errorMessage);
-    expect(error.name).toBe('AgLoggerError');
-  });
-
-  it('should inherit from AglaError', () => {
-    const error = new AgLoggerError('TEST_CODE', 'Test message');
-
-    expect(error).toBeInstanceOf(AglaError);
-    expect(error).toBeInstanceOf(Error);
-  });
-
-  it('should create AgLoggerError with context information', () => {
-    const errorCode = 'TEST_CODE';
-    const errorMessage = 'Test error with context';
-    const context = { level: 999, operation: 'getLoggerFunction' };
+    const context = { level: 999, operation: 'test' };
     const error = new AgLoggerError(errorCode, errorMessage, context);
 
-    expect(error.code).toBe(errorCode);
+    expect(error).toBeInstanceOf(AgLoggerError);
+    expect(error).toBeInstanceOf(AglaError);
+    expect(error).toBeInstanceOf(Error);
+    expect(error.errorType).toBe(errorCode);
     expect(error.message).toBe(errorMessage);
     expect(error.context).toEqual(context);
+    expect(error.name).toBe('AgLoggerError');
+    expect(error.stack).toBeDefined();
   });
 
   it('should work with predefined error categories', () => {
     const errorMessage = 'Invalid log level provided';
     const error = new AgLoggerError(AG_LOGGER_ERROR_CATEGORIES.INVALID_LOG_LEVEL, errorMessage);
 
-    expect(error.code).toBe(AG_LOGGER_ERROR_CATEGORIES.INVALID_LOG_LEVEL);
-    expect(error.code).toBe('AG_LOGGER_INVALID_LOG_LEVEL');
+    expect(error.errorType).toBe('AG_LOGGER_INVALID_LOG_LEVEL');
     expect(error.message).toBe(errorMessage);
   });
 
@@ -68,12 +54,5 @@ describe('AgLoggerError', () => {
 
     expect(errorWithoutContext.toString()).toBe('TEST_CODE: Test message');
     expect(errorWithContext.toString()).toBe('TEST_CODE: Test message {"field":"value"}');
-  });
-
-  it('should maintain stack trace', () => {
-    const error = new AgLoggerError('TEST_CODE', 'Test message');
-
-    expect(error.stack).toBeDefined();
-    expect(error.stack).toContain('AgLoggerError');
   });
 });

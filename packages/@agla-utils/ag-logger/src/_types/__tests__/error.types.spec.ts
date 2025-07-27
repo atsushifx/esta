@@ -10,30 +10,19 @@ class TestError extends AglaError {
 
 describe('AglaError', () => {
   describe('constructor', () => {
-    it('should set code property correctly', () => {
-      const error = new TestError('Test message');
-      expect(error.code).toBe('TEST_ERROR');
-    });
-
-    it('should set message property correctly', () => {
-      const error = new TestError('Test message');
-      expect(error.message).toBe('Test message');
-    });
-
-    it('should set context property when provided', () => {
+    it('should create error with all properties correctly', () => {
       const context = { key: 'value', number: 42 };
       const error = new TestError('Test message', context);
+
+      expect(error.errorType).toBe('TEST_ERROR');
+      expect(error.message).toBe('Test message');
       expect(error.context).toEqual(context);
+      expect(error.name).toBe('TestError');
     });
 
-    it('should set context property to undefined when not provided', () => {
+    it('should handle undefined context', () => {
       const error = new TestError('Test message');
       expect(error.context).toBeUndefined();
-    });
-
-    it('should set name property to constructor name', () => {
-      const error = new TestError('Test message');
-      expect(error.name).toBe('TestError');
     });
   });
 
