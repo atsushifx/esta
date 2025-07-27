@@ -9,7 +9,12 @@
 // types
 import { AG_LOGLEVEL } from '../shared/types';
 import type { AgTLogLevel } from '../shared/types';
-import type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from '../shared/types/AgLogger.interface';
+import type {
+  AgFormatFunction,
+  AgLoggerFunction,
+  AgLoggerMap,
+  AgLoggerOptions,
+} from '../shared/types/AgLogger.interface';
 
 // plugins
 import { NullFormat } from '@/plugins/format/NullFormat';
@@ -41,31 +46,25 @@ export class AgLoggerManager {
 
   /**
    * Returns the singleton instance of AgLoggerManager.
-   * Optionally sets default logger, formatter, and/or logger map on first initialization.
+   * Optionally sets configuration options on first initialization.
    *
-   * @param defaultLogger - Optional default logger function.
-   * @param formatter - Optional formatter function.
-   * @param loggerMap - Optional partial map of loggers by log level.
+   * @param options - Optional configuration options for logger setup.
    * @returns The singleton instance of AgLoggerManager.
    */
-  static getManager(
-    defaultLogger?: AgLoggerFunction,
-    formatter?: AgFormatFunction,
-    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,
-  ): AgLoggerManager {
+  static getManager(options?: AgLoggerOptions): AgLoggerManager {
     AgLoggerManager.instance ??= new AgLoggerManager();
 
-    if (defaultLogger) {
-      AgLoggerManager.instance.defaultLogger = defaultLogger;
+    if (options?.defaultLogger) {
+      AgLoggerManager.instance.defaultLogger = options.defaultLogger;
     }
 
-    if (formatter) {
-      AgLoggerManager.instance.formatter = formatter;
+    if (options?.formatter) {
+      AgLoggerManager.instance.formatter = options.formatter;
     }
 
     // Update logger map with provided default logger or custom logger map
-    if (defaultLogger || loggerMap) {
-      AgLoggerManager.instance.updateLogMap(defaultLogger, loggerMap);
+    if (options?.defaultLogger || options?.loggerMap) {
+      AgLoggerManager.instance.updateLogMap(options.defaultLogger, options.loggerMap);
     }
 
     return AgLoggerManager.instance;
@@ -129,17 +128,9 @@ export class AgLoggerManager {
    * @param logFunction - Logger function or null (optional, only for log level overload).
    */
   setManager(logLevel: AgTLogLevel, logFunction: AgLoggerFunction | null): void;
-  setManager(options: {
-    defaultLogger?: AgLoggerFunction;
-    formatter?: AgFormatFunction;
-    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
-  }): void;
+  setManager(options: AgLoggerOptions): void;
   setManager(
-    logLevelOrOptions: AgTLogLevel | {
-      defaultLogger?: AgLoggerFunction;
-      formatter?: AgFormatFunction;
-      loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
-    },
+    logLevelOrOptions: AgTLogLevel | AgLoggerOptions,
     logFunction?: AgLoggerFunction | null,
   ): void {
     if (typeof logLevelOrOptions === 'number') {

@@ -63,3 +63,37 @@ export type AgFormatFunction = (logMessage: AgLogMessage) => string;
  * ```
  */
 export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<AgTLogLevel, T | null>;
+
+/**
+ * Configuration options for AgLogger and AgLoggerManager instances.
+ * Used to configure default logger, formatter, and logger map for different log levels.
+ *
+ * @example
+ * ```typescript
+ * const options: AgLoggerOptions = {
+ *   defaultLogger: ConsoleLogger,
+ *   formatter: JsonFormat,
+ *   loggerMap: {
+ *     [AG_LOGLEVEL.ERROR]: (msg) => console.error(msg),
+ *     [AG_LOGLEVEL.WARN]: (msg) => console.warn(msg)
+ *   }
+ * };
+ * ```
+ */
+export type AgLoggerOptions = {
+  /**
+   * Default logger function to use for all log levels unless overridden by loggerMap.
+   */
+  defaultLogger?: AgLoggerFunction;
+
+  /**
+   * Formatter function to format log messages before passing to logger functions.
+   */
+  formatter?: AgFormatFunction;
+
+  /**
+   * Partial map of logger functions for specific log levels.
+   * Overrides defaultLogger for specified levels.
+   */
+  loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
+};

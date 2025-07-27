@@ -96,7 +96,7 @@ describe('E2EMockLoggerWithTestId', () => {
       ctx.onTestFinished(() => mockLogger.endTest());
 
       const loggerFunction = mockLogger.createLoggerFunction();
-      const logger = getLogger(loggerFunction, PlainFormat);
+      const logger = getLogger({ defaultLogger: loggerFunction, formatter: PlainFormat });
 
       logger.setLogLevel(AG_LOGLEVEL.INFO);
       logger.info('Test message via plugin');
@@ -111,7 +111,11 @@ describe('E2EMockLoggerWithTestId', () => {
       ctx.onTestFinished(() => mockLogger.endTest());
 
       const loggerMap = mockLogger.createLoggerMap();
-      const logger = getLogger(mockLogger.createLoggerFunction(), PlainFormat, loggerMap);
+      const logger = getLogger({
+        defaultLogger: mockLogger.createLoggerFunction(),
+        formatter: PlainFormat,
+        loggerMap: loggerMap,
+      });
 
       logger.setLogLevel(AG_LOGLEVEL.DEBUG);
       logger.error('Error message');

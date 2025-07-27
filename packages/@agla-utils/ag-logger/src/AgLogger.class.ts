@@ -10,7 +10,7 @@
 import { AG_LOGLEVEL } from '../shared/types';
 import type { AgTLogLevel } from '../shared/types';
 // interfaces
-import type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from '../shared/types/AgLogger.interface';
+import type { AgLoggerOptions } from '../shared/types/AgLogger.interface';
 
 // core
 import { AgLoggerManager } from './AgLoggerManager.class';
@@ -36,23 +36,17 @@ export class AgLogger {
 
   /**
    * Returns the singleton instance of AgLogger,
-   * optionally accepting a default logger, formatter, and logger map.
+   * optionally accepting configuration options.
    *
-   * @param defaultLogger - Optional default logger function.
-   * @param formatter - Optional formatter function.
-   * @param loggerMap - Optional partial logger map for log levels.
+   * @param options - Optional configuration options for logger setup.
    * @returns The singleton AgLogger instance.
    */
-  static getLogger(
-    defaultLogger?: AgLoggerFunction,
-    formatter?: AgFormatFunction,
-    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,
-  ): AgLogger {
+  static getLogger(options?: AgLoggerOptions): AgLogger {
     const instance = (AgLogger._instance ??= new AgLogger());
 
     // If configuration is passed, delegate to setManager for unified handling
-    if (defaultLogger !== undefined || formatter !== undefined || loggerMap !== undefined) {
-      instance.setManager({ defaultLogger, formatter, loggerMap });
+    if (options !== undefined) {
+      instance.setManager(options);
     }
 
     return instance;
@@ -133,13 +127,9 @@ export class AgLogger {
    * If ConsoleLogger is specified without a logger map,
    * ConsoleLoggerMap will be automatically applied.
    *
-   * @param options - Configuration options including defaultLogger, formatter, and loggerMap.
+   * @param options - Configuration options for the logger.
    */
-  setManager(options: {
-    defaultLogger?: AgLoggerFunction;
-    formatter?: AgFormatFunction;
-    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
-  }): void {
+  setManager(options: AgLoggerOptions): void {
     const enhancedOptions = { ...options };
     if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
       enhancedOptions.loggerMap = ConsoleLoggerMap;
@@ -204,21 +194,15 @@ export class AgLogger {
  * If ConsoleLogger is specified as default without a logger map,
  * ConsoleLoggerMap is automatically applied.
  *
- * @param defaultLogger - Optional default logger function.
- * @param formatter - Optional formatter function.
- * @param loggerMap - Optional partial logger map.
+ * @param options - Optional configuration options for the logger.
  * @returns The singleton AgLogger instance.
  */
-export const getLogger = (
-  defaultLogger?: AgLoggerFunction,
-  formatter?: AgFormatFunction,
-  loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,
-): AgLogger => {
-  if (defaultLogger === ConsoleLogger && !loggerMap) {
-    loggerMap = ConsoleLoggerMap;
+export const getLogger = (options?: AgLoggerOptions): AgLogger => {
+  if (options?.defaultLogger === ConsoleLogger && !options.loggerMap) {
+    options = { ...options, loggerMap: ConsoleLoggerMap };
   }
 
-  return AgLogger.getLogger(defaultLogger, formatter, loggerMap);
+  return AgLogger.getLogger(options);
 };
 
 export default AgLogger;

@@ -65,7 +65,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
   describe('Basic log output tests', () => {
     it('outputs INFO log using PlainFormat and ConsoleLogger', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       logger.info('Test message');
@@ -77,7 +77,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('outputs ERROR log using PlainFormat and ConsoleLogger', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.ERROR);
 
       logger.error('Error message');
@@ -89,7 +89,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('outputs WARN log using PlainFormat and ConsoleLogger', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.WARN);
 
       logger.warn('Warning message');
@@ -101,7 +101,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('outputs DEBUG log using PlainFormat and ConsoleLogger', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
       logger.debug('Debug message');
@@ -129,7 +129,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
   describe('Log output tests with multiple arguments', () => {
     it('logs message containing object and string', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       const userData = { userId: 123, userName: 'testUser' };
@@ -144,7 +144,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('logs message containing an array', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
       const items = ['item1', 'item2', 'item3'];
@@ -175,7 +175,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
   describe('Log level filtering tests', () => {
     it('does not output DEBUG logs when level is INFO', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       logger.debug('Debug message');
@@ -187,7 +187,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('does not output INFO/WARN logs when level is ERROR', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.ERROR);
 
       logger.info('Info message');
@@ -201,7 +201,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('does not output any logs when level is OFF', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.OFF);
 
       logger.error('Error message');
@@ -228,7 +228,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
   describe('Error handling tests', () => {
     it('throws error when logging circular reference objects', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       const circularObj: { name: string; self?: unknown } = { name: 'test' };
@@ -257,7 +257,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
   describe('Full integration scenario tests', () => {
     it('logs a sequence from app start to error occurrence', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
       // Application start
@@ -297,7 +297,7 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
     it('verifies log method (log) functionality', () => {
       setupTestContext();
-      const logger = getLogger(ConsoleLogger, PlainFormat);
+      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       logger.log('General log message');

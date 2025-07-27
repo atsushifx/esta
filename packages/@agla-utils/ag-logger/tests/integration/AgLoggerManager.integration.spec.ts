@@ -43,7 +43,7 @@ describe('AgLoggerManager Integration Tests', () => {
       setupTestContext();
       const manager1 = AgLoggerManager.getManager();
       const manager2 = AgLoggerManager.getManager();
-      const manager3 = AgLoggerManager.getManager(ConsoleLogger, JsonFormat);
+      const manager3 = AgLoggerManager.getManager({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
 
       expect(manager1).toBe(manager2);
       expect(manager2).toBe(manager3);
@@ -54,7 +54,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const mockLogger = vi.fn();
       const mockFormatter = vi.fn().mockReturnValue('test output');
 
-      const manager1 = AgLoggerManager.getManager(mockLogger, mockFormatter);
+      const manager1 = AgLoggerManager.getManager({ defaultLogger: mockLogger, formatter: mockFormatter });
       const manager2 = AgLoggerManager.getManager();
 
       // Both should have the same configuration
@@ -69,8 +69,8 @@ describe('AgLoggerManager Integration Tests', () => {
       const firstFormatter = vi.fn().mockReturnValue('first');
       const secondFormatter = vi.fn().mockReturnValue('second');
 
-      const manager1 = AgLoggerManager.getManager(firstLogger, firstFormatter);
-      const manager2 = AgLoggerManager.getManager(secondLogger, secondFormatter);
+      const manager1 = AgLoggerManager.getManager({ defaultLogger: firstLogger, formatter: firstFormatter });
+      const manager2 = AgLoggerManager.getManager({ defaultLogger: secondLogger, formatter: secondFormatter });
 
       // Second call with parameters should still update configuration
       // since getManager allows configuration updates
@@ -102,7 +102,11 @@ describe('AgLoggerManager Integration Tests', () => {
         [AG_LOGLEVEL.TRACE]: debugLogger,
       };
 
-      const manager = AgLoggerManager.getManager(defaultLogger, PlainFormat, loggerMap);
+      const manager = AgLoggerManager.getManager({
+        defaultLogger: defaultLogger,
+        formatter: PlainFormat,
+        loggerMap: loggerMap,
+      });
 
       expect(manager.getLogger(AG_LOGLEVEL.OFF)).toBe(NullLogger);
       expect(manager.getLogger(AG_LOGLEVEL.FATAL)).toBe(errorLogger);
@@ -124,7 +128,11 @@ describe('AgLoggerManager Integration Tests', () => {
         [AG_LOGLEVEL.DEBUG]: debugLogger,
       };
 
-      const manager = AgLoggerManager.getManager(defaultLogger, PlainFormat, partialLoggerMap);
+      const manager = AgLoggerManager.getManager({
+        defaultLogger: defaultLogger,
+        formatter: PlainFormat,
+        loggerMap: partialLoggerMap,
+      });
 
       // Specified levels should use custom loggers
       expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(errorLogger);
@@ -140,7 +148,7 @@ describe('AgLoggerManager Integration Tests', () => {
     it('should fallback to default logger for missing map entries', () => {
       setupTestContext();
       const defaultLogger = vi.fn();
-      const manager = AgLoggerManager.getManager(defaultLogger, PlainFormat);
+      const manager = AgLoggerManager.getManager({ defaultLogger: defaultLogger, formatter: PlainFormat });
 
       // All levels should return the default logger
       Object.values(AG_LOGLEVEL).forEach((level) => {
@@ -159,7 +167,7 @@ describe('AgLoggerManager Integration Tests', () => {
     it('should maintain formatter consistency across logger retrievals', () => {
       setupTestContext();
       const mockFormatter = vi.fn().mockReturnValue('formatted');
-      const manager = AgLoggerManager.getManager(ConsoleLogger, mockFormatter);
+      const manager = AgLoggerManager.getManager({ defaultLogger: ConsoleLogger, formatter: mockFormatter });
 
       const formatter1 = manager.getFormatter();
       const formatter2 = manager.getFormatter();
@@ -173,7 +181,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const firstFormatter = vi.fn().mockReturnValue('first format');
       const secondFormatter = vi.fn().mockReturnValue('second format');
 
-      const manager = AgLoggerManager.getManager(ConsoleLogger, firstFormatter);
+      const manager = AgLoggerManager.getManager({ defaultLogger: ConsoleLogger, formatter: firstFormatter });
       expect(manager.getFormatter()).toBe(firstFormatter);
 
       manager.setManager({ formatter: secondFormatter });
@@ -316,7 +324,11 @@ describe('AgLoggerManager Integration Tests', () => {
     it('should handle empty logger map correctly', () => {
       setupTestContext();
       const defaultLogger = vi.fn();
-      const manager = AgLoggerManager.getManager(defaultLogger, PlainFormat, {});
+      const manager = AgLoggerManager.getManager({
+        defaultLogger: defaultLogger,
+        formatter: PlainFormat,
+        loggerMap: {},
+      });
 
       // Should use default logger for all levels
       Object.values(AG_LOGLEVEL).forEach((level) => {

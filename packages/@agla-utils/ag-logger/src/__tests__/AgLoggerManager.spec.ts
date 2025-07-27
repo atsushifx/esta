@@ -102,7 +102,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('accepts default logger when getting instance', () => {
-      const manager = AgLoggerManager.getManager(mockDefaultLogger);
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
       const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
       infoLogger('test message');
@@ -111,7 +111,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('accepts formatter when getting instance', () => {
-      const manager = AgLoggerManager.getManager(undefined, mockFormatter);
+      const manager = AgLoggerManager.getManager({ formatter: mockFormatter });
 
       const formatter = manager.getFormatter();
       expect(formatter).toBe(mockFormatter);
@@ -123,7 +123,7 @@ describe('AgLoggerManager', () => {
         [AG_LOGLEVEL.WARN]: mockWarnLogger,
       };
 
-      const manager = AgLoggerManager.getManager(mockDefaultLogger, undefined, loggerMap);
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger, loggerMap: loggerMap });
 
       const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
       const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
@@ -144,7 +144,11 @@ describe('AgLoggerManager', () => {
         [AG_LOGLEVEL.ERROR]: mockErrorLogger,
       };
 
-      const manager = AgLoggerManager.getManager(mockDefaultLogger, mockFormatter, loggerMap);
+      const manager = AgLoggerManager.getManager({
+        defaultLogger: mockDefaultLogger,
+        formatter: mockFormatter,
+        loggerMap: loggerMap,
+      });
 
       expect(manager.getFormatter()).toBe(mockFormatter);
 
@@ -176,7 +180,7 @@ describe('AgLoggerManager', () => {
    */
   describe('getLogger', () => {
     it('returns logger function for specified log level', () => {
-      const manager = AgLoggerManager.getManager(mockDefaultLogger);
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
       const logger = manager.getLogger(AG_LOGLEVEL.INFO);
       expect(typeof logger).toBe('function');
@@ -186,7 +190,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('returns default logger if log level does not exist', () => {
-      const manager = AgLoggerManager.getManager(mockDefaultLogger);
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
       const logger = manager.getLogger(999 as AgTLogLevel);
       expect(logger).toBe(mockDefaultLogger);
@@ -207,7 +211,7 @@ describe('AgLoggerManager', () => {
    */
   describe('getFormatter', () => {
     it('returns the configured formatter', () => {
-      const manager = AgLoggerManager.getManager(undefined, mockFormatter);
+      const manager = AgLoggerManager.getManager({ formatter: mockFormatter });
 
       const formatter = manager.getFormatter();
       expect(formatter).toBe(mockFormatter);
@@ -246,7 +250,7 @@ describe('AgLoggerManager', () => {
     });
 
     it('sets default logger if null is specified', () => {
-      const manager = AgLoggerManager.getManager(mockDefaultLogger);
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
       manager.setManager(AG_LOGLEVEL.ERROR, null);
 
@@ -382,7 +386,7 @@ describe('AgLoggerManager', () => {
    */
   describe('Complex scenarios', () => {
     it('can update settings after getLogger', () => {
-      const manager = AgLoggerManager.getManager(mockDefaultLogger);
+      const manager = AgLoggerManager.getManager({ defaultLogger: mockDefaultLogger });
 
       manager.setManager(AG_LOGLEVEL.ERROR, mockErrorLogger);
       manager.setManager({ formatter: mockFormatter });

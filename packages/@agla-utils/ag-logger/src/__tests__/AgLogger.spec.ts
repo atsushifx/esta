@@ -77,7 +77,7 @@ describe('AgLogger', () => {
       });
 
       it('should maintain singleton with different parameters', () => {
-        const logger1 = AgLogger.getLogger(mockLogger, mockFormatter);
+        const logger1 = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
         const logger2 = AgLogger.getLogger();
 
         expect(logger1).toBe(logger2);
@@ -109,7 +109,7 @@ describe('AgLogger', () => {
       });
 
       it('should filter logs based on current level', () => {
-        const logger = AgLogger.getLogger(mockLogger, mockFormatter);
+        const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
         logger.setLogLevel(AG_LOGLEVEL.WARN);
 
         logger.debug('debug'); // filtered
@@ -122,7 +122,7 @@ describe('AgLogger', () => {
       });
 
       it('should block all logs when level is OFF', () => {
-        const logger = AgLogger.getLogger(mockLogger, mockFormatter);
+        const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
         logger.setLogLevel(AG_LOGLEVEL.OFF);
 
         logger.fatal('fatal');
@@ -143,7 +143,7 @@ describe('AgLogger', () => {
      */
     describe('Log Methods', () => {
       it('should call all log level methods correctly', () => {
-        const logger = AgLogger.getLogger(mockLogger, mockFormatter);
+        const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
         logger.setLogLevel(AG_LOGLEVEL.TRACE);
 
         logger.fatal('fatal message');
@@ -158,7 +158,7 @@ describe('AgLogger', () => {
       });
 
       it('should handle multiple arguments in log methods', () => {
-        const logger = AgLogger.getLogger(mockLogger, mockFormatter);
+        const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
 
         const testObj = { key: 'value' };
@@ -176,7 +176,7 @@ describe('AgLogger', () => {
      */
     describe('getLogger Function', () => {
       it('should auto-assign ConsoleLoggerMap when using ConsoleLogger', () => {
-        const logger = getLogger(ConsoleLogger);
+        const logger = getLogger({ defaultLogger: ConsoleLogger });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
 
         // ConsoleLoggerMapが自動適用されることを間接的に確認
@@ -184,7 +184,7 @@ describe('AgLogger', () => {
       });
 
       it('should work with custom logger and formatter', () => {
-        const logger = getLogger(mockLogger, mockFormatter);
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
         logger.info('test');
 
@@ -215,7 +215,7 @@ describe('AgLogger', () => {
     });
 
     it('should control verbose output correctly', () => {
-      const logger = AgLogger.getLogger(mockLogger, mockFormatter);
+      const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       // verbose off - no output
@@ -230,7 +230,7 @@ describe('AgLogger', () => {
     });
 
     it('should not affect other log levels', () => {
-      const logger = AgLogger.getLogger(mockLogger, mockFormatter);
+      const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
       logger.setLogLevel(AG_LOGLEVEL.TRACE);
       logger.setVerbose(false);
 
@@ -252,7 +252,7 @@ describe('AgLogger', () => {
       const throwingLogger = vi.fn(() => {
         throw new Error('Logger error');
       });
-      const logger = AgLogger.getLogger(throwingLogger, mockFormatter);
+      const logger = AgLogger.getLogger({ defaultLogger: throwingLogger, formatter: mockFormatter });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       expect(() => logger.info('test')).toThrow('Logger error');
@@ -262,7 +262,7 @@ describe('AgLogger', () => {
       const throwingFormatter = vi.fn(() => {
         throw new Error('Formatter error');
       });
-      const logger = AgLogger.getLogger(mockLogger, throwingFormatter);
+      const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: throwingFormatter });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       expect(() => logger.info('test')).toThrow('Formatter error');
@@ -270,7 +270,7 @@ describe('AgLogger', () => {
 
     it('should not log when formatter returns empty string', () => {
       const emptyFormatter = vi.fn().mockReturnValue('');
-      const logger = AgLogger.getLogger(mockLogger, emptyFormatter);
+      const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: emptyFormatter });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       logger.info('test message');
@@ -287,7 +287,7 @@ describe('AgLogger', () => {
    */
   describe('エッジケース: Edge Cases', () => {
     it('should handle undefined and null arguments', () => {
-      const logger = AgLogger.getLogger(mockLogger, mockFormatter);
+      const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       logger.info(undefined);
@@ -298,7 +298,7 @@ describe('AgLogger', () => {
     });
 
     it('should handle empty arguments', () => {
-      const logger = AgLogger.getLogger(mockLogger, mockFormatter);
+      const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       logger.info();
@@ -309,7 +309,7 @@ describe('AgLogger', () => {
     });
 
     it('should handle boundary log levels correctly', () => {
-      const logger = AgLogger.getLogger(mockLogger, mockFormatter);
+      const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
 
       // 最低レベル (FATAL only)
       logger.setLogLevel(AG_LOGLEVEL.FATAL);
@@ -340,7 +340,7 @@ describe('AgLogger', () => {
 
     it('should handle ConsoleLogger auto-configuration', () => {
       // getLogger with ConsoleLogger should auto-assign ConsoleLoggerMap
-      const logger1 = getLogger(ConsoleLogger);
+      const logger1 = getLogger({ defaultLogger: ConsoleLogger });
       expect(logger1).toBeInstanceOf(AgLogger);
 
       // setManager with ConsoleLogger should auto-assign ConsoleLoggerMap
