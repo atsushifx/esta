@@ -37,7 +37,7 @@ ag-loggerパッケージを現代的な関数型プログラミングパター�
    - 副作用が散在し、予測可能性が低い
 
 3. **Imperative Configuration**
-   - 複雑な条件分岐による設定処理（`setLogger`メソッド）
+   - 複雑な条件分岐による設定処理（`setManager`メソッド）
    - 手動状態同期が必要
    - プラグイン関係がハードコード（ConsoleLogger → ConsoleLoggerMap）
 

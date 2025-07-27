@@ -343,9 +343,9 @@ describe('AgLogger', () => {
       const logger1 = getLogger(ConsoleLogger);
       expect(logger1).toBeInstanceOf(AgLogger);
 
-      // setLogger with ConsoleLogger should auto-assign ConsoleLoggerMap
+      // setManager with ConsoleLogger should auto-assign ConsoleLoggerMap
       const logger2 = AgLogger.getLogger();
-      logger2.setLogger({ defaultLogger: ConsoleLogger });
+      logger2.setManager({ defaultLogger: ConsoleLogger });
       expect(logger2).toBeInstanceOf(AgLogger);
     });
   });

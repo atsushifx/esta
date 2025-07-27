@@ -245,13 +245,13 @@ export const setFormatter = (
 ): LoggerConfig => updateConfig(config, { formatter });
 
 // ロガーマップ設定
-export const setLoggers = (
+export const setManagers = (
   config: LoggerConfig,
   loggers: Partial<LoggerMap>,
 ): LoggerConfig => updateConfig(config, { loggers });
 
 // 特定レベルのロガー設定
-export const setLoggerForLevel = (
+export const setManagerForLevel = (
   config: LoggerConfig,
   level: AgTLogLevel,
   logger: AgLoggerFunction,
@@ -274,7 +274,7 @@ export const withVerbose = (verbose: boolean = true): ConfigBuilder => (config) 
 export const withFormatter = (formatter: AgFormatFunction): ConfigBuilder => (config) =>
   setFormatter(config, formatter);
 
-export const withConsoleOutput = (): ConfigBuilder => (config) => setLoggers(config, CONSOLE_LOGGER_CONFIG.loggers);
+export const withConsoleOutput = (): ConfigBuilder => (config) => setManagers(config, CONSOLE_LOGGER_CONFIG.loggers);
 
 export const withJsonFormat = (): ConfigBuilder => (config) => setFormatter(config, JsonFormat);
 

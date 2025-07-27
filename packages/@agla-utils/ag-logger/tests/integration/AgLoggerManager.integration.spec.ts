@@ -176,7 +176,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const manager = AgLoggerManager.getManager(ConsoleLogger, firstFormatter);
       expect(manager.getFormatter()).toBe(firstFormatter);
 
-      manager.setLogger({ formatter: secondFormatter });
+      manager.setManager({ formatter: secondFormatter });
       expect(manager.getFormatter()).toBe(secondFormatter);
     });
 
@@ -185,22 +185,22 @@ describe('AgLoggerManager Integration Tests', () => {
       const manager = AgLoggerManager.getManager();
 
       // Test with JsonFormat
-      manager.setLogger({ formatter: JsonFormat });
+      manager.setManager({ formatter: JsonFormat });
       expect(manager.getFormatter()).toBe(JsonFormat);
 
       // Test with PlainFormat
-      manager.setLogger({ formatter: PlainFormat });
+      manager.setManager({ formatter: PlainFormat });
       expect(manager.getFormatter()).toBe(PlainFormat);
 
       // Test with NullFormat
-      manager.setLogger({ formatter: NullFormat });
+      manager.setManager({ formatter: NullFormat });
       expect(manager.getFormatter()).toBe(NullFormat);
     });
   });
 
   /**
    * Tests complex configuration scenarios with
-   * multiple setLogger calls and overrides.
+   * multiple setManager calls and overrides.
    */
   describe('Complex Configuration Integration', () => {
     it('should handle mixed configuration updates correctly', () => {
@@ -210,7 +210,7 @@ describe('AgLoggerManager Integration Tests', () => {
       // Initial configuration
       const firstLogger = vi.fn();
       const firstFormatter = vi.fn().mockReturnValue('first');
-      manager.setLogger({
+      manager.setManager({
         defaultLogger: firstLogger,
         formatter: firstFormatter,
       });
@@ -220,21 +220,21 @@ describe('AgLoggerManager Integration Tests', () => {
 
       // Update only formatter
       const secondFormatter = vi.fn().mockReturnValue('second');
-      manager.setLogger({ formatter: secondFormatter });
+      manager.setManager({ formatter: secondFormatter });
 
       expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(firstLogger); // Should remain
       expect(manager.getFormatter()).toBe(secondFormatter); // Should update
 
       // Update only default logger
       const secondLogger = vi.fn();
-      manager.setLogger({ defaultLogger: secondLogger });
+      manager.setManager({ defaultLogger: secondLogger });
 
       expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(secondLogger); // Should update
       expect(manager.getFormatter()).toBe(secondFormatter); // Should remain
 
       // Update with partial logger map
       const errorLogger = vi.fn();
-      manager.setLogger({
+      manager.setManager({
         loggerMap: { [AG_LOGLEVEL.ERROR]: errorLogger },
       });
 
@@ -243,19 +243,19 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(manager.getFormatter()).toBe(secondFormatter); // Should remain
     });
 
-    it('should handle legacy setLogger method correctly', () => {
+    it('should handle legacy setManager method correctly', () => {
       setupTestContext();
       const manager = AgLoggerManager.getManager();
       const customLogger = vi.fn();
 
       // Test legacy single-level logger setting
-      manager.setLogger(AG_LOGLEVEL.ERROR, customLogger);
+      manager.setManager(AG_LOGLEVEL.ERROR, customLogger);
       expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(customLogger);
 
       // Test legacy null logger setting (should use default)
       const defaultLogger = vi.fn();
-      manager.setLogger({ defaultLogger });
-      manager.setLogger(AG_LOGLEVEL.INFO, null);
+      manager.setManager({ defaultLogger });
+      manager.setManager(AG_LOGLEVEL.INFO, null);
       expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(defaultLogger);
     });
 
@@ -269,7 +269,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const formatter = JsonFormat;
 
       // Complex initial setup
-      manager.setLogger({
+      manager.setManager({
         defaultLogger,
         formatter,
         loggerMap: {
@@ -286,7 +286,7 @@ describe('AgLoggerManager Integration Tests', () => {
 
       // Update default logger - should affect ALL levels since loggerMap gets rebuilt
       const newDefaultLogger = vi.fn();
-      manager.setLogger({ defaultLogger: newDefaultLogger });
+      manager.setManager({ defaultLogger: newDefaultLogger });
 
       // When default logger is updated, all levels get the new default logger
       // Only levels explicitly in loggerMap would override this
@@ -306,7 +306,7 @@ describe('AgLoggerManager Integration Tests', () => {
       setupTestContext();
       const manager = AgLoggerManager.getManager();
       const defaultLogger = vi.fn();
-      manager.setLogger({ defaultLogger });
+      manager.setManager({ defaultLogger });
 
       // Test with invalid log level (should fallback to default)
       const invalidLevel = 999 as unknown as AgTLogLevel;
@@ -331,7 +331,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const defaultLogger = vi.fn();
       const manager = AgLoggerManager.getManager();
 
-      manager.setLogger({
+      manager.setManager({
         defaultLogger,
         loggerMap: {
           [AG_LOGLEVEL.ERROR]: undefined,
@@ -351,7 +351,7 @@ describe('AgLoggerManager Integration Tests', () => {
 
       // Rapid configuration changes
       loggers.forEach((logger, index) => {
-        manager.setLogger({
+        manager.setManager({
           defaultLogger: logger,
           formatter: formatters[index],
         });

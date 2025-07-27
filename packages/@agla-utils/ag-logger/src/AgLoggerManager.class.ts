@@ -128,13 +128,13 @@ export class AgLoggerManager {
    * @param logLevelOrOptions - Either a log level or an options object.
    * @param logFunction - Logger function or null (optional, only for log level overload).
    */
-  setLogger(logLevel: AgTLogLevel, logFunction: AgLoggerFunction | null): void;
-  setLogger(options: {
+  setManager(logLevel: AgTLogLevel, logFunction: AgLoggerFunction | null): void;
+  setManager(options: {
     defaultLogger?: AgLoggerFunction;
     formatter?: AgFormatFunction;
     loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
   }): void;
-  setLogger(
+  setManager(
     logLevelOrOptions: AgTLogLevel | {
       defaultLogger?: AgLoggerFunction;
       formatter?: AgFormatFunction;
@@ -143,10 +143,10 @@ export class AgLoggerManager {
     logFunction?: AgLoggerFunction | null,
   ): void {
     if (typeof logLevelOrOptions === 'number') {
-      // Old-style: setLogger(logLevel, logFunction)
+      // Old-style: setManager(logLevel, logFunction)
       this.loggerMap[logLevelOrOptions] = logFunction ?? this.defaultLogger;
     } else {
-      // New-style: setLogger(options)
+      // New-style: setManager(options)
       const options = logLevelOrOptions;
       if (options.defaultLogger !== undefined) {
         this.defaultLogger = options.defaultLogger;

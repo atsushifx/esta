@@ -86,7 +86,7 @@ describe('AgLogger Integration Tests', () => {
         const mockLogger = vi.fn();
         const mockFormatter = vi.fn().mockReturnValue('shared format');
 
-        logger1.setLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger1.setManager({ defaultLogger: mockLogger, formatter: mockFormatter });
         logger2.setLogLevel(AG_LOGLEVEL.INFO);
         logger2.info('test message');
 
@@ -198,10 +198,10 @@ describe('AgLogger Integration Tests', () => {
         const finalFormatter = vi.fn().mockReturnValue('final format');
 
         // 段階的な設定更新
-        logger.setLogger({ defaultLogger: vi.fn() });
-        logger.setLogger({ loggerMap: { [AG_LOGLEVEL.ERROR]: vi.fn() } });
-        logger.setLogger({ formatter: finalFormatter });
-        logger.setLogger({ defaultLogger: finalLogger });
+        logger.setManager({ defaultLogger: vi.fn() });
+        logger.setManager({ loggerMap: { [AG_LOGLEVEL.ERROR]: vi.fn() } });
+        logger.setManager({ formatter: finalFormatter });
+        logger.setManager({ defaultLogger: finalLogger });
 
         logger.setLogLevel(AG_LOGLEVEL.INFO);
         logger.info('test message');
@@ -309,7 +309,7 @@ describe('AgLogger Integration Tests', () => {
         expect(logger2.setVerbose()).toBe(true);
 
         // 設定変更後もverbose状態を維持
-        logger2.setLogger({ defaultLogger: vi.fn() });
+        logger2.setManager({ defaultLogger: vi.fn() });
         expect(logger1.setVerbose()).toBe(true);
       });
     });
@@ -336,7 +336,7 @@ describe('AgLogger Integration Tests', () => {
 
       // システム復旧
       const workingLogger = vi.fn();
-      logger.setLogger({ defaultLogger: workingLogger });
+      logger.setManager({ defaultLogger: workingLogger });
 
       expect(() => logger.info('recovery test')).not.toThrow();
       expect(workingLogger).toHaveBeenCalled();
@@ -394,7 +394,7 @@ describe('AgLogger Integration Tests', () => {
 
       // 高速な設定変更
       for (let i = 0; i < 100; i++) {
-        logger.setLogger({
+        logger.setManager({
           defaultLogger: loggers[i % loggers.length],
           formatter: formatters[i % formatters.length],
         });
@@ -424,7 +424,7 @@ describe('AgLogger Integration Tests', () => {
         () => logger.debug('concurrent debug'),
         () => logger.setVerbose(true),
         () => logger.verbose('concurrent verbose'),
-        () => logger.setLogger({ defaultLogger: mockLogger }),
+        () => logger.setManager({ defaultLogger: mockLogger }),
       ];
 
       // 全操作を実行

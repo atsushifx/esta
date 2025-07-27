@@ -492,7 +492,7 @@ describe('Plugin Interaction Integration Tests', () => {
 
       // Replace with working logger
       const workingLogger = vi.fn();
-      logger.setLogger({ defaultLogger: workingLogger });
+      logger.setManager({ defaultLogger: workingLogger });
 
       // Should work normally now
       expect(() => {

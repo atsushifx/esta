@@ -222,7 +222,7 @@ describe('AgLoggerManager', () => {
   });
 
   /**
-   * setLoggerメソッド（legacy形式）のテストスイート
+   * setManagerメソッド（legacy形式）のテストスイート
    *
    * @description レガシー形式でのロガー設定機能を検証する
    * ログレベル指定でのロガー設定、null指定でのデフォルト設定を確認
@@ -233,11 +233,11 @@ describe('AgLoggerManager', () => {
    * - null指定でのデフォルトロガー設定
    * - 設定後のロガー取得・実行
    */
-  describe('setLogger - legacy form', () => {
+  describe('setManager - legacy form', () => {
     it('sets logger for specified log level', () => {
       const manager = AgLoggerManager.getManager();
 
-      manager.setLogger(AG_LOGLEVEL.ERROR, mockErrorLogger);
+      manager.setManager(AG_LOGLEVEL.ERROR, mockErrorLogger);
 
       const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
       errorLogger('error message');
@@ -248,7 +248,7 @@ describe('AgLoggerManager', () => {
     it('sets default logger if null is specified', () => {
       const manager = AgLoggerManager.getManager(mockDefaultLogger);
 
-      manager.setLogger(AG_LOGLEVEL.ERROR, null);
+      manager.setManager(AG_LOGLEVEL.ERROR, null);
 
       const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
       errorLogger('error message');
@@ -258,7 +258,7 @@ describe('AgLoggerManager', () => {
   });
 
   /**
-   * setLoggerメソッド（options形式）のテストスイート
+   * setManagerメソッド（options形式）のテストスイート
    *
    * @description options形式でのロガー設定機能を検証する
    * デフォルトロガー、フォーマッター、ロガーマップの個別・一括更新を確認
@@ -271,11 +271,11 @@ describe('AgLoggerManager', () => {
    * - 全オプション同時更新
    * - 複数オプション組み合わせ更新
    */
-  describe('setLogger - options form', () => {
+  describe('setManager - options form', () => {
     it('updates default logger', () => {
       const manager = AgLoggerManager.getManager();
 
-      manager.setLogger({ defaultLogger: mockDefaultLogger });
+      manager.setManager({ defaultLogger: mockDefaultLogger });
 
       const infoLogger = manager.getLogger(AG_LOGLEVEL.INFO);
       infoLogger('info message');
@@ -286,7 +286,7 @@ describe('AgLoggerManager', () => {
     it('updates formatter', () => {
       const manager = AgLoggerManager.getManager();
 
-      manager.setLogger({ formatter: mockFormatter });
+      manager.setManager({ formatter: mockFormatter });
 
       const formatter = manager.getFormatter();
       expect(formatter).toBe(mockFormatter);
@@ -300,7 +300,7 @@ describe('AgLoggerManager', () => {
         [AG_LOGLEVEL.WARN]: mockWarnLogger,
       };
 
-      manager.setLogger({ loggerMap });
+      manager.setManager({ loggerMap });
 
       const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
       const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);
@@ -320,7 +320,7 @@ describe('AgLoggerManager', () => {
         [AG_LOGLEVEL.DEBUG]: mockDebugLogger,
       };
 
-      manager.setLogger({
+      manager.setManager({
         defaultLogger: mockDefaultLogger,
         formatter: mockFormatter,
         loggerMap,
@@ -348,7 +348,7 @@ describe('AgLoggerManager', () => {
         [AG_LOGLEVEL.ERROR]: mockErrorLogger,
       };
 
-      manager.setLogger({
+      manager.setManager({
         defaultLogger: mockDefaultLogger,
         loggerMap,
       });
@@ -371,12 +371,12 @@ describe('AgLoggerManager', () => {
    * 複合シナリオのテストスイート
    *
    * @description 実用的な複合設定シナリオを検証する
-   * インスタンス作成後の設定更新、複数setLogger呼び出しの動作を確認
+   * インスタンス作成後の設定更新、複数setManager呼び出しの動作を確認
    *
    * @testFocus Complex Configuration Scenarios
    * @scenarios
    * - getLogger後の設定更新
-   * - 複数setLogger呼び出しの組み合わせ
+   * - 複数setManager呼び出しの組み合わせ
    * - legacy形式とoptions形式の混在使用
    * - 設定変更の累積効果
    */
@@ -384,8 +384,8 @@ describe('AgLoggerManager', () => {
     it('can update settings after getLogger', () => {
       const manager = AgLoggerManager.getManager(mockDefaultLogger);
 
-      manager.setLogger(AG_LOGLEVEL.ERROR, mockErrorLogger);
-      manager.setLogger({ formatter: mockFormatter });
+      manager.setManager(AG_LOGLEVEL.ERROR, mockErrorLogger);
+      manager.setManager({ formatter: mockFormatter });
 
       expect(manager.getFormatter()).toBe(mockFormatter);
 
@@ -399,15 +399,15 @@ describe('AgLoggerManager', () => {
       expect(mockDefaultLogger).toHaveBeenCalledWith('info message');
     });
 
-    it('can call setLogger multiple times without issue', () => {
+    it('can call setManager multiple times without issue', () => {
       const manager = AgLoggerManager.getManager();
 
-      manager.setLogger({ defaultLogger: mockDefaultLogger });
-      manager.setLogger(AG_LOGLEVEL.ERROR, mockErrorLogger);
-      manager.setLogger({ formatter: mockFormatter });
+      manager.setManager({ defaultLogger: mockDefaultLogger });
+      manager.setManager(AG_LOGLEVEL.ERROR, mockErrorLogger);
+      manager.setManager({ formatter: mockFormatter });
 
       const secondMockLogger = vi.fn();
-      manager.setLogger(AG_LOGLEVEL.WARN, secondMockLogger);
+      manager.setManager(AG_LOGLEVEL.WARN, secondMockLogger);
 
       const errorLogger = manager.getLogger(AG_LOGLEVEL.ERROR);
       const warnLogger = manager.getLogger(AG_LOGLEVEL.WARN);

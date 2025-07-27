@@ -50,9 +50,9 @@ export class AgLogger {
   ): AgLogger {
     const instance = (AgLogger._instance ??= new AgLogger());
 
-    // If configuration is passed, delegate to setLogger for unified handling
+    // If configuration is passed, delegate to setManager for unified handling
     if (defaultLogger !== undefined || formatter !== undefined || loggerMap !== undefined) {
-      instance.setLogger({ defaultLogger, formatter, loggerMap });
+      instance.setManager({ defaultLogger, formatter, loggerMap });
     }
 
     return instance;
@@ -135,7 +135,7 @@ export class AgLogger {
    *
    * @param options - Configuration options including defaultLogger, formatter, and loggerMap.
    */
-  setLogger(options: {
+  setManager(options: {
     defaultLogger?: AgLoggerFunction;
     formatter?: AgFormatFunction;
     loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
@@ -144,7 +144,7 @@ export class AgLogger {
     if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
       enhancedOptions.loggerMap = ConsoleLoggerMap;
     }
-    this._loggerManager.setLogger(enhancedOptions);
+    this._loggerManager.setManager(enhancedOptions);
   }
 
   /** Logs a message at FATAL level. */
