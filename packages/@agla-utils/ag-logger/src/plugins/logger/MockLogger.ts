@@ -31,6 +31,17 @@ export class MockLogger {
     [], // TRACE (6)
   ];
 
+  /**
+   * Validates if the provided log level is valid.
+   * @param logLevel - The log level to validate
+   * @throws {Error} When log level is invalid
+   */
+  private validateLogLevel(logLevel: AgTLogLevel): void {
+    if (typeof logLevel !== 'number' || logLevel < 0 || logLevel > 6 || !Number.isInteger(logLevel)) {
+      throw new Error(`Invalid log level: ${logLevel}`);
+    }
+  }
+
   // Logger methods
   fatal(message: string): void {
     this.messages[AG_LOGLEVEL.FATAL].push(message);
@@ -58,10 +69,12 @@ export class MockLogger {
 
   // Query methods
   getMessages(logLevel: AgTLogLevel): string[] {
+    this.validateLogLevel(logLevel);
     return [...this.messages[logLevel]];
   }
 
   getLastMessage(logLevel: AgTLogLevel): string | null {
+    this.validateLogLevel(logLevel);
     const levelMessages = this.messages[logLevel];
     return levelMessages[levelMessages.length - 1] || null;
   }
@@ -80,6 +93,7 @@ export class MockLogger {
 
   // Utility methods
   clearMessages(logLevel: AgTLogLevel): void {
+    this.validateLogLevel(logLevel);
     this.messages[logLevel] = [];
   }
 
@@ -96,6 +110,7 @@ export class MockLogger {
   }
 
   getMessageCount(logLevel: AgTLogLevel): number {
+    this.validateLogLevel(logLevel);
     return this.messages[logLevel].length;
   }
 
@@ -104,6 +119,7 @@ export class MockLogger {
   }
 
   hasMessages(logLevel: AgTLogLevel): boolean {
+    this.validateLogLevel(logLevel);
     return this.messages[logLevel].length > 0;
   }
 
