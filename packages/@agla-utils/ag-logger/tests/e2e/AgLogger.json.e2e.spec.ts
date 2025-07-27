@@ -12,7 +12,7 @@ import { describe, expect, it, vi } from 'vitest';
 // ログレベル定数 - E2Eテストで使用するログレベル定義
 import { AG_LOGLEVEL } from '../../shared/types';
 // テスト対象 - getLogger関数（ロガー取得のエントリーポイント）
-import { getLogger } from '../../src/AgLogger.class';
+import { getLogger } from '@/AgLogger.class';
 
 // --- types ---
 import type { AG_LABEL_TO_LOGLEVEL_MAP } from '../../shared/types';
@@ -24,9 +24,9 @@ type TMockConsoleMethods = keyof typeof mockConsole;
 type TCircularObject = { name: string; self?: TCircularObject };
 
 // プラグイン - JSON形式フォーマッター（構造化ログ用）
-import { JsonFormat } from '../../src/plugins/format/JsonFormat';
+import { JsonFormat } from '@/plugins/format/JsonFormat';
 // プラグイン - コンソール出力ロガー
-import { ConsoleLogger } from '../../src/plugins/logger/ConsoleLogger';
+import { ConsoleLogger } from '@/plugins/logger/ConsoleLogger';
 
 // mock console methods
 const mockConsole = {

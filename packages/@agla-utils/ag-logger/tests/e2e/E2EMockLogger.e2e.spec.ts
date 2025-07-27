@@ -6,11 +6,11 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { getLogger } from '@/AgLogger.class';
+import { PlainFormat } from '@/plugins/format/PlainFormat';
 import { E2eMockLogger as E2EMockLoggerWithTestId } from '@/plugins/logger/E2eMockLogger';
 import { describe, expect, it } from 'vitest';
 import { AG_LOGLEVEL } from '../../shared/types';
-import { getLogger } from '../../src/AgLogger.class';
-import { PlainFormat } from '../../src/plugins/format/PlainFormat';
 
 describe('E2EMockLoggerWithTestId', () => {
   describe('Basic logging functionality', () => {

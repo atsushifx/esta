@@ -12,11 +12,11 @@ import { describe, expect, it, vi } from 'vitest';
 // ログレベル定数 - E2Eテストで使用するログレベル定義
 import { AG_LOGLEVEL } from '../../shared/types';
 // テスト対象 - getLogger関数（ロガー取得のエントリーポイント）
-import { getLogger } from '../../src/AgLogger.class';
+import { getLogger } from '@/AgLogger.class';
 // プラグイン - 人間可読な平文フォーマッター
-import { PlainFormat } from '../../src/plugins/format/PlainFormat';
+import { PlainFormat } from '@/plugins/format/PlainFormat';
 // プラグイン - コンソール出力ロガー
-import { ConsoleLogger } from '../../src/plugins/logger/ConsoleLogger';
+import { ConsoleLogger } from '@/plugins/logger/ConsoleLogger';
 
 // mock console methods
 const mockConsole = {

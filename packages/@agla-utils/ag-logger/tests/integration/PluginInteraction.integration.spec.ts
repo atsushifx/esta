@@ -12,17 +12,17 @@ import { describe, expect, it, vi } from 'vitest';
 // ログレベル定数 - テストで使用するログレベル定義
 import { AG_LOGLEVEL } from '../../shared/types';
 // テスト対象 - getLogger関数（ロガー取得のエントリーポイント）
-import { getLogger } from '../../src/AgLogger.class';
+import { getLogger } from '@/AgLogger.class';
 // フォーマッタープラグイン - JSON形式でのログフォーマット
-import { JsonFormat } from '../../src/plugins/format/JsonFormat';
+import { JsonFormat } from '@/plugins/format/JsonFormat';
 // フォーマッタープラグイン - 出力なしのダミーフォーマット
-import { NullFormat } from '../../src/plugins/format/NullFormat';
+import { NullFormat } from '@/plugins/format/NullFormat';
 // フォーマッタープラグイン - 人間可読な平文フォーマット
-import { PlainFormat } from '../../src/plugins/format/PlainFormat';
+import { PlainFormat } from '@/plugins/format/PlainFormat';
 // ロガープラグイン - コンソール出力ロガーとレベルマップ
-import { ConsoleLogger, ConsoleLoggerMap } from '../../src/plugins/logger/ConsoleLogger';
+import { ConsoleLogger, ConsoleLoggerMap } from '@/plugins/logger/ConsoleLogger';
 // ロガープラグイン - 出力なしのダミーロガー
-import { NullLogger } from '../../src/plugins/logger/NullLogger';
+import { NullLogger } from '@/plugins/logger/NullLogger';
 
 // types
 type TCircular = {

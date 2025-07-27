@@ -15,15 +15,15 @@ import { AG_LOGLEVEL } from '../../shared/types';
 // Type definitions for vitest mocks
 type TVitestMock = ReturnType<typeof vi.fn>;
 // テスト対象 - メインAgLoggerクラスとgetLogger関数
-import { AgLogger, getLogger } from '../../src/AgLogger.class';
+import { AgLogger, getLogger } from '@/AgLogger.class';
 // テスト対象 - ロガー・フォーマッター管理クラス
-import { AgLoggerManager } from '../../src/AgLoggerManager.class';
+import { AgLoggerManager } from '@/AgLoggerManager.class';
 // フォーマッタープラグイン
-import { JsonFormat } from '../../src/plugins/format/JsonFormat';
-import { NullFormat } from '../../src/plugins/format/NullFormat';
-import { PlainFormat } from '../../src/plugins/format/PlainFormat';
+import { JsonFormat } from '@/plugins/format/JsonFormat';
+import { NullFormat } from '@/plugins/format/NullFormat';
+import { PlainFormat } from '@/plugins/format/PlainFormat';
 // ロガープラグイン
-import { ConsoleLogger } from '../../src/plugins/logger/ConsoleLogger';
+import { ConsoleLogger } from '@/plugins/logger/ConsoleLogger';
 
 /**
  * AgLoggerコンポーネントの包括的統合テストスイート

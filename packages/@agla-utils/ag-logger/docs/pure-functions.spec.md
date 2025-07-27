@@ -62,7 +62,7 @@ const formatLogMessage = (
 
 ```typescript
 // 実装は LogLevelHelpers.ts を参照
-import { AgToLabel, AgToLogLevel } from '../../src/utils/LogLevelHelpers';
+import { AgToLabel, AgToLogLevel } from '@/utils/LogLevelHelpers';
 
 // AgTLogLevel (数値) → AgTLogLevelLabel (文字列ラベル) 変換
 // AgToLabel(level: AgTLogLevel): AgTLogLevelLabel

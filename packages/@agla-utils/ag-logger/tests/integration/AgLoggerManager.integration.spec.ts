@@ -13,12 +13,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { AG_LOGLEVEL } from '../../shared/types';
 import type { AgTLogLevel } from '../../shared/types';
 // test targets
-import { AgLoggerManager } from '../../src/AgLoggerManager.class';
-import { JsonFormat } from '../../src/plugins/format/JsonFormat';
-import { NullFormat } from '../../src/plugins/format/NullFormat';
-import { PlainFormat } from '../../src/plugins/format/PlainFormat';
-import { ConsoleLogger } from '../../src/plugins/logger/ConsoleLogger';
-import { NullLogger } from '../../src/plugins/logger/NullLogger';
+import { AgLoggerManager } from '@/AgLoggerManager.class';
+import { JsonFormat } from '@/plugins/format/JsonFormat';
+import { NullFormat } from '@/plugins/format/NullFormat';
+import { PlainFormat } from '@/plugins/format/PlainFormat';
+import { ConsoleLogger } from '@/plugins/logger/ConsoleLogger';
+import { NullLogger } from '@/plugins/logger/NullLogger';
 
 /**
  * Integration tests for AgLoggerManager.
