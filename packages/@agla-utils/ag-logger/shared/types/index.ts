@@ -9,8 +9,8 @@
 export { AG_LABEL_TO_LOGLEVEL_MAP, AG_LOGLEVEL, AG_LOGLEVEL_TO_LABEL_MAP } from './LogLevel.types';
 
 // types
-export type { AgLogMessage } from './AgLogger.types';
-export type { AgLogLevel, AgLogLevelLabel } from './LogLevel.types';
+export type * from './AgLogger.types';
+export type * from './LogLevel.types';
 
 // Interface
-export type { AgFormatFunction, AgLoggerFunction, AgLoggerMap, AgLoggerOptions } from './AgLogger.interface';
+export type * from './AgLogger.interface';

@@ -12,7 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // ログレベル定数 - テストで使用するログレベル定義
 import { AG_LOGLEVEL } from '../../shared/types';
 // 型定義 - AgLoggerManagerで使用するログレベル型
-import type { AgLogLevel, AgLoggerFunction, AgFormatFunction, AgLoggerOptions } from '../../shared/types';
+import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions, AgLogLevel } from '../../shared/types';
 
 // テスト対象 - AgLoggerManagerクラスのシングルトン実装
 import { AgLoggerManager } from '../AgLoggerManager.class';

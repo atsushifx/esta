@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgLogLevel } from '../../shared/types';
+import type { AgLoggerMap, AgLogLevel } from '../../shared/types';
 import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions } from '../../shared/types/AgLogger.interface';
 // constants
 import { AG_LOGGER_ERROR_CATEGORIES } from '../../shared/constants/agLoggerError.constants';
@@ -424,6 +424,6 @@ export class AgLoggerConfig {
    * @internal Used internally for input validation
    */
   private isValidLogLevel(level: AgLogLevel): boolean {
-    return this.loggerMap.has(level);
+    return this._loggerMap.has(level);
   }
 }
