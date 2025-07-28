@@ -66,13 +66,15 @@ export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<
 
 /**
  * Configuration options for AgLogger and AgLoggerManager instances.
- * Used to configure default logger, formatter, and logger map for different log levels.
+ * Used to configure default logger, formatter, logger map, log level, and verbose mode for different log levels.
  *
  * @example
  * ```typescript
  * const options: AgLoggerOptions = {
  *   defaultLogger: ConsoleLogger,
  *   formatter: JsonFormat,
+ *   logLevel: AG_LOGLEVEL.INFO,
+ *   verbose: true,
  *   loggerMap: {
  *     [AG_LOGLEVEL.ERROR]: (msg) => console.error(msg),
  *     [AG_LOGLEVEL.WARN]: (msg) => console.warn(msg)
