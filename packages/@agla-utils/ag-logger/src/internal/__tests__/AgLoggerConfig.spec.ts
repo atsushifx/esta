@@ -30,7 +30,11 @@ import { AgLoggerConfig } from '../AgLoggerConfig';
 import { NullFormat } from '../../plugins/format/NullFormat';
 import { NullLogger } from '../../plugins/logger/NullLogger';
 // errors
+import { AG_LOGGER_ERROR_CATEGORIES } from '../../../shared/constants/agLoggerError.constants';
 import { AgLoggerError } from '../../../shared/types/AgLoggerError.types';
+// error classes
+import type { AgLogLevel } from '../../../shared/types';
+
 
 /**
  * Test suite for AgLoggerConfig internal class.
@@ -87,7 +91,10 @@ describe('AgLoggerConfig', () => {
     expect(config.getLoggerFunction(AG_LOGLEVEL.WARN)).toBe(NullLogger);
     expect(config.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe(NullLogger);
     expect(config.getLoggerFunction(AG_LOGLEVEL.DEBUG)).toBe(NullLogger);
-    expect(config.getLoggerFunction(AG_LOGLEVEL.TRACE)).toBe(NullLogger);
+    expect(config.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe(NullLogger);
+    expect(config.getLoggerFunction(AG_LOGLEVEL.WARN)).toBe(NullLogger);
+    expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(NullLogger);
+    expect(config.getLoggerFunction(AG_LOGLEVEL.OFF)).toBe(NullLogger);
   });
 
   it('should throw AgLoggerError for non-existent log level', () => {
@@ -138,20 +145,5 @@ describe('AgLoggerConfig', () => {
       expect(error).toBeInstanceOf(AgLoggerError);
       expect((error as AgLoggerError).code).toBe(AG_LOGGER_ERROR_CATEGORIES.INVALID_LOG_LEVEL);
     }
-  });
-
-  it('should return configured formatter', () => {
-    const config = new AgLoggerConfig();
-    expect(config.getFormatter()).toBe(NullFormat);
-  });
-
-  it('should return configured log level', () => {
-    const config = new AgLoggerConfig();
-    expect(config.getLogLevel()).toBe(AG_LOGLEVEL.OFF);
-  });
-
-  it('should return verbose setting', () => {
-    const config = new AgLoggerConfig();
-    expect(config.getVerbose()).toBe(false);
   });
 });

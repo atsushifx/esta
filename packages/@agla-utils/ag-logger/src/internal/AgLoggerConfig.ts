@@ -15,11 +15,12 @@ import type {
   AgLoggerOptions,
 } from '../../shared/types/AgLogger.interface';
 // constants
+import { AG_LOGGER_ERROR_CATEGORIES } from '../../shared/constants/agLoggerError.constants';
 import { AG_LOGLEVEL } from '../../shared/types';
 // plugins
 import { NullFormat } from '../plugins/format/NullFormat';
 import { NullLogger } from '../plugins/logger/NullLogger';
-// errors
+// error classes
 import { AgLoggerError } from '../../shared/types/AgLoggerError.types';
 
 /**
@@ -116,8 +117,18 @@ export class AgLoggerConfig {
 
   /**
    * Gets the logger function for the specified log level.
+   * Returns the configured logger function for the given log level.
+   * If an invalid log level is provided, throws an AgLoggerError with appropriate error category.
+   *
    * @param level - The log level to get the logger function for
-   * @returns Logger function for the specified level
+   * @returns Logger function for the specified level, or defaultLogger as fallback
+   * @throws {AgLoggerError} When an invalid log level is provided (error category: INVALID_LOG_LEVEL)
+   *
+   * @example
+   * ```typescript
+   * const config = new AgLoggerConfig();
+   * const logger = config.getLoggerFunction(AG_LOGLEVEL.INFO); // Returns logger for INFO level
+   * ```
    */
   public getLoggerFunction(level: AgTLogLevel): AgLoggerFunction {
     if (!this.isValidLogLevel(level)) {
@@ -126,107 +137,20 @@ export class AgLoggerConfig {
         `Invalid log level: ${level}`,
       );
     }
-    return this.loggerMap.get(level) ?? this.defaultLogger;
-  }
-
-  /**
-   * Gets the configured formatter function.
-   * @returns The configured formatter function
-   */
-  public getFormatter(): AgFormatFunction {
-    return this.formatter;
-  }
-
-  /**
-   * Gets the current log level setting.
-   * @returns The current log level
-   */
-  public getLogLevel(): AgTLogLevel {
-    return this.logLevel;
-  }
-
-  /**
-   * Gets the current verbose setting.
-   * @returns The current verbose setting
-   */
-  public getVerbose(): boolean {
-    return this.verbose;
-  }
-
-  /**
-   * Sets the log level for the configuration.
-   *
-   * Updates the current log level after validating that the provided level is valid.
-   * This setting determines which log messages will be processed by the logger.
-   * Only messages at or above this level will be output.
-   *
-   * @param level - The log level to set. Must be a valid AgTLogLevel value.
-   * @returns The log level that was successfully set
-   * @throws {AgLoggerError} When an invalid log level is provided (error category: INVALID_LOG_LEVEL)
-   *
-   * @example
-   * ```typescript
-   * const config = new AgLoggerConfig();
-   *
-   * // Set log level to INFO
-   * const setLevel = config.setLogLevel(AG_LOGLEVEL.INFO);
-   * console.log(setLevel); // Outputs: 4 (AG_LOGLEVEL.INFO value)
-   *
-   * // Attempting to set invalid log level throws error
-   * try {
-   *   config.setLogLevel(999 as AgTLogLevel);
-   * } catch (error) {
-   *   console.log(error.message); // "Invalid log level: 999"
-   * }
-   * ```
-   *
-   * @since 0.2.0
-   */
-  public setLogLevel(level: AgTLogLevel): AgTLogLevel {
-    if (!this.isValidLogLevel(level)) {
-      throw new AgLoggerError(
-        AG_LOGGER_ERROR_CATEGORIES.INVALID_LOG_LEVEL,
-        `Invalid log level: ${level}`,
-      );
-    }
-    return this.loggerMap.get(level) ?? this.defaultLogger;
-  }
-
-  /**
-   * Gets the configured formatter function.
-   * @returns The configured formatter function
-   */
-  public getFormatter(): AgFormatFunction {
-    return this.formatter;
-  }
-
-  /**
-   * Gets the current log level setting.
-   * @returns The current log level
-   */
-  public getLogLevel(): AgTLogLevel {
-    return this.logLevel;
-  }
-
-  /**
-   * Gets the current verbose setting.
-   * @returns The current verbose setting
-   */
-  public getVerbose(): boolean {
-    return this.verbose;
+    return this.loggerMap.get(level) || this.defaultLogger;
   }
 
   /**
    * Validates if the provided log level is valid.
-   * Checks if the log level exists in the AG_LOGLEVEL constants.
+   * Checks if the log level exists in the configured logger map.
    *
    * @param level - The log level to validate
-   * @returns True if the log level is valid (exists in AG_LOGLEVEL), false otherwise
+   * @returns True if the log level is valid (exists in loggerMap), false otherwise
    *
    * @private
    * @internal Used internally for input validation
    */
-  private isValidLogLevel(level: AgLogLevel): boolean {
-    return Object.values(AG_LOGLEVEL).includes(level);
+  private isValidLogLevel(level: AgTLogLevel): boolean {
+    return this.loggerMap.has(level);
   }
 }
