@@ -13,4 +13,4 @@ export type { AgLogMessage } from './AgLogger.types';
 export type { AgTLogLevel, AgTLogLevelLabel } from './LogLevel.types';
 
 // Interface
-export type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from './AgLogger.interface';
+export type { AgFormatFunction, AgLoggerFunction, AgLoggerMap, AgLoggerOptions } from './AgLogger.interface';

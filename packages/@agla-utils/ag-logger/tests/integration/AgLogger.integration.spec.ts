@@ -25,18 +25,34 @@ import { PlainFormat } from '@/plugins/format/PlainFormat';
 // ロガープラグイン
 import { ConsoleLogger } from '@/plugins/logger/ConsoleLogger';
 
+// type definitions
+type TCircularDependency = {
+  name: string;
+  data: string;
+  // circular reference
+  self?: TCircularDependency;
+  ref?: TCircularDependency;
+  // nested level
+  level1?: TCircularDependency;
+  level2?: TCircularDependency;
+  level3?: TCircularDependency;
+  // circular property
+  circular?: TCircularDependency;
+};
+
 /**
  * AgLoggerコンポーネントの包括的統合テストスイート
  *
- * @description AgLoggerエコシステム全体の統合動作を検証
- * コンポーネント間連携、設定管理、プラグイン統合、エラー処理を包括的にテスト
+ * @description AgLoggerエコシステム全体の統合動作を機能・目的別にカテゴリー分けし、
+ * 各カテゴリー内で正常系・異常系・エッジケースに分類して検証
  *
  * @testType Integration Test
  * @testTarget AgLogger + AgLoggerManager + Plugins
- * @coverage
- * - 正常系: 基本統合、プラグイン組み合わせ、設定管理
- * - 異常系: エラー処理、システム安定性、復旧機能
- * - エッジケース: 複合設定、状態遷移、境界条件
+ * @structure
+ * - 機能別カテゴリー
+ *   - 正常系: 基本的な統合動作確認
+ *   - 異常系: エラー処理、システム安定性、復旧機能
+ *   - エッジケース: 複合設定、状態遷移、境界条件
  */
 describe('AgLogger Integration Tests', () => {
   const setupTestContext = (): void => {
@@ -46,17 +62,15 @@ describe('AgLogger Integration Tests', () => {
   };
 
   /**
-   * 正常系テスト: 基本統合機能
+   * シングルトン統合管理機能
    *
-   * @description コンポーネント間の基本的な連携動作を検証
+   * @description シングルトンパターンによる統合システム管理のテスト
    */
-  describe('正常系: Basic Integration', () => {
+  describe('Singleton Integration Management', () => {
     /**
-     * シングルトン統合のテスト
-     *
-     * @description シングルトンパターンの統合動作を検証
+     * 正常系: 基本的なシングルトン統合
      */
-    describe('Singleton Integration', () => {
+    describe('正常系: Basic Singleton Integration', () => {
       it('should maintain singleton consistency across all entry points', () => {
         setupTestContext();
 
@@ -96,11 +110,54 @@ describe('AgLogger Integration Tests', () => {
     });
 
     /**
-     * プラグイン統合のテスト
-     *
-     * @description 各種プラグインの組み合わせ統合を検証
+     * 異常系: シングルトン統合エラー処理
      */
-    describe('Plugin Integration', () => {
+    describe('異常系: Singleton Integration Error Handling', () => {
+      it('should maintain singleton integrity during errors', () => {
+        setupTestContext();
+
+        const logger1 = getLogger();
+
+        // エラーを引き起こす設定
+        const throwingFormatter = vi.fn(() => {
+          throw new Error('Formatter error');
+        });
+
+        expect(() => logger1.setManager({ formatter: throwingFormatter })).not.toThrow();
+
+        const logger2 = getLogger();
+        // 同じインスタンスであることを確認
+        expect(logger1).toBe(logger2);
+      });
+    });
+
+    /**
+     * エッジケース: 複雑なシングルトン統合パターン
+     */
+    describe('エッジケース: Complex Singleton Integration Patterns', () => {
+      it('should handle rapid singleton access patterns', () => {
+        setupTestContext();
+
+        const loggers = Array.from({ length: 100 }, () => getLogger());
+
+        // 全て同じインスタンスであることを確認
+        loggers.forEach((logger) => {
+          expect(logger).toBe(loggers[0]);
+        });
+      });
+    });
+  });
+
+  /**
+   * プラグイン統合機能
+   *
+   * @description フォーマッターとロガープラグインの統合動作のテスト
+   */
+  describe('Plugin Integration Functionality', () => {
+    /**
+     * 正常系: 基本的なプラグイン統合
+     */
+    describe('正常系: Basic Plugin Integration', () => {
       it('should integrate logger and formatter plugins correctly', () => {
         setupTestContext();
 
@@ -160,11 +217,85 @@ describe('AgLogger Integration Tests', () => {
     });
 
     /**
-     * 複合設定統合のテスト
-     *
-     * @description 複雑な設定組み合わせの統合を検証
+     * 異常系: プラグイン統合エラー処理
      */
-    describe('Complex Configuration Integration', () => {
+    describe('異常系: Plugin Integration Error Handling', () => {
+      it('should handle plugin errors gracefully', () => {
+        setupTestContext();
+
+        // ロガーエラー
+        const throwingLogger = vi.fn().mockImplementation(() => {
+          throw new Error('Logger error');
+        });
+
+        const logger = getLogger({ defaultLogger: throwingLogger, formatter: PlainFormat });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        expect(() => logger.info('test')).toThrow('Logger error');
+
+        // システム復旧
+        const workingLogger = vi.fn();
+        logger.setManager({ defaultLogger: workingLogger });
+
+        expect(() => logger.info('recovery test')).not.toThrow();
+        expect(workingLogger).toHaveBeenCalled();
+      });
+
+      it('should handle formatter errors gracefully', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const throwingFormatter = vi.fn().mockImplementation(() => {
+          throw new Error('Formatter error');
+        });
+
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: throwingFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        expect(() => logger.info('test')).toThrow('Formatter error');
+      });
+    });
+
+    /**
+     * エッジケース: 特殊プラグイン統合パターン
+     */
+    describe('エッジケース: Special Plugin Integration Patterns', () => {
+      it('should handle mixed error scenarios', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const errorLogger = vi.fn().mockImplementation(() => {
+          throw new Error('Error logger failed');
+        });
+
+        const logger = getLogger({
+          defaultLogger: mockLogger,
+          formatter: PlainFormat,
+          loggerMap: {
+            [AG_LOGLEVEL.ERROR]: errorLogger,
+          },
+        });
+
+        logger.setLogLevel(AG_LOGLEVEL.DEBUG);
+
+        // エラーレベルは失敗、他は成功
+        expect(() => logger.error('error')).toThrow('Error logger failed');
+        expect(() => logger.info('info')).not.toThrow();
+        expect(mockLogger).toHaveBeenCalledTimes(1);
+      });
+    });
+  });
+
+  /**
+   * 複合設定統合機能
+   *
+   * @description 複雑な設定組み合わせの統合動作のテスト
+   */
+  describe('Complex Configuration Integration', () => {
+    /**
+     * 正常系: 基本的な複合設定統合
+     */
+    describe('正常系: Basic Complex Configuration Integration', () => {
       it('should handle partial logger maps with mixed configurations', () => {
         setupTestContext();
 
@@ -214,20 +345,79 @@ describe('AgLogger Integration Tests', () => {
         expect(finalLogger).toHaveBeenCalledWith('final format');
       });
     });
+
+    /**
+     * 異常系: 複合設定エラー処理
+     */
+    describe('異常系: Complex Configuration Error Handling', () => {
+      it('should handle configuration conflicts gracefully', () => {
+        setupTestContext();
+
+        const logger = getLogger();
+        const conflictingFormatter1 = vi.fn().mockReturnValue('format1');
+        const conflictingFormatter2 = vi.fn(() => {
+          throw new Error('Formatter conflict');
+        });
+
+        // 最初の設定は成功
+        logger.setManager({ formatter: conflictingFormatter1 });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        expect(() => logger.info('test1')).not.toThrow();
+
+        // 競合する設定でエラー
+        logger.setManager({ formatter: conflictingFormatter2 });
+
+        expect(() => logger.info('test2')).toThrow('Formatter conflict');
+      });
+    });
+
+    /**
+     * エッジケース: 複雑な設定統合パターン
+     */
+    describe('エッジケース: Complex Configuration Integration Patterns', () => {
+      it('should handle rapid configuration changes during logging', () => {
+        setupTestContext();
+
+        const mockLogger1 = vi.fn();
+        const mockLogger2 = vi.fn();
+        const mockFormatter1 = vi.fn().mockReturnValue('format1');
+        const mockFormatter2 = vi.fn().mockReturnValue('format2');
+
+        const logger = getLogger({ defaultLogger: mockLogger1, formatter: mockFormatter1 });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        // ログ出力と設定変更を交互に実行
+        for (let i = 0; i < 100; i++) {
+          logger.info(`Rapid config test ${i}`);
+
+          if (i % 10 === 0) {
+            // 10回ごとに設定変更
+            const useFirst = i % 20 === 0;
+            logger.setManager({
+              defaultLogger: useFirst ? mockLogger1 : mockLogger2,
+              formatter: useFirst ? mockFormatter1 : mockFormatter2,
+            });
+          }
+        }
+
+        // 両方のロガーが使用されたことを確認
+        expect(mockLogger1.mock.calls.length + mockLogger2.mock.calls.length).toBe(100);
+        expect(mockFormatter1.mock.calls.length + mockFormatter2.mock.calls.length).toBe(100);
+      });
+    });
   });
 
   /**
-   * 正常系テスト: 高度な機能統合
+   * ログレベルフィルタリング統合機能
    *
-   * @description 高度な機能の統合動作を検証
+   * @description 全コンポーネントでのフィルタリング一貫性のテスト
    */
-  describe('Advanced Feature Integration', () => {
+  describe('Log Level Filtering Integration', () => {
     /**
-     * ログレベルフィルタリング統合のテスト
-     *
-     * @description 全コンポーネントでのフィルタリング一貫性を検証
+     * 正常系: 基本的なフィルタリング統合
      */
-    describe('Log Level Filtering Integration', () => {
+    describe('正常系: Basic Filtering Integration', () => {
       it('should apply filtering consistently across all components', () => {
         setupTestContext();
 
@@ -281,11 +471,66 @@ describe('AgLogger Integration Tests', () => {
     });
 
     /**
-     * Verbose機能統合のテスト
-     *
-     * @description verbose機能の統合動作を検証
+     * 異常系: フィルタリングエラー処理
      */
-    describe('Verbose Mode Integration', () => {
+    describe('異常系: Filtering Error Handling', () => {
+      it('should maintain filtering integrity during formatter errors', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const throwingFormatter = vi.fn(() => {
+          throw new Error('Formatter error');
+        });
+
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: throwingFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.WARN);
+
+        // エラーが発生してもフィルタリングは機能する
+        expect(() => logger.error('should process')).toThrow('Formatter error');
+        expect(() => logger.debug('should be filtered')).not.toThrow(); // フィルタリングされるのでformatterは呼ばれない
+
+        expect(throwingFormatter).toHaveBeenCalledTimes(1); // errorのみ
+      });
+    });
+
+    /**
+     * エッジケース: 動的フィルタリングパターン
+     */
+    describe('エッジケース: Dynamic Filtering Patterns', () => {
+      it('should handle dynamic level changes during logging', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
+
+        const levels = [AG_LOGLEVEL.ERROR, AG_LOGLEVEL.WARN, AG_LOGLEVEL.INFO, AG_LOGLEVEL.DEBUG];
+
+        levels.forEach((level, index) => {
+          logger.setLogLevel(level);
+
+          // 各レベルで複数ログを出力
+          logger.error(`error ${index}`);
+          logger.warn(`warn ${index}`);
+          logger.info(`info ${index}`);
+          logger.debug(`debug ${index}`);
+        });
+
+        // 期待される呼び出し回数: ERROR(4) + WARN(3) + INFO(2) + DEBUG(1) = 10
+        expect(mockLogger).toHaveBeenCalledTimes(10);
+      });
+    });
+  });
+
+  /**
+   * Verbose機能統合
+   *
+   * @description verbose機能の統合動作のテスト
+   */
+  describe('Verbose Functionality Integration', () => {
+    /**
+     * 正常系: 基本的なverbose統合
+     */
+    describe('正常系: Basic Verbose Integration', () => {
       it('should integrate verbose mode with full logging pipeline', () => {
         setupTestContext();
 
@@ -321,172 +566,462 @@ describe('AgLogger Integration Tests', () => {
         expect(logger1.setVerbose()).toBe(true);
       });
     });
-  });
 
-  /**
-   * 異常系テスト: エラー処理と復旧
-   *
-   * @description エラー状況でのシステム動作を検証
-   */
-  describe('異常系: Error Handling and Recovery', () => {
-    it('should handle component errors gracefully', () => {
-      setupTestContext();
+    /**
+     * 異常系: verbose統合エラー処理
+     */
+    describe('異常系: Verbose Integration Error Handling', () => {
+      it('should handle verbose with failing formatter', () => {
+        setupTestContext();
 
-      // ロガーエラー
-      const throwingLogger = vi.fn().mockImplementation(() => {
-        throw new Error('Logger error');
-      });
-
-      const logger = getLogger({ defaultLogger: throwingLogger, formatter: PlainFormat });
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
-
-      expect(() => logger.info('test')).toThrow('Logger error');
-
-      // システム復旧
-      const workingLogger = vi.fn();
-      logger.setManager({ defaultLogger: workingLogger });
-
-      expect(() => logger.info('recovery test')).not.toThrow();
-      expect(workingLogger).toHaveBeenCalled();
-    });
-
-    it('should handle formatter errors gracefully', () => {
-      setupTestContext();
-
-      const mockLogger = vi.fn();
-      const throwingFormatter = vi.fn().mockImplementation(() => {
-        throw new Error('Formatter error');
-      });
-
-      const logger = getLogger({ defaultLogger: mockLogger, formatter: throwingFormatter });
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
-
-      expect(() => logger.info('test')).toThrow('Formatter error');
-    });
-
-    it('should handle mixed error scenarios', () => {
-      setupTestContext();
-
-      const mockLogger = vi.fn();
-      const errorLogger = vi.fn().mockImplementation(() => {
-        throw new Error('Error logger failed');
-      });
-
-      const logger = getLogger({
-        defaultLogger: mockLogger,
-        formatter: PlainFormat,
-        loggerMap: {
-          [AG_LOGLEVEL.ERROR]: errorLogger,
-        },
-      });
-
-      logger.setLogLevel(AG_LOGLEVEL.DEBUG);
-
-      // エラーレベルは失敗、他は成功
-      expect(() => logger.error('error')).toThrow('Error logger failed');
-      expect(() => logger.info('info')).not.toThrow();
-      expect(mockLogger).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  /**
-   * エッジケース: 複雑な統合シナリオ
-   *
-   * @description 複雑で特殊な統合シナリオを検証
-   */
-  describe('エッジケース: Complex Integration Scenarios', () => {
-    it('should handle rapid configuration changes', () => {
-      setupTestContext();
-
-      const loggers = [vi.fn(), vi.fn(), vi.fn()];
-      const formatters = [vi.fn().mockReturnValue('fmt1'), vi.fn().mockReturnValue('fmt2')];
-
-      const logger = getLogger();
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
-
-      // 高速な設定変更
-      for (let i = 0; i < 100; i++) {
-        logger.setManager({
-          defaultLogger: loggers[i % loggers.length],
-          formatter: formatters[i % formatters.length],
+        const mockLogger = vi.fn();
+        const throwingFormatter = vi.fn(() => {
+          throw new Error('Verbose formatter error');
         });
-      }
 
-      // 最終状態での動作確認
-      logger.info('final test');
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: throwingFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+        logger.setVerbose(true);
 
-      const finalLogger = loggers[99 % loggers.length];
-      const finalFormatter = formatters[99 % formatters.length];
-
-      expect(finalLogger).toHaveBeenCalled();
-      expect(finalFormatter).toHaveBeenCalled();
+        expect(() => logger.verbose('test')).toThrow('Verbose formatter error');
+      });
     });
 
-    it('should handle concurrent access patterns', () => {
-      setupTestContext();
+    /**
+     * エッジケース: verbose特殊統合パターン
+     */
+    describe('エッジケース: Verbose Special Integration Patterns', () => {
+      it('should handle rapid verbose state changes', () => {
+        setupTestContext();
 
-      const mockLogger = vi.fn();
-      const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
+        const mockLogger = vi.fn();
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
 
-      // 同時実行パターンのシミュレーション
-      const operations = [
-        () => logger.info('concurrent info'),
-        () => logger.setLogLevel(AG_LOGLEVEL.DEBUG),
-        () => logger.debug('concurrent debug'),
-        () => logger.setVerbose(true),
-        () => logger.verbose('concurrent verbose'),
-        () => logger.setManager({ defaultLogger: mockLogger }),
-      ];
+        for (let i = 0; i < 100; i++) {
+          logger.setVerbose(i % 2 === 0);
+          logger.verbose(`verbose ${i}`);
+        }
 
-      // 全操作を実行
-      operations.forEach((op) => op());
-
-      expect(mockLogger).toHaveBeenCalledTimes(3); // info, debug, verbose
+        expect(mockLogger).toHaveBeenCalledTimes(50); // verbose がtrueの時のみ
+      });
     });
+  });
 
-    it('should maintain data integrity under stress', () => {
-      setupTestContext();
+  /**
+   * 特殊データ処理統合機能
+   *
+   * @description 循環参照オブジェクトなど特殊データの統合処理のテスト
+   */
+  describe('Special Data Processing Integration', () => {
+    /**
+     * 正常系: 基本的な特殊データ処理
+     */
+    describe('正常系: Basic Special Data Processing', () => {
+      it('should handle circular references with graceful degradation', () => {
+        setupTestContext();
 
-      const mockLogger = vi.fn();
-      const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
+        const mockLogger = vi.fn();
+        const mockFormatter = vi.fn().mockImplementation((logMessage) => {
+          // フォーマッターで循環参照を処理するシナリオ
+          try {
+            return JSON.stringify(logMessage);
+          } catch (error) {
+            return `[Circular Reference Error: ${error instanceof Error ? error.message : String(error)}]`;
+          }
+        });
 
-      // 大量のログ出力
-      for (let i = 0; i < 1000; i++) {
-        logger.info(`stress test ${i}`);
-      }
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
 
-      expect(mockLogger).toHaveBeenCalledTimes(1000);
+        // 循環参照オブジェクトを作成
+        const circularObj: Record<string, unknown> = { name: 'test' };
+        circularObj.self = circularObj;
 
-      // 状態の整合性確認
-      expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.INFO);
-      expect(logger.setVerbose()).toBe(false);
-    });
-
-    it('should handle undefined/null arguments across full pipeline', () => {
-      setupTestContext();
-
-      const mockLogger = vi.fn();
-      const mockFormatter = vi.fn().mockReturnValue('formatted null/undefined');
-
-      const logger = getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
-
-      const testCases = [
-        [undefined],
-        [null],
-        ['message', undefined, null],
-        [null, undefined, 'mixed'],
-        [],
-      ];
-
-      testCases.forEach((args) => {
-        expect(() => logger.info(...(args as [string?, ...unknown[]]))).not.toThrow();
+        // システムがクラッシュしないことを確認
+        expect(() => logger.info('Circular test', circularObj)).not.toThrow();
+        expect(mockLogger).toHaveBeenCalledTimes(1);
+        expect(mockFormatter).toHaveBeenCalledTimes(1);
       });
 
-      expect(mockLogger).toHaveBeenCalledTimes(testCases.length);
-      expect(mockFormatter).toHaveBeenCalledTimes(testCases.length);
+      it('should provide meaningful error messages for circular references', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        let capturedError: string | null = null;
+
+        const errorHandlingFormatter = vi.fn().mockImplementation((logMessage) => {
+          try {
+            return JSON.stringify(logMessage);
+          } catch (error) {
+            capturedError = error instanceof Error ? error.message : String(error);
+            return `[Circular Reference: ${logMessage.level ?? 'UNKNOWN'}] ${logMessage.message ?? 'No message'}`;
+          }
+        });
+
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: errorHandlingFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        const circularObj: Record<string, unknown> = { data: 'test' };
+        circularObj.circular = circularObj;
+
+        logger.info('Testing circular reference handling', circularObj);
+
+        expect(capturedError).toBeTruthy();
+        expect(capturedError).toContain('circular');
+        expect(mockLogger).toHaveBeenCalledTimes(1);
+        const [logOutput] = mockLogger.mock.calls[0];
+        expect(logOutput).toContain('[Circular Reference:');
+        expect(logOutput).toContain('Testing circular reference handling');
+      });
+    });
+
+    /**
+     * 異常系: 特殊データ処理エラー処理
+     */
+    describe('異常系: Special Data Processing Error Handling', () => {
+      it('should maintain logger functionality after circular reference errors', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const resilientFormatter = vi.fn().mockImplementation((logMessage) => {
+          try {
+            // 意図的に循環参照でJSON.stringifyを失敗させる
+            const result = JSON.stringify(logMessage);
+            return result;
+          } catch {
+            // フォールバック処理
+            return `${logMessage.timestamp ?? new Date().toISOString()} [${logMessage.level ?? 'UNKNOWN'}] ${
+              logMessage.message ?? ''
+            }`;
+          }
+        });
+
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: resilientFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        const circularObj: Record<string, unknown> = { name: 'circular' };
+        circularObj.ref = circularObj;
+
+        // 循環参照エラー後も機能することを確認
+        logger.info('First log with circular reference', circularObj);
+        logger.info('Second normal log', { normal: 'data' });
+        logger.warn('Third log after error');
+
+        expect(mockLogger).toHaveBeenCalledTimes(3);
+        expect(resilientFormatter).toHaveBeenCalledTimes(3);
+
+        // 最初のログはフォールバックフォーマットであることを確認
+        const [firstLog] = mockLogger.mock.calls[0];
+        expect(firstLog).toContain('First log with circular reference');
+
+        // 2番目と３番目のログが正常処理されることを確認
+        expect(mockLogger.mock.calls[1]).toBeDefined();
+        expect(mockLogger.mock.calls[2]).toBeDefined();
+      });
+    });
+
+    /**
+     * エッジケース: 複雑な特殊データ処理パターン
+     */
+    describe('エッジケース: Complex Special Data Processing Patterns', () => {
+      it('should handle nested circular references correctly', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const safeFormatter = vi.fn().mockImplementation((logMessage) => {
+          // 安全なフォーマッターの実装
+          const safeStringify = (obj: unknown, depth = 0): string => {
+            if (depth > 3) { return '[Max Depth Reached]'; }
+            if (obj === null) { return 'null'; }
+            if (typeof obj !== 'object') { return String(obj); }
+
+            try {
+              const seen = new WeakSet();
+              return JSON.stringify(obj, (key, value) => {
+                if (typeof value === 'object' && value !== null) {
+                  if (seen.has(value)) { return '[Circular]'; }
+                  seen.add(value);
+                }
+                return value;
+              });
+            } catch {
+              return '[Stringify Error]';
+            }
+          };
+
+          return `${logMessage.timestamp} [${logMessage.level}] ${logMessage.message} ${
+            safeStringify(logMessage.args)
+          }`;
+        });
+
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: safeFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        // 深いネストの循環参照オブジェクト
+        const deepCircular: TCircularDependency = {
+          name: 'deep',
+          data: 'deep',
+          level1: {
+            name: 'level1',
+            data: 'level1',
+            level2: {
+              name: 'level2',
+              data: 'level2',
+              level3: {
+                name: 'level3',
+                data: 'deep',
+              },
+            },
+          },
+        };
+        deepCircular.level1!.level2!.level3!.circular = deepCircular;
+
+        expect(() => logger.info('Deep circular reference test', deepCircular)).not.toThrow();
+        expect(mockLogger).toHaveBeenCalledTimes(1);
+
+        const [logOutput] = mockLogger.mock.calls[0];
+        expect(logOutput).toContain('Deep circular reference test');
+        expect(logOutput).toContain('[Circular]');
+      });
+
+      it('should handle circular references in different argument positions', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        // 循環参照に対して強いフォーマッターを使用
+        const circularSafeFormatter = vi.fn().mockImplementation((logMessage) => {
+          try {
+            // WeakSetを使用した安全なJSONシリアライゼーション
+            const seen = new WeakSet();
+            const safeObj = JSON.stringify(logMessage, (key, value) => {
+              if (typeof value === 'object' && value !== null) {
+                if (seen.has(value)) { return '[Circular]'; }
+                seen.add(value);
+              }
+              return value;
+            });
+            return safeObj;
+          } catch {
+            return `Safe fallback: ${logMessage.message ?? 'circular data'}`;
+          }
+        });
+
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: circularSafeFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        const circular1: Record<string, unknown> = { id: 1 };
+        const circular2: Record<string, unknown> = { id: 2 };
+        circular1.ref = circular2;
+        circular2.ref = circular1;
+
+        // 異なる位置の循環参照をテスト
+        expect(() => logger.info(circular1, 'middle message', circular2)).not.toThrow();
+        expect(() => logger.info('First', circular1, 'Second', circular2, 'Third')).not.toThrow();
+
+        expect(mockLogger).toHaveBeenCalledTimes(2);
+        expect(circularSafeFormatter).toHaveBeenCalledTimes(2);
+      });
+    });
+  });
+
+  /**
+   * パフォーマンス統合機能
+   *
+   * @description 高負荷時の統合システム動作のテスト
+   */
+  describe('Performance Integration', () => {
+    /**
+     * 正常系: 基本的なパフォーマンス統合
+     */
+    describe('正常系: Basic Performance Integration', () => {
+      it('should handle high-frequency logging without memory leaks', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        const startMemory = process.memoryUsage().heapUsed;
+        const logCount = 10000;
+
+        // 大量ログ出力
+        for (let i = 0; i < logCount; i++) {
+          logger.info(`High frequency log ${i}`, { iteration: i, data: 'test'.repeat(10) });
+        }
+
+        expect(mockLogger).toHaveBeenCalledTimes(logCount);
+
+        // メモリ使用量の確認（簡易チェック）
+        const endMemory = process.memoryUsage().heapUsed;
+        const memoryIncrease = endMemory - startMemory;
+
+        // メモリ増加が過度でないことを確認（10MB以下）
+        expect(memoryIncrease).toBeLessThan(10 * 1024 * 1024);
+      });
+
+      it('should maintain consistent performance under load', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: JsonFormat });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        const batchSize = 1000;
+        const batchCount = 5;
+        const performanceMeasurements: number[] = [];
+
+        // 複数バッチでパフォーマンス測定
+        for (let batch = 0; batch < batchCount; batch++) {
+          const startTime = Date.now();
+
+          for (let i = 0; i < batchSize; i++) {
+            logger.info(`Batch ${batch} Log ${i}`, {
+              batch,
+              iteration: i,
+              timestamp: Date.now(),
+              data: { nested: { value: i * batch } },
+            });
+          }
+
+          const endTime = Date.now();
+          performanceMeasurements.push(endTime - startTime);
+        }
+
+        expect(mockLogger).toHaveBeenCalledTimes(batchSize * batchCount);
+
+        // パフォーマンスの一貫性を確認（最初と最後のバッチの差が2倍以内）
+        const firstBatchTime = performanceMeasurements[0];
+        const lastBatchTime = performanceMeasurements[performanceMeasurements.length - 1];
+
+        expect(lastBatchTime).toBeLessThan(firstBatchTime * 2);
+      });
+    });
+
+    /**
+     * 異常系: パフォーマンス統合エラー処理
+     */
+    describe('異常系: Performance Integration Error Handling', () => {
+      it('should maintain performance during error conditions', () => {
+        setupTestContext();
+
+        const errorLogger = vi.fn(() => {
+          throw new Error('Intermittent error');
+        });
+        const normalLogger = vi.fn();
+
+        const logger = getLogger({
+          defaultLogger: normalLogger,
+          formatter: PlainFormat,
+          loggerMap: {
+            [AG_LOGLEVEL.ERROR]: errorLogger,
+          },
+        });
+
+        logger.setLogLevel(AG_LOGLEVEL.DEBUG);
+
+        const startTime = Date.now();
+
+        // エラーが発生する条件下でのパフォーマンステスト
+        for (let i = 0; i < 1000; i++) {
+          try {
+            if (i % 10 === 0) {
+              logger.error(`Error log ${i}`); // エラーが発生
+            } else {
+              logger.info(`Normal log ${i}`); // 正常処理
+            }
+          } catch {
+            // エラーは無視して続行
+          }
+        }
+
+        const endTime = Date.now();
+        const totalTime = endTime - startTime;
+
+        // エラーがあってもパフォーマンスが著しく劣化しないことを確認
+        expect(totalTime).toBeLessThan(1000); // 1秒以内
+        expect(normalLogger).toHaveBeenCalledTimes(900); // エラー以外の呼び出し
+      });
+    });
+
+    /**
+     * エッジケース: 特殊パフォーマンス統合パターン
+     */
+    describe('エッジケース: Special Performance Integration Patterns', () => {
+      it('should handle concurrent logging from multiple sources', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        const concurrentSources = 10;
+        const logsPerSource = 100;
+
+        // 複数ソースからの同時ログ出力をシミュレート
+        const promises = Array.from({ length: concurrentSources }, (_, sourceId) =>
+          Promise.resolve().then(() => {
+            for (let i = 0; i < logsPerSource; i++) {
+              logger.info(`Source ${sourceId} Log ${i}`, {
+                sourceId,
+                logId: i,
+                timestamp: Date.now(),
+              });
+            }
+          }));
+
+        return Promise.all(promises).then(() => {
+          expect(mockLogger).toHaveBeenCalledTimes(concurrentSources * logsPerSource);
+
+          // 全てのログが適切にフォーマットされていることを確認
+          mockLogger.mock.calls.forEach(([logOutput]) => {
+            expect(logOutput).toMatch(/Source \d+ Log \d+/);
+          });
+        });
+      });
+
+      it('should handle stress test with mixed log levels and complex data', () => {
+        setupTestContext();
+
+        const mockLogger = vi.fn();
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: JsonFormat });
+        logger.setLogLevel(AG_LOGLEVEL.TRACE);
+
+        const logMethods = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const;
+        const complexData = {
+          user: { id: 123, name: 'Test User', roles: ['admin', 'user'] },
+          request: { method: 'POST', url: '/api/test', headers: { 'content-type': 'application/json' } },
+          response: { status: 200, data: { success: true, items: Array(50).fill({ id: 1, name: 'item' }) } },
+          metadata: { timestamp: Date.now(), version: '1.0.0', environment: 'test' },
+        };
+
+        const stressCount = 1000;
+        const startTime = Date.now();
+
+        for (let i = 0; i < stressCount; i++) {
+          const method = logMethods[i % logMethods.length];
+          const logData = { ...complexData, iteration: i, randomValue: Math.random() };
+
+          (logger[method] as (msg: string, data?: unknown) => void)(
+            `Stress test log ${i} - ${method}`,
+            logData,
+          );
+        }
+
+        const endTime = Date.now();
+        const totalTime = endTime - startTime;
+
+        expect(mockLogger).toHaveBeenCalledTimes(stressCount);
+        // 1秒以内に完了することを確認（パフォーマンス要件）
+        expect(totalTime).toBeLessThan(1000);
+
+        // ランダムサンプリングでログ品質確認
+        const sampleCalls = [0, Math.floor(stressCount / 2), stressCount - 1];
+        sampleCalls.forEach((index) => {
+          const [logOutput] = mockLogger.mock.calls[index];
+          expect(() => JSON.parse(logOutput)).not.toThrow();
+        });
+      });
     });
   });
 });
