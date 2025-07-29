@@ -73,7 +73,7 @@ export class AgLoggerConfig {
    * Map of log levels to their corresponding logger functions.
    * Initialized with all levels mapped to NullLogger.
    */
-  private readonly _loggerMap: Map<AgLogLevel, AgLoggerFunction>;
+  private readonly _loggerMap: Partial<AgLoggerMap<AgLoggerFunction>>;
 
   /**
    * Creates a new AgLoggerConfig instance with default settings.
@@ -94,26 +94,26 @@ export class AgLoggerConfig {
   /**
    * Creates a default logger map with all log levels mapped to the current defaultLogger.
    * This ensures consistent behavior where loggerMap reflects the defaultLogger unless explicitly overridden.
-   * @returns Map containing all log levels mapped to current defaultLogger
+   * @returns Record containing all log levels mapped to current defaultLogger
    */
-  private createDefaultLoggerMap(): Map<AgLogLevel, AgLoggerFunction> {
-    const map = new Map<AgLogLevel, AgLoggerFunction>();
-    map.set(AG_LOGLEVEL.OFF, this._defaultLogger);
-    map.set(AG_LOGLEVEL.FATAL, this._defaultLogger);
-    map.set(AG_LOGLEVEL.ERROR, this._defaultLogger);
-    map.set(AG_LOGLEVEL.WARN, this._defaultLogger);
-    map.set(AG_LOGLEVEL.INFO, this._defaultLogger);
-    map.set(AG_LOGLEVEL.DEBUG, this._defaultLogger);
-    map.set(AG_LOGLEVEL.TRACE, this._defaultLogger);
-    return map;
+  private createDefaultLoggerMap(): Partial<AgLoggerMap<AgLoggerFunction>> {
+    return {
+      [AG_LOGLEVEL.OFF]: this._defaultLogger,
+      [AG_LOGLEVEL.FATAL]: this._defaultLogger,
+      [AG_LOGLEVEL.ERROR]: this._defaultLogger,
+      [AG_LOGLEVEL.WARN]: this._defaultLogger,
+      [AG_LOGLEVEL.INFO]: this._defaultLogger,
+      [AG_LOGLEVEL.DEBUG]: this._defaultLogger,
+      [AG_LOGLEVEL.TRACE]: this._defaultLogger,
+    };
   }
 
   /**
    * Gets a copy of the current logger map.
-   * @returns Map of log levels to logger functions
+   * @returns Record of log levels to logger functions
    */
-  public getLoggerMap(): Map<AgLogLevel, AgLoggerFunction> {
-    return new Map(this._loggerMap);
+  public getLoggerMap(): Partial<AgLoggerMap<AgLoggerFunction>> {
+    return { ...this._loggerMap };
   }
 
   /**
@@ -133,7 +133,7 @@ export class AgLoggerConfig {
    */
   public getLoggerFunction(level: AgLogLevel): AgLoggerFunction {
     this.validateLogLevel(level);
-    return this._loggerMap.get(level) ?? this._defaultLogger;
+    return this._loggerMap[level] ?? this._defaultLogger;
   }
 
   /**
@@ -360,7 +360,7 @@ export class AgLoggerConfig {
   private initializeLoggerMapWithDefault(): void {
     Object.values(AG_LOGLEVEL).forEach((level) => {
       if (typeof level === 'number') {
-        this._loggerMap.set(level as AgLogLevel, this._defaultLogger);
+        this._loggerMap[level as AgLogLevel] = this._defaultLogger;
       }
     });
   }
@@ -377,7 +377,7 @@ export class AgLoggerConfig {
       const level = Number.parseInt(key, AgLoggerConfig.DECIMAL_RADIX) as AgLogLevel;
       const logger = loggerMap[level];
       if (logger !== undefined && logger !== null) {
-        this._loggerMap.set(level, logger);
+        this._loggerMap[level] = logger;
       }
     });
   }
@@ -393,7 +393,7 @@ export class AgLoggerConfig {
    */
   setLogger(level: AgLogLevel, logger: AgLoggerFunction): void {
     this.validateLogLevel(level);
-    this._loggerMap.set(level, logger);
+    this._loggerMap[level] = logger;
   }
 
   /**
@@ -424,6 +424,38 @@ export class AgLoggerConfig {
    * @internal Used internally for input validation
    */
   private isValidLogLevel(level: AgLogLevel): boolean {
-    return this._loggerMap.has(level);
+    return level in this._loggerMap;
+  }
+
+  /**
+   * Returns the current logger configuration settings as a defensive copy.
+   *
+   * This method provides access to all current configuration settings
+   * while ensuring external code cannot modify the internal state.
+   * The returned object is a defensive copy of the current configuration.
+   *
+   * @returns A copy of the current configuration settings
+   *
+   * @example
+   * ```typescript
+   * const config = new AgLoggerConfig();
+   * config.setLogLevel(AG_LOGLEVEL.INFO);
+   * config.setVerbose(true);
+   *
+   * const settings = config.getCurrentSettings();
+   * console.log(settings.logLevel);  // AG_LOGLEVEL.INFO
+   * console.log(settings.verbose);   // true
+   * ```
+   *
+   * @since 0.2.0
+   */
+  public getCurrentSettings(): AgLoggerOptions {
+    return {
+      defaultLogger: this._defaultLogger,
+      formatter: this._formatter,
+      loggerMap: this._loggerMap,
+      logLevel: this._logLevel,
+      verbose: this._verbose,
+    };
   }
 }

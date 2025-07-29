@@ -12,8 +12,6 @@ import type { AgLogLevel } from '../shared/types';
 // interfaces
 import type { AgLoggerOptions } from '../shared/types/AgLogger.interface';
 
-// core
-import { AgLoggerManager } from './AgLoggerManager.class';
 // internal
 import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 // plugins
@@ -28,12 +26,10 @@ import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
  */
 export class AgLogger {
   private static _instance: AgLogger | undefined;
-  private _loggerManager: AgLoggerManager;
   private _config: AgLoggerConfig;
   private _verbose: boolean = false;
 
   private constructor() {
-    this._loggerManager = AgLoggerManager.getManager();
     this._config = new AgLoggerConfig();
   }
 
@@ -99,6 +95,16 @@ export class AgLogger {
   }
 
   /**
+   * Returns the current logger configuration settings.
+   * Returns a defensive copy of the current configuration to prevent external modification.
+   *
+   * @returns A copy of the current configuration settings
+   */
+  getCurrentSettings(): AgLoggerOptions {
+    return this._config.getCurrentSettings();
+  }
+
+  /**
    * Unified log execution method that delegates all logging operations to AgLoggerConfig.
    *
    * This method implements the core logging pipeline using AgLoggerConfig for all operations:
@@ -134,7 +140,7 @@ export class AgLogger {
   }
 
   /**
-   * Configures the logger manager with the specified options.
+   * Configures the logger with the specified options.
    * If ConsoleLogger is specified without a logger map,
    * ConsoleLoggerMap will be automatically applied.
    *
@@ -146,8 +152,7 @@ export class AgLogger {
       enhancedOptions.loggerMap = ConsoleLoggerMap;
     }
 
-    // Configure both the legacy manager and the new config for backwards compatibility
-    this._loggerManager.setManager(enhancedOptions);
+    // Configure the new config only
     this._config.setLoggerConfig(enhancedOptions);
   }
 

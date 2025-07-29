@@ -842,5 +842,34 @@ describe('AgLogger', () => {
         expect(logger.setVerbose()).toBe(true);
       });
     });
+
+    /**
+     * Task 2.3: getCurrentSettings()メソッドの実装
+     */
+    describe('Task 2.3: getCurrentSettings()メソッドの実装', () => {
+      /**
+       * 小タスク2.3.1: getCurrentSettings()メソッドが定義される
+       */
+      it('小タスク2.3.1: getCurrentSettings()メソッドが定義される', () => {
+        const logger = AgLogger.getLogger();
+
+        // getCurrentSettingsメソッドが存在することを確認
+        expect(typeof logger.getCurrentSettings).toBe('function');
+      });
+
+      /**
+       * 小タスク2.3.2: 全設定項目（defaultLogger, formatter, loggerMap, logLevel, verbose）が取得される
+       */
+      it('小タスク2.3.2: 全設定項目が取得される', () => {
+        const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+        logger.setVerbose(true);
+
+        const settings = logger.getCurrentSettings();
+
+        // logLevel設定項目が取得されることを確認
+        expect(settings.logLevel).toBe(AG_LOGLEVEL.INFO);
+      });
+    });
   });
 });

@@ -52,8 +52,6 @@ describe('AgLoggerConfig', () => {
   it('should initialize with NullLogger as default logger', () => {
     const config = new AgLoggerConfig();
     // Test through public interface by checking fallback behavior
-    const loggerMap = config.getLoggerMap();
-    loggerMap.clear();
     expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(NullLogger);
   });
 
@@ -77,13 +75,13 @@ describe('AgLoggerConfig', () => {
     const loggerMap = config.getLoggerMap();
 
     // Test that all log levels are mapped to NullLogger
-    expect(loggerMap.get(AG_LOGLEVEL.OFF)).toBe(NullLogger);
-    expect(loggerMap.get(AG_LOGLEVEL.FATAL)).toBe(NullLogger);
-    expect(loggerMap.get(AG_LOGLEVEL.ERROR)).toBe(NullLogger);
-    expect(loggerMap.get(AG_LOGLEVEL.WARN)).toBe(NullLogger);
-    expect(loggerMap.get(AG_LOGLEVEL.INFO)).toBe(NullLogger);
-    expect(loggerMap.get(AG_LOGLEVEL.DEBUG)).toBe(NullLogger);
-    expect(loggerMap.get(AG_LOGLEVEL.TRACE)).toBe(NullLogger);
+    expect(loggerMap[AG_LOGLEVEL.OFF]).toBe(NullLogger);
+    expect(loggerMap[AG_LOGLEVEL.FATAL]).toBe(NullLogger);
+    expect(loggerMap[AG_LOGLEVEL.ERROR]).toBe(NullLogger);
+    expect(loggerMap[AG_LOGLEVEL.WARN]).toBe(NullLogger);
+    expect(loggerMap[AG_LOGLEVEL.INFO]).toBe(NullLogger);
+    expect(loggerMap[AG_LOGLEVEL.DEBUG]).toBe(NullLogger);
+    expect(loggerMap[AG_LOGLEVEL.TRACE]).toBe(NullLogger);
   });
 
   it('should return logger function for specified log level', () => {
@@ -288,8 +286,6 @@ describe('AgLoggerConfig', () => {
     config.setLoggerConfig(options);
 
     // Verify defaultLogger was applied by checking fallback behavior
-    const loggerMap = config.getLoggerMap();
-    loggerMap.clear();
     expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(testLogger);
   });
 
