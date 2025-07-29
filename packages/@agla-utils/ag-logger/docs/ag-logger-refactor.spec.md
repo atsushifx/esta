@@ -6,11 +6,12 @@ title: AgLogger リファクタリング仕様書
 description: AgLoggerアーキテクチャの責任分担を明確化し、SOLID原則に基づいた設計にリファクタリングする仕様書
 version: 1.0.0
 created: 2025-07-27
-updated: 2025-07-27
+updated: 2025-07-29
 authors:
   - atsushifx
 changes:
   - 2025-07-27: 初回作成（SOLID原則に基づく責任分担設計）
+  - 2025-07-29: Phase1-4設計を反映（4段階のリファクタリング計画）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
@@ -42,215 +43,105 @@ AgLoggerアーキテクチャの責任分担を明確化し、SOLID原則に基�
 - 設定とログ出力処理が密結合でテストが複雑
 - モック化が困難
 
-## 目標アーキテクチャ
+## 4段階リファクタリング設計
 
 ### 設計原則
 
 - **Single Responsibility Principle**: 各クラスが単一の責任を持つ
 - **Dependency Inversion**: 具象クラスではなく抽象に依存
 - **Composition over Inheritance**: 継承よりも委譲を優先
+- **既存API互換性**: 破壊的変更なしでリファクタリング実行
 
-### 責任分担
+### Phase 1: AgLoggerConfig作成（内部クラス）
 
-#### AgLoggerConfig（新規・内部クラス）
-
-**責任**: 設定管理と出力制御判定
+**AgLoggerConfig**の責任:
 
 - ログレベル別ロガー関数の管理
 - デフォルトロガー関数の管理
 - フォーマッター管理
 - ログレベル制御
 - Verbose制御
-- 設定値の検証
+- 設定値の検証と出力制御判定
 
-#### AgLogger
+### Phase 2: AgLogger内部リファクタリング
 
-**責任**: ログAPIの提供と実際のログ出力
+**AgLogger**の内部実装変更:
 
-- ログメソッドAPI（`fatal`, `error`, `warn`, `info`, `debug`, `trace`, `log`, `verbose`）
-- シングルトンインスタンス管理
-- AgLoggerConfigを使用した実際のログ出力処理
+- AgLoggerConfigインスタンスの組み込み
+- 全ログメソッドがAgLoggerConfig経由で動作
+- AgLoggerManagerインスタンス依存の完全削除
+- `setAgLoggerOptions()`による統一された設定適用
+- 既存APIの完全な互換性維持
 
-#### AgLoggerManager
+### Phase 3: AgLogger APIリストラクチャ
 
-**責任**: 管理APIの提供
+**API責任の明確化**:
 
-- AgLoggerインスタンスのファクトリメソッド
-- 設定変更の管理API
+- `createLogger(options?)`: 設定付きインスタンス作成専用（既存のgetLogger(options?)から変更）
+- `getLogger()`: インスタンス取得専用（パラメータなし、新規追加）
+- `setLoggerOptions(options)`: 設定適用専用
+- `getVerbose()` / `setVerbose(value)`: 責任分離
+- 既存の`getLogger(options?)`は deprecation warning 付きで`createLogger(options?)`に移行推奨
+
+### Phase 4: AgLoggerManager簡素化
+
+**AgLoggerManager**の新しい責任:
+
+- シングルトンAgLoggerインスタンスの保持・管理
+- `createLogger(options)`: 初期設定付きロガー作成
+- `getLogger()`: 内部保持インスタンス返却
+- 設定適用の仲介役（低レベルAPI活用）
 - 既存APIの互換性維持
 
-## クラス設計詳細
+## 段階的リファクタリングの利点
 
-### AgLoggerConfig
+### Phase 1-2: 内部アーキテクチャ改善
 
-```typescript
-// src/internal/AgLoggerConfig.ts
-// 注意: このクラスは外部にexportしない
-class AgLoggerConfig {
-  private loggerMap: AgLoggerMap<AgLoggerFunction>;
-  private formatter: AgFormatFunction;
-  private defaultLogger: AgLoggerFunction;
-  private logLevel: AgTLogLevel;
-  private verbose: boolean;
+- AgLoggerManagerインスタンス依存削除によるパフォーマンス向上
+- 設定管理の一元化による保守性向上
+- 既存APIの完全互換性維持
 
-  constructor() {
-    this.defaultLogger = NullLogger;
-    this.formatter = NullFormat;
-    this.logLevel = AG_LOGLEVEL.OFF;
-    this.verbose = false;
-    this.loggerMap = this.createDefaultLoggerMap();
-  }
+### Phase 3-4: API設計改善
 
-  // 設定適用（検証付き）
-  applyOptions(options: AgLoggerOptions): void;
-
-  // ログレベル制御
-  setLogLevel(level: AgTLogLevel): AgTLogLevel;
-  getLogLevel(): AgTLogLevel;
-  shouldOutput(level: AgTLogLevel): boolean;
-
-  // Verbose制御
-  setVerbose(value: boolean): boolean;
-  getVerbose(): boolean;
-  shouldOutputVerbose(): boolean;
-
-  // ロガー・フォーマッター取得
-  getLoggerFunction(level: AgTLogLevel): AgLoggerFunction;
-  getFormatter(): AgFormatFunction;
-
-  // 設定検証
-  private validateOptions(options: AgLoggerOptions): void;
-  private isValidLogLevel(level: AgTLogLevel): boolean;
-
-  // 設定状態取得
-  getCurrentOptions(): AgLoggerOptions;
-}
-```
-
-### AgLogger（リファクタリング後）
-
-```typescript
-class AgLogger {
-  private static _instance: AgLogger | undefined;
-  private config: AgLoggerConfig;
-
-  private constructor() {
-    this.config = new AgLoggerConfig();
-  }
-
-  static getLogger(options?: AgLoggerOptions): AgLogger;
-
-  // ログAPI（パブリックインターフェース）
-  fatal(...args: unknown[]): void;
-  error(...args: unknown[]): void;
-  warn(...args: unknown[]): void;
-  info(...args: unknown[]): void;
-  debug(...args: unknown[]): void;
-  trace(...args: unknown[]): void;
-  log(...args: unknown[]): void;
-  verbose(...args: unknown[]): void;
-
-  // 設定API（configに委譲）
-  applySettings(options: AgLoggerOptions): void;
-  setLogLevel(level: AgTLogLevel): AgTLogLevel;
-  getLogLevel(): AgTLogLevel;
-  setVerbose(value?: boolean): boolean;
-
-  // 実際のログ出力処理（内部メソッド）
-  private executeLog(level: AgTLogLevel, ...args: unknown[]): void;
-
-  // シングルトンリセット（テスト用）
-  static resetSingleton(): void;
-
-  // 現在の設定取得
-  getCurrentSettings(): AgLoggerOptions;
-}
-```
-
-### AgLoggerManager（リファクタリング後）
-
-```typescript
-class AgLoggerManager {
-  private static instance: AgLoggerManager | undefined;
-
-  // 既存API（互換性維持）
-  static getManager(options?: AgLoggerOptions): AgLoggerManager;
-
-  // 新しいファクトリメソッド（推奨）
-  static getLogger(options?: AgLoggerOptions): AgLogger;
-
-  // 設定管理API
-  setManager(options: AgLoggerOptions): void;
-
-  // 互換性API（非推奨、将来削除予定）
-  getLogFunction(logLevel: AgTLogLevel): AgLoggerFunction;
-  getFormatter(): AgFormatFunction;
-
-  // シングルトンリセット（テスト用）
-  static resetSingleton(): void;
-}
-```
-
-## ログ出力フロー
-
-### 新しいログ出力フロー
-
-1. ユーザーが`logger.info("message")`を呼び出す
-2. AgLoggerの`info()`メソッドが`executeLog(AG_LOGLEVEL.INFO, "message")`を呼び出す
-3. `executeLog()`内で以下の処理を実行：
-   - `config.shouldOutput(level)`で出力可否判定
-   - `AgLoggerGetMessage()`でメッセージ作成
-   - `config.getFormatter()`でフォーマット適用
-   - `config.getLoggerFunction(level)`でロガー関数取得
-   - ロガー関数を実行してログ出力
-
-### パフォーマンス改善
-
-- 静的アクセス削除により呼び出しコスト削減
-- AgLoggerConfig内でのキャッシュ効果
-- 不要なインスタンス参照削除によるメモリ効率化
+- Single Responsibility Principleに基づく明確な責任分離
+- 新旧APIの段階的移行による破壊的変更回避
+- 将来の拡張性を考慮したクリーンな設計
 
 ## API仕様
 
-### 推奨使用パターン
+### 既存APIの完全互換性維持
 
-```typescript
-// パターン1: AgLoggerManager経由（新推奨）
-const logger = AgLoggerManager.getLogger({
-  defaultLogger: ConsoleLogger,
-  formatter: PlainFormat,
-  logLevel: AG_LOGLEVEL.INFO,
-});
-logger.info('Hello World');
+**全フェーズ共通**:
 
-// パターン2: AgLogger直接（既存互換）
-const logger = AgLogger.getLogger({
-  defaultLogger: ConsoleLogger,
-  formatter: PlainFormat,
-});
-logger.setLogLevel(AG_LOGLEVEL.DEBUG);
-logger.debug('Debug message');
+- 全ログメソッド（fatal, error, warn, info, debug, trace, log, verbose）の動作維持
+- AgLoggerManager.getManager()の仕様維持
+- 設定メソッド（setLogLevel, setVerbose）の仕様維持
 
-// パターン3: 管理API使用
-AgLoggerManager.getManager().setManager({
-  defaultLogger: MockLogger,
-  formatter: JsonFormat,
-});
-const logger = AgLoggerManager.getLogger();
-logger.error('Error occurred');
-```
+**API変更（Phase 3）**:
 
-### 設定オプション
+- 既存の`AgLogger.getLogger(options?)`は`createLogger(options?)`にリネーム
+- 新しい`getLogger()`はインスタンス取得専用（パラメータなし）
+- 既存APIはdeprecation warning付きで互換性維持
 
-```typescript
-interface AgLoggerOptions {
-  defaultLogger?: AgLoggerFunction;
-  formatter?: AgFormatFunction;
-  loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
-  logLevel?: AgTLogLevel;
-  verbose?: boolean;
-}
-```
+### 新しいAPI（段階的追加）
+
+**Phase 2で追加**:
+
+- `setAgLoggerOptions(options)`: 統一された設定適用メソッド
+- `getCurrentSettings()`: 現在の設定状態取得メソッド
+
+**Phase 3で追加/変更**:
+
+- `createLogger(options?)`: 設定付きインスタンス作成専用（既存getLogger(options?)をリネーム）
+- `getLogger()`: インスタンス取得専用（パラメータなし、新規追加）
+- `setLoggerOptions(options)`: 設定適用専用
+- `getVerbose()`: Verbose状態取得専用
+- 既存`getLogger(options?)`はdeprecated扱いで`createLogger(options?)`への移行推奨
+
+**Phase 4で追加**:
+
+- `AgLoggerManager.createLogger(options?)`: 初期設定付きロガー作成
+- `AgLoggerManager.getLogger()`: 内部保持インスタンス返却
 
 ## 互換性保証
 
@@ -260,81 +151,106 @@ interface AgLoggerOptions {
 - 既存の`AgLoggerManager.getManager()`API維持
 - 既存のログメソッド（`fatal`, `error`, `warn`等）API維持
 
-### 非推奨API
+## 4段階移行戦略
 
-以下のAPIは非推奨とし、将来のバージョンで削除予定：
+### Phase 1: AgLoggerConfig作成
 
-- `AgLoggerManager.prototype.getLogger(level: AgTLogLevel)` → `getLogFunction(level)`に移行済み
-- `AgLoggerManager.prototype.getFormatter()` → 直接アクセス不要
+**目標**: 内部設定管理クラスの実装
 
-## 移行戦略
+- AgLoggerConfigクラスの実装
+- 設定管理・検証・出力制御判定の全機能
+- 包括的な単体テストの作成
+- t-wada式TDDによるexpectレベル実装
 
-### フェーズ1: AgLoggerConfig作成
+### Phase 2: AgLogger内部リファクタリング
 
-- 内部設定管理クラスの実装
-- 単体テストの追加
-- 設定検証ロジックの実装
-
-### フェーズ2: AgLogger設定委譲
+**目標**: 既存機能の内部アーキテクチャ移行
 
 - AgLoggerConfigの組み込み
-- 設定管理の委譲実装
-- 既存機能との並行稼働確認
+- 全メソッドのAgLoggerConfig経由への変更
+- AgLoggerManagerインスタンス依存の完全削除
+- `setAgLoggerOptions()`による統一設定適用
+- 既存APIの完全互換性維持
 
-### フェーズ3: ログ出力処理の変更
+### Phase 3: AgLogger APIリストラクチャ
 
-- `executeLog`メソッドの実装
-- 自身の設定を使用するよう変更
-- パフォーマンステスト実行
+**目標**: Single Responsibility Principleに基づくAPI改善
 
-### フェーズ4: AgLoggerManager API拡張
+- `createLogger()` / `getLogger()`の責任分離
+- `setVerbose()` / `getVerbose()`の責任分離
+- `setLoggerOptions()`の責任明確化
+- 既存APIはdeprecation warning付きで維持
+- 新旧API混在での動作保証
 
-- `getLogger()`ファクトリメソッド追加
-- 管理API整備
-- 新APIのテスト追加
+### Phase 4: AgLoggerManager簡素化
 
-### フェーズ5: 旧実装削除
+**目標**: 設定管理の仲介役としてのManager再構成
 
-- `_loggerManager`インスタンス削除
-- 不要なimport削除
-- コードクリーンアップ
-
-### フェーズ6: ドキュメント更新
-
-- API使用例の更新
-- 移行ガイドの作成
-- README更新
+- シングルトンAgLoggerインスタンスの内部保持
+- `createLogger()`メソッドによる初期設定付きロガー作成
+- 低レベルAPIの内部実装化
+- 設定適用の仲介機能実装
+- 既存APIの完全互換性維持
 
 ## テスト戦略
 
-### 単体テスト
+### t-wada式TDDアプローチ
 
-- **AgLoggerConfigTest**: 設定管理・検証・制御判定の網羅的テスト
-- **AgLoggerTest**: ログAPI・出力処理・設定委譲のテスト
-- **AgLoggerManagerTest**: 管理API・ファクトリメソッドのテスト
+**各フェーズ共通**:
 
-### 統合テスト
+- expect文レベルでのRed-Green-Refactorサイクル
+- 1小タスク = 1つのexpect文として細分化
+- テストファーストによる実装進行
 
-- **PluginInteractionTest**: 各プラグイン（ロガー・フォーマッター）の組み合わせテスト
-- **PerformanceTest**: 新アーキテクチャのパフォーマンステスト
-- **CompatibilityTest**: 既存API互換性のテスト
+### テスト範囲
 
-### E2Eテスト
+**継続的検証**:
 
-- **RealLoggingTest**: 実際のログ出力動作のテスト
-- **ConfigurationTest**: 複雑な設定パターンのテスト
+- 全既存テストが全フェーズで通過し続けること
+- 新機能のテストカバレッジ100%維持
+- 既存API互換性の網羅的テスト
+- E2Eテストによる統合動作確認
+
+**品質保証**:
+
+- パフォーマンス改善の検証
+- メモリ使用量削減の確認
+- エラーハンドリングの網羅的テスト
+- 境界値テストによる安定性確保
 
 ## 品質基準
 
-### 成功基準
+### 各フェーズ共通成功基準
 
 - [ ] 全既存テストが通過し続ける
-- [ ] 新アーキテクチャでのテストカバレッジ95%以上
-- [ ] パフォーマンス劣化なし（ベンチマーク実行）
-- [ ] メモリ使用量削減の確認
+- [ ] 新機能のテストカバレッジ100%
+- [ ] パフォーマンス劣化なし
 - [ ] 既存APIの完全互換性
+- [ ] TypeScript型安全性の維持・強化
+
+### フェーズ別追加基準
+
+**Phase 2完了時**:
+
+- [ ] AgLoggerManagerインスタンス依存完全削除
+- [ ] メモリ使用量削減の確認
+- [ ] ログ出力パフォーマンス維持
+
+**Phase 3完了時**:
+
+- [ ] 新旧API混在動作の確認
+- [ ] deprecation警告の適切な表示
+- [ ] API責任分離の完了
+
+**Phase 4完了時**:
+
+- [ ] AgLoggerManager簡素化完了
+- [ ] 設定適用仲介機能の正常動作
+- [ ] 低レベルAPIの適切な内部化
 
 ### 品質ゲート
+
+**各フェーズ完了時**:
 
 - [ ] `pnpm run test:develop` - 全単体テスト通過
 - [ ] `pnpm run test:ci` - 全統合テスト通過
@@ -342,36 +258,38 @@ interface AgLoggerOptions {
 - [ ] `pnpm run lint:all` - コード品質チェック通過
 - [ ] `pnpm run check:types` - 型安全性チェック通過
 
-## リスク評価
-
-### 技術的リスク
-
-- **Low**: 既存APIの互換性破壊
-- **Medium**: パフォーマンス劣化
-- **Low**: テストの複雑化
-
-### 軽減策
-
-- 段階的リファクタリングによる影響範囲の限定
-- 各フェーズでの全テスト実行
-- パフォーマンスベンチマークの継続監視
-
 ## 期待効果
 
-### 開発体験の向上
+### 段階的改善による利点
 
-- 責任分担の明確化による保守性向上
-- テスト容易性の向上
-- 新機能追加の簡易化
+**Phase 1-2: 内部アーキテクチャ改善**
 
-### パフォーマンス向上
-
-- ログ出力時の不要な静的アクセス削除
+- AgLoggerManagerインスタンス依存削除によるパフォーマンス向上
+- 設定管理の一元化による保守性向上
 - メモリ使用量の最適化
-- キャッシュ効果による高速化
+- テスト容易性の大幅向上
 
-### 拡張性向上
+**Phase 3-4: API設計改善**
 
-- 新しいログレベルの追加が容易
-- カスタムフォーマッターの実装が簡単
+- Single Responsibility Principleによる責任明確化
+- 新機能追加の簡易化
+- API予測可能性の向上
+- 将来の拡張性確保
+
+### 互換性保証による利点
+
+**破壊的変更回避**:
+
+- 既存コードへの影響なし
+- 段階的移行による安全性
+- deprecation warningによる適切な移行誘導
+- 新旧API混在での動作保証
+
+### 長期的メリット
+
+**保守性・拡張性**:
+
+- 新ログレベル追加の容易性
+- カスタムフォーマッター実装の簡素化
 - プラグインアーキテクチャの強化
+- TypeScript型安全性の最大化
