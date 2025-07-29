@@ -14,6 +14,8 @@ import type { AgLoggerOptions } from '../shared/types/AgLogger.interface';
 
 // core
 import { AgLoggerManager } from './AgLoggerManager.class';
+// internal
+import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 // plugins
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
@@ -28,10 +30,12 @@ export class AgLogger {
   private static _instance: AgLogger | undefined;
   private static _logLevel: AgLogLevel = AG_LOGLEVEL.OFF;
   private _loggerManager: AgLoggerManager;
+  private _config: AgLoggerConfig;
   private _verbose: boolean = false;
 
   private constructor() {
     this._loggerManager = AgLoggerManager.getManager();
+    this._config = new AgLoggerConfig();
   }
 
   /**
@@ -73,7 +77,7 @@ export class AgLogger {
    */
   setLogLevel(level: AgLogLevel): AgLogLevel {
     AgLogger._logLevel = level;
-    return AgLogger._logLevel;
+    return this._config.setLogLevel(level);
   }
 
   /**
@@ -82,7 +86,7 @@ export class AgLogger {
    * @returns The current log level.
    */
   getLogLevel(): AgLogLevel {
-    return AgLogger._logLevel;
+    return this._config.getLogLevel();
   }
 
   /**
@@ -94,8 +98,19 @@ export class AgLogger {
   setVerbose(value?: boolean): boolean {
     if (value !== undefined) {
       this._verbose = value;
+      this._config.setVerbose(value);
     }
-    return this._verbose;
+    return this._config.getVerbose();
+  }
+
+  /**
+   * Sets the logger configuration using AgLoggerOptions.
+   * Applies the provided configuration options to the internal AgLoggerConfig.
+   *
+   * @param options - The configuration options to apply
+   */
+  setAgLoggerOptions(options: AgLoggerOptions): void {
+    this._config.setLoggerConfig(options);
   }
 
   /**
@@ -186,6 +201,17 @@ export class AgLogger {
   static resetSingleton(): void {
     AgLogger._instance = undefined;
     AgLogger._logLevel = AG_LOGLEVEL.OFF;
+  }
+
+  /**
+   * Returns the internal AgLoggerConfig instance for testing purposes.
+   * This method is intended for testing only and should not be used in production code.
+   *
+   * @internal
+   * @returns The internal AgLoggerConfig instance
+   */
+  _getConfigForTesting(): AgLoggerConfig {
+    return this._config;
   }
 }
 

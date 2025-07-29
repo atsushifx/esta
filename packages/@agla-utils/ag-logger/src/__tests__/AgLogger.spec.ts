@@ -17,6 +17,8 @@ import type { AgLogLevel } from '../../shared/types';
 
 // テスト対象 - AgLoggerクラスのメイン実装とgetLogger関数
 import { AgLogger, getLogger } from '../AgLogger.class';
+// 内部クラス - AgLoggerConfigクラス
+import { AgLoggerConfig } from '../internal/AgLoggerConfig.class';
 // プラグイン - テストで使用するコンソールロガー
 import { ConsoleLogger } from '../plugins/logger/ConsoleLogger';
 
@@ -179,8 +181,8 @@ describe('AgLogger', () => {
         const logger = AgLogger.getLogger();
 
         // TypeScriptでは型安全だが、実行時の動作を確認
-        expect(() => logger.setLogLevel(-1 as AgLogLevel)).not.toThrow();
-        expect(() => logger.setLogLevel(999 as AgLogLevel)).not.toThrow();
+        expect(() => logger.setLogLevel(-1 as AgLogLevel)).toThrow('Invalid log level: -1');
+        expect(() => logger.setLogLevel(999 as AgLogLevel)).toThrow('Invalid log level: 999');
       });
     });
 
@@ -617,6 +619,227 @@ describe('AgLogger', () => {
         });
 
         expect(logger).toBeInstanceOf(AgLogger);
+      });
+    });
+  });
+
+  /**
+   * AgLoggerConfig統合機能（フェーズ2）
+   *
+   * @description AgLoggerConfigインスタンスの組み込みと設定委譲機能のテスト
+   */
+  describe('AgLoggerConfig Integration (Phase 2)', () => {
+    /**
+     * Task 1.1: AgLoggerConfigインスタンスの追加
+     */
+    describe('Task 1.1: AgLoggerConfigインスタンスの追加', () => {
+      /**
+       * 小タスク1.1.1: AgLoggerのconstructorでAgLoggerConfigインスタンスが作成される
+       */
+      it('小タスク1.1.1: AgLoggerのconstructorでAgLoggerConfigインスタンスが作成される', () => {
+        const logger = AgLogger.getLogger();
+
+        // AgLoggerインスタンスが内部で_configプロパティとしてAgLoggerConfigインスタンスを持つことを確認
+        // テスト用ヘルパーメソッドを使用してアクセス
+        expect(logger._getConfigForTesting()).toBeInstanceOf(AgLoggerConfig);
+      });
+
+      /**
+       * 小タスク1.1.2: AgLoggerConfigインスタンスがprivateプロパティとして保持される
+       */
+      it('小タスク1.1.2: AgLoggerConfigインスタンスがprivateプロパティとして保持される', () => {
+        const logger = AgLogger.getLogger();
+
+        // _configプロパティがプライベートであり、テスト用メソッド経由でのみアクセス可能
+        const config = logger._getConfigForTesting();
+        expect(config).toBeDefined();
+        expect(config).toBeInstanceOf(AgLoggerConfig);
+
+        // テスト用メソッドが期待通りに機能することを確認
+        expect(typeof logger._getConfigForTesting).toBe('function');
+      });
+
+      /**
+       * 小タスク1.1.3: AgLoggerConfig初期化時にデフォルト設定が適用される
+       */
+      it('小タスク1.1.3: AgLoggerConfig初期化時にデフォルト設定が適用される', () => {
+        const logger = AgLogger.getLogger();
+        const config = logger._getConfigForTesting();
+
+        // AgLoggerConfigのデフォルト設定値を確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.OFF); // デフォルトはOFF
+        expect(config.getVerbose()).toBe(false); // デフォルトはfalse
+        expect(config.getFormatter()).toBeDefined(); // フォーマッターが設定されている
+        expect(config.getLoggerFunction(AG_LOGLEVEL.INFO)).toBeDefined(); // ロガー関数が設定されている
+      });
+
+      /**
+       * 小タスク1.1.4: 初期化後のAgLoggerConfigがアクセス可能である
+       */
+      it('小タスク1.1.4: 初期化後のAgLoggerConfigがアクセス可能である', () => {
+        const logger = AgLogger.getLogger();
+        const config = logger._getConfigForTesting();
+
+        // AgLoggerConfigの全ての主要メソッドがアクセス可能であることを確認
+        expect(() => config.getLogLevel()).not.toThrow();
+        expect(() => config.getVerbose()).not.toThrow();
+        expect(() => config.getFormatter()).not.toThrow();
+        expect(() => config.getLoggerFunction(AG_LOGLEVEL.INFO)).not.toThrow();
+        expect(() => config.shouldOutput(AG_LOGLEVEL.INFO)).not.toThrow();
+        expect(() => config.shouldOutputVerbose()).not.toThrow();
+
+        // 設定メソッドもアクセス可能であることを確認
+        expect(() => config.setLogLevel(AG_LOGLEVEL.DEBUG)).not.toThrow();
+        expect(() => config.setVerbose(true)).not.toThrow();
+
+        // 実際に設定が反映されることを確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.DEBUG);
+        expect(config.getVerbose()).toBe(true);
+      });
+    });
+
+    /**
+     * Task 1.2: 既存設定メソッドのリファクタリング
+     */
+    describe('Task 1.2: 既存設定メソッドのリファクタリング', () => {
+      /**
+       * 小タスク1.2.1: setLogLevelメソッドの内部実装をconfig.setLogLevel()呼び出しに変更
+       */
+      it('小タスク1.2.1: setLogLevelメソッドの内部実装をconfig.setLogLevel()呼び出しに変更', () => {
+        const logger = AgLogger.getLogger();
+        const config = logger._getConfigForTesting();
+
+        // setLogLevelメソッドを呼び出す前の初期状態を確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.OFF);
+
+        // AgLoggerのsetLogLevelメソッドを呼び出し
+        const result = logger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        // 戻り値が正しいことを確認
+        expect(result).toBe(AG_LOGLEVEL.INFO);
+
+        // AgLoggerConfigの内部状態が更新されていることを確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.INFO);
+
+        // 従来の動作も維持されていることを確認
+        expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.INFO);
+      });
+
+      /**
+       * 小タスク1.2.2: setVerboseメソッドの内部実装をconfig.setVerbose()呼び出しに変更
+       */
+      it('小タスク1.2.2: setVerboseメソッドの内部実装をconfig.setVerbose()呼び出しに変更', () => {
+        const logger = AgLogger.getLogger();
+        const config = logger._getConfigForTesting();
+
+        // setVerboseメソッドを呼び出す前の初期状態を確認
+        expect(config.getVerbose()).toBe(false);
+
+        // AgLoggerのsetVerboseメソッドを呼び出し（引数ありパターン）
+        const result1 = logger.setVerbose(true);
+
+        // 戻り値が正しいことを確認
+        expect(result1).toBe(true);
+
+        // AgLoggerConfigの内部状態が更新されていることを確認
+        expect(config.getVerbose()).toBe(true);
+
+        // 引数なしパターンでも動作することを確認
+        const result2 = logger.setVerbose();
+        expect(result2).toBe(true);
+
+        // falseに設定
+        const result3 = logger.setVerbose(false);
+        expect(result3).toBe(false);
+        expect(config.getVerbose()).toBe(false);
+      });
+
+      /**
+       * 小タスク1.2.3: getLogLevelメソッドの内部実装をconfig.getLogLevel()呼び出しに変更
+       */
+      it('小タスク1.2.3: getLogLevelメソッドの内部実装をconfig.getLogLevel()呼び出しに変更', () => {
+        const logger = AgLogger.getLogger();
+        const config = logger._getConfigForTesting();
+
+        // AgLoggerConfigに直接設定
+        config.setLogLevel(AG_LOGLEVEL.WARN);
+
+        // AgLoggerのgetLogLevelメソッドがAgLoggerConfigの値を返すことを確認
+        const result = logger.getLogLevel();
+
+        // AgLoggerConfigの値と一致することを確認
+        expect(result).toBe(AG_LOGLEVEL.WARN);
+        expect(result).toBe(config.getLogLevel());
+
+        // 異なる値でも確認
+        config.setLogLevel(AG_LOGLEVEL.DEBUG);
+        expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.DEBUG);
+        expect(logger.getLogLevel()).toBe(config.getLogLevel());
+      });
+
+      /**
+       * 小タスク1.2.4: リファクタリング後も既存APIの動作が完全に保持される
+       */
+      it('小タスク1.2.4: リファクタリング後も既存APIの動作が完全に保持される', () => {
+        const logger = AgLogger.getLogger();
+
+        // 既存のAPI動作テスト1: setLogLevel → getLogLevel の連携
+        const setResult = logger.setLogLevel(AG_LOGLEVEL.WARN);
+        expect(setResult).toBe(AG_LOGLEVEL.WARN);
+        expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.WARN);
+
+        // 既存のAPI動作テスト2: setVerbose → setVerbose() (getter) の連携
+        const verboseResult1 = logger.setVerbose(true);
+        expect(verboseResult1).toBe(true);
+        expect(logger.setVerbose()).toBe(true); // getter として動作
+
+        const verboseResult2 = logger.setVerbose(false);
+        expect(verboseResult2).toBe(false);
+        expect(logger.setVerbose()).toBe(false);
+
+        // 既存のAPI動作テスト3: 複数回の設定変更
+        logger.setLogLevel(AG_LOGLEVEL.ERROR);
+        logger.setVerbose(true);
+        expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.ERROR);
+        expect(logger.setVerbose()).toBe(true);
+
+        // 既存のAPI動作テスト4: シングルトンパターンの維持
+        const logger2 = AgLogger.getLogger();
+        expect(logger2).toBe(logger);
+        expect(logger2.getLogLevel()).toBe(AG_LOGLEVEL.ERROR);
+        expect(logger2.setVerbose()).toBe(true);
+      });
+
+      /**
+       * 小タスク1.2.5: setAgLoggerOptionsメソッド経由の操作でも正常動作する
+       */
+      it('小タスク1.2.5: setAgLoggerOptionsメソッド経由の操作でも正常動作する', () => {
+        const logger = AgLogger.getLogger();
+        const config = logger._getConfigForTesting();
+
+        // setAgLoggerOptionsメソッドでAgLoggerOptionsを設定
+        const options = {
+          defaultLogger: mockLogger,
+          formatter: mockFormatter,
+          logLevel: AG_LOGLEVEL.INFO,
+          verbose: true,
+        };
+
+        // setAgLoggerOptionsを呼び出す前の状態確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.OFF);
+        expect(config.getVerbose()).toBe(false);
+
+        // setAgLoggerOptionsメソッドでAgLoggerConfigに設定を適用
+        logger.setAgLoggerOptions(options);
+
+        // AgLoggerConfigに設定が反映されていることを確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.INFO);
+        expect(config.getVerbose()).toBe(true);
+        expect(config.getFormatter()).toBe(mockFormatter);
+
+        // AgLoggerの既存メソッド経由でも正しい値が取得できることを確認
+        expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.INFO);
+        expect(logger.setVerbose()).toBe(true);
       });
     });
   });
