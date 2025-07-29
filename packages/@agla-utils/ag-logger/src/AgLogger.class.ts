@@ -28,7 +28,6 @@ import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
  */
 export class AgLogger {
   private static _instance: AgLogger | undefined;
-  private static _logLevel: AgLogLevel = AG_LOGLEVEL.OFF;
   private _loggerManager: AgLoggerManager;
   private _config: AgLoggerConfig;
   private _verbose: boolean = false;
@@ -63,10 +62,7 @@ export class AgLogger {
    * @returns True if the level should be logged; otherwise false.
    */
   private isOutputLevel(level: AgLogLevel): boolean {
-    if (AgLogger._logLevel === AG_LOGLEVEL.OFF) {
-      return false;
-    }
-    return level <= AgLogger._logLevel;
+    return this._config.shouldOutput(level);
   }
 
   /**
@@ -76,7 +72,6 @@ export class AgLogger {
    * @returns The updated log level.
    */
   setLogLevel(level: AgLogLevel): AgLogLevel {
-    AgLogger._logLevel = level;
     return this._config.setLogLevel(level);
   }
 
@@ -114,6 +109,42 @@ export class AgLogger {
   }
 
   /**
+   * Unified log execution method that delegates all logging operations to AgLoggerConfig.
+   *
+   * This method implements the core logging pipeline using AgLoggerConfig for all operations:
+   * - Output control decision through config.shouldOutput()
+   * - Logger function retrieval through config.getLoggerFunction()
+   * - Formatter retrieval through config.getFormatter()
+   *
+   * @param level - Log level of the message.
+   * @param args - Arguments to be logged.
+   */
+  private executeLog(level: AgLogLevel, ...args: unknown[]): void {
+    // Early return if the message should not be output according to configuration
+    if (!this._config.shouldOutput(level)) {
+      return;
+    }
+
+    // Get message through existing utility
+    const logMessage = AgLoggerGetMessage(level, ...args);
+
+    // Get formatter from configuration
+    const formatter = this._config.getFormatter();
+    const formattedMessage = formatter(logMessage);
+
+    // Only block logging if the formatter explicitly returns empty string
+    // and the original message had actual content (not just empty args)
+    if (formattedMessage === '' && logMessage.message !== '' && args.length > 0) {
+      return;
+    }
+
+    // Get logger function from configuration
+    const logger = this._config.getLoggerFunction(level);
+    logger(formattedMessage);
+  }
+
+  /**
+   * @deprecated Use executeLog instead. This method is kept for backward compatibility.
    * Internal method to perform logging if the log level is enabled.
    * Formats the message and invokes the appropriate logger function.
    *
@@ -149,58 +180,60 @@ export class AgLogger {
     if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
       enhancedOptions.loggerMap = ConsoleLoggerMap;
     }
+
+    // Configure both the legacy manager and the new config for backwards compatibility
     this._loggerManager.setManager(enhancedOptions);
+    this._config.setLoggerConfig(enhancedOptions);
   }
 
   /** Logs a message at FATAL level. */
   fatal(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.FATAL, ...args);
+    this.executeLog(AG_LOGLEVEL.FATAL, ...args);
   }
 
   /** Logs a message at ERROR level. */
   error(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.ERROR, ...args);
+    this.executeLog(AG_LOGLEVEL.ERROR, ...args);
   }
 
   /** Logs a message at WARN level. */
   warn(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.WARN, ...args);
+    this.executeLog(AG_LOGLEVEL.WARN, ...args);
   }
 
   /** Logs a message at INFO level. */
   info(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.INFO, ...args);
+    this.executeLog(AG_LOGLEVEL.INFO, ...args);
   }
 
   /** Logs a message at DEBUG level. */
   debug(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.DEBUG, ...args);
+    this.executeLog(AG_LOGLEVEL.DEBUG, ...args);
   }
 
   /** Logs a message at TRACE level. */
   trace(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.TRACE, ...args);
+    this.executeLog(AG_LOGLEVEL.TRACE, ...args);
   }
 
   /** General log method logging at INFO level. */
   log(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.INFO, ...args);
+    this.executeLog(AG_LOGLEVEL.INFO, ...args);
   }
 
   /** Verbose log method that only outputs when verbose flag is true. */
   verbose(...args: unknown[]): void {
-    if (this._verbose) {
-      this.log(...args);
+    if (this._config.shouldOutputVerbose()) {
+      this.executeLog(AG_LOGLEVEL.INFO, ...args);
     }
   }
 
   /**
-   * Resets the singleton instance and log level.
+   * Resets the singleton instance.
    * This method is intended for testing purposes to ensure clean state between tests.
    */
   static resetSingleton(): void {
     AgLogger._instance = undefined;
-    AgLogger._logLevel = AG_LOGLEVEL.OFF;
   }
 
   /**
