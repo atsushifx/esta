@@ -19,8 +19,9 @@ import type { AgLogLevel } from '../../shared/types';
 import { AgLogger, getLogger } from '../AgLogger.class';
 // 内部クラス - AgLoggerConfigクラス
 import { AgLoggerConfig } from '../internal/AgLoggerConfig.class';
-// プラグイン - テストで使用するコンソールロガー
+// プラグイン - テストで使用するコンソールロガーとモックロガー
 import { ConsoleLogger } from '../plugins/logger/ConsoleLogger';
+import { MockLogger } from '../plugins/logger/MockLogger';
 
 // テスト用モック関数
 const mockLogger = vi.fn();
@@ -869,6 +870,243 @@ describe('AgLogger', () => {
 
         // logLevel設定項目が取得されることを確認
         expect(settings.logLevel).toBe(AG_LOGLEVEL.INFO);
+      });
+    });
+  });
+
+  /**
+   * Task 4: 設定管理の統合とテスト
+   */
+  describe('Task 4: 設定管理の統合とテスト', () => {
+    /**
+     * Task 4.1: 設定の適切な受け渡しテスト
+     */
+    describe('Task 4.1: 設定の適切な受け渡しテスト', () => {
+      /**
+       * タスク4.1.1: getLogger(options)実行時にAgLoggerConfigに設定が適切に渡される
+       */
+      it('タスク4.1.1: getLogger(options)実行時にAgLoggerConfigに設定が適切に渡される', () => {
+        // Red: テストを先に書く
+        const options = {
+          defaultLogger: mockLogger,
+          formatter: mockFormatter,
+          logLevel: AG_LOGLEVEL.DEBUG,
+          verbose: true,
+        };
+
+        const logger = AgLogger.getLogger(options);
+        const config = logger._getConfigForTesting();
+
+        // 設定がAgLoggerConfigに正しく渡されていることを確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.DEBUG);
+        expect(config.getVerbose()).toBe(true);
+        expect(config.getFormatter()).toBe(mockFormatter);
+      });
+
+      /**
+       * タスク4.1.2: setAgLoggerOptions()でAgLoggerConfigに設定が適切に適用される
+       */
+      it('タスク4.1.2: setAgLoggerOptions()でAgLoggerConfigに設定が適切に適用される', () => {
+        // Red: テストを先に書く
+        const logger = AgLogger.getLogger();
+        const config = logger._getConfigForTesting();
+
+        // 初期状態の確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.OFF);
+        expect(config.getVerbose()).toBe(false);
+
+        const options = {
+          defaultLogger: mockLogger,
+          formatter: mockFormatter,
+          logLevel: AG_LOGLEVEL.WARN,
+          verbose: true,
+        };
+
+        // setAgLoggerOptionsで設定を適用
+        logger.setAgLoggerOptions(options);
+
+        // AgLoggerConfigに設定が正しく適用されていることを確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.WARN);
+        expect(config.getVerbose()).toBe(true);
+        expect(config.getFormatter()).toBe(mockFormatter);
+      });
+
+      /**
+       * タスク4.1.3: 設定変更後にAgLoggerConfigから正しい値が参照される
+       */
+      it('タスク4.1.3: 設定変更後にAgLoggerConfigから正しい値が参照される', () => {
+        // Red: テストを先に書く
+        const logger = AgLogger.getLogger();
+        const config = logger._getConfigForTesting();
+
+        // 初期設定
+        const initialOptions = {
+          defaultLogger: mockLogger,
+          formatter: mockFormatter,
+          logLevel: AG_LOGLEVEL.ERROR,
+          verbose: false,
+        };
+        logger.setAgLoggerOptions(initialOptions);
+
+        // 初期設定の確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.ERROR);
+        expect(config.getVerbose()).toBe(false);
+
+        // 設定変更
+        const updatedOptions = {
+          logLevel: AG_LOGLEVEL.DEBUG,
+          verbose: true,
+        };
+        logger.setAgLoggerOptions(updatedOptions);
+
+        // 変更後の設定がAgLoggerConfigから正しく参照できることを確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.DEBUG);
+        expect(config.getVerbose()).toBe(true);
+
+        // getCurrentSettings()経由でも正しい値が取得できることを確認
+        const currentSettings = logger.getCurrentSettings();
+        expect(currentSettings.logLevel).toBe(AG_LOGLEVEL.DEBUG);
+        expect(currentSettings.verbose).toBe(true);
+      });
+
+      /**
+       * タスク4.1.4: 複数の設定項目が同時に設定・参照できる
+       */
+      it('タスク4.1.4: 複数の設定項目が同時に設定・参照できる', () => {
+        // Red: テストを先に書く
+        const logger = AgLogger.getLogger();
+        const config = logger._getConfigForTesting();
+
+        // 複数の設定項目を同時に設定
+        const multipleOptions = {
+          defaultLogger: mockLogger,
+          formatter: mockFormatter,
+          logLevel: AG_LOGLEVEL.INFO,
+          verbose: true,
+        };
+        logger.setAgLoggerOptions(multipleOptions);
+
+        // 複数の設定項目がAgLoggerConfigで同時に正しく管理されていることを確認
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.INFO);
+        expect(config.getVerbose()).toBe(true);
+        expect(config.getFormatter()).toBe(mockFormatter);
+
+        // getCurrentSettings()で全設定項目が同時に参照できることを確認
+        const currentSettings = logger.getCurrentSettings();
+        expect(currentSettings.logLevel).toBe(AG_LOGLEVEL.INFO);
+        expect(currentSettings.verbose).toBe(true);
+        expect(currentSettings.formatter).toBe(mockFormatter);
+        expect(currentSettings.defaultLogger).toBe(mockLogger);
+
+        // 一部設定項目のみを変更した場合の動作確認
+        const partialOptions = {
+          logLevel: AG_LOGLEVEL.WARN,
+          verbose: false,
+        };
+        logger.setAgLoggerOptions(partialOptions);
+
+        // 変更された項目と変更されていない項目が正しく参照できることを確認
+        const updatedSettings = logger.getCurrentSettings();
+        expect(updatedSettings.logLevel).toBe(AG_LOGLEVEL.WARN); // 変更された
+        expect(updatedSettings.verbose).toBe(false); // 変更された
+        expect(updatedSettings.formatter).toBe(mockFormatter); // 維持されている
+        expect(updatedSettings.defaultLogger).toBe(mockLogger); // 維持されている
+      });
+
+      /**
+       * タスク4.1.5: loggerMap設定がAgLoggerConfigで適切に管理される
+       */
+      it('タスク4.1.5: loggerMap設定がAgLoggerConfigで適切に管理される', () => {
+        // Red: テストを先に書く
+        const logger = AgLogger.getLogger();
+        const config = logger._getConfigForTesting();
+
+        // MockLoggerを使用してメッセージ内容を検証
+        const mockLoggerInstance = new MockLogger();
+        const customLoggerMap = mockLoggerInstance.createLoggerMap();
+
+        // loggerMapを含む設定を適用
+        const options = {
+          defaultLogger: mockLoggerInstance.createLoggerFunction(),
+          formatter: mockFormatter,
+          loggerMap: customLoggerMap,
+          logLevel: AG_LOGLEVEL.INFO,
+          verbose: false,
+        };
+        logger.setAgLoggerOptions(options);
+
+        // loggerMapがAgLoggerConfigで適切に管理されていることを確認
+        expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(customLoggerMap[AG_LOGLEVEL.ERROR]);
+        expect(config.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe(customLoggerMap[AG_LOGLEVEL.INFO]);
+
+        // getCurrentSettings()でloggerMapが取得できることを確認
+        const currentSettings = logger.getCurrentSettings();
+        expect(currentSettings.loggerMap).toBeDefined();
+        expect(currentSettings.loggerMap?.[AG_LOGLEVEL.ERROR]).toBe(customLoggerMap[AG_LOGLEVEL.ERROR]);
+        expect(currentSettings.loggerMap?.[AG_LOGLEVEL.INFO]).toBe(customLoggerMap[AG_LOGLEVEL.INFO]);
+
+        // 実際のログ出力でloggerMapが使用され、正しいメッセージが記録されることを確認
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+        logger.error('test error message');
+        logger.info('test info message');
+
+        // MockLoggerでメッセージ内容を検証
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.ERROR)).toContain('test error message');
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.INFO)).toContain('test info message');
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.ERROR)).toBe(1);
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(1);
+      });
+
+      /**
+       * タスク4.1.6: verboseモード設定がAgLoggerConfigで適切に管理される
+       */
+      it('タスク4.1.6: verboseモード設定がAgLoggerConfigで適切に管理される', () => {
+        // Red: テストを先に書く
+        const mockLoggerInstance = new MockLogger();
+        const logger = AgLogger.getLogger({
+          defaultLogger: mockLoggerInstance.createLoggerFunction(),
+          formatter: mockFormatter,
+        });
+        const config = logger._getConfigForTesting();
+
+        // 初期状態（verbose: false）の確認
+        expect(config.getVerbose()).toBe(false);
+        expect(config.shouldOutputVerbose()).toBe(false);
+
+        // verboseモードを有効にする設定を適用
+        const verboseOptions = {
+          verbose: true,
+          logLevel: AG_LOGLEVEL.INFO,
+        };
+        logger.setAgLoggerOptions(verboseOptions);
+
+        // verboseモード設定がAgLoggerConfigで適切に管理されていることを確認
+        expect(config.getVerbose()).toBe(true);
+        expect(config.shouldOutputVerbose()).toBe(true);
+
+        // getCurrentSettings()でverbose設定が取得できることを確認
+        const currentSettings = logger.getCurrentSettings();
+        expect(currentSettings.verbose).toBe(true);
+
+        // AgLoggerのsetVerbose()メソッドでも連動することを確認
+        expect(logger.setVerbose()).toBe(true);
+
+        // verboseモードでのログ出力動作確認とメッセージ内容検証
+        mockLoggerInstance.clearAllMessages();
+        logger.verbose('verbose test message');
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.INFO)).toContain('verbose test message');
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(1);
+
+        // verboseモードを無効にする
+        logger.setAgLoggerOptions({ verbose: false });
+        expect(config.getVerbose()).toBe(false);
+        expect(config.shouldOutputVerbose()).toBe(false);
+
+        // verboseモード無効時のログ出力動作確認
+        mockLoggerInstance.clearAllMessages();
+        logger.verbose('verbose test message should not appear');
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(0);
+        expect(mockLoggerInstance.hasAnyMessages()).toBe(false);
       });
     });
   });
