@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 import type { AgLogLevel } from '../../../shared/types';
-import { AgToLabel } from '../../utils/LogLevelHelpers';
+import { AgToLabel } from '../../utils/AgLogLevelHelpers';
 
 export type LogMessage = {
   readonly level: string;

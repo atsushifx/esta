@@ -10,7 +10,7 @@
 import type { AgFormatFunction, AgLogMessage } from '../../../shared/types';
 
 // utils
-import { AgToLabel } from '../../utils/LogLevelHelpers';
+import { AgToLabel } from '../../utils/AgLogLevelHelpers';
 
 /**
  * Formats a log message into a plain text string.

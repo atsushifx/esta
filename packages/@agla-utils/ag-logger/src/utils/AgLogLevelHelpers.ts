@@ -1,5 +1,5 @@
-// src/utils/LogLevelHelpers.ts
-// @(#) : LogLevel helper functions implementation
+// src/utils/AgLogLevelHelpers.ts
+// @(#) : AgLogLevel helper functions implementation
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //

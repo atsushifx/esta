@@ -1,5 +1,5 @@
-// src/utils/__tests__/LogLevelHelpers.spec.ts
-// @(#) : LogLevel helper functions test
+// src/utils/__tests__/AgLogLevelHelpers.spec.ts
+// @(#) : AgLogLevel helper functions test
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
 // Import helper functions
 import { AG_LOGLEVEL } from '../../../shared/types';
 import type { AgLogLevel } from '../../../shared/types';
-import { AgToLabel } from '../LogLevelHelpers';
+import { AgToLabel } from '../AgLogLevelHelpers';
 
 describe('LogLevel Helper Functions', () => {
   describe('AgToLabel function', () => {
