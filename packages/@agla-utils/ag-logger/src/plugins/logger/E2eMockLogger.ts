@@ -26,7 +26,7 @@ export class E2eMockLogger {
 
   constructor(identifier?: string) {
     const trimmedIdentifier = typeof identifier === 'string' ? identifier.trim() : '';
-    this.testIdentifier = trimmedIdentifier ? getNormalizedBasename(trimmedIdentifier) : 'e2edefault';
+    this.testIdentifier = trimmedIdentifier ? getNormalizedBasename(trimmedIdentifier) : 'e2e-default';
     this.currentTestId = null;
     this.mockLoggers = new Map<string, MockLogger>();
   }
