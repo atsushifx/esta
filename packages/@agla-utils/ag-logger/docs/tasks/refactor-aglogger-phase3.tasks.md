@@ -34,11 +34,11 @@ Phase2で内部実装をAgLoggerConfig経由にリファクタリングした後
 
 ## 前提条件（フェーズ2完了状態）
 
-- [ ] AgLoggerConfigが唯一の設定管理者として動作
-- [ ] 全既存メソッドがAgLoggerConfig経由にリファクタリング済み
-- [ ] AgLoggerManagerインスタンス依存の完全削除
-- [ ] executeLogメソッドによる統一されたログ出力処理
-- [ ] 既存APIの完全な互換性維持
+- [ ] AgLoggerConfigが唯一の設定管理者として動作 ⏳ **Phase2で実装予定**
+- [ ] 全既存メソッドがAgLoggerConfig経由にリファクタリング済み ⏳ **Phase2で実装予定**
+- [ ] AgLoggerManagerインスタンス依存の完全削除 ⏳ **Phase2で実装予定**
+- [ ] executeLogメソッドによる統一されたログ出力処理 ⏳ **Phase2で実装予定**
+- [ ] 既存APIの完全な互換性維持 ⏳ **Phase2で実装予定**
 
 ## API責任分析
 

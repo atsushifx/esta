@@ -34,10 +34,10 @@ Phase3でAgLogger APIの責任分離を完了した後、Phase4ではAgLoggerMan
 
 ## 前提条件（フェーズ3完了状態）
 
-- [ ] AgLogger APIの責任が明確に分離されている
-- [ ] createLogger(), getLogger()の責任分離完了
-- [ ] Single Responsibility Principleに基づくクリーンな設計
-- [ ] 既存コードとの完全な互換性維持
+- [ ] AgLogger APIの責任が明確に分離されている ⏳ **Phase3で実装予定**
+- [ ] createLogger(), getLogger()の責任分離完了 ⏳ **Phase3で実装予定**
+- [ ] Single Responsibility Principleに基づくクリーンな設計 ⏳ **Phase3で実装予定**
+- [ ] 既存コードとの完全な互換性維持 ⏳ **Phase3で実装予定**
 
 ## 現在のAgLoggerManagerの問題分析
 
