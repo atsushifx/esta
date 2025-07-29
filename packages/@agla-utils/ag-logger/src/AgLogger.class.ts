@@ -27,10 +27,24 @@ import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
 export class AgLogger {
   private static _instance: AgLogger | undefined;
   private _config: AgLoggerConfig;
-  private _verbose: boolean = false;
 
   private constructor() {
     this._config = new AgLoggerConfig();
+  }
+
+  /**
+   * Enhances options by automatically applying ConsoleLoggerMap
+   * when ConsoleLogger is specified without a logger map.
+   *
+   * @param options - The original configuration options
+   * @returns Enhanced options with ConsoleLoggerMap if applicable
+   * @private
+   */
+  private static enhanceOptionsWithConsoleLoggerMap(options: AgLoggerOptions): AgLoggerOptions {
+    if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
+      return { ...options, loggerMap: ConsoleLoggerMap };
+    }
+    return options;
   }
 
   /**
@@ -43,9 +57,10 @@ export class AgLogger {
   static getLogger(options?: AgLoggerOptions): AgLogger {
     const instance = (AgLogger._instance ??= new AgLogger());
 
-    // If configuration is passed, delegate to setManager for unified handling
+    // If configuration is passed, delegate to updateOptions for unified handling
     if (options !== undefined) {
-      instance.setManager(options);
+      const enhancedOptions = AgLogger.enhanceOptionsWithConsoleLoggerMap(options);
+      instance.updateOptions(enhancedOptions);
     }
 
     return instance;
@@ -78,7 +93,6 @@ export class AgLogger {
    */
   setVerbose(value?: boolean): boolean {
     if (value !== undefined) {
-      this._verbose = value;
       this._config.setVerbose(value);
     }
     return this._config.getVerbose();
@@ -140,20 +154,23 @@ export class AgLogger {
   }
 
   /**
-   * Configures the logger with the specified options.
+   * Updates the logger configuration with the specified options.
    * If ConsoleLogger is specified without a logger map,
    * ConsoleLoggerMap will be automatically applied.
    *
+   * @param options - Configuration options to update.
+   */
+  updateOptions(options: AgLoggerOptions): void {
+    const enhancedOptions = AgLogger.enhanceOptionsWithConsoleLoggerMap(options);
+    this._config.setLoggerConfig(enhancedOptions);
+  }
+
+  /**
+   * @deprecated Use updateOptions() instead. This method will be removed in a future version.
    * @param options - Configuration options for the logger.
    */
   setManager(options: AgLoggerOptions): void {
-    const enhancedOptions = { ...options };
-    if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
-      enhancedOptions.loggerMap = ConsoleLoggerMap;
-    }
-
-    // Configure the new config only
-    this._config.setLoggerConfig(enhancedOptions);
+    this.updateOptions(options);
   }
 
   /** Logs a message at FATAL level. */
@@ -227,10 +244,6 @@ export class AgLogger {
  * @returns The singleton AgLogger instance.
  */
 export const getLogger = (options?: AgLoggerOptions): AgLogger => {
-  if (options?.defaultLogger === ConsoleLogger && !options.loggerMap) {
-    options = { ...options, loggerMap: ConsoleLoggerMap };
-  }
-
   return AgLogger.getLogger(options);
 };
 
