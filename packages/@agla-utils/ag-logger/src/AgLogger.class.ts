@@ -56,16 +56,6 @@ export class AgLogger {
   }
 
   /**
-   * Checks if a given log level passes the configured log level filter.
-   *
-   * @param level - Log level to check.
-   * @returns True if the level should be logged; otherwise false.
-   */
-  private isOutputLevel(level: AgLogLevel): boolean {
-    return this._config.shouldOutput(level);
-  }
-
-  /**
    * Sets the global log level filter.
    *
    * @param level - Log level to set.
@@ -141,31 +131,6 @@ export class AgLogger {
     // Get logger function from configuration
     const logger = this._config.getLoggerFunction(level);
     logger(formattedMessage);
-  }
-
-  /**
-   * @deprecated Use executeLog instead. This method is kept for backward compatibility.
-   * Internal method to perform logging if the log level is enabled.
-   * Formats the message and invokes the appropriate logger function.
-   *
-   * @param level - Log level of the message.
-   * @param args - Arguments to be logged.
-   */
-  private logWithLevel(level: AgLogLevel, ...args: unknown[]): void {
-    if (this.isOutputLevel(level)) {
-      const logMessage = AgLoggerGetMessage(level, ...args);
-      const formatter = this._loggerManager.getFormatter();
-      const formattedMessage = formatter(logMessage);
-
-      // Only block logging if the formatter explicitly returns empty string
-      // and the original message had actual content (not just empty args)
-      if (formattedMessage === '' && logMessage.message !== '' && args.length > 0) {
-        return;
-      }
-
-      const logger = this._loggerManager.getLogger(level);
-      logger(formattedMessage);
-    }
   }
 
   /**
