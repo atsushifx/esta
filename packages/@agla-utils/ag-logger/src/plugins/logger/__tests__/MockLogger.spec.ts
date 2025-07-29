@@ -11,7 +11,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 // import test target
 import { AG_LOGLEVEL } from '../../../../shared/types';
-import type { AG_LABEL_TO_LOGLEVEL_MAP, AgTLogLevel } from '../../../../shared/types';
+import type { AG_LABEL_TO_LOGLEVEL_MAP, AgLogLevel } from '../../../../shared/types';
 import { MockLogger } from '../MockLogger';
 
 // Type definitions derived from log level constants
@@ -189,7 +189,7 @@ describe('MockLogger', () => {
    */
   describe('異常系: Error Handling', () => {
     it('should handle invalid log levels with appropriate errors', () => {
-      const invalidLevel = 999 as unknown as AgTLogLevel;
+      const invalidLevel = 999 as unknown as AgLogLevel;
 
       // 無効レベルでの操作は適切なエラーを投げるべき
       expect(() => mockLogger.getMessages(invalidLevel))
@@ -205,9 +205,9 @@ describe('MockLogger', () => {
     });
 
     it('should handle null and undefined log levels', () => {
-      expect(() => mockLogger.getMessages(null as unknown as AgTLogLevel))
+      expect(() => mockLogger.getMessages(null as unknown as AgLogLevel))
         .toThrow('Invalid log level: null');
-      expect(() => mockLogger.getMessages(undefined as unknown as AgTLogLevel))
+      expect(() => mockLogger.getMessages(undefined as unknown as AgLogLevel))
         .toThrow('Invalid log level: undefined');
     });
 

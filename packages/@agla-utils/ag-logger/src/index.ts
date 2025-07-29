@@ -19,7 +19,7 @@
 export { AG_LOGLEVEL } from '../shared/types';
 
 // types
-export type { AgTLogLevel, AgTLogLevelLabel } from '../shared/types';
+export type { AgLogLevel, AgLogLevelLabel } from '../shared/types';
 
 // logger main
 export { AgLogger, getLogger } from './AgLogger.class';

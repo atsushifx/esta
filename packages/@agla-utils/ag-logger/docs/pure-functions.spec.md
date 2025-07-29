@@ -64,8 +64,8 @@ const formatLogMessage = (
 // 実装は LogLevelHelpers.ts を参照
 import { AgToLabel, AgToLogLevel } from '@/utils/LogLevelHelpers';
 
-// AgTLogLevel (数値) → AgTLogLevelLabel (文字列ラベル) 変換
-// AgToLabel(level: AgTLogLevel): AgTLogLevelLabel
+// AgTLogLevel (数値) → AgLogLevelLabel (文字列ラベル) 変換
+// AgToLabel(level: AgTLogLevel): AgLogLevelLabel
 
 // AgTLogLevel (数値) → AgTLogLevel (数値、同じ値) 変換
 // AgToLogLevel(level: AgTLogLevel): AgTLogLevel

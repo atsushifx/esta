@@ -73,7 +73,7 @@ export const AG_LABEL_TO_LOGLEVEL_MAP = {
  */
 export const AG_LOGLEVEL_TO_LABEL_MAP = Object.fromEntries(
   Object.entries(AG_LABEL_TO_LOGLEVEL_MAP).map(([key, value]) => [value, key]),
-) as Record<AgTLogLevel, AgTLogLevelLabel>;
+) as Record<AgLogLevel, AgLogLevelLabel>;
 
 /**
  * Numeric log level type derived from AG_LOGLEVEL values.
@@ -81,11 +81,11 @@ export const AG_LOGLEVEL_TO_LABEL_MAP = Object.fromEntries(
  *
  * @example
  * ```typescript
- * const level: AgTLogLevel = AG_LOGLEVEL.INFO; // Valid
- * const invalid: AgTLogLevel = 7; // Type error
+ * const level: AgLogLevel = AG_LOGLEVEL.INFO; // Valid
+ * const invalid: AgLogLevel = 7; // Type error
  * ```
  */
-export type AgTLogLevel = typeof AG_LOGLEVEL[keyof typeof AG_LOGLEVEL];
+export type AgLogLevel = typeof AG_LOGLEVEL[keyof typeof AG_LOGLEVEL];
 
 /**
  * String log level label type derived from AG_LABEL_TO_LOGLEVEL_MAP keys.
@@ -93,8 +93,8 @@ export type AgTLogLevel = typeof AG_LOGLEVEL[keyof typeof AG_LOGLEVEL];
  *
  * @example
  * ```typescript
- * const label: AgTLogLevelLabel = 'INFO'; // Valid
- * const invalid: AgTLogLevelLabel = 'INVALID'; // Type error
+ * const label: AgLogLevelLabel = 'INFO'; // Valid
+ * const invalid: AgLogLevelLabel = 'INVALID'; // Type error
  * ```
  */
-export type AgTLogLevelLabel = keyof typeof AG_LABEL_TO_LOGLEVEL_MAP;
+export type AgLogLevelLabel = keyof typeof AG_LABEL_TO_LOGLEVEL_MAP;

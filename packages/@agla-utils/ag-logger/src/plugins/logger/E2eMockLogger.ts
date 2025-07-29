@@ -12,7 +12,7 @@ import { MockLogger } from './MockLogger';
 
 // types
 import { AG_LOGLEVEL } from '../../../shared/types';
-import type { AgLoggerFunction, AgLoggerMap, AgTLogLevel } from '../../../shared/types';
+import type { AgLoggerFunction, AgLoggerMap, AgLogLevel } from '../../../shared/types';
 
 /**
  * Mock logger for E2E testing that supports parallel test execution.
@@ -130,17 +130,17 @@ export class E2eMockLogger {
   }
 
   // Query methods
-  getMessages(logLevel: AgTLogLevel): string[] {
+  getMessages(logLevel: AgLogLevel): string[] {
     const mockLogger = this.getCurrentMockLogger();
     return mockLogger.getMessages(logLevel);
   }
 
-  getLastMessage(logLevel: AgTLogLevel): string | null {
+  getLastMessage(logLevel: AgLogLevel): string | null {
     const mockLogger = this.getCurrentMockLogger();
     return mockLogger.getLastMessage(logLevel);
   }
 
-  clearMessages(logLevel: AgTLogLevel): void {
+  clearMessages(logLevel: AgLogLevel): void {
     const mockLogger = this.getCurrentMockLogger();
     mockLogger.clearMessages(logLevel);
   }

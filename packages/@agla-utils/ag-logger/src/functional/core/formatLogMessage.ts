@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import type { AgTLogLevel } from '../../../shared/types';
+import type { AgLogLevel } from '../../../shared/types';
 import { AgToLabel } from '../../utils/LogLevelHelpers';
 
 export type LogMessage = {
@@ -81,7 +81,7 @@ const parseTimestamp = (args: readonly unknown[]): [Date, readonly unknown[]] =>
 
 /**
  * Pure function to format log messages.
- * Converts AgTLogLevel to string labels, handles optional timestamp,
+ * Converts AgLogLevel to string labels, handles optional timestamp,
  * and separates message from structured arguments.
  *
  * @param level - The log level
@@ -89,7 +89,7 @@ const parseTimestamp = (args: readonly unknown[]): [Date, readonly unknown[]] =>
  * @returns Immutable LogMessage object
  */
 export const formatLogMessage = (
-  level: AgTLogLevel,
+  level: AgLogLevel,
   ...args: readonly unknown[]
 ): LogMessage => {
   const [timestamp, remainingArgs] = parseTimestamp(args);

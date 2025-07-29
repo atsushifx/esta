@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import type { AgTLogLevel } from '../../shared/types';
+import type { AgLogLevel } from '../../shared/types';
 import type { AgLogMessage } from '../../shared/types/AgLogger.types';
 import { formatLogMessage } from '../functional/core/formatLogMessage';
 
@@ -21,7 +21,7 @@ import { formatLogMessage } from '../functional/core/formatLogMessage';
  *               a timestamp string, primitive values, and complex objects.
  * @returns A structured `AgLogMessage` object with parsed timestamp, message, and arguments.
  */
-export const AgLoggerGetMessage = (logLevel: AgTLogLevel, ...args: unknown[]): AgLogMessage => {
+export const AgLoggerGetMessage = (logLevel: AgLogLevel, ...args: unknown[]): AgLogMessage => {
   const formatted = formatLogMessage(logLevel, ...args);
 
   // formatLogMessage の結果を AgLogMessage 型に変換

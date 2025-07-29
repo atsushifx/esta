@@ -7,7 +7,7 @@ describe('MockLoggerError', () => {
     it('should create error with INVALID_LOG_LEVEL message using constant', () => {
       const error = new MockLoggerError(ERROR_CATEGORIES.VALIDATION, 'INVALID_LOG_LEVEL');
       expect(error.message).toBe('Invalid log level specified');
-      expect(error.code).toBe('VALIDATION_ERROR');
+      expect(error.errorType).toBe('VALIDATION_ERROR');
       expect(error.category).toBe(ERROR_CATEGORIES.VALIDATION);
     });
   });

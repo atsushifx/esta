@@ -8,7 +8,7 @@
 
 // types
 import { AG_LOGLEVEL } from '../shared/types';
-import type { AgTLogLevel } from '../shared/types';
+import type { AgLogLevel } from '../shared/types';
 // interfaces
 import type { AgLoggerOptions } from '../shared/types/AgLogger.interface';
 
@@ -26,7 +26,7 @@ import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
  */
 export class AgLogger {
   private static _instance: AgLogger | undefined;
-  private static _logLevel: AgTLogLevel = AG_LOGLEVEL.OFF;
+  private static _logLevel: AgLogLevel = AG_LOGLEVEL.OFF;
   private _loggerManager: AgLoggerManager;
   private _verbose: boolean = false;
 
@@ -58,7 +58,7 @@ export class AgLogger {
    * @param level - Log level to check.
    * @returns True if the level should be logged; otherwise false.
    */
-  private isOutputLevel(level: AgTLogLevel): boolean {
+  private isOutputLevel(level: AgLogLevel): boolean {
     if (AgLogger._logLevel === AG_LOGLEVEL.OFF) {
       return false;
     }
@@ -71,7 +71,7 @@ export class AgLogger {
    * @param level - Log level to set.
    * @returns The updated log level.
    */
-  setLogLevel(level: AgTLogLevel): AgTLogLevel {
+  setLogLevel(level: AgLogLevel): AgLogLevel {
     AgLogger._logLevel = level;
     return AgLogger._logLevel;
   }
@@ -81,7 +81,7 @@ export class AgLogger {
    *
    * @returns The current log level.
    */
-  getLogLevel(): AgTLogLevel {
+  getLogLevel(): AgLogLevel {
     return AgLogger._logLevel;
   }
 
@@ -105,7 +105,7 @@ export class AgLogger {
    * @param level - Log level of the message.
    * @param args - Arguments to be logged.
    */
-  private logWithLevel(level: AgTLogLevel, ...args: unknown[]): void {
+  private logWithLevel(level: AgLogLevel, ...args: unknown[]): void {
     if (this.isOutputLevel(level)) {
       const logMessage = AgLoggerGetMessage(level, ...args);
       const formatter = this._loggerManager.getFormatter();

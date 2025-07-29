@@ -11,7 +11,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 // constants
 import { AG_LOGLEVEL } from '../../shared/types';
-import type { AgTLogLevel } from '../../shared/types';
+import type { AgLogLevel } from '../../shared/types';
 // test targets
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 import { JsonFormat } from '@/plugins/format/JsonFormat';
@@ -317,7 +317,7 @@ describe('AgLoggerManager Integration Tests', () => {
       manager.setManager({ defaultLogger });
 
       // Test with invalid log level (should fallback to default)
-      const invalidLevel = 999 as unknown as AgTLogLevel;
+      const invalidLevel = 999 as unknown as AgLogLevel;
       expect(manager.getLogger(invalidLevel)).toBe(defaultLogger);
     });
 
