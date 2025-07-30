@@ -210,9 +210,7 @@ export class AgLogger {
 
   /** Verbose log method that only outputs when verbose flag is true. */
   verbose(...args: unknown[]): void {
-    if (this._config.shouldOutputVerbose()) {
-      this.executeLog(AG_LOGLEVEL.INFO, ...args);
-    }
+    this.executeLog(AG_LOGLEVEL.VERBOSE, ...args);
   }
 
   /**

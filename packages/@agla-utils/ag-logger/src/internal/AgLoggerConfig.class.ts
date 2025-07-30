@@ -259,6 +259,11 @@ export class AgLoggerConfig {
    * @since 0.2.0
    */
   public shouldOutput(level: AgLogLevel): boolean {
+    // when verbose mode is enabled, show verbose messages
+    if (this._logLevel === AG_LOGLEVEL.VERBOSE && this.shouldOutputVerbose()) {
+      return true;
+    }
+
     // When log level is OFF, no output should be generated
     if (this._logLevel === AG_LOGLEVEL.OFF) {
       return false;
