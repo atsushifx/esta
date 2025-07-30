@@ -1,6 +1,6 @@
 ---
 header:
-- src: refactor-aglogger-phase4.tasks.md
+- src: refactor-agLogger-phase4.tasks.md
 - @(#): フェーズ4: AgLoggerManager設定管理API再構成タスク
 title: フェーズ4: AgLoggerManager設定管理API再構成タスク
 description: AgLoggerManagerをAgLoggerの設定管理APIとしての立ち位置に適した高レベルAPIに再構成

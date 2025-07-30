@@ -1,6 +1,6 @@
 ---
 header:
-- src: refactor-aglogger-phase3.tasks.md
+- src: refactor-agLogger-phase3.tasks.md
 - @(#): フェーズ3: AgLogger APIリストラクチャタスク
 title: フェーズ3: AgLogger APIリストラクチャタスク
 description: Single Responsibility Principleに基づいたAgLogger APIの責任分離と明確化
