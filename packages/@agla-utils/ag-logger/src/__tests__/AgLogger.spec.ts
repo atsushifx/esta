@@ -23,6 +23,10 @@ import { AgLoggerConfig } from '../internal/AgLoggerConfig.class';
 import { ConsoleLogger } from '../plugins/logger/ConsoleLogger';
 import { MockLogger } from '../plugins/logger/MockLogger';
 
+type TestableAgLogger = {
+  executeLog: (level: number, ...args: unknown[]) => void;
+};
+
 // テスト用モック関数
 const mockLogger = vi.fn();
 const mockFormatter = vi.fn().mockImplementation((msg) => msg.message ?? msg);
@@ -1168,6 +1172,56 @@ describe('AgLogger', () => {
         logger.verbose('verbose test message should not appear');
         expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(0);
         expect(mockLoggerInstance.hasAnyMessages()).toBe(false);
+      });
+    });
+  });
+
+  /**
+   * executeLog Validation Tests
+   *
+   * @description executeLogメソッドでのログレベル検証機能のテスト
+   */
+  describe('executeLog Validation Tests', () => {
+    /**
+     * 正常系: 有効なログレベルでの動作確認
+     */
+    describe('正常系: Valid Log Level Operations', () => {
+      it('should execute log normally with valid log levels', () => {
+        const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.TRACE);
+
+        // 有効なログレベルで正常にログが出力されることを確認
+        expect(() => logger.fatal('test')).not.toThrow();
+        expect(() => logger.error('test')).not.toThrow();
+        expect(() => logger.warn('test')).not.toThrow();
+        expect(() => logger.info('test')).not.toThrow();
+        expect(() => logger.debug('test')).not.toThrow();
+        expect(() => logger.trace('test')).not.toThrow();
+
+        expect(mockLogger).toHaveBeenCalledTimes(6);
+      });
+    });
+
+    /**
+     * 異常系: 無効なログレベルでのエラー処理
+     */
+    describe('異常系: Invalid Log Level Error Handling', () => {
+      it('should throw error when executeLog is called with invalid log level', () => {
+        const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+
+        // テスト用インターフェース
+
+        // 無効なログレベルで例外が投げられることを確認
+        expect(() => {
+          (logger as unknown as TestableAgLogger).executeLog(-1, 'test message');
+        }).toThrow('Invalid log level: -1');
+
+        expect(() => {
+          (logger as unknown as TestableAgLogger).executeLog(999, 'test message');
+        }).toThrow('Invalid log level: 999');
+
+        // ログが出力されていないことを確認
+        expect(mockLogger).not.toHaveBeenCalled();
       });
     });
   });

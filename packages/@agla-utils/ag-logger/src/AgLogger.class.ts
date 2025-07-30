@@ -122,6 +122,7 @@ export class AgLogger {
    * Unified log execution method that delegates all logging operations to AgLoggerConfig.
    *
    * This method implements the core logging pipeline using AgLoggerConfig for all operations:
+   * - Log level validation through config.validateLogLevel()
    * - Output control decision through config.shouldOutput()
    * - Logger function retrieval through config.getLoggerFunction()
    * - Formatter retrieval through config.getFormatter()
@@ -130,6 +131,9 @@ export class AgLogger {
    * @param args - Arguments to be logged.
    */
   private executeLog(level: AgLogLevel, ...args: unknown[]): void {
+    // Validate log level first
+    this._config.validateLogLevel(level);
+
     // Early return if the message should not be output according to configuration
     if (!this._config.shouldOutput(level)) {
       return;
