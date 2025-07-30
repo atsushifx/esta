@@ -83,6 +83,7 @@ describe('ConsoleLogger', () => {
     describe('ConsoleLoggerMap', () => {
       it('should map log levels to correct console methods', () => {
         const testCases = [
+          { level: AG_LOGLEVEL.VERBOSE, method: 'debug' },
           { level: AG_LOGLEVEL.OFF, expectFunction: true }, // NullLogger
           { level: AG_LOGLEVEL.FATAL, method: 'error' },
           { level: AG_LOGLEVEL.ERROR, method: 'error' },
@@ -111,6 +112,25 @@ describe('ConsoleLogger', () => {
 
         infoLogger(testMessage);
         expect(mockConsole.info).toHaveBeenCalledWith(testMessage);
+      });
+
+      describe('VERBOSE level support', () => {
+        it('should handle VERBOSE level mapping to console.debug', () => {
+          const verboseLogger = ConsoleLoggerMap[AG_LOGLEVEL.VERBOSE];
+          const verboseMessage = 'verbose debug message';
+
+          expect(verboseLogger).toBeDefined();
+          expect(typeof verboseLogger).toBe('function');
+
+          verboseLogger(verboseMessage);
+          expect(mockConsole.debug).toHaveBeenCalledWith(verboseMessage);
+          expect(mockConsole.debug).toHaveBeenCalledTimes(1);
+        });
+
+        it('should handle VERBOSE level with special value -99', () => {
+          expect(AG_LOGLEVEL.VERBOSE).toBe(-99);
+          expect(ConsoleLoggerMap[AG_LOGLEVEL.VERBOSE]).toBeDefined();
+        });
       });
     });
   });

@@ -112,6 +112,11 @@ export class E2eMockLogger {
     mockLogger.trace(message);
   }
 
+  verbose(message: string): void {
+    const mockLogger = this.getCurrentMockLogger();
+    mockLogger.verbose(message);
+  }
+
   /**
    * Get the MockLogger instance for the current test.
    * Validates that there is an active test before returning.
@@ -192,8 +197,10 @@ export class E2eMockLogger {
    * Create AgLoggerMap for the current test.
    * This provides level-specific logging functions.
    */
+
   createLoggerMap(): AgLoggerMap {
     return {
+      [AG_LOGLEVEL.VERBOSE]: (message: string) => this.verbose(message),
       [AG_LOGLEVEL.OFF]: () => {},
       [AG_LOGLEVEL.FATAL]: (message: string) => this.fatal(message),
       [AG_LOGLEVEL.ERROR]: (message: string) => this.error(message),

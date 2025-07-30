@@ -16,7 +16,8 @@ import type { AgLogLevel, AgLogLevelLabel } from '../../shared/types';
  * @throws Error if log level is invalid
  */
 export const AgToLabel = (level: AgLogLevel): AgLogLevelLabel => {
-  if (typeof level !== 'number' || level < AG_LOGLEVEL.OFF || level > AG_LOGLEVEL.TRACE || !Number.isInteger(level)) {
+  const validLevels = Object.values(AG_LOGLEVEL);
+  if (!validLevels.includes(level)) {
     throw new Error(`Invalid log level: ${level}`);
   }
 

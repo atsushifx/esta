@@ -16,6 +16,7 @@ import { AgToLabel } from '../AgLogLevelHelpers';
 describe('LogLevel Helper Functions', () => {
   describe('AgToLabel function', () => {
     it('should convert numeric log level to uppercase string', () => {
+      expect(AgToLabel(AG_LOGLEVEL.VERBOSE)).toBe('VERBOSE');
       expect(AgToLabel(AG_LOGLEVEL.OFF)).toBe('OFF');
       expect(AgToLabel(AG_LOGLEVEL.FATAL)).toBe('FATAL');
       expect(AgToLabel(AG_LOGLEVEL.ERROR)).toBe('ERROR');
@@ -27,6 +28,7 @@ describe('LogLevel Helper Functions', () => {
 
     it('should maintain compatibility with expected string format', () => {
       // Test that labels match expected format
+      expect(AgToLabel(AG_LOGLEVEL.VERBOSE)).toBe('VERBOSE');
       expect(AgToLabel(AG_LOGLEVEL.OFF)).toBe('OFF');
       expect(AgToLabel(AG_LOGLEVEL.FATAL)).toBe('FATAL');
       expect(AgToLabel(AG_LOGLEVEL.ERROR)).toBe('ERROR');
@@ -74,6 +76,29 @@ describe('LogLevel Helper Functions', () => {
 
       // Should complete in reasonable time (less than 100ms for 1000 operations)
       expect(duration).toBeLessThan(100);
+    });
+
+    describe('VERBOSE level support', () => {
+      it('should handle VERBOSE special value (-99) correctly', () => {
+        expect(AG_LOGLEVEL.VERBOSE).toBe(-99);
+        expect(AgToLabel(AG_LOGLEVEL.VERBOSE)).toBe('VERBOSE');
+      });
+
+      it('should convert VERBOSE level to correct label', () => {
+        const verboseLevel = AG_LOGLEVEL.VERBOSE;
+        const verboseLabel = AgToLabel(verboseLevel);
+
+        expect(verboseLabel).toBe('VERBOSE');
+        expect(verboseLabel).toMatch(/^[A-Z]+$/);
+      });
+
+      it('should maintain VERBOSE in all log level operations', () => {
+        const verboseFromConstant = AG_LOGLEVEL.VERBOSE;
+        const verboseLabelFromFunction = AgToLabel(verboseFromConstant);
+
+        expect(verboseFromConstant).toBe(-99);
+        expect(verboseLabelFromFunction).toBe('VERBOSE');
+      });
     });
   });
 });

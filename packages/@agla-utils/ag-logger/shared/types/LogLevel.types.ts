@@ -11,6 +11,7 @@
  * Based on AWS CloudWatch Logs convention.
  *
  * @remarks
+ * - VERBOSE (-99): Special verbose mode for extremely detailed output
  * - OFF (0): No logging
  * - FATAL (1): Fatal errors that cause application termination
  * - ERROR (2): Error conditions that don't stop the application
@@ -20,6 +21,8 @@
  * - TRACE (6): Very detailed tracing information
  */
 export const AG_LOGLEVEL = {
+  /** Special verbose mode for extremely detailed output. */
+  VERBOSE: -99,
   /** No logging output. */
   OFF: 0,
   /** Fatal errors that cause application termination. */
@@ -46,6 +49,8 @@ export const AG_LOGLEVEL = {
  * ```
  */
 export const AG_LABEL_TO_LOGLEVEL_MAP = {
+  /** Maps 'VERBOSE' string to numeric value -99. */
+  'VERBOSE': AG_LOGLEVEL.VERBOSE,
   /** Maps 'OFF' string to numeric value 0. */
   'OFF': AG_LOGLEVEL.OFF,
   /** Maps 'FATAL' string to numeric value 1. */

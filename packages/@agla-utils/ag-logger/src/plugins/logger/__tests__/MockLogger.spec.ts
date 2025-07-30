@@ -52,6 +52,7 @@ describe('MockLogger', () => {
     describe('Log Message Capture', () => {
       it('should capture messages for all log levels', () => {
         const testCases = [
+          { level: AG_LOGLEVEL.VERBOSE, method: 'verbose', message: 'verbose message' },
           { level: AG_LOGLEVEL.FATAL, method: 'fatal', message: 'fatal error' },
           { level: AG_LOGLEVEL.ERROR, method: 'error', message: 'error message' },
           { level: AG_LOGLEVEL.WARN, method: 'warn', message: 'warning message' },
@@ -74,6 +75,37 @@ describe('MockLogger', () => {
 
         expect(mockLogger.getMessages(AG_LOGLEVEL.ERROR)).toEqual(['first error', 'second error']);
         expect(mockLogger.getMessages(AG_LOGLEVEL.INFO)).toEqual(['info message']);
+      });
+
+      describe('VERBOSE level support', () => {
+        it('should support verbose() method for VERBOSE level logging', () => {
+          const verboseMessage = 'verbose debug info';
+
+          mockLogger.verbose(verboseMessage);
+
+          expect(mockLogger.getMessages(AG_LOGLEVEL.VERBOSE)).toEqual([verboseMessage]);
+          expect(mockLogger.getLastMessage(AG_LOGLEVEL.VERBOSE)).toBe(verboseMessage);
+          expect(mockLogger.hasMessages(AG_LOGLEVEL.VERBOSE)).toBe(true);
+        });
+
+        it('should handle VERBOSE level with special value -99', () => {
+          expect(AG_LOGLEVEL.VERBOSE).toBe(-99);
+
+          const verboseMsg = 'test verbose';
+          mockLogger.verbose(verboseMsg);
+
+          expect(mockLogger.getMessages(AG_LOGLEVEL.VERBOSE)).toContain(verboseMsg);
+        });
+
+        it('should store VERBOSE messages independently from other levels', () => {
+          mockLogger.verbose('verbose msg 1');
+          mockLogger.debug('debug msg');
+          mockLogger.verbose('verbose msg 2');
+
+          expect(mockLogger.getMessages(AG_LOGLEVEL.VERBOSE)).toEqual(['verbose msg 1', 'verbose msg 2']);
+          expect(mockLogger.getMessages(AG_LOGLEVEL.DEBUG)).toEqual(['debug msg']);
+          expect(mockLogger.getMessageCount(AG_LOGLEVEL.VERBOSE)).toBe(2);
+        });
       });
     });
 
@@ -113,6 +145,27 @@ describe('MockLogger', () => {
         expect(allMessages.INFO).toEqual(['info1']);
         expect(allMessages.WARN).toEqual(['warn1']);
         expect(allMessages.DEBUG).toEqual([]);
+      });
+
+      describe('VERBOSE level in getAllMessages', () => {
+        it('should include VERBOSE messages in getAllMessages output', () => {
+          const cleanLogger = new MockLogger();
+          cleanLogger.verbose('verbose test message');
+          cleanLogger.error('error message');
+
+          const allMessages = cleanLogger.getAllMessages();
+
+          expect(allMessages.VERBOSE).toEqual(['verbose test message']);
+          expect(allMessages.ERROR).toEqual(['error message']);
+          expect(allMessages).toHaveProperty('VERBOSE');
+        });
+
+        it('should handle empty VERBOSE array in getAllMessages', () => {
+          const allMessages = mockLogger.getAllMessages();
+
+          expect(allMessages.VERBOSE).toEqual([]);
+          expect(Array.isArray(allMessages.VERBOSE)).toBe(true);
+        });
       });
     });
 
@@ -178,6 +231,27 @@ describe('MockLogger', () => {
         // OFFレベルは何もしない
         loggerMap[AG_LOGLEVEL.OFF]('should not log');
         expect(mockLogger.hasMessages(AG_LOGLEVEL.OFF)).toBe(false);
+
+        // VERBOSEレベルのテスト
+        loggerMap[AG_LOGLEVEL.VERBOSE]('verbose via map');
+        expect(mockLogger.getMessages(AG_LOGLEVEL.VERBOSE)).toEqual(['verbose via map']);
+      });
+
+      describe('VERBOSE level validation', () => {
+        it('should validate VERBOSE level (-99) as valid', () => {
+          expect(() => mockLogger.getMessages(AG_LOGLEVEL.VERBOSE)).not.toThrow();
+          expect(() => mockLogger.clearMessages(AG_LOGLEVEL.VERBOSE)).not.toThrow();
+          expect(() => mockLogger.hasMessages(AG_LOGLEVEL.VERBOSE)).not.toThrow();
+        });
+
+        it('should include VERBOSE in createLoggerFunction validation', () => {
+          expect(() => mockLogger.createLoggerFunction(AG_LOGLEVEL.VERBOSE)).not.toThrow();
+
+          const verboseLogger = mockLogger.createLoggerFunction(AG_LOGLEVEL.VERBOSE);
+          verboseLogger('verbose from function');
+
+          expect(mockLogger.getMessages(AG_LOGLEVEL.VERBOSE)).toEqual(['verbose from function']);
+        });
       });
     });
   });

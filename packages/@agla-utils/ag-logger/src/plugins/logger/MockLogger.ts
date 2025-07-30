@@ -22,15 +22,16 @@ import type { AgLoggerFunction, AgLoggerMap, AgLogLevel } from '../../../shared/
  * - Auto-configured loggerMap for seamless integration
  */
 export class MockLogger {
-  private _messages: string[][] = [
-    [], // OFF (0) - not used for actual logging
-    [], // FATAL (1)
-    [], // ERROR (2)
-    [], // WARN (3)
-    [], // INFO (4)
-    [], // DEBUG (5)
-    [], // TRACE (6)
-  ];
+  private _messages: Record<AgLogLevel, string[]> = {
+    [AG_LOGLEVEL.VERBOSE]: [], // VERBOSE (-99)
+    [AG_LOGLEVEL.OFF]: [], // OFF (0) - not used for actual logging
+    [AG_LOGLEVEL.FATAL]: [], // FATAL (1)
+    [AG_LOGLEVEL.ERROR]: [], // ERROR (2)
+    [AG_LOGLEVEL.WARN]: [], // WARN (3)
+    [AG_LOGLEVEL.INFO]: [], // INFO (4)
+    [AG_LOGLEVEL.DEBUG]: [], // DEBUG (5)
+    [AG_LOGLEVEL.TRACE]: [], // TRACE (6)
+  };
 
   private _loggerMap: AgLoggerMap;
   private _defaultLoggerFunction: AgLoggerFunction;
@@ -47,7 +48,8 @@ export class MockLogger {
    * @throws {Error} When log level is invalid
    */
   private validateLogLevel(logLevel: AgLogLevel): void {
-    if (typeof logLevel !== 'number' || logLevel < 0 || logLevel > 6 || !Number.isInteger(logLevel)) {
+    const validLevels = Object.values(AG_LOGLEVEL);
+    if (!validLevels.includes(logLevel)) {
       throw new Error(`Invalid log level: ${logLevel}`);
     }
   }
@@ -77,6 +79,10 @@ export class MockLogger {
     this._loggerMap[AG_LOGLEVEL.TRACE](message);
   }
 
+  verbose(message: string): void {
+    this._loggerMap[AG_LOGLEVEL.VERBOSE](message);
+  }
+
   // Query methods
   getMessages(logLevel: AgLogLevel): string[] {
     this.validateLogLevel(logLevel);
@@ -91,6 +97,7 @@ export class MockLogger {
 
   getAllMessages(): { [K in keyof typeof AG_LOGLEVEL]: string[] } {
     return {
+      VERBOSE: [...this._messages[AG_LOGLEVEL.VERBOSE]],
       OFF: [...this._messages[AG_LOGLEVEL.OFF]],
       FATAL: [...this._messages[AG_LOGLEVEL.FATAL]],
       ERROR: [...this._messages[AG_LOGLEVEL.ERROR]],
@@ -108,15 +115,16 @@ export class MockLogger {
   }
 
   clearAllMessages(): void {
-    this._messages = [
-      [], // OFF (0)
-      [], // FATAL (1)
-      [], // ERROR (2)
-      [], // WARN (3)
-      [], // INFO (4)
-      [], // DEBUG (5)
-      [], // TRACE (6)
-    ];
+    this._messages = {
+      [AG_LOGLEVEL.VERBOSE]: [], // VERBOSE (-99)
+      [AG_LOGLEVEL.OFF]: [], // OFF (0)
+      [AG_LOGLEVEL.FATAL]: [], // FATAL (1)
+      [AG_LOGLEVEL.ERROR]: [], // ERROR (2)
+      [AG_LOGLEVEL.WARN]: [], // WARN (3)
+      [AG_LOGLEVEL.INFO]: [], // INFO (4)
+      [AG_LOGLEVEL.DEBUG]: [], // DEBUG (5)
+      [AG_LOGLEVEL.TRACE]: [], // TRACE (6)
+    };
   }
 
   getMessageCount(logLevel: AgLogLevel): number {
@@ -125,7 +133,7 @@ export class MockLogger {
   }
 
   getTotalMessageCount(): number {
-    return this._messages.reduce((total, levelMessages) => total + levelMessages.length, 0);
+    return Object.values(this._messages).reduce((total, levelMessages) => total + levelMessages.length, 0);
   }
 
   hasMessages(logLevel: AgLogLevel): boolean {
@@ -134,7 +142,7 @@ export class MockLogger {
   }
 
   hasAnyMessages(): boolean {
-    return this._messages.some((levelMessages) => levelMessages.length > 0);
+    return Object.values(this._messages).some((levelMessages) => levelMessages.length > 0);
   }
 
   /**
@@ -178,6 +186,7 @@ export class MockLogger {
    */
   createLoggerMap(): AgLoggerMap {
     return {
+      [AG_LOGLEVEL.VERBOSE]: this.createLoggerFunction(AG_LOGLEVEL.VERBOSE),
       [AG_LOGLEVEL.OFF]: this.createLoggerFunction(AG_LOGLEVEL.OFF),
       [AG_LOGLEVEL.FATAL]: this.createLoggerFunction(AG_LOGLEVEL.FATAL),
       [AG_LOGLEVEL.ERROR]: this.createLoggerFunction(AG_LOGLEVEL.ERROR),
