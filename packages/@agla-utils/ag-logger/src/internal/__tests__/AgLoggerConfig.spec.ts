@@ -107,39 +107,28 @@ describe('AgLoggerConfig', () => {
     const invalidHighLevel = 7;
     const invalidLowLevel = -1;
 
-    // Verify that AgLoggerError is thrown for out-of-bounds values
-    expect(() => config.getLoggerFunction(invalidHighLevel as AgLogLevel))
-      .toThrow(AgLoggerError);
-    expect(() => config.getLoggerFunction(invalidHighLevel as AgLogLevel))
-      .toThrow('Invalid log level: 7');
+    // Verify that getLoggerFunction returns NullLogger for out-of-bounds values
+    const loggerForInvalidHigh = config.getLoggerFunction(invalidHighLevel as AgLogLevel);
+    const loggerForInvalidLow = config.getLoggerFunction(invalidLowLevel as AgLogLevel);
 
-    expect(() => config.getLoggerFunction(invalidLowLevel as AgLogLevel))
-      .toThrow(AgLoggerError);
-    expect(() => config.getLoggerFunction(invalidLowLevel as AgLogLevel))
-      .toThrow('Invalid log level: -1');
+    // Both should return NullLogger for invalid numeric values
+    expect(loggerForInvalidHigh).toBe(NullLogger);
+    expect(loggerForInvalidLow).toBe(NullLogger);
 
     // Test runtime type violations (when TypeScript type checking fails)
     const stringValue = 'INVALID' as unknown as AgLogLevel;
     const nullValue = null as unknown as AgLogLevel;
     const undefinedValue = undefined as unknown as AgLogLevel;
 
-    // Verify error handling for string values
-    expect(() => config.getLoggerFunction(stringValue))
-      .toThrow(AgLoggerError);
-    expect(() => config.getLoggerFunction(stringValue))
-      .toThrow('Invalid log level: INVALID');
+    // For type-invalid values, getLoggerFunction should return NullLogger
+    const loggerForString = config.getLoggerFunction(stringValue);
+    const loggerForNull = config.getLoggerFunction(nullValue);
+    const loggerForUndefined = config.getLoggerFunction(undefinedValue);
 
-    // Verify error handling for null values
-    expect(() => config.getLoggerFunction(nullValue))
-      .toThrow(AgLoggerError);
-    expect(() => config.getLoggerFunction(nullValue))
-      .toThrow('Invalid log level: null');
-
-    // Verify error handling for undefined values
-    expect(() => config.getLoggerFunction(undefinedValue))
-      .toThrow(AgLoggerError);
-    expect(() => config.getLoggerFunction(undefinedValue))
-      .toThrow('Invalid log level: undefined');
+    // All should return NullLogger for invalid type values
+    expect(loggerForString).toBe(NullLogger);
+    expect(loggerForNull).toBe(NullLogger);
+    expect(loggerForUndefined).toBe(NullLogger);
 
     // Verify correct error category is set
     try {

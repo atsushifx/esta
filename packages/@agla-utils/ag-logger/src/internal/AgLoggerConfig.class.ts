@@ -98,6 +98,7 @@ export class AgLoggerConfig {
    */
   private createDefaultLoggerMap(): Partial<AgLoggerMap<AgLoggerFunction>> {
     return {
+      [AG_LOGLEVEL.VERBOSE]: this._defaultLogger,
       [AG_LOGLEVEL.OFF]: this._defaultLogger,
       [AG_LOGLEVEL.FATAL]: this._defaultLogger,
       [AG_LOGLEVEL.ERROR]: this._defaultLogger,
@@ -114,26 +115,6 @@ export class AgLoggerConfig {
    */
   public getLoggerMap(): Partial<AgLoggerMap<AgLoggerFunction>> {
     return { ...this._loggerMap };
-  }
-
-  /**
-   * Gets the logger function for the specified log level.
-   * Returns the configured logger function for the given log level.
-   * If an invalid log level is provided, throws an AgLoggerError with appropriate error category.
-   *
-   * @param level - The log level to get the logger function for
-   * @returns Logger function for the specified level, or defaultLogger as fallback
-   * @throws {AgLoggerError} When an invalid log level is provided (error category: INVALID_LOG_LEVEL)
-   *
-   * @example
-   * ```typescript
-   * const config = new AgLoggerConfig();
-   * const logger = config.getLoggerFunction(AG_LOGLEVEL.INFO); // Returns logger for INFO level
-   * ```
-   */
-  public getLoggerFunction(level: AgLogLevel): AgLoggerFunction {
-    this.validateLogLevel(level);
-    return this._loggerMap[level] ?? this._defaultLogger;
   }
 
   /**
@@ -259,6 +240,11 @@ export class AgLoggerConfig {
    * @since 0.2.0
    */
   public shouldOutput(level: AgLogLevel): boolean {
+    // Special handling for VERBOSE level messages
+    if (level === AG_LOGLEVEL.VERBOSE) {
+      return this.shouldOutputVerbose();
+    }
+
     // when verbose mode is enabled, show verbose messages
     if (this._logLevel === AG_LOGLEVEL.VERBOSE && this.shouldOutputVerbose()) {
       return true;
@@ -430,6 +416,34 @@ export class AgLoggerConfig {
    */
   private isValidLogLevel(level: AgLogLevel): boolean {
     return level in this._loggerMap;
+  }
+
+  /**
+   * Gets the logger function for the specified log level.
+   *
+   * Returns the appropriate logger function based on the log level.
+   * For all levels including VERBOSE, returns the logger mapped to that level or the default logger.
+   *
+   * @param level - The log level to get the logger function for
+   * @returns The logger function for the specified level
+   *
+   * @example
+   * ```typescript
+   * const config = new AgLoggerConfig();
+   * const infoLogger = config.getLoggerFunction(AG_LOGLEVEL.INFO);
+   * const verboseLogger = config.getLoggerFunction(AG_LOGLEVEL.VERBOSE);
+   * ```
+   *
+   * @since 0.2.0
+   */
+  public getLoggerFunction(level: AgLogLevel): AgLoggerFunction {
+    // For invalid log levels, return NullLogger for safety
+    if (!this.isValidLogLevel(level)) {
+      return NullLogger;
+    }
+
+    // Return the mapped logger or default logger
+    return this._loggerMap[level] ?? this._defaultLogger;
   }
 
   /**

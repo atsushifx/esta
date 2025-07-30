@@ -554,6 +554,67 @@ describe('AgLogger', () => {
 
         expect(mockLogger).toHaveBeenCalledTimes(50); // verbose がtrueの時のみ
       });
+
+      it('should output verbose messages even when log level is OFF', () => {
+        const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.OFF);
+        logger.setVerbose(true);
+
+        logger.verbose('verbose message with OFF level');
+        logger.info('info message with OFF level'); // should be filtered
+        logger.error('error message with OFF level'); // should be filtered
+
+        expect(mockLogger).toHaveBeenCalledTimes(1); // only verbose should output
+        expect(mockFormatter).toHaveBeenCalledTimes(1);
+      });
+
+      it('should not output verbose messages when verbose is false, regardless of log level', () => {
+        const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.TRACE); // highest level
+        logger.setVerbose(false);
+
+        logger.verbose('verbose message with TRACE level');
+        logger.trace('trace message with TRACE level'); // should output
+
+        expect(mockLogger).toHaveBeenCalledTimes(1); // only trace should output
+        expect(mockFormatter).toHaveBeenCalledTimes(1);
+      });
+
+      it('should output verbose messages with various log levels when verbose is enabled', () => {
+        const testCases = [
+          AG_LOGLEVEL.OFF,
+          AG_LOGLEVEL.FATAL,
+          AG_LOGLEVEL.ERROR,
+          AG_LOGLEVEL.WARN,
+          AG_LOGLEVEL.INFO,
+          AG_LOGLEVEL.DEBUG,
+          AG_LOGLEVEL.TRACE,
+        ];
+
+        testCases.forEach((level, _index) => {
+          vi.clearAllMocks();
+          const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+          logger.setLogLevel(level);
+          logger.setVerbose(true);
+
+          logger.verbose(`verbose message at level ${level}`);
+
+          expect(mockLogger).toHaveBeenCalledTimes(1);
+          expect(mockFormatter).toHaveBeenCalledTimes(1);
+        });
+      });
+
+      it('should handle VERBOSE log level correctly', () => {
+        const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.VERBOSE);
+        logger.setVerbose(true);
+
+        logger.verbose('verbose message with VERBOSE level');
+        logger.info('info message with VERBOSE level'); // should also output since VERBOSE includes everything
+
+        expect(mockLogger).toHaveBeenCalledTimes(2);
+        expect(mockFormatter).toHaveBeenCalledTimes(2);
+      });
     });
   });
 
@@ -1150,9 +1211,10 @@ describe('AgLogger', () => {
         expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.FATAL)).toBe(1);
         expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.ERROR)).toBe(1);
         expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.WARN)).toBe(1);
-        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(3); // info + log + verbose
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(2); // info + log
         expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.DEBUG)).toBe(1);
         expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.TRACE)).toBe(1);
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.VERBOSE)).toBe(1); // verbose
 
         // メッセージ内容も確認
         expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.FATAL)).toContain('fatal message');
@@ -1160,7 +1222,7 @@ describe('AgLogger', () => {
         expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.WARN)).toContain('warn message');
         expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.INFO)).toContain('info message');
         expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.INFO)).toContain('log message');
-        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.INFO)).toContain('verbose message');
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.VERBOSE)).toContain('verbose message');
         expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.DEBUG)).toContain('debug message');
         expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.TRACE)).toContain('trace message');
       });
@@ -1182,8 +1244,8 @@ describe('AgLogger', () => {
         // verbose on - 出力される
         logger.setVerbose(true);
         logger.verbose('verbose on message');
-        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(1);
-        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.INFO)).toContain('verbose on message');
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.VERBOSE)).toBe(1);
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.VERBOSE)).toContain('verbose on message');
       });
 
       it('ログレベルフィルタリングが各メソッドで正常に機能する', () => {
