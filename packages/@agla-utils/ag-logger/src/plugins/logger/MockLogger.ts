@@ -19,9 +19,10 @@ import type { AgLoggerFunction, AgLoggerMap, AgLogLevel } from '../../../shared/
  * - Component interaction verification
  * - Synchronous operations only
  * - Thread-safe for single-threaded test scenarios
+ * - Auto-configured loggerMap for seamless integration
  */
 export class MockLogger {
-  private messages: string[][] = [
+  private _messages: string[][] = [
     [], // OFF (0) - not used for actual logging
     [], // FATAL (1)
     [], // ERROR (2)
@@ -30,6 +31,15 @@ export class MockLogger {
     [], // DEBUG (5)
     [], // TRACE (6)
   ];
+
+  private _loggerMap: AgLoggerMap;
+  private _defaultLoggerFunction: AgLoggerFunction;
+
+  constructor() {
+    // Auto-create loggerMap with level-specific functions
+    this._loggerMap = this.createLoggerMap();
+    this._defaultLoggerFunction = this.createLoggerFunction();
+  }
 
   /**
    * Validates if the provided log level is valid.
@@ -42,63 +52,63 @@ export class MockLogger {
     }
   }
 
-  // Logger methods
+  // Logger methods - use loggerMap functions for consistency
   fatal(message: string): void {
-    this.messages[AG_LOGLEVEL.FATAL].push(message);
+    this._loggerMap[AG_LOGLEVEL.FATAL](message);
   }
 
   error(message: string): void {
-    this.messages[AG_LOGLEVEL.ERROR].push(message);
+    this._loggerMap[AG_LOGLEVEL.ERROR](message);
   }
 
   warn(message: string): void {
-    this.messages[AG_LOGLEVEL.WARN].push(message);
+    this._loggerMap[AG_LOGLEVEL.WARN](message);
   }
 
   info(message: string): void {
-    this.messages[AG_LOGLEVEL.INFO].push(message);
+    this._loggerMap[AG_LOGLEVEL.INFO](message);
   }
 
   debug(message: string): void {
-    this.messages[AG_LOGLEVEL.DEBUG].push(message);
+    this._loggerMap[AG_LOGLEVEL.DEBUG](message);
   }
 
   trace(message: string): void {
-    this.messages[AG_LOGLEVEL.TRACE].push(message);
+    this._loggerMap[AG_LOGLEVEL.TRACE](message);
   }
 
   // Query methods
   getMessages(logLevel: AgLogLevel): string[] {
     this.validateLogLevel(logLevel);
-    return [...this.messages[logLevel]];
+    return [...this._messages[logLevel]];
   }
 
   getLastMessage(logLevel: AgLogLevel): string | null {
     this.validateLogLevel(logLevel);
-    const levelMessages = this.messages[logLevel];
+    const levelMessages = this._messages[logLevel];
     return levelMessages[levelMessages.length - 1] || null;
   }
 
   getAllMessages(): { [K in keyof typeof AG_LOGLEVEL]: string[] } {
     return {
-      OFF: [...this.messages[AG_LOGLEVEL.OFF]],
-      FATAL: [...this.messages[AG_LOGLEVEL.FATAL]],
-      ERROR: [...this.messages[AG_LOGLEVEL.ERROR]],
-      WARN: [...this.messages[AG_LOGLEVEL.WARN]],
-      INFO: [...this.messages[AG_LOGLEVEL.INFO]],
-      DEBUG: [...this.messages[AG_LOGLEVEL.DEBUG]],
-      TRACE: [...this.messages[AG_LOGLEVEL.TRACE]],
+      OFF: [...this._messages[AG_LOGLEVEL.OFF]],
+      FATAL: [...this._messages[AG_LOGLEVEL.FATAL]],
+      ERROR: [...this._messages[AG_LOGLEVEL.ERROR]],
+      WARN: [...this._messages[AG_LOGLEVEL.WARN]],
+      INFO: [...this._messages[AG_LOGLEVEL.INFO]],
+      DEBUG: [...this._messages[AG_LOGLEVEL.DEBUG]],
+      TRACE: [...this._messages[AG_LOGLEVEL.TRACE]],
     };
   }
 
   // Utility methods
   clearMessages(logLevel: AgLogLevel): void {
     this.validateLogLevel(logLevel);
-    this.messages[logLevel] = [];
+    this._messages[logLevel] = [];
   }
 
   clearAllMessages(): void {
-    this.messages = [
+    this._messages = [
       [], // OFF (0)
       [], // FATAL (1)
       [], // ERROR (2)
@@ -111,46 +121,70 @@ export class MockLogger {
 
   getMessageCount(logLevel: AgLogLevel): number {
     this.validateLogLevel(logLevel);
-    return this.messages[logLevel].length;
+    return this._messages[logLevel].length;
   }
 
   getTotalMessageCount(): number {
-    return this.messages.reduce((total, levelMessages) => total + levelMessages.length, 0);
+    return this._messages.reduce((total, levelMessages) => total + levelMessages.length, 0);
   }
 
   hasMessages(logLevel: AgLogLevel): boolean {
     this.validateLogLevel(logLevel);
-    return this.messages[logLevel].length > 0;
+    return this._messages[logLevel].length > 0;
   }
 
   hasAnyMessages(): boolean {
-    return this.messages.some((levelMessages) => levelMessages.length > 0);
+    return this._messages.some((levelMessages) => levelMessages.length > 0);
   }
 
   /**
    * Create AgLoggerFunction for testing.
    * This can be used as a plugin for ag-logger.
+   *
+   * @param defaultLevel - The log level to use for messages. Defaults to INFO.
    */
-  createLoggerFunction(): AgLoggerFunction {
+  createLoggerFunction(defaultLevel: AgLogLevel = AG_LOGLEVEL.INFO): AgLoggerFunction {
+    this.validateLogLevel(defaultLevel);
+
+    // Return a function that directly pushes to the specified level's buffer
     return (formattedLogMessage: string): void => {
-      // Use info level as default for generic logger function
-      this.info(formattedLogMessage);
+      if (defaultLevel === AG_LOGLEVEL.OFF) {
+        // No-op for OFF level
+        return;
+      }
+      this._messages[defaultLevel].push(formattedLogMessage);
     };
   }
 
   /**
+   * Get the auto-configured loggerMap for direct use in tests.
+   * @returns The pre-configured AgLoggerMap
+   */
+  getLoggerMap(): AgLoggerMap {
+    return this._loggerMap;
+  }
+
+  /**
+   * Get the default logger function for direct use in tests.
+   * @returns The pre-configured default AgLoggerFunction
+   */
+  getDefaultLoggerFunction(): AgLoggerFunction {
+    return this._defaultLoggerFunction;
+  }
+
+  /**
    * Create AgLoggerMap for testing.
-   * This provides level-specific logging functions.
+   * This provides level-specific logging functions using createLoggerFunction.
    */
   createLoggerMap(): AgLoggerMap {
     return {
-      [AG_LOGLEVEL.OFF]: () => {}, // No-op for OFF level
-      [AG_LOGLEVEL.FATAL]: (message: string) => this.fatal(message),
-      [AG_LOGLEVEL.ERROR]: (message: string) => this.error(message),
-      [AG_LOGLEVEL.WARN]: (message: string) => this.warn(message),
-      [AG_LOGLEVEL.INFO]: (message: string) => this.info(message),
-      [AG_LOGLEVEL.DEBUG]: (message: string) => this.debug(message),
-      [AG_LOGLEVEL.TRACE]: (message: string) => this.trace(message),
+      [AG_LOGLEVEL.OFF]: this.createLoggerFunction(AG_LOGLEVEL.OFF),
+      [AG_LOGLEVEL.FATAL]: this.createLoggerFunction(AG_LOGLEVEL.FATAL),
+      [AG_LOGLEVEL.ERROR]: this.createLoggerFunction(AG_LOGLEVEL.ERROR),
+      [AG_LOGLEVEL.WARN]: this.createLoggerFunction(AG_LOGLEVEL.WARN),
+      [AG_LOGLEVEL.INFO]: this.createLoggerFunction(AG_LOGLEVEL.INFO),
+      [AG_LOGLEVEL.DEBUG]: this.createLoggerFunction(AG_LOGLEVEL.DEBUG),
+      [AG_LOGLEVEL.TRACE]: this.createLoggerFunction(AG_LOGLEVEL.TRACE),
     };
   }
 

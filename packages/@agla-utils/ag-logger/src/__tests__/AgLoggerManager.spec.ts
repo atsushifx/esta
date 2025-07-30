@@ -291,7 +291,7 @@ describe('AgLoggerManager', () => {
           defaultLogger: mockDefaultLogger,
           loggerMap: {
             [AG_LOGLEVEL.ERROR]: mockErrorLogger,
-            [AG_LOGLEVEL.WARN]: undefined as AgLoggerFunction | null | undefined, // 意図的なundefined
+            [AG_LOGLEVEL.WARN]: undefined as AgLoggerFunction | undefined, // 意図的なundefined
             [AG_LOGLEVEL.INFO]: mockDefaultLogger,
           },
         });
@@ -369,6 +369,29 @@ describe('AgLoggerManager', () => {
 
         expect(errorLogger).toBe(mockErrorLogger);
         expect(infoLogger).toBe(mockDefaultLogger);
+      });
+
+      it('returns default logger for unspecified levels when partial loggerMap is provided', () => {
+        const customErrorLogger = vi.fn();
+        const customWarnLogger = vi.fn();
+
+        const manager = AgLoggerManager.getManager({
+          defaultLogger: mockDefaultLogger,
+          loggerMap: {
+            [AG_LOGLEVEL.ERROR]: customErrorLogger,
+            [AG_LOGLEVEL.WARN]: customWarnLogger,
+          },
+        });
+
+        // Test specified levels return custom loggers
+        expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(customErrorLogger);
+        expect(manager.getLogger(AG_LOGLEVEL.WARN)).toBe(customWarnLogger);
+
+        // Test unspecified levels return default logger
+        expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(mockDefaultLogger);
+        expect(manager.getLogger(AG_LOGLEVEL.DEBUG)).toBe(mockDefaultLogger);
+        expect(manager.getLogger(AG_LOGLEVEL.TRACE)).toBe(mockDefaultLogger);
+        expect(manager.getLogger(AG_LOGLEVEL.FATAL)).toBe(mockDefaultLogger);
       });
     });
 

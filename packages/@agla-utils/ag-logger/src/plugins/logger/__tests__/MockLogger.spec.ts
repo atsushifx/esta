@@ -169,14 +169,14 @@ describe('MockLogger', () => {
 
         // ロガーマップ
         const loggerMap = mockLogger.createLoggerMap();
-        loggerMap[AG_LOGLEVEL.ERROR]?.('error via map');
-        loggerMap[AG_LOGLEVEL.WARN]?.('warn via map');
+        loggerMap[AG_LOGLEVEL.ERROR]('error via map');
+        loggerMap[AG_LOGLEVEL.WARN]('warn via map');
 
         expect(mockLogger.getMessages(AG_LOGLEVEL.ERROR)).toEqual(['error via map']);
         expect(mockLogger.getMessages(AG_LOGLEVEL.WARN)).toEqual(['warn via map']);
 
         // OFFレベルは何もしない
-        loggerMap[AG_LOGLEVEL.OFF]?.('should not log');
+        loggerMap[AG_LOGLEVEL.OFF]('should not log');
         expect(mockLogger.hasMessages(AG_LOGLEVEL.OFF)).toBe(false);
       });
     });

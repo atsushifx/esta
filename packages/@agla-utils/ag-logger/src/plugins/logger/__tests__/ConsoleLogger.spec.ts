@@ -98,7 +98,7 @@ describe('ConsoleLogger', () => {
           expect(typeof logFunction).toBe('function');
 
           if (method) {
-            logFunction!(`test ${method} message`);
+            logFunction(`test ${method} message`);
             expect(mockConsole[method as keyof typeof mockConsole]).toHaveBeenCalledTimes(1);
             vi.clearAllMocks();
           }
@@ -109,7 +109,7 @@ describe('ConsoleLogger', () => {
         const testMessage = 'formatted log message';
         const infoLogger = ConsoleLoggerMap[AG_LOGLEVEL.INFO];
 
-        infoLogger!(testMessage);
+        infoLogger(testMessage);
         expect(mockConsole.info).toHaveBeenCalledWith(testMessage);
       });
     });
@@ -127,7 +127,7 @@ describe('ConsoleLogger', () => {
       });
 
       const errorLogger = ConsoleLoggerMap[AG_LOGLEVEL.ERROR];
-      expect(() => errorLogger!('test')).toThrow('Console error');
+      expect(() => errorLogger('test')).toThrow('Console error');
 
       throwingConsole.mockRestore();
     });
@@ -155,7 +155,7 @@ describe('ConsoleLogger', () => {
       const longMessage = 'a'.repeat(10000);
       const infoLogger = ConsoleLoggerMap[AG_LOGLEVEL.INFO];
 
-      infoLogger!(longMessage);
+      infoLogger(longMessage);
       expect(console.info).toHaveBeenCalledWith(longMessage);
     });
 

@@ -1110,4 +1110,320 @@ describe('AgLogger', () => {
       });
     });
   });
+
+  /**
+   * Task 4.2: 互換性確保テスト
+   *
+   * @description リファクタリング後でも既存のAPI仕様と動作が完全に維持されることを確認
+   */
+  describe('Task 4.2: 互換性確保テスト', () => {
+    /**
+     * Task 4.2.1: 全ログメソッド（fatal, error, warn, info, debug, trace, log, verbose）が正常動作する
+     */
+    describe('Task 4.2.1: 全ログメソッドの正常動作確認', () => {
+      it('全ログメソッドが正しい引数で実行されることを確認', () => {
+        const mockLoggerInstance = new MockLogger();
+        const logger = AgLogger.getLogger({
+          defaultLogger: mockLoggerInstance.getDefaultLoggerFunction(),
+          formatter: mockFormatter,
+          loggerMap: mockLoggerInstance.getLoggerMap(), // 自動設定されたloggerMapを使用
+          logLevel: AG_LOGLEVEL.TRACE, // デフォルトがOFFのため明示的に設定
+        });
+
+        // 設定が正しく適用されているかを確認
+        expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.TRACE);
+
+        // 各ログメソッドを実行
+        logger.fatal('fatal message', { fatal: true });
+        logger.error('error message', { error: true });
+        logger.warn('warn message', { warn: true });
+        logger.info('info message', { info: true });
+        logger.debug('debug message', { debug: true });
+        logger.trace('trace message', { trace: true });
+        logger.log('log message', { log: true }); // INFO レベルでログ出力
+
+        // verboseは別途テスト（verbose flagに依存）
+        logger.setVerbose(true);
+        logger.verbose('verbose message', { verbose: true });
+
+        // 各レベルでメッセージが記録されていることを確認
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.FATAL)).toBe(1);
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.ERROR)).toBe(1);
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.WARN)).toBe(1);
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(3); // info + log + verbose
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.DEBUG)).toBe(1);
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.TRACE)).toBe(1);
+
+        // メッセージ内容も確認
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.FATAL)).toContain('fatal message');
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.ERROR)).toContain('error message');
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.WARN)).toContain('warn message');
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.INFO)).toContain('info message');
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.INFO)).toContain('log message');
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.INFO)).toContain('verbose message');
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.DEBUG)).toContain('debug message');
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.TRACE)).toContain('trace message');
+      });
+
+      it('verboseフラグによるverboseメソッドの動作制御が正常に機能する', () => {
+        const mockLoggerInstance = new MockLogger();
+        const logger = AgLogger.getLogger({
+          defaultLogger: mockLoggerInstance.getDefaultLoggerFunction(),
+          formatter: mockFormatter,
+          loggerMap: mockLoggerInstance.getLoggerMap(),
+          logLevel: AG_LOGLEVEL.INFO, // デフォルトがOFFのため明示的に設定
+        });
+
+        // verbose off - 出力されない
+        logger.setVerbose(false);
+        logger.verbose('verbose off message');
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(0);
+
+        // verbose on - 出力される
+        logger.setVerbose(true);
+        logger.verbose('verbose on message');
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(1);
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.INFO)).toContain('verbose on message');
+      });
+
+      it('ログレベルフィルタリングが各メソッドで正常に機能する', () => {
+        const mockLoggerInstance = new MockLogger();
+        const logger = AgLogger.getLogger({
+          defaultLogger: mockLoggerInstance.getDefaultLoggerFunction(),
+          formatter: mockFormatter,
+          loggerMap: mockLoggerInstance.getLoggerMap(),
+          logLevel: AG_LOGLEVEL.WARN, // WARNレベルに設定（WARN以上のみ出力）
+        });
+
+        // 各レベルでログを試行
+        logger.trace('trace - filtered'); // フィルタリング
+        logger.debug('debug - filtered'); // フィルタリング
+        logger.info('info - filtered'); // フィルタリング
+        logger.log('log - filtered'); // フィルタリング（INFOレベル）
+        logger.warn('warn - logged'); // 出力
+        logger.error('error - logged'); // 出力
+        logger.fatal('fatal - logged'); // 出力
+
+        // WARN以上のみが出力されていることを確認
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.TRACE)).toBe(0);
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.DEBUG)).toBe(0);
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(0);
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.WARN)).toBe(1);
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.ERROR)).toBe(1);
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.FATAL)).toBe(1);
+      });
+    });
+
+    /**
+     * Task 4.2.2: AgLoggerManagerを通じた操作が正常動作する
+     */
+    describe('Task 4.2.2: AgLoggerManager互換性確認', () => {
+      it('setManagerメソッドが正常に動作し、既存の設定変更APIが機能する', () => {
+        const mockLoggerInstance = new MockLogger();
+        const logger = AgLogger.getLogger();
+
+        // setManagerメソッドで設定を適用
+        logger.setManager({
+          defaultLogger: mockLoggerInstance.createLoggerFunction(),
+          formatter: mockFormatter,
+          logLevel: AG_LOGLEVEL.INFO,
+          verbose: true,
+        });
+
+        // 設定が正しく適用されていることを確認
+        expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.INFO);
+        expect(logger.setVerbose()).toBe(true);
+
+        // ログ出力が正常に動作することを確認
+        logger.info('setManager test message');
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.INFO)).toBe(1);
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.INFO)).toContain('setManager test message');
+      });
+
+      it('@deprecatedアノテーションのsetManagerメソッドがupdateOptionsと同等に動作する', () => {
+        const mockLoggerInstance1 = new MockLogger();
+        const mockLoggerInstance2 = new MockLogger();
+
+        // 最初のインスタンスでsetManagerをテスト
+        const logger1 = AgLogger.getLogger();
+        const testOptions1 = {
+          defaultLogger: mockLoggerInstance1.getDefaultLoggerFunction(),
+          formatter: mockFormatter,
+          loggerMap: mockLoggerInstance1.getLoggerMap(),
+          logLevel: AG_LOGLEVEL.DEBUG,
+          verbose: true,
+        };
+        logger1.setManager(testOptions1);
+        logger1.debug('test message from setManager');
+
+        // resetSingleton後に新しいインスタンスでupdateOptionsをテスト
+        AgLogger.resetSingleton();
+        const logger2 = AgLogger.getLogger();
+        const testOptions2 = {
+          defaultLogger: mockLoggerInstance2.getDefaultLoggerFunction(),
+          formatter: mockFormatter,
+          loggerMap: mockLoggerInstance2.getLoggerMap(),
+          logLevel: AG_LOGLEVEL.DEBUG,
+          verbose: true,
+        };
+        logger2.updateOptions(testOptions2);
+        logger2.debug('test message from updateOptions');
+
+        // 両方の設定が同じ状態になることを確認（ログレベルとverbose）
+        expect(logger1.getLogLevel()).toBe(logger2.getLogLevel());
+        expect(logger1.setVerbose()).toBe(logger2.setVerbose());
+
+        // 両方でログが正常に出力されることを確認
+        expect(mockLoggerInstance1.getMessageCount(AG_LOGLEVEL.DEBUG)).toBe(1);
+        expect(mockLoggerInstance2.getMessageCount(AG_LOGLEVEL.DEBUG)).toBe(1);
+        expect(mockLoggerInstance1.getMessages(AG_LOGLEVEL.DEBUG)).toContain('test message from setManager');
+        expect(mockLoggerInstance2.getMessages(AG_LOGLEVEL.DEBUG)).toContain('test message from updateOptions');
+      });
+    });
+
+    /**
+     * Task 4.2.3: 既存のシングルトンパターンが維持される
+     */
+    describe('Task 4.2.3: シングルトンパターン維持確認', () => {
+      it('複数回のgetLogger呼び出しで同一インスタンスが返される', () => {
+        const instance1 = AgLogger.getLogger();
+        const instance2 = AgLogger.getLogger();
+        const instance3 = getLogger();
+        const instance4 = getLogger({ defaultLogger: mockLogger });
+
+        // 全て同一インスタンスであることを確認
+        expect(instance1).toBe(instance2);
+        expect(instance2).toBe(instance3);
+        expect(instance3).toBe(instance4);
+        expect(instance1).toBeInstanceOf(AgLogger);
+      });
+
+      it('シングルトンインスタンス間で設定が共有される', () => {
+        const logger1 = AgLogger.getLogger();
+        const logger2 = getLogger();
+
+        // logger1で設定変更
+        logger1.setLogLevel(AG_LOGLEVEL.ERROR);
+        logger1.setVerbose(true);
+
+        // logger2で同じ設定が反映されていることを確認
+        expect(logger2.getLogLevel()).toBe(AG_LOGLEVEL.ERROR);
+        expect(logger2.setVerbose()).toBe(true);
+
+        // logger2で設定変更
+        logger2.setLogLevel(AG_LOGLEVEL.DEBUG);
+        logger2.setVerbose(false);
+
+        // logger1でも変更が反映されていることを確認
+        expect(logger1.getLogLevel()).toBe(AG_LOGLEVEL.DEBUG);
+        expect(logger1.setVerbose()).toBe(false);
+      });
+
+      it('シングルトンインスタンス間でAgLoggerConfig設定が共有される', () => {
+        const mockLoggerInstance = new MockLogger();
+        const logger1 = AgLogger.getLogger();
+        const logger2 = getLogger();
+
+        // logger1でsetAgLoggerOptionsを使用して設定
+        logger1.setAgLoggerOptions({
+          defaultLogger: mockLoggerInstance.getDefaultLoggerFunction(),
+          formatter: mockFormatter,
+          loggerMap: mockLoggerInstance.getLoggerMap(),
+          logLevel: AG_LOGLEVEL.WARN,
+          verbose: true,
+        });
+
+        // logger2で同じ設定が反映されていることを確認
+        const config1 = logger1._getConfigForTesting();
+        const config2 = logger2._getConfigForTesting();
+
+        expect(config1).toBe(config2); // 同一インスタンス
+        expect(logger2.getLogLevel()).toBe(AG_LOGLEVEL.WARN);
+        expect(logger2.setVerbose()).toBe(true);
+
+        // logger2からログ出力して設定が有効であることを確認
+        logger2.warn('shared config test');
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.WARN)).toBe(1);
+      });
+    });
+
+    /**
+     * Task 4.2.4: resetSingletonメソッドが正常動作する
+     */
+    describe('Task 4.2.4: resetSingleton動作確認', () => {
+      it('resetSingleton後に新しいインスタンスが生成される', () => {
+        const instance1 = AgLogger.getLogger();
+
+        // 設定を変更
+        instance1.setLogLevel(AG_LOGLEVEL.ERROR);
+        instance1.setVerbose(true);
+
+        // resetSingleton実行
+        AgLogger.resetSingleton();
+
+        const instance2 = AgLogger.getLogger();
+
+        // 新しいインスタンスが生成されることを確認
+        expect(instance1).not.toBe(instance2);
+        expect(instance2).toBeInstanceOf(AgLogger);
+      });
+
+      it('resetSingleton後に設定がデフォルトに戻る', () => {
+        const logger = AgLogger.getLogger();
+
+        // 設定を変更
+        logger.setLogLevel(AG_LOGLEVEL.ERROR);
+        logger.setVerbose(true);
+
+        // 変更が適用されていることを確認
+        expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.ERROR);
+        expect(logger.setVerbose()).toBe(true);
+
+        // resetSingleton実行
+        AgLogger.resetSingleton();
+
+        const newLogger = AgLogger.getLogger();
+        const newConfig = newLogger._getConfigForTesting();
+
+        // デフォルト設定に戻っていることを確認
+        expect(newConfig.getLogLevel()).toBe(AG_LOGLEVEL.OFF);
+        expect(newConfig.getVerbose()).toBe(false);
+        expect(newLogger.getLogLevel()).toBe(AG_LOGLEVEL.OFF);
+        expect(newLogger.setVerbose()).toBe(false);
+      });
+
+      it('resetSingleton後でもAgLoggerConfigが正常に動作する', () => {
+        const mockLoggerInstance = new MockLogger();
+
+        // 最初のインスタンスで設定
+        const logger1 = AgLogger.getLogger({
+          defaultLogger: mockLoggerInstance.getDefaultLoggerFunction(),
+          formatter: mockFormatter,
+          loggerMap: mockLoggerInstance.getLoggerMap(),
+        });
+        logger1.setLogLevel(AG_LOGLEVEL.INFO);
+
+        // resetSingleton実行
+        AgLogger.resetSingleton();
+
+        // 新しいインスタンスで再設定
+        const logger2 = AgLogger.getLogger({
+          defaultLogger: mockLoggerInstance.getDefaultLoggerFunction(),
+          formatter: mockFormatter,
+          loggerMap: mockLoggerInstance.getLoggerMap(),
+        });
+        logger2.setLogLevel(AG_LOGLEVEL.WARN);
+
+        // 新しいインスタンスのAgLoggerConfigが正常に動作することを確認
+        const config2 = logger2._getConfigForTesting();
+        expect(config2.getLogLevel()).toBe(AG_LOGLEVEL.WARN);
+        expect(config2.getVerbose()).toBe(false);
+
+        // ログ出力も正常に動作することを確認
+        logger2.warn('reset test message');
+        expect(mockLoggerInstance.getMessageCount(AG_LOGLEVEL.WARN)).toBe(1);
+        expect(mockLoggerInstance.getMessages(AG_LOGLEVEL.WARN)).toContain('reset test message');
+      });
+    });
+  });
 });

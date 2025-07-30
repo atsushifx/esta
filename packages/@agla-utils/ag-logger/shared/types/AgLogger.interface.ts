@@ -44,7 +44,7 @@ export type AgFormatFunction = (logMessage: AgLogMessage) => string;
 
 /**
  * A map holding logging functions for each log level.
- * Values can be a logging function for the level or `null` to disable logging at that level.
+ * Each level must have a logging function assigned - use NullLogger to disable logging.
  * Allows different loggers to be used for different log levels.
  *
  * @template T - The type of logging function. Defaults to `AgLoggerFunction`.
@@ -58,11 +58,11 @@ export type AgFormatFunction = (logMessage: AgLogMessage) => string;
  *   [AG_LOGLEVEL.DEBUG]: (msg) => console.debug(msg),
  *   [AG_LOGLEVEL.TRACE]: (msg) => console.debug(msg),
  *   [AG_LOGLEVEL.FATAL]: (msg) => console.error(msg),
- *   [AG_LOGLEVEL.OFF]: null,
+ *   [AG_LOGLEVEL.OFF]: (msg) => {}, // NullLogger function
  * };
  * ```
  */
-export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<AgLogLevel, T | null>;
+export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<AgLogLevel, T>;
 
 /**
  * Configuration options for AgLogger and AgLoggerManager instances.

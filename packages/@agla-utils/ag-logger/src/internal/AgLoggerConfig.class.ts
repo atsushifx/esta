@@ -376,7 +376,7 @@ export class AgLoggerConfig {
     Object.keys(loggerMap).forEach((key) => {
       const level = Number.parseInt(key, AgLoggerConfig.DECIMAL_RADIX) as AgLogLevel;
       const logger = loggerMap[level];
-      if (logger !== undefined && logger !== null) {
+      if (logger !== undefined) {
         this._loggerMap[level] = logger;
       }
     });

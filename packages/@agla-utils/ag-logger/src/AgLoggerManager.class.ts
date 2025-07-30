@@ -78,7 +78,8 @@ export class AgLoggerManager {
    * @returns The logger function for the specified log level.
    */
   getLogger(logLevel: AgLogLevel): AgLoggerFunction {
-    return this.loggerMap[logLevel] ?? this.defaultLogger;
+    const logger = this.loggerMap[logLevel];
+    return logger || this.defaultLogger;
   }
 
   /**
