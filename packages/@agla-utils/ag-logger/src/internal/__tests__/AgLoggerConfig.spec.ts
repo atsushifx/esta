@@ -613,4 +613,99 @@ describe('AgLoggerConfig', () => {
       expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(secondLogger);
     });
   });
+
+  // TDD: Constructor options support tests
+  describe('Constructor with options support', () => {
+    describe('when logLevel is provided in options', () => {
+      it('should set the logLevel from options', () => {
+        const config = new AgLoggerConfig();
+        const options: AgLoggerOptions = {
+          logLevel: AG_LOGLEVEL.INFO,
+        };
+        config.setLoggerConfig(options);
+
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.INFO);
+      });
+
+      it('should apply logLevel from options and affect shouldOutput behavior', () => {
+        const config = new AgLoggerConfig();
+        const options: AgLoggerOptions = {
+          logLevel: AG_LOGLEVEL.WARN,
+        };
+        config.setLoggerConfig(options);
+
+        expect(config.shouldOutput(AG_LOGLEVEL.ERROR)).toBe(true);
+        expect(config.shouldOutput(AG_LOGLEVEL.WARN)).toBe(true);
+        expect(config.shouldOutput(AG_LOGLEVEL.INFO)).toBe(false);
+      });
+    });
+
+    describe('when verbose is provided in options', () => {
+      it('should set the verbose from options', () => {
+        const config = new AgLoggerConfig();
+        const options: AgLoggerOptions = {
+          verbose: true,
+        };
+        config.setLoggerConfig(options);
+
+        expect(config.getVerbose()).toBe(true);
+      });
+
+      it('should apply verbose from options and affect shouldOutputVerbose behavior', () => {
+        const config = new AgLoggerConfig();
+        const options: AgLoggerOptions = {
+          verbose: true,
+        };
+        config.setLoggerConfig(options);
+
+        expect(config.shouldOutputVerbose()).toBe(true);
+      });
+    });
+
+    describe('when all options are provided together', () => {
+      it('should apply all options consistently', () => {
+        const config = new AgLoggerConfig();
+        const testLogger = (_message: string): void => {/* test logger */};
+        const testFormatter = (_logMessage: AgLogMessage): string => 'formatted';
+        const testErrorLogger = (_message: string): void => {/* test error logger */};
+
+        const options: AgLoggerOptions = {
+          defaultLogger: testLogger,
+          formatter: testFormatter,
+          logLevel: AG_LOGLEVEL.DEBUG,
+          verbose: true,
+          loggerMap: {
+            [AG_LOGLEVEL.ERROR]: testErrorLogger,
+          },
+        };
+        config.setLoggerConfig(options);
+
+        expect(config.getLogLevel()).toBe(AG_LOGLEVEL.DEBUG);
+        expect(config.getVerbose()).toBe(true);
+        expect(config.getFormatter()).toBe(testFormatter);
+        expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(testErrorLogger);
+        expect(config.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe(testLogger);
+      });
+
+      it('should maintain option values after setting all options', () => {
+        const config = new AgLoggerConfig();
+        const testLogger = (_message: string): void => {/* test logger */};
+        const testFormatter = (_logMessage: AgLogMessage): string => 'formatted';
+
+        const options: AgLoggerOptions = {
+          defaultLogger: testLogger,
+          formatter: testFormatter,
+          logLevel: AG_LOGLEVEL.INFO,
+          verbose: false,
+        };
+        config.setLoggerConfig(options);
+
+        const currentSettings = config.getCurrentSettings();
+        expect(currentSettings.logLevel).toBe(AG_LOGLEVEL.INFO);
+        expect(currentSettings.verbose).toBe(false);
+        expect(currentSettings.defaultLogger).toBe(testLogger);
+        expect(currentSettings.formatter).toBe(testFormatter);
+      });
+    });
+  });
 });

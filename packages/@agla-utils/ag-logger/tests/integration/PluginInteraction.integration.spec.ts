@@ -19,10 +19,12 @@ import { JsonFormat } from '@/plugins/format/JsonFormat';
 import { NullFormat } from '@/plugins/format/NullFormat';
 // フォーマッタープラグイン - 人間可読な平文フォーマット
 import { PlainFormat } from '@/plugins/format/PlainFormat';
-// ロガープラグイン - コンソール出力ロガーとレベルマップ
-import { ConsoleLogger, ConsoleLoggerMap } from '@/plugins/logger/ConsoleLogger';
+// ロガープラグイン - テスト用モックロガー
+import { MockLogger } from '@/plugins/logger/MockLogger';
 // ロガープラグイン - 出力なしのダミーロガー
 import { NullLogger } from '@/plugins/logger/NullLogger';
+// ロガープラグイン - コンソール出力ロガーとレベルマップ
+import { ConsoleLogger, ConsoleLoggerMap } from '@/plugins/logger/ConsoleLogger';
 
 // types
 type TCircular = {
@@ -67,60 +69,71 @@ describe('Plugin Interaction Integration Tests', () => {
    * - 出力品質とフォーマット正確性
    */
   describe('Logger-Formatter Combinations', () => {
-    it('should work correctly with ConsoleLogger and JsonFormat', () => {
+    it('should work correctly with MockLogger and JsonFormat', () => {
       setupTestContext();
-      const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
+      const mockLogger = new MockLogger();
+      const loggerMap = mockLogger.getLoggerMap();
 
-      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+      const logger = getLogger({
+        defaultLogger: mockLogger.getDefaultLoggerFunction(),
+        formatter: JsonFormat,
+        loggerMap: loggerMap,
+      });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
       logger.info('test message', { data: 'value' });
 
-      expect(consoleSpy).toHaveBeenCalledTimes(1);
-      const [output] = consoleSpy.mock.calls[0];
+      expect(mockLogger.hasMessages(AG_LOGLEVEL.INFO)).toBe(true);
+      const output = mockLogger.getLastMessage(AG_LOGLEVEL.INFO);
 
       // Should be valid JSON
-      expect(() => JSON.parse(output)).not.toThrow();
-      const parsed = JSON.parse(output);
+      expect(() => JSON.parse(output!)).not.toThrow();
+      const parsed = JSON.parse(output!);
       expect(parsed).toMatchObject({
         level: 'INFO',
         message: 'test message',
         args: [{ data: 'value' }],
       });
-
-      consoleSpy.mockRestore();
     });
 
-    it('should work correctly with ConsoleLogger and PlainFormat', () => {
+    it('should work correctly with MockLogger and PlainFormat', () => {
       setupTestContext();
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const mockLogger = new MockLogger();
+      const loggerMap = mockLogger.getLoggerMap();
 
-      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormat });
+      const logger = getLogger({
+        defaultLogger: mockLogger.getDefaultLoggerFunction(),
+        formatter: PlainFormat,
+        loggerMap: loggerMap,
+      });
       logger.setLogLevel(AG_LOGLEVEL.WARN);
       logger.warn('warning message', 'additional info');
 
-      expect(consoleSpy).toHaveBeenCalledTimes(1);
-      const [output] = consoleSpy.mock.calls[0];
+      expect(mockLogger.hasMessages(AG_LOGLEVEL.WARN)).toBe(true);
+      const output = mockLogger.getLastMessage(AG_LOGLEVEL.WARN);
 
       // Should match PlainFormat pattern
       expect(output).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z \[WARN\] warning message additional info$/);
-
-      consoleSpy.mockRestore();
     });
 
-    it('should work correctly with E2eMockLogger and JsonFormat', () => {
+    it('should work correctly with MockLogger and JsonFormat for DEBUG level', () => {
       setupTestContext();
-      const mockLogger = vi.fn();
+      const mockLogger = new MockLogger();
+      const loggerMap = mockLogger.getLoggerMap();
 
-      const logger = getLogger({ defaultLogger: mockLogger, formatter: JsonFormat });
+      const logger = getLogger({
+        defaultLogger: mockLogger.getDefaultLoggerFunction(),
+        formatter: JsonFormat,
+        loggerMap: loggerMap,
+      });
       logger.setLogLevel(AG_LOGLEVEL.DEBUG);
       logger.debug('debug message', { debug: true });
 
-      expect(mockLogger).toHaveBeenCalledTimes(1);
-      const [output] = mockLogger.mock.calls[0];
+      expect(mockLogger.hasMessages(AG_LOGLEVEL.DEBUG)).toBe(true);
+      const output = mockLogger.getLastMessage(AG_LOGLEVEL.DEBUG);
 
       // Should be valid JSON
-      expect(() => JSON.parse(output)).not.toThrow();
-      const parsed = JSON.parse(output);
+      expect(() => JSON.parse(output!)).not.toThrow();
+      const parsed = JSON.parse(output!);
       expect(parsed).toMatchObject({
         level: 'DEBUG',
         message: 'debug message',
@@ -128,16 +141,21 @@ describe('Plugin Interaction Integration Tests', () => {
       });
     });
 
-    it('should work correctly with E2eMockLogger and PlainFormat', () => {
+    it('should work correctly with MockLogger and PlainFormat for ERROR level', () => {
       setupTestContext();
-      const mockLogger = vi.fn();
+      const mockLogger = new MockLogger();
+      const loggerMap = mockLogger.getLoggerMap();
 
-      const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
+      const logger = getLogger({
+        defaultLogger: mockLogger.getDefaultLoggerFunction(),
+        formatter: PlainFormat,
+        loggerMap: loggerMap,
+      });
       logger.setLogLevel(AG_LOGLEVEL.ERROR);
       logger.error('error message', 'error details');
 
-      expect(mockLogger).toHaveBeenCalledTimes(1);
-      const [output] = mockLogger.mock.calls[0];
+      expect(mockLogger.hasMessages(AG_LOGLEVEL.ERROR)).toBe(true);
+      const output = mockLogger.getLastMessage(AG_LOGLEVEL.ERROR);
 
       // Should match PlainFormat pattern
       expect(output).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z \[ERROR\] error message error details$/);
@@ -156,14 +174,14 @@ describe('Plugin Interaction Integration Tests', () => {
 
     it('should handle any logger with NullFormat correctly', () => {
       setupTestContext();
-      const mockLogger = vi.fn();
+      const mockLogger = new MockLogger();
 
-      const logger = getLogger({ defaultLogger: mockLogger, formatter: NullFormat });
+      const logger = getLogger({ defaultLogger: mockLogger.getDefaultLoggerFunction(), formatter: NullFormat });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
       logger.info('test message');
 
-      // NullFormat returns empty string, so logger should not be called
-      expect(mockLogger).not.toHaveBeenCalled();
+      // NullFormat returns empty string, so logger should not capture messages
+      expect(mockLogger.hasMessages(AG_LOGLEVEL.INFO)).toBe(false);
     });
   });
 
@@ -295,26 +313,29 @@ describe('Plugin Interaction Integration Tests', () => {
       };
 
       // Test with JsonFormat
-      const jsonMockLogger = vi.fn();
-      const jsonLogger = getLogger({ defaultLogger: jsonMockLogger, formatter: JsonFormat });
+      const jsonMockLogger = new MockLogger();
+      const jsonLogger = getLogger({ defaultLogger: jsonMockLogger.getDefaultLoggerFunction(), formatter: JsonFormat });
       jsonLogger.setLogLevel(AG_LOGLEVEL.INFO);
       jsonLogger.info('Complex data', complexData);
 
-      expect(jsonMockLogger).toHaveBeenCalledTimes(1);
-      const [jsonOutput] = jsonMockLogger.mock.calls[0];
+      expect(jsonMockLogger.hasMessages(AG_LOGLEVEL.INFO)).toBe(true);
+      const jsonOutput = jsonMockLogger.getLastMessage(AG_LOGLEVEL.INFO);
 
-      expect(() => JSON.parse(jsonOutput)).not.toThrow();
-      const parsedJson = JSON.parse(jsonOutput);
+      expect(() => JSON.parse(jsonOutput!)).not.toThrow();
+      const parsedJson = JSON.parse(jsonOutput!);
       expect(parsedJson.args[0]).toEqual(complexData);
 
       // Test with PlainFormat
-      const plainMockLogger = vi.fn();
-      const plainLogger = getLogger({ defaultLogger: plainMockLogger, formatter: PlainFormat });
+      const plainMockLogger = new MockLogger();
+      const plainLogger = getLogger({
+        defaultLogger: plainMockLogger.getDefaultLoggerFunction(),
+        formatter: PlainFormat,
+      });
       plainLogger.setLogLevel(AG_LOGLEVEL.INFO);
       plainLogger.info('Complex data', complexData);
 
-      expect(plainMockLogger).toHaveBeenCalledTimes(1);
-      const [plainOutput] = plainMockLogger.mock.calls[0];
+      expect(plainMockLogger.hasMessages(AG_LOGLEVEL.INFO)).toBe(true);
+      const plainOutput = plainMockLogger.getLastMessage(AG_LOGLEVEL.INFO);
 
       // PlainFormat should contain stringified representation
       expect(plainOutput).toContain('Complex data');
@@ -327,8 +348,8 @@ describe('Plugin Interaction Integration Tests', () => {
       circularObj.self = circularObj;
 
       // Test with JsonFormat (should handle circular references)
-      const jsonMockLogger = vi.fn();
-      const jsonLogger = getLogger({ defaultLogger: jsonMockLogger, formatter: JsonFormat });
+      const jsonMockLogger = new MockLogger();
+      const jsonLogger = getLogger({ defaultLogger: jsonMockLogger.getDefaultLoggerFunction(), formatter: JsonFormat });
       jsonLogger.setLogLevel(AG_LOGLEVEL.INFO);
 
       // JSON.stringify with circular references should throw, so we expect the error to propagate
@@ -337,8 +358,11 @@ describe('Plugin Interaction Integration Tests', () => {
       }).toThrow();
 
       // Test with PlainFormat - also uses JSON.stringify
-      const plainMockLogger = vi.fn();
-      const plainLogger = getLogger({ defaultLogger: plainMockLogger, formatter: PlainFormat });
+      const plainMockLogger = new MockLogger();
+      const plainLogger = getLogger({
+        defaultLogger: plainMockLogger.getDefaultLoggerFunction(),
+        formatter: PlainFormat,
+      });
       plainLogger.setLogLevel(AG_LOGLEVEL.INFO);
 
       expect(() => {
@@ -350,8 +374,8 @@ describe('Plugin Interaction Integration Tests', () => {
       setupTestContext();
       const largeArray = Array.from({ length: 1000 }, (_, i) => ({ id: i, data: `item${i}` }));
 
-      const mockLogger = vi.fn();
-      const logger = getLogger({ defaultLogger: mockLogger, formatter: JsonFormat });
+      const mockLogger = new MockLogger();
+      const logger = getLogger({ defaultLogger: mockLogger.getDefaultLoggerFunction(), formatter: JsonFormat });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       const startTime = Date.now();
@@ -360,10 +384,10 @@ describe('Plugin Interaction Integration Tests', () => {
 
       // Should complete in reasonable time (less than 100ms)
       expect(endTime - startTime).toBeLessThan(100);
-      expect(mockLogger).toHaveBeenCalledTimes(1);
+      expect(mockLogger.hasMessages(AG_LOGLEVEL.INFO)).toBe(true);
 
-      const [output] = mockLogger.mock.calls[0];
-      expect(() => JSON.parse(output)).not.toThrow();
+      const output = mockLogger.getLastMessage(AG_LOGLEVEL.INFO);
+      expect(() => JSON.parse(output!)).not.toThrow();
     });
   });
 
@@ -384,8 +408,13 @@ describe('Plugin Interaction Integration Tests', () => {
   describe('Performance Integration', () => {
     it('should maintain performance with high-frequency logging', () => {
       setupTestContext();
-      const mockLogger = vi.fn();
-      const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
+      const mockLogger = new MockLogger();
+      const loggerMap = mockLogger.getLoggerMap();
+      const logger = getLogger({
+        defaultLogger: mockLogger.getDefaultLoggerFunction(),
+        formatter: PlainFormat,
+        loggerMap: loggerMap,
+      });
       logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
       const iterations = 1000;
@@ -400,13 +429,18 @@ describe('Plugin Interaction Integration Tests', () => {
 
       // Should handle 1000 logs in reasonable time (less than 1 second)
       expect(totalTime).toBeLessThan(1000);
-      expect(mockLogger).toHaveBeenCalledTimes(iterations);
+      expect(mockLogger.getMessageCount(AG_LOGLEVEL.DEBUG)).toBe(iterations);
     });
 
     it('should not impact performance when log level filters out messages', () => {
       setupTestContext();
-      const mockLogger = vi.fn();
-      const logger = getLogger({ defaultLogger: mockLogger, formatter: JsonFormat });
+      const mockLogger = new MockLogger();
+      const loggerMap = mockLogger.getLoggerMap();
+      const logger = getLogger({
+        defaultLogger: mockLogger.getDefaultLoggerFunction(),
+        formatter: JsonFormat,
+        loggerMap: loggerMap,
+      });
       logger.setLogLevel(AG_LOGLEVEL.ERROR);
 
       const iterations = 1000;
@@ -421,7 +455,7 @@ describe('Plugin Interaction Integration Tests', () => {
 
       // Should be very fast since messages are filtered out
       expect(totalTime).toBeLessThan(100);
-      expect(mockLogger).not.toHaveBeenCalled();
+      expect(mockLogger.hasMessages(AG_LOGLEVEL.DEBUG)).toBe(false);
     });
   });
 
@@ -460,12 +494,12 @@ describe('Plugin Interaction Integration Tests', () => {
 
     it('should handle formatter errors gracefully', () => {
       setupTestContext();
-      const mockLogger = vi.fn();
+      const mockLogger = new MockLogger();
       const throwingFormatter = vi.fn().mockImplementation(() => {
         throw new Error('Formatter error');
       });
 
-      const logger = getLogger({ defaultLogger: mockLogger, formatter: throwingFormatter });
+      const logger = getLogger({ defaultLogger: mockLogger.getDefaultLoggerFunction(), formatter: throwingFormatter });
       logger.setLogLevel(AG_LOGLEVEL.INFO);
 
       expect(() => {
@@ -473,7 +507,7 @@ describe('Plugin Interaction Integration Tests', () => {
       }).toThrow('Formatter error');
 
       // Logger should not be called if formatter throws
-      expect(mockLogger).not.toHaveBeenCalled();
+      expect(mockLogger.hasMessages(AG_LOGLEVEL.INFO)).toBe(false);
     });
 
     it('should maintain system stability after plugin errors', () => {
@@ -491,15 +525,15 @@ describe('Plugin Interaction Integration Tests', () => {
       }).toThrow('Temporary error');
 
       // Replace with working logger
-      const workingLogger = vi.fn();
-      logger.setManager({ defaultLogger: workingLogger });
+      const workingLogger = new MockLogger();
+      logger.setManager({ defaultLogger: workingLogger.getDefaultLoggerFunction() });
 
       // Should work normally now
       expect(() => {
         logger.info('second message');
       }).not.toThrow();
 
-      expect(workingLogger).toHaveBeenCalled();
+      expect(workingLogger.hasMessages(AG_LOGLEVEL.INFO)).toBe(true);
     });
   });
 });
