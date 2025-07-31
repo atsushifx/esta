@@ -95,7 +95,7 @@ describe('AgLogger Integration Tests', () => {
 
         // ロガーマネージャー設定の共有
         const mockLogger = new MockLogger();
-        const mockFormatter = () => 'shared format';
+        const mockFormatter = (): string => 'shared format';
 
         logger1.setManager({ defaultLogger: mockLogger.getDefaultLoggerFunction(), formatter: mockFormatter });
         logger2.setLogLevel(AG_LOGLEVEL.INFO);
@@ -116,7 +116,7 @@ describe('AgLogger Integration Tests', () => {
         const logger1 = getLogger();
 
         // エラーを引き起こす設定
-        const throwingFormatter = () => {
+        const throwingFormatter = (): string => {
           throw new Error('Formatter error');
         };
 
@@ -221,7 +221,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         // ロガーエラー用のテスト関数を作成
-        const throwingLogger = () => {
+        const throwingLogger = (): void => {
           throw new Error('Logger error');
         };
 
@@ -242,7 +242,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = new MockLogger();
-        const throwingFormatter = () => {
+        const throwingFormatter = (): string => {
           throw new Error('Formatter error');
         };
 
@@ -264,7 +264,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = new MockLogger();
-        const errorLogger = () => {
+        const errorLogger = (): void => {
           throw new Error('Error logger failed');
         };
 
@@ -327,7 +327,7 @@ describe('AgLogger Integration Tests', () => {
 
         const logger = getLogger();
         const finalLogger = new MockLogger();
-        const finalFormatter = () => 'final format';
+        const finalFormatter = (): string => 'final format';
 
         // 段階的な設定更新
         const tempLogger1 = new MockLogger();
@@ -353,8 +353,8 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const logger = getLogger();
-        const conflictingFormatter1 = () => 'format1';
-        const conflictingFormatter2 = () => {
+        const conflictingFormatter1 = (): string => 'format1';
+        const conflictingFormatter2 = (): string => {
           throw new Error('Formatter conflict');
         };
 
@@ -386,11 +386,11 @@ describe('AgLogger Integration Tests', () => {
         const mockLogger2 = new MockLogger();
         let formatter1CallCount = 0;
         let formatter2CallCount = 0;
-        const mockFormatter1 = () => {
+        const mockFormatter1 = (): string => {
           formatter1CallCount++;
           return 'format1';
         };
-        const mockFormatter2 = () => {
+        const mockFormatter2 = (): string => {
           formatter2CallCount++;
           return 'format2';
         };
@@ -459,7 +459,7 @@ describe('AgLogger Integration Tests', () => {
 
         const mockLogger = new MockLogger();
         let formatterCalled = false;
-        const mockFormatter = () => {
+        const mockFormatter = (): string => {
           formatterCalled = true;
           return 'test format';
         };
@@ -490,7 +490,7 @@ describe('AgLogger Integration Tests', () => {
 
         const mockLogger = new MockLogger();
         let throwingFormatterCallCount = 0;
-        const throwingFormatter = () => {
+        const throwingFormatter = (): string => {
           throwingFormatterCallCount++;
           throw new Error('Formatter error');
         };
@@ -552,7 +552,7 @@ describe('AgLogger Integration Tests', () => {
 
         const mockLogger = new MockLogger();
         const loggerMap = mockLogger.getLoggerMap();
-        const mockFormatter = () => 'verbose formatted';
+        const mockFormatter = (): string => 'verbose formatted';
 
         const logger = getLogger({
           defaultLogger: mockLogger.getDefaultLoggerFunction(),
@@ -597,7 +597,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = new MockLogger();
-        const throwingFormatter = () => {
+        const throwingFormatter = (): string => {
           throw new Error('Verbose formatter error');
         };
 
@@ -652,7 +652,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = new MockLogger();
-        const mockFormatter = (logMessage: unknown) => {
+        const mockFormatter = (logMessage: unknown): string => {
           // フォーマッターで循環参照を処理するシナリオ
           try {
             return JSON.stringify(logMessage);
@@ -680,12 +680,14 @@ describe('AgLogger Integration Tests', () => {
         const mockLogger = new MockLogger();
         let capturedError: string | null = null;
 
-        const errorHandlingFormatter = (logMessage: Record<string, unknown>) => {
+        const errorHandlingFormatter = (logMessage: Record<string, unknown>): string => {
           try {
             return JSON.stringify(logMessage);
           } catch (error) {
             capturedError = error instanceof Error ? error.message : String(error);
-            return `[Circular Reference: ${logMessage.level ?? 'UNKNOWN'}] ${logMessage.message ?? 'No message'}`;
+            return `[Circular Reference: ${String(logMessage.level ?? 'UNKNOWN')}] ${
+              String(logMessage.message ?? 'No message')
+            }]`;
           }
         };
 
@@ -719,7 +721,7 @@ describe('AgLogger Integration Tests', () => {
         const mockLogger = new MockLogger();
         const loggerMap = mockLogger.getLoggerMap();
         let resilientFormatterCallCount = 0;
-        const resilientFormatter = (logMessage: Record<string, unknown>) => {
+        const resilientFormatter = (logMessage: Record<string, unknown>): string => {
           resilientFormatterCallCount++;
           try {
             // 意図的に循環参照でJSON.stringifyを失敗させる
@@ -727,9 +729,9 @@ describe('AgLogger Integration Tests', () => {
             return result;
           } catch {
             // フォールバック処理
-            return `${logMessage.timestamp ?? new Date().toISOString()} [${logMessage.level ?? 'UNKNOWN'}] ${
-              logMessage.message ?? ''
-            }`;
+            return `${String(logMessage.timestamp ?? new Date().toISOString())} [${
+              String(logMessage.level ?? 'UNKNOWN')
+            }] ${String(logMessage.message ?? '')}`;
           }
         };
 
@@ -770,7 +772,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = new MockLogger();
-        const safeFormatter = (logMessage: Record<string, unknown>) => {
+        const safeFormatter = (logMessage: Record<string, unknown>): string => {
           // 安全なフォーマッターの実装
           const safeStringify = (obj: unknown, depth = 0): string => {
             if (depth > 3) { return '[Max Depth Reached]'; }
@@ -791,7 +793,7 @@ describe('AgLogger Integration Tests', () => {
             }
           };
 
-          return `${logMessage.timestamp} [${logMessage.level}] ${logMessage.message} ${
+          return `${String(logMessage.timestamp)} [${String(logMessage.level)}] ${String(logMessage.message)} ${
             safeStringify(logMessage.args)
           }`;
         };
@@ -832,7 +834,7 @@ describe('AgLogger Integration Tests', () => {
         const mockLogger = new MockLogger();
         // 循環参照に対して強いフォーマッターを使用
         let circularSafeFormatterCallCount = 0;
-        const circularSafeFormatter = (logMessage: Record<string, unknown>) => {
+        const circularSafeFormatter = (logMessage: Record<string, unknown>): string => {
           circularSafeFormatterCallCount++;
           try {
             // WeakSetを使用した安全なJSONシリアライゼーション
@@ -846,7 +848,7 @@ describe('AgLogger Integration Tests', () => {
             });
             return safeObj;
           } catch {
-            return `Safe fallback: ${logMessage.message ?? 'circular data'}`;
+            return `Safe fallback: ${String(logMessage.message ?? 'circular data')}`;
           }
         };
 
@@ -951,7 +953,7 @@ describe('AgLogger Integration Tests', () => {
       it('should maintain performance during error conditions', () => {
         setupTestContext();
 
-        const errorLogger = () => {
+        const errorLogger = (): void => {
           throw new Error('Intermittent error');
         };
         const mockLogger = new MockLogger();
