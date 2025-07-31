@@ -29,6 +29,7 @@ picklist
 readdir
 REGPATH
 sharkdp
+stringifiable
 stylelintcache
 subrepo
 supplypike
@@ -37,3 +38,4 @@ TESTID
 tsup
 userid
 Yedidia
+typesafety
