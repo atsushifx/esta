@@ -12,12 +12,11 @@ import type { AgLogLevel, AgLogLevelLabel } from '../../shared/types';
 /**
  * Convert numeric log level to string label
  * @param level - Numeric log level
- * @returns String label for the log level
- * @throws Error if log level is invalid
+ * @returns String label for the log level, or empty string if invalid
  */
 export const AgToLabel = (level: AgLogLevel): AgLogLevelLabel => {
-  if (typeof level !== 'number' || level < AG_LOGLEVEL.OFF || level > AG_LOGLEVEL.TRACE || !Number.isInteger(level)) {
-    throw new Error(`Invalid log level: ${level}`);
+  if (!isValidLogLevel(level)) {
+    return '' as AgLogLevelLabel;
   }
 
   return AG_LOGLEVEL_TO_LABEL_MAP[level];
@@ -30,4 +29,11 @@ export const AgToLabel = (level: AgLogLevel): AgLogLevelLabel => {
  */
 export const AgToLogLevel = (level: AgLogLevel): AgLogLevel => {
   return level;
+};
+
+export const isValidLogLevel = (logLevel: AgLogLevel): boolean => {
+  return (
+    typeof logLevel === 'number'
+    && Object.values(AG_LOGLEVEL).includes(logLevel)
+  );
 };

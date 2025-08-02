@@ -34,6 +34,8 @@ export const AG_LOGLEVEL = {
   DEBUG: 5,
   /** Very detailed tracing information. */
   TRACE: 6,
+  /** special value: verbose mode  */
+  VERBOSE: -99,
 } as const;
 
 /**
@@ -60,6 +62,8 @@ export const AG_LABEL_TO_LOGLEVEL_MAP = {
   'DEBUG': AG_LOGLEVEL.DEBUG,
   /** Maps 'TRACE' string to numeric value 6. */
   'TRACE': AG_LOGLEVEL.TRACE,
+  /** Maps 'VERBOSE' string to numeric value -99. */
+  'VERBOSE': AG_LOGLEVEL.VERBOSE,
 } as const;
 
 /**
