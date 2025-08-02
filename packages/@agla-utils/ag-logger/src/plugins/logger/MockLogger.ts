@@ -6,13 +6,17 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// libs
+import { isValidLogLevel } from '@/utils/AgLogLevelHelpers';
+// constants
+import { AG_LOGLEVEL, AG_LOGLEVEL_KEYS } from '../../../shared/types';
 // types
-import { AG_LOGLEVEL } from '../../../shared/types';
 import type {
   AgFormattedLogMessage,
   AgLoggerFunction,
   AgLoggerMap,
   AgLogLevel,
+  AgLogLevelKey,
   AgLogMessage,
 } from '../../../shared/types';
 
@@ -25,17 +29,31 @@ import type {
  * - Component interaction verification
  * - Synchronous operations only
  * - Thread-safe for single-threaded test scenarios
+ * - Deep immutability for message objects
  */
 export class MockLogger {
-  private messages: AgFormattedLogMessage[][] = [
-    [], // OFF (0) - not used for actual logging
-    [], // FATAL (1)
-    [], // ERROR (2)
-    [], // WARN (3)
-    [], // INFO (4)
-    [], // DEBUG (5)
-    [], // TRACE (6)
-  ];
+  private messages: Map<AgLogLevel, AgFormattedLogMessage[]> = new Map([
+    [AG_LOGLEVEL.VERBOSE, []], // VERBOSE (-99)
+    [AG_LOGLEVEL.OFF, []], // OFF (0) - not used for actual logging
+    [AG_LOGLEVEL.FATAL, []], // FATAL (1)
+    [AG_LOGLEVEL.ERROR, []], // ERROR (2)
+    [AG_LOGLEVEL.WARN, []], // WARN (3)
+    [AG_LOGLEVEL.INFO, []], // INFO (4)
+    [AG_LOGLEVEL.DEBUG, []], // DEBUG (5)
+    [AG_LOGLEVEL.TRACE, []], // TRACE (6)
+  ]);
+
+  /**
+   * Deep clone a message to ensure immutability.
+   * @param message - The message to clone
+   * @returns Deep clone of the message
+   */
+  private deepClone(message: AgFormattedLogMessage): AgFormattedLogMessage {
+    if (typeof message === 'string' || typeof message === 'number' || message === null || message === undefined) {
+      return message;
+    }
+    return JSON.parse(JSON.stringify(message));
+  }
 
   /**
    * Validates if the provided log level is valid.
@@ -43,94 +61,98 @@ export class MockLogger {
    * @throws {Error} When log level is invalid
    */
   private validateLogLevel(logLevel: AgLogLevel): void {
-    if (typeof logLevel !== 'number' || logLevel < 0 || logLevel > 6 || !Number.isInteger(logLevel)) {
-      throw new Error(`Invalid log level: ${logLevel}`);
+    if (!isValidLogLevel(logLevel)) {
+      throw new Error(`MockLogger: Invalid log level: ${logLevel}`);
     }
   }
 
   // Logger methods
   fatal(message: AgFormattedLogMessage): void {
-    this.messages[AG_LOGLEVEL.FATAL].push(message);
+    this.messages.get(AG_LOGLEVEL.FATAL)!.push(message);
   }
 
   error(message: AgFormattedLogMessage): void {
-    this.messages[AG_LOGLEVEL.ERROR].push(message);
+    this.messages.get(AG_LOGLEVEL.ERROR)!.push(message);
   }
 
   warn(message: AgFormattedLogMessage): void {
-    this.messages[AG_LOGLEVEL.WARN].push(message);
+    this.messages.get(AG_LOGLEVEL.WARN)!.push(message);
   }
 
   info(message: AgFormattedLogMessage): void {
-    this.messages[AG_LOGLEVEL.INFO].push(message);
+    this.messages.get(AG_LOGLEVEL.INFO)!.push(message);
   }
 
   debug(message: AgFormattedLogMessage): void {
-    this.messages[AG_LOGLEVEL.DEBUG].push(message);
+    this.messages.get(AG_LOGLEVEL.DEBUG)!.push(message);
   }
 
   trace(message: AgFormattedLogMessage): void {
-    this.messages[AG_LOGLEVEL.TRACE].push(message);
+    this.messages.get(AG_LOGLEVEL.TRACE)!.push(message);
+  }
+
+  verbose(message: AgFormattedLogMessage): void {
+    this.messages.get(AG_LOGLEVEL.VERBOSE)!.push(message);
   }
 
   // Query methods
   getMessages(logLevel: AgLogLevel): AgFormattedLogMessage[] {
     this.validateLogLevel(logLevel);
-    return [...this.messages[logLevel]];
+    return this.messages.get(logLevel)?.slice() ?? [];
   }
 
   getLastMessage(logLevel: AgLogLevel): AgLogMessage | string | null {
     this.validateLogLevel(logLevel);
-    const levelMessages = this.messages[logLevel];
-    return levelMessages[levelMessages.length - 1] || null;
+    return this.messages.get(logLevel)?.slice(-1)[0] ?? null;
   }
 
-  getAllMessages(): { [K in keyof typeof AG_LOGLEVEL]: AgFormattedLogMessage[] } {
-    return {
-      OFF: [...this.messages[AG_LOGLEVEL.OFF]],
-      FATAL: [...this.messages[AG_LOGLEVEL.FATAL]],
-      ERROR: [...this.messages[AG_LOGLEVEL.ERROR]],
-      WARN: [...this.messages[AG_LOGLEVEL.WARN]],
-      INFO: [...this.messages[AG_LOGLEVEL.INFO]],
-      DEBUG: [...this.messages[AG_LOGLEVEL.DEBUG]],
-      TRACE: [...this.messages[AG_LOGLEVEL.TRACE]],
-    };
+  getAllMessages(): { [K in AgLogLevelKey]: AgFormattedLogMessage[] } {
+    return AG_LOGLEVEL_KEYS.reduce((acc, key) => ({
+      ...acc,
+      [key]: this.messages.get(AG_LOGLEVEL[key])?.slice() ?? [],
+    }), {} as { [K in AgLogLevelKey]: AgFormattedLogMessage[] });
   }
 
   // Utility methods
   clearMessages(logLevel: AgLogLevel): void {
     this.validateLogLevel(logLevel);
-    this.messages[logLevel] = [];
+    this.messages.set(logLevel, []);
   }
 
   clearAllMessages(): void {
-    this.messages = [
-      [], // OFF (0)
-      [], // FATAL (1)
-      [], // ERROR (2)
-      [], // WARN (3)
-      [], // INFO (4)
-      [], // DEBUG (5)
-      [], // TRACE (6)
-    ];
+    this.messages.set(AG_LOGLEVEL.VERBOSE, []);
+    this.messages.set(AG_LOGLEVEL.OFF, []);
+    this.messages.set(AG_LOGLEVEL.FATAL, []);
+    this.messages.set(AG_LOGLEVEL.ERROR, []);
+    this.messages.set(AG_LOGLEVEL.WARN, []);
+    this.messages.set(AG_LOGLEVEL.INFO, []);
+    this.messages.set(AG_LOGLEVEL.DEBUG, []);
+    this.messages.set(AG_LOGLEVEL.TRACE, []);
   }
 
   getMessageCount(logLevel: AgLogLevel): number {
     this.validateLogLevel(logLevel);
-    return this.messages[logLevel].length;
+    return this.messages.get(logLevel)!.length;
   }
 
   getTotalMessageCount(): number {
-    return this.messages.reduce((total, levelMessages) => total + levelMessages.length, 0);
+    let total = 0;
+    for (const levelMessages of this.messages.values()) {
+      total += levelMessages.length;
+    }
+    return total;
   }
 
   hasMessages(logLevel: AgLogLevel): boolean {
     this.validateLogLevel(logLevel);
-    return this.messages[logLevel].length > 0;
+    return this.messages.get(logLevel)!.length > 0;
   }
 
   hasAnyMessages(): boolean {
-    return this.messages.some((levelMessages) => levelMessages.length > 0);
+    for (const levelMessages of this.messages.values()) {
+      if (levelMessages.length > 0) { return true; }
+    }
+    return false;
   }
 
   /**
@@ -150,6 +172,7 @@ export class MockLogger {
    */
   createLoggerMap(): AgLoggerMap {
     return {
+      [AG_LOGLEVEL.VERBOSE]: (message: string | AgLogMessage) => this.verbose(message),
       [AG_LOGLEVEL.OFF]: () => {}, // No-op for OFF level
       [AG_LOGLEVEL.FATAL]: (message: string | AgLogMessage) => this.fatal(message),
       [AG_LOGLEVEL.ERROR]: (message: string | AgLogMessage) => this.error(message),
@@ -158,18 +181,5 @@ export class MockLogger {
       [AG_LOGLEVEL.DEBUG]: (message: string | AgLogMessage) => this.debug(message),
       [AG_LOGLEVEL.TRACE]: (message: string | AgLogMessage) => this.trace(message),
     };
-  }
-
-  // Legacy methods for backward compatibility
-  getErrorMessages(): AgFormattedLogMessage[] {
-    return this.getMessages(AG_LOGLEVEL.ERROR);
-  }
-
-  getLastErrorMessage(): AgLogMessage | string | null {
-    return this.getLastMessage(AG_LOGLEVEL.ERROR);
-  }
-
-  clearErrorMessages(): void {
-    this.clearMessages(AG_LOGLEVEL.ERROR);
   }
 }

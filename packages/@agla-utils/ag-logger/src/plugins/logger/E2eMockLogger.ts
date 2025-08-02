@@ -33,7 +33,7 @@ export class E2eMockLogger {
 
   constructor(identifier?: string) {
     const trimmedIdentifier = typeof identifier === 'string' ? identifier.trim() : '';
-    this.testIdentifier = trimmedIdentifier ? getNormalizedBasename(trimmedIdentifier) : 'e2edefault';
+    this.testIdentifier = trimmedIdentifier ? getNormalizedBasename(trimmedIdentifier) : 'e2e-default';
     this.currentTestId = null;
     this.mockLoggers = new Map<string, MockLogger>();
   }
@@ -119,6 +119,11 @@ export class E2eMockLogger {
     mockLogger.trace(message);
   }
 
+  verbose(message: AgFormattedLogMessage): void {
+    const mockLogger = this.getCurrentMockLogger();
+    mockLogger.verbose(message);
+  }
+
   /**
    * Get the MockLogger instance for the current test.
    * Validates that there is an active test before returning.
@@ -150,22 +155,6 @@ export class E2eMockLogger {
   clearMessages(logLevel: AgLogLevel): void {
     const mockLogger = this.getCurrentMockLogger();
     mockLogger.clearMessages(logLevel);
-  }
-
-  // Error-specific convenience methods
-  getErrorMessages(): AgLogMessageCollection {
-    const mockLogger = this.getCurrentMockLogger();
-    return mockLogger.getErrorMessages();
-  }
-
-  getLastErrorMessage(): string | AgLogMessage | null {
-    const mockLogger = this.getCurrentMockLogger();
-    return mockLogger.getLastErrorMessage();
-  }
-
-  clearErrorMessages(): void {
-    const mockLogger = this.getCurrentMockLogger();
-    mockLogger.clearErrorMessages();
   }
 
   /**
@@ -201,6 +190,7 @@ export class E2eMockLogger {
    */
   createLoggerMap(): AgLoggerMap {
     return {
+      [AG_LOGLEVEL.VERBOSE]: (message: AgFormattedLogMessage) => this.verbose(message),
       [AG_LOGLEVEL.OFF]: () => {},
       [AG_LOGLEVEL.FATAL]: (message: AgFormattedLogMessage) => this.fatal(message),
       [AG_LOGLEVEL.ERROR]: (message: AgFormattedLogMessage) => this.error(message),

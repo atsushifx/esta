@@ -11,7 +11,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 // import test target
 import { AG_LOGLEVEL } from '../../../../shared/types';
-import type { AG_LABEL_TO_LOGLEVEL_MAP, AgLogLevel } from '../../../../shared/types';
+import type { AG_LABEL_TO_LOGLEVEL_MAP, AgLogLevel, AgLogMessage } from '../../../../shared/types';
 import { MockLogger } from '../MockLogger';
 
 // Type definitions derived from log level constants
@@ -67,6 +67,17 @@ describe('MockLogger', () => {
         });
       });
 
+      it('should capture verbose messages in VERBOSE level storage', () => {
+        // Arrange
+        const verboseMessage = 'verbose diagnostic message';
+
+        // Act
+        mockLogger.verbose(verboseMessage);
+
+        // Assert
+        expect(mockLogger.getMessages(AG_LOGLEVEL.VERBOSE)).toEqual([verboseMessage]);
+      });
+
       it('should handle multiple messages per level', () => {
         mockLogger.error('first error');
         mockLogger.error('second error');
@@ -74,6 +85,55 @@ describe('MockLogger', () => {
 
         expect(mockLogger.getMessages(AG_LOGLEVEL.ERROR)).toEqual(['first error', 'second error']);
         expect(mockLogger.getMessages(AG_LOGLEVEL.INFO)).toEqual(['info message']);
+      });
+
+      it('should accept AgLogMessage objects as well as strings', () => {
+        // Arrange
+        const logMessage: AgLogMessage = {
+          logLevel: AG_LOGLEVEL.INFO,
+          timestamp: new Date('2023-12-01T10:30:00Z'),
+          message: 'Structured log message',
+          args: [{ userId: 123, action: 'login' }],
+        };
+        const stringMessage = 'Simple string message';
+
+        // Act
+        mockLogger.info(logMessage);
+        mockLogger.info(stringMessage);
+
+        // Assert
+        const messages = mockLogger.getMessages(AG_LOGLEVEL.INFO);
+        expect(messages).toHaveLength(2);
+        expect(messages[0]).toEqual(logMessage);
+        expect(messages[1]).toEqual(stringMessage);
+      });
+
+      it('should accept AgLogMessage objects in all logger methods', () => {
+        // Arrange
+        const createLogMessage = (level: AgLogLevel, msg: string): AgLogMessage => ({
+          logLevel: level,
+          timestamp: new Date('2023-12-01T10:30:00Z'),
+          message: msg,
+          args: [],
+        });
+
+        // Act & Assert
+        const testCases = [
+          { method: 'fatal', level: AG_LOGLEVEL.FATAL },
+          { method: 'error', level: AG_LOGLEVEL.ERROR },
+          { method: 'warn', level: AG_LOGLEVEL.WARN },
+          { method: 'info', level: AG_LOGLEVEL.INFO },
+          { method: 'debug', level: AG_LOGLEVEL.DEBUG },
+          { method: 'trace', level: AG_LOGLEVEL.TRACE },
+          { method: 'verbose', level: AG_LOGLEVEL.VERBOSE }, // verbose stores in VERBOSE
+        ];
+
+        testCases.forEach(({ method, level }) => {
+          const logMessage = createLogMessage(level, `${method} structured message`);
+          (mockLogger[method as TMockLoggerMethods] as (msg: AgLogMessage) => void)(logMessage);
+          expect(mockLogger.getMessages(level)).toContain(logMessage);
+          mockLogger.clearMessages(level);
+        });
       });
     });
 
@@ -114,6 +174,20 @@ describe('MockLogger', () => {
         expect(allMessages.WARN).toEqual(['warn1']);
         expect(allMessages.DEBUG).toEqual([]);
       });
+
+      it('should return verbose messages in VERBOSE key and trace messages in TRACE key separately', () => {
+        // Arrange
+        mockLogger.verbose('verbose message 1');
+        mockLogger.verbose('verbose message 2');
+        mockLogger.trace('trace message 1');
+
+        // Act
+        const allMessages = mockLogger.getAllMessages();
+
+        // Assert
+        expect(allMessages.VERBOSE).toEqual(['verbose message 1', 'verbose message 2']);
+        expect(allMessages.TRACE).toEqual(['trace message 1']);
+      });
     });
 
     /**
@@ -140,16 +214,16 @@ describe('MockLogger', () => {
         expect(mockLogger.getTotalMessageCount()).toBe(0);
       });
 
-      it('should support legacy error-specific methods', () => {
+      it('should support error message management with new methods', () => {
         // 新しいmockLoggerインスタンスを使用してテストを分離
         const testLogger = new MockLogger();
-        testLogger.error('legacy error');
+        testLogger.error('error message');
 
-        expect(testLogger.getErrorMessages()).toEqual(['legacy error']);
-        expect(testLogger.getLastErrorMessage()).toBe('legacy error');
+        expect(testLogger.getMessages(AG_LOGLEVEL.ERROR)).toEqual(['error message']);
+        expect(testLogger.getLastMessage(AG_LOGLEVEL.ERROR)).toBe('error message');
 
-        testLogger.clearErrorMessages();
-        expect(testLogger.getErrorMessages()).toEqual([]);
+        testLogger.clearMessages(AG_LOGLEVEL.ERROR);
+        expect(testLogger.getMessages(AG_LOGLEVEL.ERROR)).toEqual([]);
       });
     });
 
@@ -179,6 +253,18 @@ describe('MockLogger', () => {
         loggerMap[AG_LOGLEVEL.OFF]?.('should not log');
         expect(mockLogger.hasMessages(AG_LOGLEVEL.OFF)).toBe(false);
       });
+
+      it('should include VERBOSE level in createLoggerMap with correct mapping', () => {
+        // Arrange
+        const loggerMap = mockLogger.createLoggerMap();
+
+        // Act
+        loggerMap[AG_LOGLEVEL.VERBOSE]?.('verbose message via map');
+
+        // Assert
+        expect(mockLogger.getMessages(AG_LOGLEVEL.VERBOSE)).toEqual(['verbose message via map']);
+        expect(AG_LOGLEVEL.VERBOSE).toBe(-99); // Verify VERBOSE constant
+      });
     });
   });
 
@@ -188,27 +274,95 @@ describe('MockLogger', () => {
    * @description エラー状況での動作を検証
    */
   describe('異常系: Error Handling', () => {
-    it('should handle invalid log levels with appropriate errors', () => {
-      const invalidLevel = 999 as unknown as AgLogLevel;
+    /**
+     * 無効なログレベル型のテスト
+     */
+    describe('Invalid Log Level Types', () => {
+      it('should throw error for string log levels with exact format', () => {
+        const stringLevel = 'DEBUG' as unknown as AgLogLevel;
+        expect(() => mockLogger.getMessages(stringLevel))
+          .toThrow('MockLogger: Invalid log level: DEBUG');
+      });
 
-      // 無効レベルでの操作は適切なエラーを投げるべき
-      expect(() => mockLogger.getMessages(invalidLevel))
-        .toThrow('Invalid log level: 999');
-      expect(() => mockLogger.clearMessages(invalidLevel))
-        .toThrow('Invalid log level: 999');
-      expect(() => mockLogger.hasMessages(invalidLevel))
-        .toThrow('Invalid log level: 999');
-      expect(() => mockLogger.getMessageCount(invalidLevel))
-        .toThrow('Invalid log level: 999');
-      expect(() => mockLogger.getLastMessage(invalidLevel))
-        .toThrow('Invalid log level: 999');
+      it('should throw error for boolean log levels with exact format', () => {
+        const booleanLevel = true as unknown as AgLogLevel;
+        expect(() => mockLogger.getMessages(booleanLevel))
+          .toThrow('MockLogger: Invalid log level: true');
+      });
+
+      it('should throw error for object log levels with exact format', () => {
+        const objectLevel = { level: 1 } as unknown as AgLogLevel;
+        expect(() => mockLogger.getMessages(objectLevel))
+          .toThrow('MockLogger: Invalid log level: [object Object]');
+      });
+
+      it('should throw error for array log levels with exact format', () => {
+        const arrayLevel = [1, 2, 3] as unknown as AgLogLevel;
+        expect(() => mockLogger.getMessages(arrayLevel))
+          .toThrow('MockLogger: Invalid log level: 1,2,3');
+      });
+
+      it('should throw error for null and undefined log levels with exact format', () => {
+        expect(() => mockLogger.getMessages(null as unknown as AgLogLevel))
+          .toThrow('MockLogger: Invalid log level: null');
+        expect(() => mockLogger.getMessages(undefined as unknown as AgLogLevel))
+          .toThrow('MockLogger: Invalid log level: undefined');
+      });
     });
 
-    it('should handle null and undefined log levels', () => {
-      expect(() => mockLogger.getMessages(null as unknown as AgLogLevel))
-        .toThrow('Invalid log level: null');
-      expect(() => mockLogger.getMessages(undefined as unknown as AgLogLevel))
-        .toThrow('Invalid log level: undefined');
+    /**
+     * 無効な数値ログレベルのテスト
+     */
+    describe('Invalid Numeric Log Levels', () => {
+      it('should throw error for out-of-range positive numbers with exact format', () => {
+        const outOfRangeLevel = 7 as unknown as AgLogLevel;
+        expect(() => mockLogger.getMessages(outOfRangeLevel))
+          .toThrow('MockLogger: Invalid log level: 7');
+      });
+
+      it('should throw error for out-of-range negative numbers with exact format', () => {
+        const negativeLevel = -1 as unknown as AgLogLevel;
+        expect(() => mockLogger.getMessages(negativeLevel))
+          .toThrow('MockLogger: Invalid log level: -1');
+      });
+
+      it('should throw error for invalid negative numbers near VERBOSE range with exact format', () => {
+        const nearVerboseLevel = -98 as unknown as AgLogLevel;
+        expect(() => mockLogger.getMessages(nearVerboseLevel))
+          .toThrow('MockLogger: Invalid log level: -98');
+      });
+
+      it('should throw error for decimal numbers with exact format', () => {
+        const decimalLevel = 1.5 as unknown as AgLogLevel;
+        expect(() => mockLogger.getMessages(decimalLevel))
+          .toThrow('MockLogger: Invalid log level: 1.5');
+      });
+
+      it('should throw error for large out-of-range numbers with exact format', () => {
+        const largeLevel = 999 as unknown as AgLogLevel;
+        expect(() => mockLogger.getMessages(largeLevel))
+          .toThrow('MockLogger: Invalid log level: 999');
+      });
+    });
+
+    /**
+     * 全メソッドでの一貫した検証テスト
+     */
+    describe('Consistent Validation Across Methods', () => {
+      const invalidLevel = 999 as unknown as AgLogLevel;
+
+      it('should validate log levels consistently in all query methods', () => {
+        expect(() => mockLogger.getMessages(invalidLevel))
+          .toThrow('MockLogger: Invalid log level: 999');
+        expect(() => mockLogger.clearMessages(invalidLevel))
+          .toThrow('MockLogger: Invalid log level: 999');
+        expect(() => mockLogger.hasMessages(invalidLevel))
+          .toThrow('MockLogger: Invalid log level: 999');
+        expect(() => mockLogger.getMessageCount(invalidLevel))
+          .toThrow('MockLogger: Invalid log level: 999');
+        expect(() => mockLogger.getLastMessage(invalidLevel))
+          .toThrow('MockLogger: Invalid log level: 999');
+      });
     });
 
     it('should handle empty state operations safely', () => {
@@ -227,6 +381,15 @@ describe('MockLogger', () => {
    * @description 境界値や特殊な入力での動作を検証
    */
   describe('エッジケース: Edge Cases', () => {
+    type TestNestedData = {
+      user: {
+        id: number;
+        profile: {
+          name: string;
+        };
+      };
+    };
+
     it('should maintain data immutability', () => {
       mockLogger.error('original error');
 
@@ -239,6 +402,34 @@ describe('MockLogger', () => {
       const allMessages = mockLogger.getAllMessages();
       allMessages.ERROR.push('external modification');
       expect(mockLogger.getMessages(AG_LOGLEVEL.ERROR)).toEqual(['original error']);
+    });
+
+    it('should return same object references for AgLogMessage objects', () => {
+      // Arrange
+      const nestedLogMessage: AgLogMessage = {
+        logLevel: AG_LOGLEVEL.INFO,
+        timestamp: new Date('2023-12-01T10:30:00Z'),
+        message: 'Nested object test',
+        args: [{ user: { id: 123, profile: { name: 'test' } } }],
+      };
+
+      // Act
+      mockLogger.info(nestedLogMessage);
+      const retrievedMessages = mockLogger.getMessages(AG_LOGLEVEL.INFO);
+      const allMessages = mockLogger.getAllMessages();
+
+      // Assert - should return same object references (JavaScript standard behavior)
+      expect(retrievedMessages[0]).toBe(nestedLogMessage);
+      expect(allMessages.INFO[0]).toBe(nestedLogMessage);
+
+      // Verify object structure is preserved
+      if (typeof retrievedMessages[0] === 'object' && 'args' in retrievedMessages[0]) {
+        // retrievedMessages[0]はAgLogMessage型で、args プロパティは readonly unknown[] として定義されているため
+        const args = retrievedMessages[0].args;
+        const testData = args[0] as TestNestedData;
+        expect(testData.user.id).toBe(123);
+        expect(testData.user.profile.name).toBe('test');
+      }
     });
 
     it('should handle special message types', () => {

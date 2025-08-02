@@ -31,6 +31,9 @@ export const ConsoleLogger: AgLoggerFunction = (formattedLogMessage: AgFormatted
  * Uses appropriate console methods per log level for better log categorization.
  */
 export const ConsoleLoggerMap: AgLoggerMap = {
+  [AG_LOGLEVEL.VERBOSE]: (formattedMessage: AgFormattedLogMessage) => {
+    console.debug(formattedMessage);
+  },
   [AG_LOGLEVEL.OFF]: NullLogger,
   [AG_LOGLEVEL.FATAL]: (formattedMessage: AgFormattedLogMessage) => {
     console.error(formattedMessage);

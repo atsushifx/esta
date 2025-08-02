@@ -102,3 +102,26 @@ export type AgLogLevel = typeof AG_LOGLEVEL[keyof typeof AG_LOGLEVEL];
  * ```
  */
 export type AgLogLevelLabel = keyof typeof AG_LABEL_TO_LOGLEVEL_MAP;
+
+/**
+ * Log level key type derived from AG_LOGLEVEL keys.
+ * Represents all valid log level constant names.
+ *
+ * @example
+ * ```typescript
+ * const key: AgLogLevelKey = 'INFO'; // Valid
+ * const invalid: AgLogLevelKey = 'INVALID'; // Type error
+ * ```
+ */
+export type AgLogLevelKey = keyof typeof AG_LOGLEVEL;
+
+/**
+ * Array of all log level keys in AG_LOGLEVEL.
+ * Useful for iteration and functional programming operations.
+ *
+ * @example
+ * ```typescript
+ * AG_LOGLEVEL_KEYS.forEach(key => console.log(AG_LOGLEVEL[key]));
+ * ```
+ */
+export const AG_LOGLEVEL_KEYS = Object.keys(AG_LOGLEVEL) as AgLogLevelKey[];
