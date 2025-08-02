@@ -15,13 +15,12 @@ import type { AgLoggerOptions } from '../shared/types/AgLogger.interface';
 // constants
 import { AG_LOGGER_ERROR_CATEGORIES } from '../shared/constants/agLoggerError.constants';
 
-// core
-import { AgLoggerConfig } from '@/internal/AgLoggerConfig.class';
+// internal
+import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 // plugins
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
 import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
-import { format } from 'path';
 
 /**
  * Abstract logger class providing singleton instance management,
@@ -30,10 +29,7 @@ import { format } from 'path';
  */
 export class AgLogger {
   private static _instance: AgLogger | undefined;
-  private static _logLevel: AgLogLevel = AG_LOGLEVEL.OFF;
   private _config: AgLoggerConfig;
-
-  private _verbose: boolean = false;
 
   protected constructor() {
     this._config = new AgLoggerConfig();
@@ -59,7 +55,7 @@ export class AgLogger {
 
   static getLogger(): AgLogger {
     if (AgLogger._instance === undefined) {
-      throw new AgLoggerError(AG_LOGGER_ERROR_CATEGORIES.LOGGER, 'Logger instance not created. Call createLogger() first.');
+      throw new AgLoggerError(AG_LOGGER_ERROR_CATEGORIES.INITIALIZE_ERROR, 'Logger instance not created. Call createLogger() first.');
     }
     return AgLogger._instance;
   }
@@ -71,10 +67,10 @@ export class AgLogger {
    * @returns True if the level should be logged; otherwise false.
    */
   private shouldOutput(level: AgLogLevel): boolean {
-    if (AgLogger._logLevel === AG_LOGLEVEL.OFF) {
+    if (this.logLevel === AG_LOGLEVEL.OFF) {
       return false;
     }
-    return level <= AgLogger._logLevel;
+    return (level <= this.logLevel);
   }
 
   /**
@@ -83,31 +79,25 @@ export class AgLogger {
    * @param level - Log level to set.
    * @returns The updated log level.
    */
-  setLogLevel(level: AgLogLevel): AgLogLevel {
-    AgLogger._logLevel = level;
-    return AgLogger._logLevel;
+  get isVerbose(): boolean {
+    return this._config.isVerbose;
   }
 
-  /**
-   * Retrieves the current global log level.
-   *
-   * @returns The current log level.
-   */
-  getLogLevel(): AgLogLevel {
-    return AgLogger._logLevel;
+  set setVerbose(value: boolean) {
+    this._config.setVerbose = value;
   }
 
+
   /**
-   * Sets or gets the verbose flag.
-   *
-   * @param value - The verbose setting. If undefined, returns current value without setting.
-   * @returns The current verbose setting.
+   * Gets the current log level.
+   * @returns The current log level
    */
-  setVerbose(value?: boolean): boolean {
-    if (value !== undefined) {
-      this._verbose = value;
-    }
-    return this._verbose;
+  public get logLevel(): AgLogLevel {
+    return this._config.logLevel;
+  }
+
+  public set logLevel(level: AgLogLevel) {
+    this._config.logLevel = level;
   }
 
   /**
@@ -118,7 +108,7 @@ export class AgLogger {
    * @param args - Arguments to be logged.
    */
   protected executeLog(level: AgLogLevel, ...args: unknown[]): void {
-    if (!this._config.shouldOutput(level)) {
+    if (!this.shouldOutput(level)) {
       return;
     }
 
@@ -128,7 +118,7 @@ export class AgLogger {
     }
 
     const logMessage = AgLoggerGetMessage(level, ...args);
-    const formatter = this._config.getFormatter();
+    const formatter = this._config.formatter
     const formattedMessage = formatter(logMessage);
 
     // Only block logging if the formatter explicitly returns empty string
@@ -137,7 +127,7 @@ export class AgLogger {
       return;
     }
 
-    const logger = this._config.getLoggerFunction(level)
+    const logger = this._config.getLoggerFunction(level);
     logger(formattedMessage);
   }
 
@@ -194,7 +184,7 @@ export class AgLogger {
 
   /** Verbose log method that only outputs when verbose flag is true. */
   verbose(...args: unknown[]): void {
-    if (this._verbose) {
+    if (this._config.isVerbose) {
       this.log(...args);
     }
   }
@@ -205,7 +195,6 @@ export class AgLogger {
    */
   static resetSingleton(): void {
     AgLogger._instance = undefined;
-    AgLogger._logLevel = AG_LOGLEVEL.OFF;
   }
 }
 

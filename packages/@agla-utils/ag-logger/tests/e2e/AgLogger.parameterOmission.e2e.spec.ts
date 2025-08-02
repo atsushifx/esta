@@ -65,8 +65,8 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
     it('uses previous settings when all parameters are omitted after initial setup', () => {
       setupTestContext();
       // Initial setup
-      const logger1 = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
-      logger1.setLogLevel(AG_LOGLEVEL.INFO);
+      const logger1 = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
+      logger1.logLevel = AG_LOGLEVEL.INFO;
       logger1.info('Log after initial setup');
 
       // createLogger with all parameters omitted
@@ -88,8 +88,8 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
       createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
 
       // Omit formatter only
-      const logger = getLogger({ defaultLogger: ConsoleLogger });
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
+      const logger = createLogger({ defaultLogger: ConsoleLogger });
+      logger.logLevel = AG_LOGLEVEL.INFO;
       logger.info('Log after partial parameter omission');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
@@ -123,8 +123,8 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
   describe('setManager method functionality', () => {
     it('updates all settings at once via setManager', () => {
       setupTestContext();
-      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
+      const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
+      logger.logLevel = AG_LOGLEVEL.INFO;
 
       // Change settings via setManager
       logger.setManager({
@@ -141,8 +141,8 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
 
     it('updates partial settings via setManager', () => {
       setupTestContext();
-      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
+      const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
+      logger.logLevel = AG_LOGLEVEL.INFO;
 
       // Change only formatter
       logger.setManager({
@@ -158,8 +158,8 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
 
     it('updates only defaultLogger via setManager', () => {
       setupTestContext();
-      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
+      const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
+      logger.logLevel = AG_LOGLEVEL.INFO;
 
       // Change only defaultLogger
       logger.setManager({
@@ -192,8 +192,8 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
     it('combines setting changes and parameter omission', () => {
       setupTestContext();
       // Initial setup
-      const logger1 = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
-      logger1.setLogLevel(AG_LOGLEVEL.INFO);
+      const logger1 = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
+      logger1.logLevel = AG_LOGLEVEL.INFO;
       logger1.info('Initial setup');
 
       // Change settings via setManager
@@ -219,8 +219,8 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
 
     it('overwrites settings via multiple setManager calls', () => {
       setupTestContext();
-      const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
-      logger.setLogLevel(AG_LOGLEVEL.INFO);
+      const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
+      logger.logLevel = AG_LOGLEVEL.INFO;
 
       // First settings update
       logger.setManager({

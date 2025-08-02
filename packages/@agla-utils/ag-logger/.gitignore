@@ -34,11 +34,13 @@ $~*
 *swp
 *lock
 
-## AI agents
-# mcp
+## AIagent files
+
+## mcp
 .mcp.json
 .serena/
 .lsmcp/
+
 
 
 ##		Editor
