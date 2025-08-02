@@ -59,17 +59,17 @@ describe('AgLoggerConfig', () => {
 
   it('should initialize with NullFormatter as default formatter', () => {
     const config = new AgLoggerConfig();
-    expect(config.getFormatter()).toBe(NullFormatter);
+    expect(config.formatter).toBe(NullFormatter);
   });
 
   it('should initialize with AG_LOGLEVEL.OFF as default log level', () => {
     const config = new AgLoggerConfig();
-    expect(config.getLogLevel()).toBe(AG_LOGLEVEL.OFF);
+    expect(config.logLevel).toBe(AG_LOGLEVEL.OFF);
   });
 
   it('should initialize with verbose as false', () => {
     const config = new AgLoggerConfig();
-    expect(config.getVerbose()).toBe(DISABLE);
+    expect(config.isVerbose).toBe(DISABLE);
   });
 
   it('should initialize all log levels with NullLogger', () => {
@@ -135,17 +135,17 @@ describe('AgLoggerConfig', () => {
 
   it('should return configured formatter', () => {
     const config = new AgLoggerConfig();
-    expect(config.getFormatter()).toBe(NullFormatter);
+    expect(config.formatter).toBe(NullFormatter);
   });
 
   it('should return configured log level', () => {
     const config = new AgLoggerConfig();
-    expect(config.getLogLevel()).toBe(AG_LOGLEVEL.OFF);
+    expect(config.logLevel).toBe(AG_LOGLEVEL.OFF);
   });
 
   it('should return verbose setting', () => {
     const config = new AgLoggerConfig();
-    expect(config.getVerbose()).toBe(DISABLE);
+    expect(config.isVerbose).toBe(DISABLE);
   });
 
   describe('isVerbose getter', () => {
@@ -161,7 +161,7 @@ describe('AgLoggerConfig', () => {
 
     it('should return true when verbose is enabled', () => {
       const config = new AgLoggerConfig();
-      config.setVerbose(true);
+      config.setVerbose = ENABLE;
       expect(config.isVerbose).toBe(true);
     });
   });
@@ -170,8 +170,8 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Test setting one log level first (t-wada style - one expect at a time)
-    config.setLogLevel(AG_LOGLEVEL.DEBUG);
-    expect(config.getLogLevel()).toBe(AG_LOGLEVEL.DEBUG);
+    config.logLevel = AG_LOGLEVEL.DEBUG;
+    expect(config.logLevel).toBe(AG_LOGLEVEL.DEBUG);
   });
 
   it('should return true when setting valid log level', () => {
@@ -195,28 +195,28 @@ describe('AgLoggerConfig', () => {
 
   it('should not change log level when invalid value is provided', () => {
     const config = new AgLoggerConfig();
-    const originalLevel = config.getLogLevel();
+    const originalLevel = config.logLevel;
 
     // Attempt to set invalid log level
-    config.setLogLevel(999 as AgLogLevel);
+    config.logLevel = 999 as AgLogLevel;
 
     // Verify log level remains unchanged
-    expect(config.getLogLevel()).toBe(originalLevel);
+    expect(config.logLevel).toBe(originalLevel);
   });
 
   it('should set verbose setting correctly', () => {
     const config = new AgLoggerConfig();
 
     // Test enabling verbose mode (t-wada style - one expect at a time)
-    config.setVerbose(ENABLE);
-    expect(config.getVerbose()).toBe(ENABLE);
+    config.setVerbose = ENABLE;
+    expect(config.isVerbose).toBe(ENABLE);
   });
 
   it('should return the set verbose value', () => {
     const config = new AgLoggerConfig();
 
     // Test that setVerbose returns the set verbose value
-    const result = config.setVerbose(DISABLE);
+    const result = config.setVerbose = DISABLE;
     expect(result).toBe(DISABLE);
   });
 
@@ -224,7 +224,7 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Ensure log level is OFF (default state)
-    expect(config.getLogLevel()).toBe(AG_LOGLEVEL.OFF);
+    expect(config.logLevel).toBe(AG_LOGLEVEL.OFF);
 
     // Test that shouldOutput returns false for all log levels when set to OFF
     expect(config.shouldOutput(AG_LOGLEVEL.DEBUG)).toBe(false);
@@ -238,7 +238,7 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Set log level to WARN
-    config.setLogLevel(AG_LOGLEVEL.WARN);
+    config.logLevel = AG_LOGLEVEL.WARN;
 
     // Test that levels below WARN return false
     expect(config.shouldOutput(AG_LOGLEVEL.DEBUG)).toBe(false);
@@ -253,12 +253,12 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Test minimum log level (FATAL = 1)
-    config.setLogLevel(AG_LOGLEVEL.FATAL);
+    config.logLevel = AG_LOGLEVEL.FATAL;
     expect(config.shouldOutput(AG_LOGLEVEL.FATAL)).toBe(true); // 1 <= 1
     expect(config.shouldOutput(AG_LOGLEVEL.ERROR)).toBe(false); // 2 > 1
 
     // Test maximum log level (TRACE = 6)
-    config.setLogLevel(AG_LOGLEVEL.TRACE);
+    config.logLevel = AG_LOGLEVEL.TRACE;
     expect(config.shouldOutput(AG_LOGLEVEL.TRACE)).toBe(true); // 6 <= 6
     expect(config.shouldOutput(AG_LOGLEVEL.DEBUG)).toBe(true); // 5 <= 6
     expect(config.shouldOutput(AG_LOGLEVEL.FATAL)).toBe(true); // 1 <= 6
@@ -282,7 +282,7 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Enable verbose mode
-    config.setVerbose(ENABLE);
+    config.setVerbose = ENABLE;
 
     // Test that shouldOutputVerbose returns true when verbose is enabled
     expect(config.shouldOutputVerbose()).toBe(true);
@@ -292,13 +292,13 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Ensure verbose is disabled (default state)
-    expect(config.getVerbose()).toBe(DISABLE);
+    expect(config.isVerbose).toBe(DISABLE);
 
     // Test that shouldOutputVerbose returns false when verbose is disabled
     expect(config.shouldOutputVerbose()).toBe(false);
 
     // Explicitly disable verbose and test again
-    config.setVerbose(DISABLE);
+    config.setVerbose = DISABLE;
     expect(config.shouldOutputVerbose()).toBe(false);
   });
 
@@ -341,7 +341,7 @@ describe('AgLoggerConfig', () => {
     config.setLoggerConfig(options);
 
     // Verify formatter was applied
-    expect(config.getFormatter()).toBe(testFormatter);
+    expect(config.formatter).toBe(testFormatter);
   });
 
   it('should apply logLevel setting', () => {
@@ -354,7 +354,7 @@ describe('AgLoggerConfig', () => {
     config.setLoggerConfig(options);
 
     // Verify logLevel was applied
-    expect(config.getLogLevel()).toBe(AG_LOGLEVEL.DEBUG);
+    expect(config.logLevel).toBe(AG_LOGLEVEL.DEBUG);
   });
 
   it('should apply verbose setting', () => {
@@ -367,7 +367,7 @@ describe('AgLoggerConfig', () => {
     config.setLoggerConfig(options);
 
     // Verify verbose was applied
-    expect(config.getVerbose()).toBe(ENABLE);
+    expect(config.isVerbose).toBe(ENABLE);
   });
 
   it('should have setLogger method that can be called', () => {

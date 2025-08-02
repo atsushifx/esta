@@ -143,24 +143,13 @@ export class AgLoggerConfig {
    * Gets the configured formatter function.
    * @returns The configured formatter function
    */
-  public getFormatter(): AgFormatFunction {
+  public get formatter(): AgFormatFunction {
     return this._options.formatter;
   }
 
-  /**
-   * Gets the current log level setting.
-   * @returns The current log level
-   */
-  public getLogLevel(): AgLogLevel {
-    return this._options.logLevel;
-  }
-
-  /**
-   * Gets the current verbose setting.
-   * @returns The current verbose setting
-   */
-  public getVerbose(): boolean {
-    return this._options.verbose;
+  /** */
+  protected set formatter(formatter: AgFormatFunction) {
+    this._options.formatter = formatter;
   }
 
   /**
@@ -172,33 +161,34 @@ export class AgLoggerConfig {
   }
 
   /**
-   * Sets the log level for the configuration.
-   *
-   * Updates the current log level after validating that the provided level is valid.
-   * This setting determines which log messages will be processed by the logger.
-   * Only messages at or above this level will be output.
-   *
-   * @param level - The log level to set. Must be a valid AgLogLevel value.
-   * @returns The log level that was successfully set
-   * @throws {AgLoggerError} When an invalid log level is provided (error category: INVALID_LOG_LEVEL)
-   *
-   * @example
-   * ```typescript
-   * const config = new AgLoggerConfig();
-   *
-   * // Set log level to INFO
-   * const setLevel = config.setLogLevel(AG_LOGLEVEL.INFO);
-   * console.log(setLevel); // Outputs: 4 (AG_LOGLEVEL.INFO value)
-   *
-   * // Attempting to set invalid log level throws error
-   * try {
-   *   config.setLogLevel(999 as AgLogLevel);
-   * } catch (error) {
-   *   console.log(error.message); // "Invalid log level: 999"
-   * }
-   * ```
-   *
-   * @since 0.2.0
+   * setter for Verbose
+   */
+  public set setVerbose(value: boolean) {
+    this._options.verbose = value;
+  }
+
+  /**
+   *  getter for logLevel
+   *  @return logLevel
+   */
+  public get logLevel(): AgLogLevel {
+    return this._options.logLevel;
+  }
+
+  /**
+   *  setter for logLevel
+   *  @return logLevel
+   */
+  public set logLevel(level: AgLogLevel) {
+    if (!isValidLogLevel(level)) {
+      return;
+    }
+    this._options.logLevel = level;
+  }
+
+  /**
+   *  getter for logLevel
+   *  @return boolean
    */
   public setLogLevel(level: AgLogLevel): boolean {
     if (!isValidLogLevel(level)) {
@@ -206,41 +196,6 @@ export class AgLoggerConfig {
     }
     this._options.logLevel = level;
     return true;
-  }
-
-  /**
-   * Sets the verbose mode setting for the configuration.
-   *
-   * Controls whether the logger should provide detailed/verbose output.
-   * When enabled (true), the logger may output additional diagnostic information.
-   * When disabled (false), only standard log messages are output.
-   *
-   * @param value - The verbose setting to set. Use ENABLE (true) or DISABLE (false) constants for better readability.
-   * @returns The verbose setting that was successfully set
-   *
-   * @example
-   * ```typescript
-   * import { ENABLE, DISABLE } from '../../../shared/constants/common.constants';
-   *
-   * const config = new AgLoggerConfig();
-   *
-   * // Enable verbose mode
-   * const verboseEnabled = config.setVerbose(ENABLE);
-   * console.log(verboseEnabled); // Outputs: true
-   *
-   * // Disable verbose mode
-   * const verboseDisabled = config.setVerbose(DISABLE);
-   * console.log(verboseDisabled); // Outputs: false
-   *
-   * // Check current verbose setting
-   * console.log(config.getVerbose()); // Outputs: false
-   * ```
-   *
-   * @since 0.2.0
-   */
-  public setVerbose(value: boolean): boolean {
-    this._options.verbose = value;
-    return this._options.verbose;
   }
 
   /**
@@ -272,6 +227,10 @@ export class AgLoggerConfig {
    * @since 0.2.0
    */
   public shouldOutput(level: AgLogLevel): boolean {
+    if (level === AG_LOGLEVEL.VERBOSE) {
+      return this.isVerbose;
+    }
+
     if (!isValidLogLevel(level)) {
       return false;
     }
@@ -351,12 +310,12 @@ export class AgLoggerConfig {
 
     // Apply logLevel setting if provided
     if (options.logLevel !== undefined) {
-      this.setLogLevel(options.logLevel);
+      this.logLevel = options.logLevel;
     }
 
     // Apply verbose setting if provided
     if (options.verbose !== undefined) {
-      this.setVerbose(options.verbose);
+      this.setVerbose = options.verbose;
     }
 
     // Apply loggerMap setting if provided (this overrides the defaultLogger initialization above)
