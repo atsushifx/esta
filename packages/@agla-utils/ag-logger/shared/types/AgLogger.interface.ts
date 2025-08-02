@@ -23,7 +23,7 @@ import type { AgLogLevel } from './AgLogLevel.types';
  * const fileLogger: AgLoggerFunction = (message) => fs.appendFileSync('log.txt', message);
  * ```
  */
-export type AgLoggerFunction = (formattedLogMessage: string) => void;
+export type AgLoggerFunction = (formattedLogMessage: string | AgLogMessage) => void;
 
 /**
  * Represents a formatting function for log messages.
@@ -40,7 +40,7 @@ export type AgLoggerFunction = (formattedLogMessage: string) => void;
  *   `${logMsg.timestamp} [${logMsg.level}] ${logMsg.message}`;
  * ```
  */
-export type AgFormatFunction = (logMessage: AgLogMessage) => string;
+export type AgFormatFunction = (logMessage: AgLogMessage) => string | AgLogMessage;
 
 /**
  * A map holding logging functions for each log level.

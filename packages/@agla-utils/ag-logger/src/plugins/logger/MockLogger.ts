@@ -8,7 +8,7 @@
 
 // types
 import { AG_LOGLEVEL } from '../../../shared/types';
-import type { AgLoggerFunction, AgLoggerMap, AgLogLevel } from '../../../shared/types';
+import type { AgLoggerFunction, AgLoggerMap, AgLogLevel, AgLogMessage } from '../../../shared/types';
 
 /**
  * Universal mock logger for unit and integration testing.
@@ -21,7 +21,7 @@ import type { AgLoggerFunction, AgLoggerMap, AgLogLevel } from '../../../shared/
  * - Thread-safe for single-threaded test scenarios
  */
 export class MockLogger {
-  private messages: string[][] = [
+  private messages: (AgLogMessage | string)[][] = [
     [], // OFF (0) - not used for actual logging
     [], // FATAL (1)
     [], // ERROR (2)
@@ -43,43 +43,43 @@ export class MockLogger {
   }
 
   // Logger methods
-  fatal(message: string): void {
+  fatal(message: AgLogMessage | string): void {
     this.messages[AG_LOGLEVEL.FATAL].push(message);
   }
 
-  error(message: string): void {
+  error(message: AgLogMessage | string): void {
     this.messages[AG_LOGLEVEL.ERROR].push(message);
   }
 
-  warn(message: string): void {
+  warn(message: AgLogMessage | string): void {
     this.messages[AG_LOGLEVEL.WARN].push(message);
   }
 
-  info(message: string): void {
+  info(message: AgLogMessage | string): void {
     this.messages[AG_LOGLEVEL.INFO].push(message);
   }
 
-  debug(message: string): void {
+  debug(message: AgLogMessage | string): void {
     this.messages[AG_LOGLEVEL.DEBUG].push(message);
   }
 
-  trace(message: string): void {
+  trace(message: AgLogMessage | string): void {
     this.messages[AG_LOGLEVEL.TRACE].push(message);
   }
 
   // Query methods
-  getMessages(logLevel: AgLogLevel): string[] {
+  getMessages(logLevel: AgLogLevel): (AgLogMessage | string)[] {
     this.validateLogLevel(logLevel);
     return [...this.messages[logLevel]];
   }
 
-  getLastMessage(logLevel: AgLogLevel): string | null {
+  getLastMessage(logLevel: AgLogLevel): AgLogMessage | string | null {
     this.validateLogLevel(logLevel);
     const levelMessages = this.messages[logLevel];
     return levelMessages[levelMessages.length - 1] || null;
   }
 
-  getAllMessages(): { [K in keyof typeof AG_LOGLEVEL]: string[] } {
+  getAllMessages(): { [K in keyof typeof AG_LOGLEVEL]: (AgLogMessage | string)[] } {
     return {
       OFF: [...this.messages[AG_LOGLEVEL.OFF]],
       FATAL: [...this.messages[AG_LOGLEVEL.FATAL]],
@@ -132,7 +132,7 @@ export class MockLogger {
    * This can be used as a plugin for ag-logger.
    */
   createLoggerFunction(): AgLoggerFunction {
-    return (formattedLogMessage: string): void => {
+    return (formattedLogMessage: string | AgLogMessage): void => {
       // Use info level as default for generic logger function
       this.info(formattedLogMessage);
     };
@@ -145,21 +145,21 @@ export class MockLogger {
   createLoggerMap(): AgLoggerMap {
     return {
       [AG_LOGLEVEL.OFF]: () => {}, // No-op for OFF level
-      [AG_LOGLEVEL.FATAL]: (message: string) => this.fatal(message),
-      [AG_LOGLEVEL.ERROR]: (message: string) => this.error(message),
-      [AG_LOGLEVEL.WARN]: (message: string) => this.warn(message),
-      [AG_LOGLEVEL.INFO]: (message: string) => this.info(message),
-      [AG_LOGLEVEL.DEBUG]: (message: string) => this.debug(message),
-      [AG_LOGLEVEL.TRACE]: (message: string) => this.trace(message),
+      [AG_LOGLEVEL.FATAL]: (message: string | AgLogMessage) => this.fatal(message),
+      [AG_LOGLEVEL.ERROR]: (message: string | AgLogMessage) => this.error(message),
+      [AG_LOGLEVEL.WARN]: (message: string | AgLogMessage) => this.warn(message),
+      [AG_LOGLEVEL.INFO]: (message: string | AgLogMessage) => this.info(message),
+      [AG_LOGLEVEL.DEBUG]: (message: string | AgLogMessage) => this.debug(message),
+      [AG_LOGLEVEL.TRACE]: (message: string | AgLogMessage) => this.trace(message),
     };
   }
 
   // Legacy methods for backward compatibility
-  getErrorMessages(): string[] {
+  getErrorMessages(): (AgLogMessage | string)[] {
     return this.getMessages(AG_LOGLEVEL.ERROR);
   }
 
-  getLastErrorMessage(): string | null {
+  getLastErrorMessage(): AgLogMessage | string | null {
     return this.getLastMessage(AG_LOGLEVEL.ERROR);
   }
 
