@@ -12,6 +12,14 @@ import type { AgFormatFunction, AgLogMessage } from '../../../shared/types';
 // utils
 import { AgToLabel } from '../../utils/AgLogLevelHelpers';
 
+const argsToString = (args: readonly unknown[]): string => {
+  if (args.length === 0) {
+    return '';
+  }
+  const message = args.map((arg) => JSON.stringify(arg)).join(' ').trim();
+  return message;
+};
+
 /**
  * Formats a log message into a plain text string.
  * The format includes ISO8601 timestamp (without milliseconds), log level label in uppercase,
@@ -24,11 +32,9 @@ export const PlainFormatter: AgFormatFunction = (logMessage: AgLogMessage): stri
   const timestamp = logMessage.timestamp.toISOString().replace(/\.\d{3}Z$/, 'Z');
   const levelLabel = AgToLabel(logMessage.logLevel);
   const message = logMessage.message;
-  const argsString = logMessage.args.length > 0
-    ? ` ${logMessage.args.map((arg) => JSON.stringify(arg)).join(' ')}`
-    : '';
+  const argsString = argsToString(logMessage.args);
 
-  return `${timestamp} [${levelLabel}] ${message}${argsString}`;
+  return `${timestamp} [${levelLabel}] ${message} ${argsString}`.trim();
 };
 
 export default PlainFormatter;
