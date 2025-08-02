@@ -8,7 +8,13 @@
 
 // types
 import { AG_LOGLEVEL } from '../../../shared/types';
-import type { AgLoggerFunction, AgLoggerMap, AgLogLevel, AgLogMessage } from '../../../shared/types';
+import type {
+  AgFormattedLogMessage,
+  AgLoggerFunction,
+  AgLoggerMap,
+  AgLogLevel,
+  AgLogMessage,
+} from '../../../shared/types';
 
 /**
  * Universal mock logger for unit and integration testing.
@@ -21,7 +27,7 @@ import type { AgLoggerFunction, AgLoggerMap, AgLogLevel, AgLogMessage } from '..
  * - Thread-safe for single-threaded test scenarios
  */
 export class MockLogger {
-  private messages: (AgLogMessage | string)[][] = [
+  private messages: AgFormattedLogMessage[][] = [
     [], // OFF (0) - not used for actual logging
     [], // FATAL (1)
     [], // ERROR (2)
@@ -43,32 +49,32 @@ export class MockLogger {
   }
 
   // Logger methods
-  fatal(message: AgLogMessage | string): void {
+  fatal(message: AgFormattedLogMessage): void {
     this.messages[AG_LOGLEVEL.FATAL].push(message);
   }
 
-  error(message: AgLogMessage | string): void {
+  error(message: AgFormattedLogMessage): void {
     this.messages[AG_LOGLEVEL.ERROR].push(message);
   }
 
-  warn(message: AgLogMessage | string): void {
+  warn(message: AgFormattedLogMessage): void {
     this.messages[AG_LOGLEVEL.WARN].push(message);
   }
 
-  info(message: AgLogMessage | string): void {
+  info(message: AgFormattedLogMessage): void {
     this.messages[AG_LOGLEVEL.INFO].push(message);
   }
 
-  debug(message: AgLogMessage | string): void {
+  debug(message: AgFormattedLogMessage): void {
     this.messages[AG_LOGLEVEL.DEBUG].push(message);
   }
 
-  trace(message: AgLogMessage | string): void {
+  trace(message: AgFormattedLogMessage): void {
     this.messages[AG_LOGLEVEL.TRACE].push(message);
   }
 
   // Query methods
-  getMessages(logLevel: AgLogLevel): (AgLogMessage | string)[] {
+  getMessages(logLevel: AgLogLevel): AgFormattedLogMessage[] {
     this.validateLogLevel(logLevel);
     return [...this.messages[logLevel]];
   }
@@ -79,7 +85,7 @@ export class MockLogger {
     return levelMessages[levelMessages.length - 1] || null;
   }
 
-  getAllMessages(): { [K in keyof typeof AG_LOGLEVEL]: (AgLogMessage | string)[] } {
+  getAllMessages(): { [K in keyof typeof AG_LOGLEVEL]: AgFormattedLogMessage[] } {
     return {
       OFF: [...this.messages[AG_LOGLEVEL.OFF]],
       FATAL: [...this.messages[AG_LOGLEVEL.FATAL]],
@@ -155,7 +161,7 @@ export class MockLogger {
   }
 
   // Legacy methods for backward compatibility
-  getErrorMessages(): (AgLogMessage | string)[] {
+  getErrorMessages(): AgFormattedLogMessage[] {
     return this.getMessages(AG_LOGLEVEL.ERROR);
   }
 

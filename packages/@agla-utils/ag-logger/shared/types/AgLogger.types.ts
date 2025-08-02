@@ -59,3 +59,15 @@ export type AgLogMessage = {
    */
   readonly args: readonly unknown[];
 };
+
+/**
+ * Type representing a formatted log message that can be either a string or AgLogMessage object.
+ * Used by logger functions and message collections in testing utilities.
+ */
+export type AgFormattedLogMessage = string | AgLogMessage;
+
+/**
+ * Type representing a collection of formatted log messages.
+ * Used by mock loggers and testing utilities to store logged messages.
+ */
+export type AgLogMessageCollection = AgFormattedLogMessage[];

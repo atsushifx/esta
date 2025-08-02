@@ -10,6 +10,7 @@
 // constants
 import { AG_LOGLEVEL } from '../../../shared/types';
 // types
+import type { AgFormattedLogMessage } from '../../../shared/types';
 import type { AgLoggerFunction, AgLoggerMap } from '../../../shared/types/AgLogger.interface';
 
 // logger if log level is OFF
@@ -21,7 +22,7 @@ import { NullLogger } from './NullLogger';
  *
  * @param formattedLogMessage - The formatted log message to be logged.
  */
-export const ConsoleLogger: AgLoggerFunction = (formattedLogMessage: string) => {
+export const ConsoleLogger: AgLoggerFunction = (formattedLogMessage: AgFormattedLogMessage) => {
   console.log(formattedLogMessage);
 };
 
@@ -31,22 +32,22 @@ export const ConsoleLogger: AgLoggerFunction = (formattedLogMessage: string) => 
  */
 export const ConsoleLoggerMap: AgLoggerMap = {
   [AG_LOGLEVEL.OFF]: NullLogger,
-  [AG_LOGLEVEL.FATAL]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.FATAL]: (formattedMessage: AgFormattedLogMessage) => {
     console.error(formattedMessage);
   },
-  [AG_LOGLEVEL.ERROR]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.ERROR]: (formattedMessage: AgFormattedLogMessage) => {
     console.error(formattedMessage);
   },
-  [AG_LOGLEVEL.WARN]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.WARN]: (formattedMessage: AgFormattedLogMessage) => {
     console.warn(formattedMessage);
   },
-  [AG_LOGLEVEL.INFO]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.INFO]: (formattedMessage: AgFormattedLogMessage) => {
     console.info(formattedMessage);
   },
-  [AG_LOGLEVEL.DEBUG]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.DEBUG]: (formattedMessage: AgFormattedLogMessage) => {
     console.debug(formattedMessage);
   },
-  [AG_LOGLEVEL.TRACE]: (formattedMessage: string) => {
+  [AG_LOGLEVEL.TRACE]: (formattedMessage: AgFormattedLogMessage) => {
     console.debug(formattedMessage);
   },
 };

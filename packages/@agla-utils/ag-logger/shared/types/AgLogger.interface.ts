@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // type
-import type { AgLogMessage } from './AgLogger.types';
+import type { AgFormattedLogMessage, AgLogMessage } from './AgLogger.types';
 import type { AgLogLevel } from './AgLogLevel.types';
 
 // --- interfaces ---
@@ -23,7 +23,7 @@ import type { AgLogLevel } from './AgLogLevel.types';
  * const fileLogger: AgLoggerFunction = (message) => fs.appendFileSync('log.txt', message);
  * ```
  */
-export type AgLoggerFunction = (formattedLogMessage: string | AgLogMessage) => void;
+export type AgLoggerFunction = (formattedLogMessage: AgFormattedLogMessage) => void;
 
 /**
  * Represents a formatting function for log messages.
@@ -40,7 +40,7 @@ export type AgLoggerFunction = (formattedLogMessage: string | AgLogMessage) => v
  *   `${logMsg.timestamp} [${logMsg.level}] ${logMsg.message}`;
  * ```
  */
-export type AgFormatFunction = (logMessage: AgLogMessage) => string | AgLogMessage;
+export type AgFormatFunction = (logMessage: AgLogMessage) => AgFormattedLogMessage;
 
 /**
  * A map holding logging functions for each log level.

@@ -176,5 +176,192 @@ describe('parseArgsToAgLogMessage', () => {
 
       expect(result.message).toBe('not-a-timestamp test message');
     });
+
+    describe('Date parsing edge cases', () => {
+      it('should treat "today" as regular string, not as timestamp', () => {
+        const result = parseArgsToAgLogMessage(
+          AG_LOGLEVEL.INFO,
+          'today',
+          'is a good day',
+        );
+
+        expect(result.message).toBe('today is a good day');
+        expect(result.timestamp).toBeInstanceOf(Date);
+        expect(result.timestamp.getTime()).not.toBeNaN();
+      });
+
+      it('should treat "now" as regular string, not as timestamp', () => {
+        const result = parseArgsToAgLogMessage(
+          AG_LOGLEVEL.WARN,
+          'now',
+          'processing',
+        );
+
+        expect(result.message).toBe('now processing');
+      });
+
+      it('should treat "yesterday" as regular string, not as timestamp', () => {
+        const result = parseArgsToAgLogMessage(
+          AG_LOGLEVEL.DEBUG,
+          'yesterday',
+          'was better',
+        );
+
+        expect(result.message).toBe('yesterday was better');
+      });
+
+      it('should treat "tomorrow" as regular string, not as timestamp', () => {
+        const result = parseArgsToAgLogMessage(
+          AG_LOGLEVEL.ERROR,
+          'tomorrow',
+          'never comes',
+        );
+
+        expect(result.message).toBe('tomorrow never comes');
+      });
+
+      it('should treat partial date strings as regular strings', () => {
+        const testCases = [
+          'Jan',
+          'January',
+          'Mon',
+          'Monday',
+          '2025',
+          'Dec 25',
+          '25/12',
+          '12/25',
+        ];
+
+        testCases.forEach((dateStr) => {
+          const result = parseArgsToAgLogMessage(
+            AG_LOGLEVEL.INFO,
+            dateStr,
+            'test',
+          );
+
+          expect(result.message).toBe(`${dateStr} test`);
+        });
+      });
+
+      it('should treat ambiguous date-like strings as regular strings', () => {
+        const ambiguousStrings = [
+          '01/02/03', // Could be various date formats
+          '1/1/1', // Minimal date format
+          '99/99/99', // Invalid date values
+          '13/25/2025', // Invalid month/day
+          '2025-13-01', // Invalid month
+          '2025-01-32', // Invalid day
+        ];
+
+        ambiguousStrings.forEach((dateStr) => {
+          const result = parseArgsToAgLogMessage(
+            AG_LOGLEVEL.WARN,
+            dateStr,
+            'might be date',
+          );
+
+          expect(result.message).toBe(`${dateStr} might be date`);
+        });
+      });
+
+      it('should treat numeric timestamp strings as regular strings', () => {
+        const numericTimestamp = '1640995200000'; // Unix timestamp in milliseconds
+        const result = parseArgsToAgLogMessage(
+          AG_LOGLEVEL.INFO,
+          numericTimestamp,
+          'unix time test',
+        );
+
+        expect(result.message).toBe(`${numericTimestamp} unix time test`);
+        expect(result.timestamp).toBeInstanceOf(Date);
+      });
+
+      it('should treat invalid numeric strings as regular strings', () => {
+        const invalidNumbers = [
+          'NaN',
+          'Infinity',
+          '-Infinity',
+          '1.5.3', // Invalid decimal format
+          '1e999', // Number too large
+        ];
+
+        invalidNumbers.forEach((numStr) => {
+          const result = parseArgsToAgLogMessage(
+            AG_LOGLEVEL.ERROR,
+            numStr,
+            'not a number',
+          );
+
+          expect(result.message).toBe(`${numStr} not a number`);
+        });
+      });
+
+      it('should handle empty and whitespace-only timestamp candidates', () => {
+        const whitespaceStrings = [
+          '', // Empty string
+          ' ', // Single space
+          '\t', // Tab
+          '\n', // Newline
+          '   ', // Multiple spaces
+          '\t\n ', // Mixed whitespace
+        ];
+
+        whitespaceStrings.forEach((wsStr) => {
+          const result = parseArgsToAgLogMessage(
+            AG_LOGLEVEL.TRACE,
+            wsStr,
+            'whitespace test',
+          );
+
+          // Empty/whitespace strings should be treated as message arguments
+          if (wsStr.trim() === '') {
+            expect(result.message).toBe('whitespace test');
+          } else {
+            expect(result.message).toBe(`${wsStr} whitespace test`);
+          }
+        });
+      });
+
+      it('should handle timezone-aware timestamps correctly', () => {
+        const timezoneTimestamps = [
+          '2025-07-22T02:45:00+09:00', // JST
+          '2025-07-22T02:45:00-05:00', // EST
+          '2025-07-22T02:45:00Z', // UTC (Zulu)
+        ];
+
+        timezoneTimestamps.forEach((tzTimestamp) => {
+          const result = parseArgsToAgLogMessage(
+            AG_LOGLEVEL.INFO,
+            tzTimestamp,
+            'timezone test',
+          );
+
+          expect(result.timestamp).toEqual(new Date(tzTimestamp));
+          expect(result.message).toBe('timezone test');
+        });
+      });
+
+      it('should reject malformed ISO strings as timestamps', () => {
+        const malformedISO = [
+          '2025-07-22T25:45:00.000Z', // Invalid hour
+          '2025-07-22T02:60:00.000Z', // Invalid minute
+          '2025-07-22T02:45:60.000Z', // Invalid second
+          '2025-13-22T02:45:00.000Z', // Invalid month
+          '2025-07-32T02:45:00.000Z', // Invalid day
+          '2025-07-22 02:45:00.000Z', // Missing 'T'
+          '2025/07/22T02:45:00.000Z', // Wrong date separator
+        ];
+
+        malformedISO.forEach((isoStr) => {
+          const result = parseArgsToAgLogMessage(
+            AG_LOGLEVEL.ERROR,
+            isoStr,
+            'malformed ISO',
+          );
+
+          expect(result.message).toBe(`${isoStr} malformed ISO`);
+        });
+      });
+    });
   });
 });
