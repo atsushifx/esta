@@ -17,6 +17,11 @@ import type { AgLoggerOptions } from '../../shared/types/AgLogger.interface';
 
 // テスト対象 - AgLoggerクラスのメイン実装とgetLogger関数
 import { AgLogger, getLogger } from '../AgLogger.class';
+
+// テスト用型定義 - protectedメソッドをテストするためのヘルパー型
+type AgLoggerForTesting = AgLogger & {
+  shouldOutput: (level: AgLogLevel) => boolean;
+};
 // プラグイン - テストで使用するコンソールロガー
 import { ConsoleLogger } from '../plugins/logger/ConsoleLogger';
 
@@ -630,6 +635,177 @@ describe('AgLogger', () => {
         });
 
         expect(logger).toBeInstanceOf(AgLogger);
+      });
+    });
+  });
+
+  /**
+   * 設定管理システム (Configuration Management System)
+   *
+   * @description AgClassConfigによる設定の委譲、プロパティアクセス、状態管理のテスト
+   */
+  describe('Configuration Management System', () => {
+    /**
+     * 正常系: プロパティ委譲の基本動作
+     */
+    describe('正常系: Property Delegation Operations', () => {
+      it('should delegate verbose property access to config', () => {
+        const logger = AgLogger.getLogger();
+        expect(logger.isVerbose).toBe(false);
+      });
+
+      it('should delegate verbose property updates to config', () => {
+        const logger = AgLogger.getLogger();
+        logger.setVerbose(true);
+        expect(logger.isVerbose).toBe(true);
+      });
+
+      it('should maintain verbose state through config', () => {
+        const logger = AgLogger.getLogger();
+        logger.setVerbose(true);
+        const result = logger.setVerbose();
+        expect(result).toBe(true);
+      });
+
+      it('should delegate log level property access to config', () => {
+        const logger = AgLogger.getLogger();
+        expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.OFF);
+      });
+
+      it('should delegate log level property updates to config', () => {
+        const logger = AgLogger.getLogger();
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+        expect(logger.getLogLevel()).toBe(AG_LOGLEVEL.INFO);
+      });
+    });
+
+    /**
+     * 正常系: 出力レベルフィルタリング
+     */
+    describe('正常系: Output Level Filtering Through Config', () => {
+      it('should use config shouldOutput method for filtering', () => {
+        const logger = AgLogger.getLogger();
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+        const loggerForTesting = logger as AgLoggerForTesting;
+
+        const shouldOutputError = loggerForTesting.shouldOutput(AG_LOGLEVEL.ERROR);
+        const shouldOutputDebug = loggerForTesting.shouldOutput(AG_LOGLEVEL.DEBUG);
+
+        expect(shouldOutputError).toBe(true);
+        expect(shouldOutputDebug).toBe(false);
+      });
+    });
+
+    /**
+     * 正常系: shouldOutput Protected Method Access
+     */
+    describe('正常系: shouldOutput Protected Method Access', () => {
+      it('should expose shouldOutput method to test subclasses', () => {
+        // Given: AgLoggerのインスタンスを取得
+        const logger = AgLogger.getLogger();
+
+        // When: shouldOutputメソッドにアクセスを試行
+        const loggerForTesting = logger as AgLoggerForTesting;
+
+        // Then: shouldOutputメソッドが存在し、関数として呼び出し可能であることを確認
+        expect(typeof loggerForTesting.shouldOutput).toBe('function');
+      });
+
+      it('should return true when log level ERROR is at INFO threshold', () => {
+        // Given: INFO レベルに設定されたAgLoggerインスタンス
+        const logger = AgLogger.getLogger();
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+        const loggerForTesting = logger as AgLoggerForTesting;
+
+        // When: ERROR レベル（2）でshouldOutputを呼び出し
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.ERROR);
+
+        // Then: ERROR（2）はINFO（4）以下なのでtrueが返される
+        expect(result).toBe(true);
+      });
+
+      it('should return false when log level DEBUG is above INFO threshold', () => {
+        // Given: INFO レベルに設定されたAgLoggerインスタンス
+        const logger = AgLogger.getLogger();
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+        const loggerForTesting = logger as AgLoggerForTesting;
+
+        // When: DEBUG レベル（5）でshouldOutputを呼び出し
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.DEBUG);
+
+        // Then: DEBUG（5）はINFO（4）より大きいのでfalseが返される
+        expect(result).toBe(false);
+      });
+
+      it('should return false when log level is OFF regardless of message level', () => {
+        // Given: OFF レベルに設定されたAgLoggerインスタンス
+        const logger = AgLogger.getLogger();
+        logger.setLogLevel(AG_LOGLEVEL.OFF);
+        const loggerForTesting = logger as AgLoggerForTesting;
+
+        // When: ERROR レベルでshouldOutputを呼び出し
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.ERROR);
+
+        // Then: OFFの場合はどのレベルでもfalseが返される
+        expect(result).toBe(false);
+      });
+
+      it('should return true for VERBOSE level when verbose flag is enabled', () => {
+        // Given: verboseフラグがtrueに設定されたAgLoggerインスタンス
+        const logger = AgLogger.getLogger();
+        logger.setVerbose(true);
+        const loggerForTesting = logger as AgLoggerForTesting;
+
+        // When: VERBOSE レベルでshouldOutputを呼び出し
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.VERBOSE);
+
+        // Then: verboseフラグがtrueなのでtrueが返される
+        expect(result).toBe(true);
+      });
+
+      it('should return false for VERBOSE level when verbose flag is disabled', () => {
+        // Given: verboseフラグがfalseに設定されたAgLoggerインスタンス
+        const logger = AgLogger.getLogger();
+        logger.setVerbose(false);
+        const loggerForTesting = logger as AgLoggerForTesting;
+
+        // When: VERBOSE レベルでshouldOutputを呼び出し
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.VERBOSE);
+
+        // Then: verboseフラグがfalseなのでfalseが返される
+        expect(result).toBe(false);
+      });
+
+      it('should return true for VERBOSE level when verbose flag is enabled even with OFF log level', () => {
+        // Given: OFFレベルかつverboseフラグがtrueに設定されたAgLoggerインスタンス
+        const logger = AgLogger.getLogger();
+        logger.setLogLevel(AG_LOGLEVEL.OFF);
+        logger.setVerbose(true);
+        const loggerForTesting = logger as AgLoggerForTesting;
+
+        // When: VERBOSE レベルでshouldOutputを呼び出し
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.VERBOSE);
+
+        // Then: OFFレベルでもverboseフラグがtrueならtrueが返される
+        expect(result).toBe(true);
+      });
+    });
+
+    /**
+     * 正常系: Verboseメソッドと設定連携
+     */
+    describe('正常系: Verbose Method Integration with Config', () => {
+      it('should respect config verbose setting in verbose method', () => {
+        const logger = AgLogger.getLogger();
+        const mockLog = vi.fn();
+        (logger as AgLogger & { log: typeof mockLog }).log = mockLog;
+
+        logger.verbose('test message');
+        expect(mockLog).not.toHaveBeenCalled();
+
+        logger.setVerbose(true);
+        logger.verbose('test message');
+        expect(mockLog).toHaveBeenCalledWith('test message');
       });
     });
   });

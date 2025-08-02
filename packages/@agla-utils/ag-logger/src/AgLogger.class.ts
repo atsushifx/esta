@@ -60,7 +60,7 @@ export class AgLogger {
    * @param level - Log level to check.
    * @returns True if the level should be logged; otherwise false.
    */
-  private isOutputLevel(level: AgLogLevel): boolean {
+  protected shouldOutput(level: AgLogLevel): boolean {
     return this._config.shouldOutput(level);
   }
 
@@ -113,7 +113,7 @@ export class AgLogger {
    * @param args - Arguments to be logged.
    */
   protected executeLog(level: AgLogLevel, ...args: unknown[]): void {
-    if (this.isOutputLevel(level)) {
+    if (this.shouldOutput(level)) {
       const logMessage = AgLoggerGetMessage(level, ...args);
       const formatter = this._loggerManager.getFormatter();
       const formattedMessage = formatter(logMessage);
