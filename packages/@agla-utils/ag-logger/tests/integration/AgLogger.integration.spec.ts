@@ -19,9 +19,9 @@ import { AgLogger, getLogger } from '@/AgLogger.class';
 // テスト対象 - ロガー・フォーマッター管理クラス
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 // フォーマッタープラグイン
-import { JsonFormat } from '@/plugins/format/JsonFormat';
-import { NullFormat } from '@/plugins/format/NullFormat';
-import { PlainFormat } from '@/plugins/format/PlainFormat';
+import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
+import { NullFormatter } from '@/plugins/formatter/NullFormatter';
+import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
 // ロガープラグイン
 import { ConsoleLogger } from '@/plugins/logger/ConsoleLogger';
 
@@ -163,9 +163,9 @@ describe('AgLogger Integration Tests', () => {
 
         const testCases = [
           {
-            name: 'ConsoleLogger + JsonFormat',
+            name: 'ConsoleLogger + JsonFormatter',
             logger: ConsoleLogger,
-            formatter: JsonFormat,
+            formatter: JsonFormatter,
             setupSpy: () => vi.spyOn(console, 'info').mockImplementation(() => {}),
             verify: (spy: TVitestMock) => {
               const [output] = spy.mock.calls[0];
@@ -179,9 +179,9 @@ describe('AgLogger Integration Tests', () => {
             },
           },
           {
-            name: 'MockLogger + PlainFormat',
+            name: 'MockLogger + PlainFormatter',
             logger: vi.fn(),
-            formatter: PlainFormat,
+            formatter: PlainFormatter,
             setupSpy: () => null,
             verify: (spy: TVitestMock | null, logger: TVitestMock) => {
               expect(logger).toHaveBeenCalledTimes(1);
@@ -206,9 +206,9 @@ describe('AgLogger Integration Tests', () => {
       it('should handle special plugin combinations', () => {
         setupTestContext();
 
-        // NullFormat + 任意のロガー = 出力なし
+        // NullFormatter + 任意のロガー = 出力なし
         const mockLogger = vi.fn();
-        const logger = getLogger({ defaultLogger: mockLogger, formatter: NullFormat });
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: NullFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
         logger.info('test message');
 
@@ -228,7 +228,7 @@ describe('AgLogger Integration Tests', () => {
           throw new Error('Logger error');
         });
 
-        const logger = getLogger({ defaultLogger: throwingLogger, formatter: PlainFormat });
+        const logger = getLogger({ defaultLogger: throwingLogger, formatter: PlainFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
 
         expect(() => logger.info('test')).toThrow('Logger error');
@@ -270,7 +270,7 @@ describe('AgLogger Integration Tests', () => {
 
         const logger = getLogger({
           defaultLogger: mockLogger,
-          formatter: PlainFormat,
+          formatter: PlainFormatter,
           loggerMap: {
             [AG_LOGLEVEL.ERROR]: errorLogger,
           },
@@ -305,7 +305,7 @@ describe('AgLogger Integration Tests', () => {
 
         const logger = getLogger({
           defaultLogger: defaultLogger,
-          formatter: PlainFormat,
+          formatter: PlainFormatter,
           loggerMap: {
             [AG_LOGLEVEL.ERROR]: errorLogger,
             [AG_LOGLEVEL.WARN]: warnLogger,
@@ -430,7 +430,7 @@ describe('AgLogger Integration Tests', () => {
 
         const logger = getLogger({
           defaultLogger: loggers[AG_LOGLEVEL.INFO],
-          formatter: JsonFormat,
+          formatter: JsonFormatter,
           loggerMap: loggers,
         });
         logger.setLogLevel(AG_LOGLEVEL.WARN);
@@ -501,7 +501,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = vi.fn();
-        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormatter });
 
         const levels = [AG_LOGLEVEL.ERROR, AG_LOGLEVEL.WARN, AG_LOGLEVEL.INFO, AG_LOGLEVEL.DEBUG];
 
@@ -595,7 +595,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = vi.fn();
-        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
 
         for (let i = 0; i < 100; i++) {
@@ -839,7 +839,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = vi.fn();
-        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
 
         const startMemory = process.memoryUsage().heapUsed;
@@ -864,7 +864,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = vi.fn();
-        const logger = getLogger({ defaultLogger: mockLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
 
         const batchSize = 1000;
@@ -912,7 +912,7 @@ describe('AgLogger Integration Tests', () => {
 
         const logger = getLogger({
           defaultLogger: normalLogger,
-          formatter: PlainFormat,
+          formatter: PlainFormatter,
           loggerMap: {
             [AG_LOGLEVEL.ERROR]: errorLogger,
           },
@@ -952,7 +952,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = vi.fn();
-        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormat });
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
 
         const concurrentSources = 10;
@@ -984,7 +984,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = vi.fn();
-        const logger = getLogger({ defaultLogger: mockLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: mockLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.TRACE);
 
         const logMethods = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const;

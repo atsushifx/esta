@@ -17,7 +17,7 @@ import type {
 } from '../shared/types/AgLogger.interface';
 
 // plugins
-import { NullFormat } from '@/plugins/format/NullFormat';
+import { NullFormatter } from '@/plugins/formatter/NullFormatter';
 import { NullLogger } from '@/plugins/logger/NullLogger';
 
 /**
@@ -32,7 +32,7 @@ export class AgLoggerManager {
 
   private constructor() {
     this.defaultLogger = NullLogger;
-    this.formatter = NullFormat;
+    this.formatter = NullFormatter;
     this.loggerMap = {
       [AG_LOGLEVEL.OFF]: NullLogger,
       [AG_LOGLEVEL.FATAL]: NullLogger,

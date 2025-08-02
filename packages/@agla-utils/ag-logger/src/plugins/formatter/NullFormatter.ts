@@ -1,5 +1,5 @@
-// src/plugins/format/NullFormat.ts
-// @(#) : Null Format Plugin Implementation
+// src/plugins/formatter/NullFormatter.ts
+// @(#) : Null Formatter Plugin Implementation
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -16,10 +16,10 @@ import type { AgFormatFunction, AgLogMessage } from '../../../shared/types';
  * @param _logMessage - The log message object (ignored).
  * @returns An empty string.
  */
-export const NullFormat: AgFormatFunction = (
+export const NullFormatter: AgFormatFunction = (
   _logMessage: AgLogMessage,
 ): string => {
   return '';
 };
 
-export default NullFormat;
+export default NullFormatter;

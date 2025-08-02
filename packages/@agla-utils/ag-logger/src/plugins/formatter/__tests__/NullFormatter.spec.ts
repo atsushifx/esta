@@ -1,5 +1,5 @@
-// src/plugins/format/__tests__/NullFormat.spec.ts
-// @(#) : Unit tests for NullFormat plugin
+// src/plugins/formatter/__tests__/NullFormatter.spec.ts
+// @(#) : Unit tests for NullFormatter plugin
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -15,9 +15,9 @@ import { AG_LOGLEVEL } from '../../../../shared/types';
 import type { AgLogMessage } from '../../../../shared/types/AgLogger.types';
 
 // subject under test
-import { NullFormat } from '../NullFormat';
+import { NullFormatter } from '../NullFormatter';
 
-describe('NullFormat', () => {
+describe('NullFormatter', () => {
   /**
    * Returns an empty string regardless of input arguments.
    */
@@ -28,7 +28,7 @@ describe('NullFormat', () => {
       message: 'test message',
       args: [],
     };
-    expect(NullFormat(logMessage)).toBe('');
+    expect(NullFormatter(logMessage)).toBe('');
   });
 
   /**
@@ -41,7 +41,7 @@ describe('NullFormat', () => {
       message: 'msg1 msg2',
       args: [123, true, { data: 'test' }],
     };
-    expect(NullFormat(logMessage)).toBe('');
+    expect(NullFormatter(logMessage)).toBe('');
   });
 
   /**
@@ -54,12 +54,12 @@ describe('NullFormat', () => {
       args: [],
     };
 
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.OFF })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.FATAL })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.ERROR })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.WARN })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.INFO })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.DEBUG })).toBe('');
-    expect(NullFormat({ ...baseMessage, logLevel: AG_LOGLEVEL.TRACE })).toBe('');
+    expect(NullFormatter({ ...baseMessage, logLevel: AG_LOGLEVEL.OFF })).toBe('');
+    expect(NullFormatter({ ...baseMessage, logLevel: AG_LOGLEVEL.FATAL })).toBe('');
+    expect(NullFormatter({ ...baseMessage, logLevel: AG_LOGLEVEL.ERROR })).toBe('');
+    expect(NullFormatter({ ...baseMessage, logLevel: AG_LOGLEVEL.WARN })).toBe('');
+    expect(NullFormatter({ ...baseMessage, logLevel: AG_LOGLEVEL.INFO })).toBe('');
+    expect(NullFormatter({ ...baseMessage, logLevel: AG_LOGLEVEL.DEBUG })).toBe('');
+    expect(NullFormatter({ ...baseMessage, logLevel: AG_LOGLEVEL.TRACE })).toBe('');
   });
 });

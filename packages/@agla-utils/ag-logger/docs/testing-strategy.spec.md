@@ -37,10 +37,10 @@ ag-logger関数型リファクタリングにおけるt-wada式TDD実行戦略�
 
 ```typescript
 // ✅ 正しいTDDサイクル
-describe('formatLogMessage', () => {
+describe('parseArgsToAgLogMessage', () => {
   // Red: 失敗するテストを1つだけ作成
   it('should format basic message with level', () => {
-    const result = formatLogMessage(AG_LOG_LEVEL.INFO, 'test');
+    const result = parseArgsToAgLogMessage(AG_LOG_LEVEL.INFO, 'test');
     expect(result.level).toBe('INFO');
     expect(result.message).toBe('test');
   });
@@ -49,7 +49,7 @@ describe('formatLogMessage', () => {
 });
 
 // Green: 最小限の実装
-export const formatLogMessage = (level: AgTLogLevel, message: string) => ({
+export const parseArgsToAgLogMessage = (level: AgTLogLevel, message: string) => ({
   level: 'INFO', // ハードコード（最小実装）
   message: message,
   timestamp: new Date(),
@@ -58,7 +58,7 @@ export const formatLogMessage = (level: AgTLogLevel, message: string) => ({
 
 // Refactor: より良い実装に改善
 const LEVEL_MAP = { ... };
-export const formatLogMessage = (level: AgTLogLevel, ...args: unknown[]) => ({
+export const parseArgsToAgLogMessage = (level: AgTLogLevel, ...args: unknown[]) => ({
   level: LEVEL_MAP[level],
   message: extractMessage(args),
   timestamp: new Date(),
@@ -97,7 +97,7 @@ export const formatLogMessage = (level: AgTLogLevel, ...args: unknown[]) => ({
 src/
 ├── functional/
 │   ├── __tests__/              # 純関数ユニットテスト
-│   │   ├── formatLogMessage.spec.ts
+│   │   ├── parseArgsToAgLogMessage.spec.ts
 │   │   ├── shouldLogAtLevel.spec.ts
 │   │   └── processLogMessage.spec.ts
 │
@@ -152,11 +152,11 @@ describe('Legacy API Compatibility', () => {
 
 ```typescript
 // 純関数テストの利点を最大活用
-describe('formatLogMessage (Pure Function)', () => {
+describe('parseArgsToAgLogMessage (Pure Function)', () => {
   // 決定的動作テスト
   it('should return identical results for identical inputs', () => {
-    const input1 = formatLogMessage(AG_LOG_LEVEL.INFO, 'test');
-    const input2 = formatLogMessage(AG_LOG_LEVEL.INFO, 'test');
+    const input1 = parseArgsToAgLogMessage(AG_LOG_LEVEL.INFO, 'test');
+    const input2 = parseArgsToAgLogMessage(AG_LOG_LEVEL.INFO, 'test');
 
     // タイムスタンプ以外は完全一致
     expect(input1.level).toBe(input2.level);
@@ -169,14 +169,14 @@ describe('formatLogMessage (Pure Function)', () => {
     const originalArgs = ['message', { data: 'test' }];
     const argsCopy = [...originalArgs];
 
-    formatLogMessage(AG_LOG_LEVEL.INFO, ...originalArgs);
+    parseArgsToAgLogMessage(AG_LOG_LEVEL.INFO, ...originalArgs);
 
     expect(originalArgs).toEqual(argsCopy);
   });
 
   // イミュータブル戻り値テスト
   it('should return frozen (immutable) objects', () => {
-    const result = formatLogMessage(AG_LOG_LEVEL.INFO, 'test');
+    const result = parseArgsToAgLogMessage(AG_LOG_LEVEL.INFO, 'test');
 
     expect(Object.isFrozen(result)).toBe(true);
     expect(Object.isFrozen(result.args)).toBe(true);
@@ -190,14 +190,14 @@ describe('formatLogMessage (Pure Function)', () => {
 // より堅牢なテストのためのプロパティテスト
 import fc from 'fast-check';
 
-describe('formatLogMessage Property Tests', () => {
+describe('parseArgsToAgLogMessage Property Tests', () => {
   it('should always return valid LogMessage structure', () => {
     fc.assert(
       fc.property(
         fc.constantFrom(...Object.values(AG_LOG_LEVEL)),
         fc.array(fc.anything()),
         (level, args) => {
-          const result = formatLogMessage(level, ...args);
+          const result = parseArgsToAgLogMessage(level, ...args);
 
           // 基本構造の検証
           expect(result).toHaveProperty('level');
@@ -283,19 +283,19 @@ describe('Parallel Test Safe Setup', () => {
 describe('Functional Implementation Parallel Tests', () => {
   // これらのテストは完全に独立して並列実行可能
   it.concurrent('should format message concurrently 1', async () => {
-    const result = formatLogMessage(AG_LOG_LEVEL.INFO, 'concurrent test 1');
+    const result = parseArgsToAgLogMessage(AG_LOG_LEVEL.INFO, 'concurrent test 1');
     expect(result.message).toBe('concurrent test 1');
   });
 
   it.concurrent('should format message concurrently 2', async () => {
-    const result = formatLogMessage(AG_LOG_LEVEL.ERROR, 'concurrent test 2');
+    const result = parseArgsToAgLogMessage(AG_LOG_LEVEL.ERROR, 'concurrent test 2');
     expect(result.message).toBe('concurrent test 2');
   });
 
   // 純関数なので状態競合なし
   it.concurrent('should handle complex args concurrently', async () => {
     const complexData = { nested: { data: Math.random() } };
-    const result = formatLogMessage(AG_LOG_LEVEL.DEBUG, 'complex', complexData);
+    const result = parseArgsToAgLogMessage(AG_LOG_LEVEL.DEBUG, 'complex', complexData);
 
     expect(result.args).toContain(complexData);
   });
@@ -325,7 +325,7 @@ describe('Performance Benchmarks', () => {
     // 新実装のベンチマーク
     const functionalStart = performance.now();
     for (let i = 0; i < iterations; i++) {
-      const message = formatLogMessage(AG_LOG_LEVEL.INFO, 'benchmark test', { iteration: i });
+      const message = parseArgsToAgLogMessage(AG_LOG_LEVEL.INFO, 'benchmark test', { iteration: i });
       const formatted = JsonFormat(message);
       ConsoleLogger(formatted);
     }
@@ -526,9 +526,9 @@ const debugLogMessage = (logMessage: LogMessage) => {
 };
 
 // テスト内でのデバッグ使用例
-describe('formatLogMessage debugging', () => {
+describe('parseArgsToAgLogMessage debugging', () => {
   it('should debug complex message formatting', () => {
-    const result = formatLogMessage(
+    const result = parseArgsToAgLogMessage(
       AG_LOG_LEVEL.INFO,
       'Complex',
       42,
@@ -558,7 +558,7 @@ const FEATURE_FLAGS = {
 };
 
 // ロールバック可能な実装
-export const formatLogMessage = FEATURE_FLAGS.USE_FUNCTIONAL_FORMAT
+export const parseArgsToAgLogMessage = FEATURE_FLAGS.USE_FUNCTIONAL_FORMAT
   ? functionalFormatLogMessage
   : legacyFormatLogMessage;
 ```
@@ -573,7 +573,7 @@ describe('Performance Monitoring', () => {
 
     // 大量処理の実行
     for (let i = 0; i < 1000; i++) {
-      formatLogMessage(AG_LOG_LEVEL.INFO, `message ${i}`, { data: i });
+      parseArgsToAgLogMessage(AG_LOG_LEVEL.INFO, `message ${i}`, { data: i });
     }
 
     const duration = performance.now() - start;

@@ -24,7 +24,7 @@ type TMockConsoleMethods = keyof typeof mockConsole;
 type TCircularObject = { name: string; self?: TCircularObject };
 
 // プラグイン - JSON形式フォーマッター（構造化ログ用）
-import { JsonFormat } from '@/plugins/format/JsonFormat';
+import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
 // プラグイン - コンソール出力ロガー
 import { ConsoleLogger } from '@/plugins/logger/ConsoleLogger';
 
@@ -69,7 +69,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     describe('正常系: Basic JSON Structured Logging', () => {
       it('should output structured JSON logs for all levels', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.TRACE);
 
         const testCases = [
@@ -99,7 +99,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       it('should handle complex data structures in JSON format', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
 
         const complexData = {
@@ -124,7 +124,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       it('should handle arrays and primitive types correctly', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
         const testData = {
@@ -148,7 +148,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       it('should omit args property when no structured arguments', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
 
         logger.info('Simple message without args');
@@ -167,7 +167,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       it('should maintain JSON structure with empty objects and arrays', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.WARN);
 
         logger.warn('Empty structures test', {}, [], '');
@@ -190,7 +190,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     describe('異常系: JSON Serialization Error Handling', () => {
       it('should handle JSON serialization errors gracefully', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.ERROR);
 
         // 循環参照オブジェクト
@@ -216,7 +216,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     describe('正常系: Basic Filtering Operations', () => {
       it('should filter logs based on current level with JSON output', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
 
         // INFO レベルに設定
         logger.setLogLevel(AG_LOGLEVEL.INFO);
@@ -238,7 +238,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       it('should block all output when level is OFF', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.OFF);
 
         logger.fatal('fatal message');
@@ -265,7 +265,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     describe('正常系: Basic Integration Scenarios', () => {
       it('should handle complete application lifecycle logging', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.DEBUG);
 
         // アプリケーション起動
@@ -333,7 +333,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       it('should handle high-frequency logging with JSON format', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
 
         // 大量のログ出力をシミュレート
@@ -366,7 +366,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
       it('should handle log method (generic) with JSON format', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
 
         logger.log('Generic log message', { data: 'test' });

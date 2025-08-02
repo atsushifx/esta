@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgLogLevel } from './LogLevel.types';
+import type { AgLogLevel } from './AgLogLevel.types';
 
 /**
  * Parsed result from logging input arguments.
@@ -31,7 +31,7 @@ export type AgLogMessage = {
    *
    * @example AG_LOGLEVEL.INFO (4)
    */
-  logLevel: AgLogLevel;
+  readonly logLevel: AgLogLevel;
 
   /**
    * Timestamp for the log entry.
@@ -39,7 +39,7 @@ export type AgLogMessage = {
    *
    * @example new Date('2023-12-01T10:30:00Z')
    */
-  timestamp: Date;
+  readonly timestamp: Date;
 
   /**
    * Formatted log message string.
@@ -48,7 +48,7 @@ export type AgLogMessage = {
    *
    * @example "User logged in successfully"
    */
-  message: string;
+  readonly message: string;
 
   /**
    * Structured arguments excluded from message output.
@@ -57,5 +57,5 @@ export type AgLogMessage = {
    *
    * @example [{ userId: 123, sessionId: 'abc123' }]
    */
-  args: unknown[];
+  readonly args: readonly unknown[];
 };

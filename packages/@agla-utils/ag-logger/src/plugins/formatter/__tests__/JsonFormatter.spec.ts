@@ -1,5 +1,5 @@
-// src: /src/plugins/format/__tests__/JsonFormat.spec.ts
-// @(#) : JUnit tests for JsonFormat plugin
+// src: /src/plugins/format/__tests__/JsonFormatter.spec.ts
+// @(#) : JUnit tests for JsonFormatter plugin
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -15,19 +15,19 @@ import { AG_LOGLEVEL } from '../../../../shared/types';
 import type { AgLogMessage } from '../../../../shared/types/AgLogger.types';
 
 // テスト対象 - JSON形式フォーマッタープラグインの実装
-import { JsonFormat } from '../JsonFormat';
+import { JsonFormatter } from '../JsonFormatter';
 
 // test main
 
 /**
- * JsonFormatプラグインのユニットテストスイート
+ * JsonFormatterプラグインのユニットテストスイート
  *
  * @description JSON形式でのログメッセージフォーマット機能を検証する
  * 基本メッセージのJSON化、複数引数処理、全ログレベル対応、
  * エラーハンドリング、出力の妥当性をテスト
  *
  * @testType Unit Test
- * @testTarget JsonFormat Plugin
+ * @testTarget JsonFormatter Plugin
  * @coverage
  * - 基本ログメッセージのJSON構造化
  * - 引数・配列・オブジェクトの適切なシリアライゼーション
@@ -36,7 +36,7 @@ import { JsonFormat } from '../JsonFormat';
  * - 循環参照でのエラー処理
  * - 有効なJSON文字列の出力保証
  */
-describe('JsonFormat', () => {
+describe('JsonFormatter', () => {
   /**
    * Tests basic message formatting into JSON.
    */
@@ -48,7 +48,7 @@ describe('JsonFormat', () => {
       args: [],
     };
 
-    const result = JsonFormat(logMessage);
+    const result = JsonFormatter(logMessage);
     const parsed = JSON.parse(result);
 
     expect(parsed.timestamp).toBe('2025-01-01T12:00:00.000Z');
@@ -68,7 +68,7 @@ describe('JsonFormat', () => {
       args: [{ userId: 123, action: 'login' }],
     };
 
-    const result = JsonFormat(logMessage);
+    const result = JsonFormatter(logMessage);
     const parsed = JSON.parse(result);
 
     expect(parsed.timestamp).toBe('2025-06-22T15:30:45.123Z');
@@ -92,7 +92,7 @@ describe('JsonFormat', () => {
       ],
     };
 
-    const result = JsonFormat(logMessage);
+    const result = JsonFormatter(logMessage);
     const parsed = JSON.parse(result);
 
     expect(parsed.timestamp).toBe('2025-03-15T09:15:30.500Z');
@@ -125,7 +125,7 @@ describe('JsonFormat', () => {
     ];
 
     testCases.forEach(({ level, expected }) => {
-      const result = JsonFormat({ ...baseMessage, logLevel: level });
+      const result = JsonFormatter({ ...baseMessage, logLevel: level });
       const parsed = JSON.parse(result);
       expect(parsed.level).toBe(expected);
     });
@@ -142,7 +142,7 @@ describe('JsonFormat', () => {
       args: [{ warning: 'empty message' }],
     };
 
-    const result = JsonFormat(logMessage);
+    const result = JsonFormatter(logMessage);
     const parsed = JSON.parse(result);
 
     expect(parsed.timestamp).toBe('2025-12-31T23:59:59.999Z');
@@ -165,7 +165,7 @@ describe('JsonFormat', () => {
       args: [circularObj],
     };
 
-    expect(() => JsonFormat(logMessage)).toThrow();
+    expect(() => JsonFormatter(logMessage)).toThrow('Converting circular structure to JSON');
   });
 
   /**
@@ -179,7 +179,7 @@ describe('JsonFormat', () => {
       args: [{ key: 'value' }],
     };
 
-    const result = JsonFormat(logMessage);
+    const result = JsonFormatter(logMessage);
 
     // Verify that output is valid JSON
     expect(() => JSON.parse(result)).not.toThrow();

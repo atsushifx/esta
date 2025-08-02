@@ -13,7 +13,7 @@ import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions } from '../../
 import { AG_LOGGER_ERROR_CATEGORIES } from '../../shared/constants/agLoggerError.constants';
 import { AG_LOGLEVEL } from '../../shared/types';
 // plugins
-import { NullFormat } from '../plugins/format/NullFormat';
+import { NullFormatter } from '../plugins/formatter/NullFormatter';
 import { NullLogger } from '../plugins/logger/NullLogger';
 // error classes
 import { AgLoggerError } from '../../shared/types/AgLoggerError.types';
@@ -29,7 +29,7 @@ import { AgLoggerError } from '../../shared/types/AgLoggerError.types';
  * - Output control logic for determining when to log messages
  *
  * This class follows the principle of secure defaults, initializing all logging
- * to disabled state (NullLogger, NullFormat, OFF level) to prevent unintended output.
+ * to disabled state (NullLogger, NullFormatter, OFF level) to prevent unintended output.
  *
  * **Note**: This class is internal to the AgLogger package and should not be
  * exported or used directly by external consumers.
@@ -53,9 +53,9 @@ export class AgLoggerConfig {
 
   /**
    * Default formatter function used to format log messages.
-   * Initialized to NullFormat to disable formatting by default.
+   * Initialized to NullFormatter to disable formatting by default.
    */
-  public _formatter: AgFormatFunction = NullFormat;
+  public _formatter: AgFormatFunction = NullFormatter;
 
   /**
    * Current log level setting that determines which messages are processed.
@@ -81,7 +81,7 @@ export class AgLoggerConfig {
    * Initializes the configuration with secure defaults:
    * - All log levels mapped to NullLogger (logging disabled)
    * - Default logger set to NullLogger
-   * - Formatter set to NullFormat (formatting disabled)
+   * - Formatter set to NullFormatter (formatting disabled)
    * - Log level set to OFF (no messages processed)
    * - Verbose mode disabled
    *

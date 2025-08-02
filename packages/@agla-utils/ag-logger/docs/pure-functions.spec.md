@@ -23,7 +23,7 @@ ag-loggerのメッセージ処理を純関数として再設計する。副作�
 
 ---
 
-## formatLogMessage 関数仕様
+## parseArgsToAgLogMessage 関数仕様
 
 ### 目的
 
@@ -44,7 +44,7 @@ interface LogMessage {
   readonly args: readonly unknown[];
 }
 
-const formatLogMessage = (
+const parseArgsToAgLogMessage = (
   level: AgTLogLevel,
   ...args: readonly unknown[]
 ): LogMessage
@@ -101,7 +101,7 @@ const extractArgs = (args: readonly unknown[]): readonly unknown[] => {
 #### 4. 完全実装
 
 ```typescript
-export const formatLogMessage = (
+export const parseArgsToAgLogMessage = (
   level: AgTLogLevel,
   ...args: readonly unknown[]
 ): LogMessage => {
@@ -117,9 +117,9 @@ export const formatLogMessage = (
 ### テストケース
 
 ```typescript
-describe('formatLogMessage', () => {
+describe('parseArgsToAgLogMessage', () => {
   it('should format message with level and timestamp', () => {
-    const result = formatLogMessage(AG_LOG_LEVEL.INFO, 'Test message');
+    const result = parseArgsToAgLogMessage(AG_LOG_LEVEL.INFO, 'Test message');
 
     expect(result).toEqual({
       level: 'INFO',
@@ -131,7 +131,7 @@ describe('formatLogMessage', () => {
 
   it('should separate strings and objects', () => {
     const userData = { id: 123 };
-    const result = formatLogMessage(
+    const result = parseArgsToAgLogMessage(
       AG_LOG_LEVEL.ERROR,
       'User error',
       userData,
@@ -395,7 +395,7 @@ export const processLogMessage = (config: LoggerConfig) => {
     }
 
     // Step 2: メッセージフォーマット
-    const logMessage = formatLogMessage(targetLevel, ...args);
+    const logMessage = parseArgsToAgLogMessage(targetLevel, ...args);
 
     // Step 3: フォーマッター適用
     const formattedMessage = config.formatter(logMessage);
@@ -422,7 +422,7 @@ export const processLogMessageFunctional = (config: LoggerConfig) => {
     // メッセージフォーマット
     (ctx) => ({
       ...ctx,
-      logMessage: formatLogMessage(ctx.targetLevel, ...ctx.args),
+      logMessage: parseArgsToAgLogMessage(ctx.targetLevel, ...ctx.args),
     }),
     // フォーマッター適用
     (ctx) => ({
@@ -574,7 +574,7 @@ const safeFormatLogMessage = (
   ...args: readonly unknown[]
 ): LogMessage | Error => {
   try {
-    return formatLogMessage(level, ...args);
+    return parseArgsToAgLogMessage(level, ...args);
   } catch (error) {
     return error instanceof Error ? error : new Error(String(error));
   }

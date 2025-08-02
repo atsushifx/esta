@@ -1,4 +1,4 @@
-// shared/constants/errorMessages.ts
+// shared/constants/agErrorMessages.ts
 // @(#) : Error Messages and Categories for MockLogger
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>

@@ -17,7 +17,7 @@ import type {
 } from '../../../shared/types/AgLogger.interface';
 
 // constants
-import { AG_LOGLEVEL } from '../../../shared/types/LogLevel.types';
+import { AG_LOGLEVEL } from '../../../shared/types/AgLogLevel.types';
 
 /**
  * AgLoggerOptions型定義の包括的テストスイート

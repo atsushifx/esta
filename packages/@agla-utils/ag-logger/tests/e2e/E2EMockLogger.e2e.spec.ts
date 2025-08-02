@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 import { getLogger } from '@/AgLogger.class';
-import { PlainFormat } from '@/plugins/format/PlainFormat';
+import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
 import { E2eMockLogger as E2EMockLoggerWithTestId } from '@/plugins/logger/E2eMockLogger';
 import { describe, expect, it } from 'vitest';
 import { AG_LOGLEVEL } from '../../shared/types';
@@ -139,7 +139,7 @@ describe('E2EMockLoggerWithTestId', () => {
         ctx.onTestFinished(() => mockLogger.endTest());
 
         const loggerFunction = mockLogger.createLoggerFunction();
-        const logger = getLogger({ defaultLogger: loggerFunction, formatter: PlainFormat });
+        const logger = getLogger({ defaultLogger: loggerFunction, formatter: PlainFormatter });
 
         logger.setLogLevel(AG_LOGLEVEL.INFO);
         logger.info('Test message via plugin');
@@ -156,7 +156,7 @@ describe('E2EMockLoggerWithTestId', () => {
         const loggerMap = mockLogger.createLoggerMap();
         const logger = getLogger({
           defaultLogger: mockLogger.createLoggerFunction(),
-          formatter: PlainFormat,
+          formatter: PlainFormatter,
           loggerMap: loggerMap,
         });
 
