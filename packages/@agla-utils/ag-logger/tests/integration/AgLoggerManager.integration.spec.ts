@@ -14,9 +14,9 @@ import { AG_LOGLEVEL } from '../../shared/types';
 import type { AgLogLevel } from '../../shared/types';
 // test targets
 import { AgLoggerManager } from '@/AgLoggerManager.class';
-import { JsonFormat } from '@/plugins/format/JsonFormat';
-import { NullFormat } from '@/plugins/format/NullFormat';
-import { PlainFormat } from '@/plugins/format/PlainFormat';
+import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
+import { NullFormatter } from '@/plugins/formatter/NullFormatter';
+import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
 import { ConsoleLogger } from '@/plugins/logger/ConsoleLogger';
 import { NullLogger } from '@/plugins/logger/NullLogger';
 
@@ -43,7 +43,7 @@ describe('AgLoggerManager Integration Tests', () => {
       setupTestContext();
       const manager1 = AgLoggerManager.getManager();
       const manager2 = AgLoggerManager.getManager();
-      const manager3 = AgLoggerManager.getManager({ defaultLogger: ConsoleLogger, formatter: JsonFormat });
+      const manager3 = AgLoggerManager.getManager({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
 
       expect(manager1).toBe(manager2);
       expect(manager2).toBe(manager3);
@@ -104,7 +104,7 @@ describe('AgLoggerManager Integration Tests', () => {
 
       const manager = AgLoggerManager.getManager({
         defaultLogger: defaultLogger,
-        formatter: PlainFormat,
+        formatter: PlainFormatter,
         loggerMap: loggerMap,
       });
 
@@ -130,7 +130,7 @@ describe('AgLoggerManager Integration Tests', () => {
 
       const manager = AgLoggerManager.getManager({
         defaultLogger: defaultLogger,
-        formatter: PlainFormat,
+        formatter: PlainFormatter,
         loggerMap: partialLoggerMap,
       });
 
@@ -148,7 +148,7 @@ describe('AgLoggerManager Integration Tests', () => {
     it('should fallback to default logger for missing map entries', () => {
       setupTestContext();
       const defaultLogger = vi.fn();
-      const manager = AgLoggerManager.getManager({ defaultLogger: defaultLogger, formatter: PlainFormat });
+      const manager = AgLoggerManager.getManager({ defaultLogger: defaultLogger, formatter: PlainFormatter });
 
       // All levels should return the default logger
       Object.values(AG_LOGLEVEL).forEach((level) => {
@@ -192,17 +192,17 @@ describe('AgLoggerManager Integration Tests', () => {
       setupTestContext();
       const manager = AgLoggerManager.getManager();
 
-      // Test with JsonFormat
-      manager.setManager({ formatter: JsonFormat });
-      expect(manager.getFormatter()).toBe(JsonFormat);
+      // Test with JsonFormatter
+      manager.setManager({ formatter: JsonFormatter });
+      expect(manager.getFormatter()).toBe(JsonFormatter);
 
-      // Test with PlainFormat
-      manager.setManager({ formatter: PlainFormat });
-      expect(manager.getFormatter()).toBe(PlainFormat);
+      // Test with PlainFormatter
+      manager.setManager({ formatter: PlainFormatter });
+      expect(manager.getFormatter()).toBe(PlainFormatter);
 
-      // Test with NullFormat
-      manager.setManager({ formatter: NullFormat });
-      expect(manager.getFormatter()).toBe(NullFormat);
+      // Test with NullFormatter
+      manager.setManager({ formatter: NullFormatter });
+      expect(manager.getFormatter()).toBe(NullFormatter);
     });
   });
 
@@ -274,7 +274,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const defaultLogger = vi.fn();
       const errorLogger = vi.fn();
       const debugLogger = vi.fn();
-      const formatter = JsonFormat;
+      const formatter = JsonFormatter;
 
       // Complex initial setup
       manager.setManager({
@@ -326,7 +326,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const defaultLogger = vi.fn();
       const manager = AgLoggerManager.getManager({
         defaultLogger: defaultLogger,
-        formatter: PlainFormat,
+        formatter: PlainFormatter,
         loggerMap: {},
       });
 
@@ -359,7 +359,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const manager = AgLoggerManager.getManager();
 
       const loggers = Array.from({ length: 5 }, () => vi.fn());
-      const formatters = [JsonFormat, PlainFormat, NullFormat, JsonFormat, PlainFormat];
+      const formatters = [JsonFormatter, PlainFormatter, NullFormatter, JsonFormatter, PlainFormatter];
 
       // Rapid configuration changes
       loggers.forEach((logger, index) => {

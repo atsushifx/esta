@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // base error class
-import { AglaError } from './error.types';
+import { AglaError } from './AglaError.types';
 
 /**
  * AgLogger specific error class that extends AglaError.

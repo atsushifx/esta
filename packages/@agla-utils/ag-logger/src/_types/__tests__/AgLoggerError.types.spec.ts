@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
 // target class
 import { AgLoggerError } from '../../../shared/types/AgLoggerError.types';
 // base error class for inheritance testing
-import { AglaError } from '../../../shared/types/error.types';
+import { AglaError } from '../../../shared/types/AglaError.types';
 // error categories
 import { AG_LOGGER_ERROR_CATEGORIES } from '../../../shared/constants/agLoggerError.constants';
 

@@ -1,5 +1,5 @@
-// src/functional/core/__tests__/formatLogMessage.spec.ts
-// @(#) : Unit tests for formatLogMessage pure function
+// src/functional/core/__tests__/parseArgsToAgLogMessage.spec.ts
+// @(#) : Unit tests for parseArgsToAgLogMessage pure function
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -8,16 +8,16 @@
 
 import { describe, expect, it } from 'vitest';
 import { AG_LOGLEVEL } from '../../../../shared/types';
-import { formatLogMessage } from '../formatLogMessage';
+import { parseArgsToAgLogMessage } from '../parseArgsToAgLogMessage';
 
 /**
- * Unit tests for the formatLogMessage pure function.
+ * Unit tests for the parseArgsToAgLogMessage pure function.
  * This function should replace AgLoggerGetMessage with a pure functional approach.
  */
-describe('formatLogMessage', () => {
+describe('parseArgsToAgLogMessage', () => {
   describe('Basic functionality', () => {
     it('should format basic message with level', () => {
-      const result = formatLogMessage(AG_LOGLEVEL.INFO, 'test message');
+      const result = parseArgsToAgLogMessage(AG_LOGLEVEL.INFO, 'test message');
 
       expect(result.level).toBe('INFO');
       expect(result.message).toBe('test message');
@@ -27,12 +27,12 @@ describe('formatLogMessage', () => {
     });
 
     it('should convert log level to string label', () => {
-      const fatalResult = formatLogMessage(AG_LOGLEVEL.FATAL, 'fatal error');
-      const errorResult = formatLogMessage(AG_LOGLEVEL.ERROR, 'error message');
-      const warnResult = formatLogMessage(AG_LOGLEVEL.WARN, 'warning message');
-      const infoResult = formatLogMessage(AG_LOGLEVEL.INFO, 'info message');
-      const debugResult = formatLogMessage(AG_LOGLEVEL.DEBUG, 'debug message');
-      const traceResult = formatLogMessage(AG_LOGLEVEL.TRACE, 'trace message');
+      const fatalResult = parseArgsToAgLogMessage(AG_LOGLEVEL.FATAL, 'fatal error');
+      const errorResult = parseArgsToAgLogMessage(AG_LOGLEVEL.ERROR, 'error message');
+      const warnResult = parseArgsToAgLogMessage(AG_LOGLEVEL.WARN, 'warning message');
+      const infoResult = parseArgsToAgLogMessage(AG_LOGLEVEL.INFO, 'info message');
+      const debugResult = parseArgsToAgLogMessage(AG_LOGLEVEL.DEBUG, 'debug message');
+      const traceResult = parseArgsToAgLogMessage(AG_LOGLEVEL.TRACE, 'trace message');
 
       expect(fatalResult.level).toBe('FATAL');
       expect(errorResult.level).toBe('ERROR');
@@ -44,7 +44,7 @@ describe('formatLogMessage', () => {
 
     it('should separate message args from structured args', () => {
       const userData = { id: 123, name: 'John' };
-      const result = formatLogMessage(
+      const result = parseArgsToAgLogMessage(
         AG_LOGLEVEL.ERROR,
         'User error',
         userData,
@@ -64,21 +64,21 @@ describe('formatLogMessage', () => {
       const originalArgs = ['message', { data: 'test' }];
       const argsCopy = [...originalArgs];
 
-      formatLogMessage(AG_LOGLEVEL.INFO, ...originalArgs);
+      parseArgsToAgLogMessage(AG_LOGLEVEL.INFO, ...originalArgs);
 
       expect(originalArgs).toEqual(argsCopy);
     });
 
     it('should return frozen (immutable) objects', () => {
-      const result = formatLogMessage(AG_LOGLEVEL.INFO, 'test');
+      const result = parseArgsToAgLogMessage(AG_LOGLEVEL.INFO, 'test');
 
       expect(Object.isFrozen(result)).toBe(true);
       expect(Object.isFrozen(result.args)).toBe(true);
     });
 
     it('should be deterministic for same inputs (excluding timestamp)', () => {
-      const result1 = formatLogMessage(AG_LOGLEVEL.INFO, 'test', { data: 'value' });
-      const result2 = formatLogMessage(AG_LOGLEVEL.INFO, 'test', { data: 'value' });
+      const result1 = parseArgsToAgLogMessage(AG_LOGLEVEL.INFO, 'test', { data: 'value' });
+      const result2 = parseArgsToAgLogMessage(AG_LOGLEVEL.INFO, 'test', { data: 'value' });
 
       expect(result1.level).toBe(result2.level);
       expect(result1.message).toBe(result2.message);
@@ -88,7 +88,7 @@ describe('formatLogMessage', () => {
 
   describe('Complex argument handling', () => {
     it('should handle mixed primitive and object arguments', () => {
-      const result = formatLogMessage(
+      const result = parseArgsToAgLogMessage(
         AG_LOGLEVEL.WARN,
         'Processing',
         123,
@@ -102,14 +102,14 @@ describe('formatLogMessage', () => {
     });
 
     it('should handle empty arguments', () => {
-      const result = formatLogMessage(AG_LOGLEVEL.INFO);
+      const result = parseArgsToAgLogMessage(AG_LOGLEVEL.INFO);
 
       expect(result.message).toBe('');
       expect(result.args).toEqual([]);
     });
 
     it('should handle null and undefined arguments', () => {
-      const result = formatLogMessage(
+      const result = parseArgsToAgLogMessage(
         AG_LOGLEVEL.DEBUG,
         'Testing',
         null,
@@ -122,7 +122,7 @@ describe('formatLogMessage', () => {
     });
 
     it('should handle empty string arguments - E2E test case verification', () => {
-      const result = formatLogMessage(
+      const result = parseArgsToAgLogMessage(
         AG_LOGLEVEL.WARN,
         'Empty structures test',
         {},
@@ -147,7 +147,7 @@ describe('formatLogMessage', () => {
   describe('Timestamp handling (compatible with AgLoggerGetMessage)', () => {
     it('should use provided timestamp if first argument is valid ISO string', () => {
       const timestampStr = '2025-07-22T02:45:00.000Z';
-      const result = formatLogMessage(
+      const result = parseArgsToAgLogMessage(
         AG_LOGLEVEL.INFO,
         timestampStr,
         'test message',
@@ -159,7 +159,7 @@ describe('formatLogMessage', () => {
 
     it('should use current time if no timestamp provided', () => {
       const before = new Date();
-      const result = formatLogMessage(AG_LOGLEVEL.INFO, 'test message');
+      const result = parseArgsToAgLogMessage(AG_LOGLEVEL.INFO, 'test message');
       const after = new Date();
 
       expect(result.timestamp.getTime()).toBeGreaterThanOrEqual(before.getTime());
@@ -168,7 +168,7 @@ describe('formatLogMessage', () => {
     });
 
     it('should treat invalid timestamp as regular string argument', () => {
-      const result = formatLogMessage(
+      const result = parseArgsToAgLogMessage(
         AG_LOGLEVEL.INFO,
         'not-a-timestamp',
         'test message',

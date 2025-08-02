@@ -1,4 +1,4 @@
-// shared/constants/agloggerError.constants.ts
+// shared/constants/agLoggerError.constants.ts
 // @(#) : AgLogger Error Category Constants
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -13,7 +13,7 @@
  *
  * @example
  * ```typescript
- * import { AG_LOGGER_ERROR_CATEGORIES } from './agloggerError.constants';
+ * import { AG_LOGGER_ERROR_CATEGORIES } from './agLoggerError.constants';
  * import { AgLoggerError } from '../src/internal/AgLoggerError';
  *
  * // Usage in error throwing

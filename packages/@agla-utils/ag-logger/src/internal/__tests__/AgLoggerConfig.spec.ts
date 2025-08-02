@@ -31,7 +31,7 @@ import type { AgLoggerOptions } from '../../../shared/types/AgLogger.interface';
 // target
 import { AgLoggerConfig } from '../AgLoggerConfig.class';
 // plugins
-import { NullFormat } from '../../plugins/format/NullFormat';
+import { NullFormatter } from '../../plugins/formatter/NullFormatter';
 import { NullLogger } from '../../plugins/logger/NullLogger';
 // errors
 import { AG_LOGGER_ERROR_CATEGORIES } from '../../../shared/constants/agLoggerError.constants';
@@ -57,9 +57,9 @@ describe('AgLoggerConfig', () => {
     expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(NullLogger);
   });
 
-  it('should initialize with NullFormat as default formatter', () => {
+  it('should initialize with NullFormatter as default formatter', () => {
     const config = new AgLoggerConfig();
-    expect(config._formatter).toBe(NullFormat);
+    expect(config._formatter).toBe(NullFormatter);
   });
 
   it('should initialize with AG_LOGLEVEL.OFF as default log level', () => {
@@ -154,7 +154,7 @@ describe('AgLoggerConfig', () => {
 
   it('should return configured formatter', () => {
     const config = new AgLoggerConfig();
-    expect(config.getFormatter()).toBe(NullFormat);
+    expect(config.getFormatter()).toBe(NullFormatter);
   });
 
   it('should return configured log level', () => {

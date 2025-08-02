@@ -31,10 +31,10 @@ export { E2eMockLogger } from './plugins/logger/E2eMockLogger';
 export { MockLogger } from './plugins/logger/MockLogger';
 export { NullLogger } from './plugins/logger/NullLogger';
 
-// plugins: format
-export { JsonFormat } from './plugins/format/JsonFormat';
-export { NullFormat } from './plugins/format/NullFormat';
-export { PlainFormat } from './plugins/format/PlainFormat';
+// plugins: formatter
+export { JsonFormatter } from './plugins/formatter/JsonFormatter';
+export { NullFormatter } from './plugins/formatter/NullFormatter';
+export { PlainFormatter } from './plugins/formatter/PlainFormatter';
 
 // utilities
 export { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';

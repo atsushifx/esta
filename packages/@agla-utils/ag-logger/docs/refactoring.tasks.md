@@ -36,17 +36,17 @@ copyright:
 **BDD仕様:**
 
 - **Given** 現在の`AgLoggerGetMessage`関数がレベルとメッセージを処理している
-- **When** 純関数`formatLogMessage`を作成する
+- **When** 純関数`parseArgsToAgLogMessage`を作成する
 - **Then** 同じ入力に対して同じ出力が得られ、副作用がない
 
 **完了条件:**
 
-- [ ] `formatLogMessage(level, message, ...args)`関数のテスト作成（Red）
+- [ ] `parseArgsToAgLogMessage(level, message, ...args)`関数のテスト作成（Red）
 - [ ] 最小実装で既存テストが通る（Green）
 - [ ] 純関数として設計改善（Refactor）
 - [ ] 既存の`AgLoggerGetMessage`と同等の出力を生成
 
-**実装場所:** `src/functional/core/formatLogMessage.ts`
+**実装場所:** `src/functional/core/parseArgsToAgLogMessage.ts`
 
 ### Task 1.2: ログレベルフィルタリング関数の純関数化
 

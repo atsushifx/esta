@@ -1,5 +1,5 @@
-// src/plugins/format/JsonFormat.ts
-// @(#) : JSON Format Plugin Implementation
+// src/plugins/format/JsonFormatter.ts
+// @(#) : JSON Formatter Plugin Implementation
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -10,7 +10,7 @@
 import type { AgLogMessage } from '../../../shared/types';
 
 // utilities
-import { AgToLabel } from '../../utils/LogLevelHelpers';
+import { AgToLabel } from '../../utils/AgLogLevelHelpers';
 
 /**
  * Formats a log message into a JSON string.
@@ -18,7 +18,7 @@ import { AgToLabel } from '../../utils/LogLevelHelpers';
  * @param logMessage - The log message object containing timestamp, level, message, and optional args.
  * @returns A JSON string representing the structured log entry.
  */
-export const JsonFormat = (logMessage: AgLogMessage): string => {
+export const JsonFormatter = (logMessage: AgLogMessage): string => {
   const logEntry = {
     timestamp: logMessage.timestamp.toISOString(),
     level: AgToLabel(logMessage.logLevel),
@@ -29,4 +29,4 @@ export const JsonFormat = (logMessage: AgLogMessage): string => {
   return JSON.stringify(logEntry);
 };
 
-export default JsonFormat;
+export default JsonFormatter;

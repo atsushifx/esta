@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AglaError } from '../../../shared/types/error.types';
+import { AglaError } from '../../../shared/types/AglaError.types';
 
 // Test implementation of AglaError since it's abstract
 class TestError extends AglaError {

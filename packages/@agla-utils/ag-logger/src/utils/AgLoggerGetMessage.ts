@@ -8,7 +8,7 @@
 
 import type { AgLogLevel } from '../../shared/types';
 import type { AgLogMessage } from '../../shared/types/AgLogger.types';
-import { formatLogMessage } from '../functional/core/formatLogMessage';
+import { parseArgsToAgLogMessage } from '../functional/core/parseArgsToAgLogMessage';
 
 /**
  * Parses log arguments into a structured log message object.
@@ -22,9 +22,9 @@ import { formatLogMessage } from '../functional/core/formatLogMessage';
  * @returns A structured `AgLogMessage` object with parsed timestamp, message, and arguments.
  */
 export const AgLoggerGetMessage = (logLevel: AgLogLevel, ...args: unknown[]): AgLogMessage => {
-  const formatted = formatLogMessage(logLevel, ...args);
+  const formatted = parseArgsToAgLogMessage(logLevel, ...args);
 
-  // formatLogMessage の結果を AgLogMessage 型に変換
+  // parseArgsToAgLogMessage の結果を AgLogMessage 型に変換
   return {
     logLevel,
     timestamp: formatted.timestamp,

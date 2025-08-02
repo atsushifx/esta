@@ -1,5 +1,5 @@
-// src/plugins/format/PlainFormat.ts
-// @(#) : Plain Format Plugin Implementation
+// src/plugins/formatter/PlainFormatter.ts
+// @(#) : Plain Formatter Plugin Implementation
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -10,7 +10,7 @@
 import type { AgFormatFunction, AgLogMessage } from '../../../shared/types';
 
 // utils
-import { AgToLabel } from '../../utils/LogLevelHelpers';
+import { AgToLabel } from '../../utils/AgLogLevelHelpers';
 
 /**
  * Formats a log message into a plain text string.
@@ -20,7 +20,7 @@ import { AgToLabel } from '../../utils/LogLevelHelpers';
  * @param logMessage - The log message object containing timestamp, level, message, and optional args.
  * @returns A formatted plain text log string.
  */
-export const PlainFormat: AgFormatFunction = (logMessage: AgLogMessage): string => {
+export const PlainFormatter: AgFormatFunction = (logMessage: AgLogMessage): string => {
   const timestamp = logMessage.timestamp.toISOString().replace(/\.\d{3}Z$/, 'Z');
   const levelLabel = AgToLabel(logMessage.logLevel);
   const message = logMessage.message;
@@ -31,4 +31,4 @@ export const PlainFormat: AgFormatFunction = (logMessage: AgLogMessage): string 
   return `${timestamp} [${levelLabel}] ${message}${argsString}`;
 };
 
-export default PlainFormat;
+export default PlainFormatter;

@@ -8,7 +8,7 @@
 
 // type
 import type { AgLogMessage } from './AgLogger.types';
-import type { AgLogLevel } from './LogLevel.types';
+import type { AgLogLevel } from './AgLogLevel.types';
 
 // --- interfaces ---
 /**

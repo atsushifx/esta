@@ -50,7 +50,7 @@ copyright:
 3. **ドキュメント参照例**
    ```
    "docs/refactoring.tasks.mdからPhase 1のタスク1を確認して"
-   "pure-functions.spec.mdのformatLogMessage仕様を読んで"
+   "pure-functions.spec.mdのparseArgsToAgLogMessage仕様を読んで"
    "testing-strategy.spec.mdのRed-Green-Refactorサイクルを参照して"
    ```
 
@@ -97,7 +97,7 @@ graph TD
 
 **核となる純関数の詳細仕様**
 
-- `formatLogMessage`: メッセージフォーマット関数
+- `parseArgsToAgLogMessage`: メッセージフォーマット関数
 - `shouldLogAtLevel`: ログレベル判定関数
 - `parseLogArguments`: 引数解析関数
 - `processLogMessage`: パイプライン統合関数
@@ -152,7 +152,7 @@ graph TD
 ```typescript
 // Task 1.1実装時
 'docs/refactoring.tasks.mdからTask 1.1の完了条件を確認して';
-'docs/pure-functions.spec.mdのformatLogMessage仕様に従って実装して';
+'docs/pure-functions.spec.mdのparseArgsToAgLogMessage仕様に従って実装して';
 
 // テスト作成時
 'docs/testing-strategy.spec.mdのRed-Green-Refactorサイクルに従って進めて';

@@ -1,4 +1,4 @@
-// shared/types/LogLevel.types.ts
+// shared/types/AgLogLevel.types.ts
 // @(#) : Unified LogLevel constants, types and conversion maps
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
