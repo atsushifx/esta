@@ -11,6 +11,7 @@ import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
 import { E2eMockLogger as E2EMockLoggerWithTestId } from '@/plugins/logger/E2eMockLogger';
 import { describe, expect, it } from 'vitest';
 import { AG_LOGLEVEL } from '../../shared/types';
+import type { AgFormattedLogMessage } from '../../shared/types';
 
 /**
  * E2EMockLoggerWithTestId E2Eテストスイート
@@ -254,7 +255,7 @@ describe('E2EMockLoggerWithTestId', () => {
   const simulateParallelTest = async function(
     identifier: string,
     message: string,
-  ): Promise<{ testId: string; messages: string[] }> {
+  ): Promise<{ testId: string; messages: AgFormattedLogMessage[] }> {
     const parallelMockLogger = new E2EMockLoggerWithTestId(identifier);
     const testId = `${identifier}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 

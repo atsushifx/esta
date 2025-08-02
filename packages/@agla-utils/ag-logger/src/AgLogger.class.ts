@@ -30,7 +30,7 @@ export class AgLogger {
   private _loggerManager: AgLoggerManager;
   private _verbose: boolean = false;
 
-  private constructor() {
+  protected constructor() {
     this._loggerManager = AgLoggerManager.getManager();
   }
 
@@ -105,7 +105,7 @@ export class AgLogger {
    * @param level - Log level of the message.
    * @param args - Arguments to be logged.
    */
-  private logWithLevel(level: AgLogLevel, ...args: unknown[]): void {
+  protected executeLog(level: AgLogLevel, ...args: unknown[]): void {
     if (this.isOutputLevel(level)) {
       const logMessage = AgLoggerGetMessage(level, ...args);
       const formatter = this._loggerManager.getFormatter();
@@ -139,37 +139,37 @@ export class AgLogger {
 
   /** Logs a message at FATAL level. */
   fatal(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.FATAL, ...args);
+    this.executeLog(AG_LOGLEVEL.FATAL, ...args);
   }
 
   /** Logs a message at ERROR level. */
   error(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.ERROR, ...args);
+    this.executeLog(AG_LOGLEVEL.ERROR, ...args);
   }
 
   /** Logs a message at WARN level. */
   warn(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.WARN, ...args);
+    this.executeLog(AG_LOGLEVEL.WARN, ...args);
   }
 
   /** Logs a message at INFO level. */
   info(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.INFO, ...args);
+    this.executeLog(AG_LOGLEVEL.INFO, ...args);
   }
 
   /** Logs a message at DEBUG level. */
   debug(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.DEBUG, ...args);
+    this.executeLog(AG_LOGLEVEL.DEBUG, ...args);
   }
 
   /** Logs a message at TRACE level. */
   trace(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.TRACE, ...args);
+    this.executeLog(AG_LOGLEVEL.TRACE, ...args);
   }
 
   /** General log method logging at INFO level. */
   log(...args: unknown[]): void {
-    this.logWithLevel(AG_LOGLEVEL.INFO, ...args);
+    this.executeLog(AG_LOGLEVEL.INFO, ...args);
   }
 
   /** Verbose log method that only outputs when verbose flag is true. */

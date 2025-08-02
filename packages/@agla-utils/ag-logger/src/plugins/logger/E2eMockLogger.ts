@@ -12,7 +12,14 @@ import { MockLogger } from './MockLogger';
 
 // types
 import { AG_LOGLEVEL } from '../../../shared/types';
-import type { AgLoggerFunction, AgLoggerMap, AgLogLevel } from '../../../shared/types';
+import type {
+  AgFormattedLogMessage,
+  AgLoggerFunction,
+  AgLoggerMap,
+  AgLogLevel,
+  AgLogMessage,
+  AgLogMessageCollection,
+} from '../../../shared/types';
 
 /**
  * Mock logger for E2E testing that supports parallel test execution.
@@ -26,7 +33,7 @@ export class E2eMockLogger {
 
   constructor(identifier?: string) {
     const trimmedIdentifier = typeof identifier === 'string' ? identifier.trim() : '';
-    this.testIdentifier = trimmedIdentifier ? getNormalizedBasename(trimmedIdentifier) : 'e2edefault';
+    this.testIdentifier = trimmedIdentifier ? getNormalizedBasename(trimmedIdentifier) : 'e2e-default';
     this.currentTestId = null;
     this.mockLoggers = new Map<string, MockLogger>();
   }
@@ -41,7 +48,7 @@ export class E2eMockLogger {
   /**
    * Get the current test ID for this logger instance.
    */
-  getCurrentTestId(): string | null {
+  getCurrentTestId(): string | AgLogMessage | null {
     return this.currentTestId;
   }
 
@@ -82,34 +89,39 @@ export class E2eMockLogger {
   }
 
   // Logger methods
-  fatal(message: string): void {
+  fatal(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
     mockLogger.fatal(message);
   }
 
-  error(message: string): void {
+  error(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
     mockLogger.error(message);
   }
 
-  warn(message: string): void {
+  warn(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
     mockLogger.warn(message);
   }
 
-  info(message: string): void {
+  info(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
     mockLogger.info(message);
   }
 
-  debug(message: string): void {
+  debug(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
     mockLogger.debug(message);
   }
 
-  trace(message: string): void {
+  trace(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
     mockLogger.trace(message);
+  }
+
+  verbose(message: AgFormattedLogMessage): void {
+    const mockLogger = this.getCurrentMockLogger();
+    mockLogger.verbose(message);
   }
 
   /**
@@ -130,12 +142,12 @@ export class E2eMockLogger {
   }
 
   // Query methods
-  getMessages(logLevel: AgLogLevel): string[] {
+  getMessages(logLevel: AgLogLevel): AgLogMessageCollection {
     const mockLogger = this.getCurrentMockLogger();
     return mockLogger.getMessages(logLevel);
   }
 
-  getLastMessage(logLevel: AgLogLevel): string | null {
+  getLastMessage(logLevel: AgLogLevel): string | AgLogMessage | null {
     const mockLogger = this.getCurrentMockLogger();
     return mockLogger.getLastMessage(logLevel);
   }
@@ -145,26 +157,10 @@ export class E2eMockLogger {
     mockLogger.clearMessages(logLevel);
   }
 
-  // Error-specific convenience methods
-  getErrorMessages(): string[] {
-    const mockLogger = this.getCurrentMockLogger();
-    return mockLogger.getErrorMessages();
-  }
-
-  getLastErrorMessage(): string | null {
-    const mockLogger = this.getCurrentMockLogger();
-    return mockLogger.getLastErrorMessage();
-  }
-
-  clearErrorMessages(): void {
-    const mockLogger = this.getCurrentMockLogger();
-    mockLogger.clearErrorMessages();
-  }
-
   /**
    * Get all messages for all log levels.
    */
-  getAllMessages(): { [K in keyof typeof AG_LOGLEVEL]: string[] } {
+  getAllMessages(): { [K in keyof typeof AG_LOGLEVEL]: AgLogMessageCollection } {
     const mockLogger = this.getCurrentMockLogger();
     return mockLogger.getAllMessages();
   }
@@ -182,7 +178,7 @@ export class E2eMockLogger {
    * This can be used as a plugin for ag-logger.
    */
   createLoggerFunction(): AgLoggerFunction {
-    return (formattedLogMessage: string): void => {
+    return (formattedLogMessage: AgFormattedLogMessage): void => {
       const mockLogger = this.getCurrentMockLogger();
       mockLogger.info(formattedLogMessage);
     };
@@ -194,13 +190,14 @@ export class E2eMockLogger {
    */
   createLoggerMap(): AgLoggerMap {
     return {
+      [AG_LOGLEVEL.VERBOSE]: (message: AgFormattedLogMessage) => this.verbose(message),
       [AG_LOGLEVEL.OFF]: () => {},
-      [AG_LOGLEVEL.FATAL]: (message: string) => this.fatal(message),
-      [AG_LOGLEVEL.ERROR]: (message: string) => this.error(message),
-      [AG_LOGLEVEL.WARN]: (message: string) => this.warn(message),
-      [AG_LOGLEVEL.INFO]: (message: string) => this.info(message),
-      [AG_LOGLEVEL.DEBUG]: (message: string) => this.debug(message),
-      [AG_LOGLEVEL.TRACE]: (message: string) => this.trace(message),
+      [AG_LOGLEVEL.FATAL]: (message: AgFormattedLogMessage) => this.fatal(message),
+      [AG_LOGLEVEL.ERROR]: (message: AgFormattedLogMessage) => this.error(message),
+      [AG_LOGLEVEL.WARN]: (message: AgFormattedLogMessage) => this.warn(message),
+      [AG_LOGLEVEL.INFO]: (message: AgFormattedLogMessage) => this.info(message),
+      [AG_LOGLEVEL.DEBUG]: (message: AgFormattedLogMessage) => this.debug(message),
+      [AG_LOGLEVEL.TRACE]: (message: AgFormattedLogMessage) => this.trace(message),
     };
   }
 }

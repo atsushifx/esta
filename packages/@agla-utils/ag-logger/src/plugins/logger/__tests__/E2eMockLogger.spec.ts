@@ -51,7 +51,7 @@ describe('E2eMockLogger', () => {
       mockLogger.error('First error');
       mockLogger.error('Second error');
 
-      const errorMessages = mockLogger.getErrorMessages();
+      const errorMessages = mockLogger.getMessages(AG_LOGLEVEL.ERROR);
       expect(errorMessages).toEqual(['First error', 'Second error']);
     });
   });
@@ -64,7 +64,7 @@ describe('E2eMockLogger', () => {
       mockLogger.error('First error');
       mockLogger.error('Second error');
 
-      const lastError = mockLogger.getLastErrorMessage();
+      const lastError = mockLogger.getLastMessage(AG_LOGLEVEL.ERROR);
       expect(lastError).toBe('Second error');
     });
 
@@ -72,7 +72,7 @@ describe('E2eMockLogger', () => {
       mockLogger.startTest(ctx.task.id);
       ctx.onTestFinished(() => mockLogger.endTest());
 
-      const lastError = mockLogger.getLastErrorMessage();
+      const lastError = mockLogger.getLastMessage(AG_LOGLEVEL.ERROR);
       expect(lastError).toBeNull();
     });
   });
@@ -85,11 +85,11 @@ describe('E2eMockLogger', () => {
       mockLogger.error('First error');
       mockLogger.error('Second error');
 
-      mockLogger.clearErrorMessages();
+      mockLogger.clearMessages(AG_LOGLEVEL.ERROR);
 
-      const errorMessages = mockLogger.getErrorMessages();
+      const errorMessages = mockLogger.getMessages(AG_LOGLEVEL.ERROR);
       expect(errorMessages).toEqual([]);
-      expect(mockLogger.getLastErrorMessage()).toBeNull();
+      expect(mockLogger.getLastMessage(AG_LOGLEVEL.ERROR)).toBeNull();
     });
   });
 

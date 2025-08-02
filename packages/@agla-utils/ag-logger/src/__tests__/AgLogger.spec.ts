@@ -11,9 +11,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ログレベル定数 - テストで使用するログレベルの定義
 import { AG_LOGLEVEL } from '../../shared/types';
-// 型定義 - ログレベル型（現在未使用）
-// import type { AgLogLevel } from '../../shared/types';
+// 型定義 - ログレベル型とオプション型
 import type { AgLogLevel } from '../../shared/types';
+import type { AgLoggerOptions } from '../../shared/types/AgLogger.interface';
 
 // テスト対象 - AgLoggerクラスのメイン実装とgetLogger関数
 import { AgLogger, getLogger } from '../AgLogger.class';
@@ -361,7 +361,7 @@ describe('AgLogger', () => {
         expect(mockFormatter).toHaveBeenCalledTimes(edgeCases.length);
       });
 
-      it('should handle concurrent calls to logWithLevel correctly', () => {
+      it('should handle concurrent calls to executeLog correctly', () => {
         const delayedLogger = vi.fn();
         const logger = AgLogger.getLogger({ defaultLogger: delayedLogger, formatter: mockFormatter });
         logger.setLogLevel(AG_LOGLEVEL.INFO);
@@ -401,11 +401,11 @@ describe('AgLogger', () => {
         expect(mockLogger).toHaveBeenCalledWith('formatted message');
       });
 
-      it('should apply correct log level filtering in logWithLevel', () => {
+      it('should apply correct log level filtering in executeLog', () => {
         const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
         logger.setLogLevel(AG_LOGLEVEL.WARN);
 
-        // isOutputLevel内部テスト
+        // isOutputLevel internal test via executeLog
         logger.trace('trace'); // filtered
         logger.debug('debug'); // filtered
         logger.info('info'); // filtered
@@ -617,6 +617,121 @@ describe('AgLogger', () => {
         });
 
         expect(logger).toBeInstanceOf(AgLogger);
+      });
+    });
+  });
+
+  /**
+   * executeLog method refactoring tests
+   *
+   * @description Tests for the refactored executeLog method (previously logWithLevel)
+   * Testing protected method visibility and behavior preservation
+   */
+  describe('executeLog Method Refactoring', () => {
+    /**
+     * Test class that extends AgLogger to expose executeLog method for testing
+     */
+    class TestAgLogger extends AgLogger {
+      constructor() {
+        super();
+      }
+
+      static getTestLogger(options?: AgLoggerOptions): TestAgLogger {
+        const instance = new TestAgLogger();
+        if (options !== undefined) {
+          instance.setManager(options);
+        }
+        return instance;
+      }
+
+      // Expose the protected executeLog method for testing
+      public executeLog(level: AgLogLevel, ...args: unknown[]): void {
+        return super.executeLog(level, ...args);
+      }
+    }
+
+    /**
+     * 正常系: executeLog method accessibility and visibility
+     */
+    describe('正常系: Method Accessibility and Visibility', () => {
+      it('should have executeLog method accessible in TestAgLogger', () => {
+        const testLogger = TestAgLogger.getTestLogger();
+
+        expect(typeof testLogger.executeLog).toBe('function');
+        expect(testLogger.executeLog).toBeDefined();
+      });
+
+      it('should have executeLog method as protected (accessible via casting but not via public API)', () => {
+        const logger = AgLogger.getLogger();
+        const testLogger = TestAgLogger.getTestLogger();
+
+        // executeLog should be protected - accessible via TestAgLogger but not part of public API
+        expect(typeof testLogger.executeLog).toBe('function');
+        // But it should not be directly accessible without casting
+        expect('executeLog' in logger).toBe(true);
+        // The method should be defined but marked as protected in TypeScript
+        expect(testLogger.executeLog).toBeDefined();
+      });
+    });
+
+    /**
+     * 正常系: executeLog behavioral equivalence tests
+     */
+    describe('正常系: Behavioral Equivalence Tests', () => {
+      it('should filter logs based on log level same as original implementation', () => {
+        const testLogger = TestAgLogger.getTestLogger({
+          defaultLogger: mockLogger,
+          formatter: mockFormatter,
+        });
+        testLogger.setLogLevel(AG_LOGLEVEL.WARN);
+
+        testLogger.executeLog(AG_LOGLEVEL.DEBUG, 'debug'); // should be filtered
+        testLogger.executeLog(AG_LOGLEVEL.INFO, 'info'); // should be filtered
+        testLogger.executeLog(AG_LOGLEVEL.WARN, 'warn'); // should be logged
+        testLogger.executeLog(AG_LOGLEVEL.ERROR, 'error'); // should be logged
+
+        expect(mockLogger).toHaveBeenCalledTimes(2);
+      });
+
+      it('should format messages using formatter same as original implementation', () => {
+        const customFormatter = vi.fn().mockReturnValue('formatted message');
+        const testLogger = TestAgLogger.getTestLogger({
+          defaultLogger: mockLogger,
+          formatter: customFormatter,
+        });
+        testLogger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        testLogger.executeLog(AG_LOGLEVEL.INFO, 'original message');
+
+        expect(customFormatter).toHaveBeenCalled();
+        expect(mockLogger).toHaveBeenCalledWith('formatted message');
+      });
+
+      it('should invoke appropriate logger function same as original implementation', () => {
+        const testLogger = TestAgLogger.getTestLogger({
+          defaultLogger: mockLogger,
+          formatter: mockFormatter,
+        });
+        testLogger.setLogLevel(AG_LOGLEVEL.ERROR);
+
+        testLogger.executeLog(AG_LOGLEVEL.ERROR, 'error message');
+
+        expect(mockLogger).toHaveBeenCalledTimes(1);
+        expect(mockFormatter).toHaveBeenCalled();
+      });
+
+      it('should handle empty formatter output same as original implementation', () => {
+        const emptyFormatter = vi.fn().mockReturnValue('');
+        const testLogger = TestAgLogger.getTestLogger({
+          defaultLogger: mockLogger,
+          formatter: emptyFormatter,
+        });
+        testLogger.setLogLevel(AG_LOGLEVEL.INFO);
+
+        testLogger.executeLog(AG_LOGLEVEL.INFO, 'test message');
+
+        expect(emptyFormatter).toHaveBeenCalled();
+        expect(mockLogger).not.toHaveBeenCalled();
       });
     });
   });

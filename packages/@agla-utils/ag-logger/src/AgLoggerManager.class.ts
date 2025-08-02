@@ -17,8 +17,8 @@ import type {
 } from '../shared/types/AgLogger.interface';
 
 // plugins
-import { NullFormatter } from '@/plugins/formatter/NullFormatter';
-import { NullLogger } from '@/plugins/logger/NullLogger';
+import { NullFormatter } from './plugins/formatter/NullFormatter';
+import { NullLogger } from './plugins/logger/NullLogger';
 
 /**
  * Singleton manager class for handling loggers and formatters by log level.
@@ -34,6 +34,7 @@ export class AgLoggerManager {
     this.defaultLogger = NullLogger;
     this.formatter = NullFormatter;
     this.loggerMap = {
+      [AG_LOGLEVEL.VERBOSE]: NullLogger,
       [AG_LOGLEVEL.OFF]: NullLogger,
       [AG_LOGLEVEL.FATAL]: NullLogger,
       [AG_LOGLEVEL.ERROR]: NullLogger,

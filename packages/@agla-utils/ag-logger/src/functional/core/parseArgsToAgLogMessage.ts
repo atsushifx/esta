@@ -32,12 +32,22 @@ const isMessageArgument = (arg: unknown): arg is string | number | boolean | sym
 
 /**
  * Checks if an argument is a valid timestamp string.
+ * Only accepts ISO format or 'yyyy-mm-dd HH:MM:SS' format.
  *
  * @param arg - The argument to check
- * @returns True if the argument is a valid date string
+ * @returns True if the argument is a valid ISO timestamp or 'yyyy-mm-dd HH:MM:SS' format
  */
 const isTimestamp = (arg: unknown): arg is string => {
   if (typeof arg !== 'string') { return false; }
+
+  // Check for ISO timestamp format (strict)
+  const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?([+-]\d{2}:\d{2}|Z)$/;
+
+  // Check for 'yyyy-mm-dd HH:MM:SS' format
+  const standardPattern = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+
+  if (!isoPattern.test(arg) && !standardPattern.test(arg)) { return false; }
+
   const timestamp = new Date(arg);
   return !isNaN(timestamp.getTime());
 };

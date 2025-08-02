@@ -10,6 +10,7 @@
 import { describe, expect, it } from 'vitest';
 
 // type imports
+import type { AgLogMessage } from '../../../shared/types';
 import type {
   AgFormatFunction,
   AgLoggerFunction,
@@ -41,7 +42,7 @@ describe('AgLoggerOptions Interface Tests', () => {
   describe('補助Task 1.1: AgLoggerOptionsの型定義が正しく動作することをテスト', () => {
     it('should accept valid AgLoggerOptions interface', () => {
       // テスト用のモック関数を作成
-      const mockLogger: AgLoggerFunction = (message: string) => console.log(message);
+      const mockLogger: AgLoggerFunction = (message: string | AgLogMessage) => console.log(message);
       const mockFormatter: AgFormatFunction = (logMessage) => `${logMessage.message}`;
 
       // 有効なオプションオブジェクトを作成
@@ -154,7 +155,7 @@ describe('AgLoggerOptions Interface Tests', () => {
       };
 
       const partialOptions3: AgLoggerOptions = {
-        defaultLogger: (msg: string) => console.log(msg),
+        defaultLogger: (msg: string | AgLogMessage) => console.log(msg),
         logLevel: AG_LOGLEVEL.DEBUG,
       };
 

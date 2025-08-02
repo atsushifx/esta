@@ -6,6 +6,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// utilities
+import { isValidLogLevel } from '@/utils/AgLogLevelHelpers';
 // types
 import type { AgLoggerMap, AgLogLevel } from '../../shared/types';
 import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions } from '../../shared/types/AgLogger.interface';
@@ -46,28 +48,16 @@ export class AgLoggerConfig {
   private static readonly DECIMAL_RADIX = 10;
 
   /**
-   * Default logger function used when no specific logger is configured.
-   * Initialized to NullLogger to disable logging by default.
+   * Internal options storage containing all configuration settings.
+   * Initialized with secure defaults to disable logging by default.
    */
-  private _defaultLogger: AgLoggerFunction = NullLogger;
-
-  /**
-   * Default formatter function used to format log messages.
-   * Initialized to NullFormatter to disable formatting by default.
-   */
-  public _formatter: AgFormatFunction = NullFormatter;
-
-  /**
-   * Current log level setting that determines which messages are processed.
-   * Initialized to AG_LOGLEVEL.OFF to disable all logging by default.
-   */
-  public _logLevel: AgLogLevel = AG_LOGLEVEL.OFF;
-
-  /**
-   * Verbose mode setting that controls additional output behavior.
-   * Initialized to false to disable verbose output by default.
-   */
-  public _verbose: boolean = false;
+  private _options: Required<AgLoggerOptions> = {
+    defaultLogger: NullLogger,
+    formatter: NullFormatter,
+    logLevel: AG_LOGLEVEL.OFF,
+    verbose: false,
+    loggerMap: {},
+  };
 
   /**
    * Map of log levels to their corresponding logger functions.
@@ -88,24 +78,24 @@ export class AgLoggerConfig {
    * @since 0.2.0
    */
   constructor() {
-    this._loggerMap = this.createDefaultLoggerMap();
+    this._loggerMap = new Map<AgLogLevel, AgLoggerFunction>();
+    this.clearLoggerMap();
   }
 
   /**
-   * Creates a default logger map with all log levels mapped to the current defaultLogger.
-   * This ensures consistent behavior where loggerMap reflects the defaultLogger unless explicitly overridden.
-   * @returns Map containing all log levels mapped to current defaultLogger
+   * Clears the logger map and fills all log levels with NullLogger.
+   * This ensures all logging is disabled by default for security.
    */
-  private createDefaultLoggerMap(): Map<AgLogLevel, AgLoggerFunction> {
-    const map = new Map<AgLogLevel, AgLoggerFunction>();
-    map.set(AG_LOGLEVEL.OFF, this._defaultLogger);
-    map.set(AG_LOGLEVEL.FATAL, this._defaultLogger);
-    map.set(AG_LOGLEVEL.ERROR, this._defaultLogger);
-    map.set(AG_LOGLEVEL.WARN, this._defaultLogger);
-    map.set(AG_LOGLEVEL.INFO, this._defaultLogger);
-    map.set(AG_LOGLEVEL.DEBUG, this._defaultLogger);
-    map.set(AG_LOGLEVEL.TRACE, this._defaultLogger);
-    return map;
+  private clearLoggerMap(): void {
+    this._loggerMap.clear();
+    this._loggerMap.set(AG_LOGLEVEL.VERBOSE, NullLogger);
+    this._loggerMap.set(AG_LOGLEVEL.OFF, NullLogger);
+    this._loggerMap.set(AG_LOGLEVEL.FATAL, NullLogger);
+    this._loggerMap.set(AG_LOGLEVEL.ERROR, NullLogger);
+    this._loggerMap.set(AG_LOGLEVEL.WARN, NullLogger);
+    this._loggerMap.set(AG_LOGLEVEL.INFO, NullLogger);
+    this._loggerMap.set(AG_LOGLEVEL.DEBUG, NullLogger);
+    this._loggerMap.set(AG_LOGLEVEL.TRACE, NullLogger);
   }
 
   /**
@@ -119,21 +109,34 @@ export class AgLoggerConfig {
   /**
    * Gets the logger function for the specified log level.
    * Returns the configured logger function for the given log level.
-   * If an invalid log level is provided, throws an AgLoggerError with appropriate error category.
+   * If an invalid log level is provided, returns NullLogger.
+   * If the retrieved logger is undefined or NullLogger, returns defaultLogger.
    *
    * @param level - The log level to get the logger function for
-   * @returns Logger function for the specified level, or defaultLogger as fallback
-   * @throws {AgLoggerError} When an invalid log level is provided (error category: INVALID_LOG_LEVEL)
+   * @returns Logger function for the specified level, NullLogger for invalid levels, or defaultLogger as fallback
    *
    * @example
    * ```typescript
    * const config = new AgLoggerConfig();
    * const logger = config.getLoggerFunction(AG_LOGLEVEL.INFO); // Returns logger for INFO level
+   * const invalid = config.getLoggerFunction(999 as AgLogLevel); // Returns NullLogger
    * ```
    */
   public getLoggerFunction(level: AgLogLevel): AgLoggerFunction {
-    this.validateLogLevel(level);
-    return this._loggerMap.get(level) ?? this._defaultLogger;
+    // Return NullLogger for invalid log levels
+    if (!isValidLogLevel(level)) {
+      return NullLogger;
+    }
+
+    // Get logger from map
+    const logger = this._loggerMap.get(level);
+
+    // If logger is undefined or NullLogger, return defaultLogger
+    if (logger === undefined || logger === NullLogger) {
+      return this._options.defaultLogger;
+    }
+
+    return logger;
   }
 
   /**
@@ -141,7 +144,7 @@ export class AgLoggerConfig {
    * @returns The configured formatter function
    */
   public getFormatter(): AgFormatFunction {
-    return this._formatter;
+    return this._options.formatter;
   }
 
   /**
@@ -149,7 +152,7 @@ export class AgLoggerConfig {
    * @returns The current log level
    */
   public getLogLevel(): AgLogLevel {
-    return this._logLevel;
+    return this._options.logLevel;
   }
 
   /**
@@ -157,7 +160,7 @@ export class AgLoggerConfig {
    * @returns The current verbose setting
    */
   public getVerbose(): boolean {
-    return this._verbose;
+    return this._options.verbose;
   }
 
   /**
@@ -189,10 +192,12 @@ export class AgLoggerConfig {
    *
    * @since 0.2.0
    */
-  public setLogLevel(level: AgLogLevel): AgLogLevel {
-    this.validateLogLevel(level);
-    this._logLevel = level;
-    return this._logLevel;
+  public setLogLevel(level: AgLogLevel): boolean {
+    if (!isValidLogLevel(level)) {
+      return false;
+    }
+    this._options.logLevel = level;
+    return true;
   }
 
   /**
@@ -226,8 +231,8 @@ export class AgLoggerConfig {
    * @since 0.2.0
    */
   public setVerbose(value: boolean): boolean {
-    this._verbose = value;
-    return this._verbose;
+    this._options.verbose = value;
+    return this._options.verbose;
   }
 
   /**
@@ -259,15 +264,18 @@ export class AgLoggerConfig {
    * @since 0.2.0
    */
   public shouldOutput(level: AgLogLevel): boolean {
+    if (!isValidLogLevel(level)) {
+      return false;
+    }
     // When log level is OFF, no output should be generated
-    if (this._logLevel === AG_LOGLEVEL.OFF) {
+    if (this._options.logLevel === AG_LOGLEVEL.OFF) {
       return false;
     }
 
     // For other levels, only show messages at or below the configured level
     // Lower numbers = less verbose, higher numbers = more verbose
     // So we show messages when their level is <= the configured level
-    return level <= this._logLevel;
+    return level <= this._options.logLevel;
   }
 
   /**
@@ -298,7 +306,7 @@ export class AgLoggerConfig {
    * @since 0.2.0
    */
   public shouldOutputVerbose(): boolean {
-    return this._verbose;
+    return this._options.verbose;
   }
 
   /**
@@ -325,14 +333,12 @@ export class AgLoggerConfig {
   public setLoggerConfig(options: AgLoggerOptions): void {
     // Apply defaultLogger setting if provided
     if (options.defaultLogger !== undefined) {
-      this._defaultLogger = options.defaultLogger;
-      // When defaultLogger is set via setLoggerConfig, initialize all loggerMap entries
-      this.initializeLoggerMapWithDefault();
+      this._options.defaultLogger = options.defaultLogger;
     }
 
     // Apply formatter setting if provided
     if (options.formatter !== undefined) {
-      this._formatter = options.formatter;
+      this._options.formatter = options.formatter;
     }
 
     // Apply logLevel setting if provided
@@ -347,6 +353,7 @@ export class AgLoggerConfig {
 
     // Apply loggerMap setting if provided (this overrides the defaultLogger initialization above)
     if (options.loggerMap !== undefined) {
+      this._options.loggerMap = { ...this._options.loggerMap, ...options.loggerMap };
       this.updateLoggerMap(options.loggerMap);
     }
   }
@@ -360,18 +367,22 @@ export class AgLoggerConfig {
   private initializeLoggerMapWithDefault(): void {
     Object.values(AG_LOGLEVEL).forEach((level) => {
       if (typeof level === 'number') {
-        this._loggerMap.set(level as AgLogLevel, this._defaultLogger);
+        this._loggerMap.set(level as AgLogLevel, this._options.defaultLogger);
       }
     });
   }
 
   /**
    * Updates the logger map with the provided partial logger map.
+   * First clears the logger map to ensure clean state.
    *
    * @param loggerMap - Partial logger map to update the internal logger map
    * @private
    */
   private updateLoggerMap(loggerMap: Partial<AgLoggerMap<AgLoggerFunction>>): void {
+    // Clear the logger map first
+    this.clearLoggerMap();
+
     // Update each logger in the provided map
     Object.keys(loggerMap).forEach((key) => {
       const level = Number.parseInt(key, AgLoggerConfig.DECIMAL_RADIX) as AgLogLevel;
@@ -391,9 +402,12 @@ export class AgLoggerConfig {
    *
    * @internal Used internally for setting logger functions with validation
    */
-  setLogger(level: AgLogLevel, logger: AgLoggerFunction): void {
-    this.validateLogLevel(level);
+  setLogger(level: AgLogLevel, logger: AgLoggerFunction): boolean {
+    if (!isValidLogLevel(level)) {
+      return false;
+    }
     this._loggerMap.set(level, logger);
+    return true;
   }
 
   /**
@@ -405,25 +419,11 @@ export class AgLoggerConfig {
    * @internal Used internally for input validation with error throwing
    */
   validateLogLevel(level: AgLogLevel): void {
-    if (!this.isValidLogLevel(level)) {
+    if (!isValidLogLevel(level)) {
       throw new AgLoggerError(
         AG_LOGGER_ERROR_CATEGORIES.INVALID_LOG_LEVEL,
         `Invalid log level: ${level}`,
       );
     }
-  }
-
-  /**
-   * Validates if the provided log level is valid.
-   * Checks if the log level exists in the configured logger map.
-   *
-   * @param level - The log level to validate
-   * @returns True if the log level is valid (exists in loggerMap), false otherwise
-   *
-   * @private
-   * @internal Used internally for input validation
-   */
-  private isValidLogLevel(level: AgLogLevel): boolean {
-    return this._loggerMap.has(level);
   }
 }
