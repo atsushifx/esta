@@ -14,6 +14,8 @@ import type { AgLoggerOptions } from '../shared/types/AgLogger.interface';
 
 // core
 import { AgLoggerManager } from './AgLoggerManager.class';
+// internal
+import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 // plugins
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
@@ -26,12 +28,12 @@ import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
  */
 export class AgLogger {
   private static _instance: AgLogger | undefined;
-  private static _logLevel: AgLogLevel = AG_LOGLEVEL.OFF;
   private _loggerManager: AgLoggerManager;
-  private _verbose: boolean = false;
+  private _config: AgLoggerConfig;
 
   protected constructor() {
     this._loggerManager = AgLoggerManager.getManager();
+    this._config = new AgLoggerConfig();
   }
 
   /**
@@ -59,10 +61,7 @@ export class AgLogger {
    * @returns True if the level should be logged; otherwise false.
    */
   private isOutputLevel(level: AgLogLevel): boolean {
-    if (AgLogger._logLevel === AG_LOGLEVEL.OFF) {
-      return false;
-    }
-    return level <= AgLogger._logLevel;
+    return this._config.shouldOutput(level);
   }
 
   /**
@@ -72,8 +71,8 @@ export class AgLogger {
    * @returns The updated log level.
    */
   setLogLevel(level: AgLogLevel): AgLogLevel {
-    AgLogger._logLevel = level;
-    return AgLogger._logLevel;
+    this._config.logLevel = level;
+    return this._config.logLevel;
   }
 
   /**
@@ -82,7 +81,7 @@ export class AgLogger {
    * @returns The current log level.
    */
   getLogLevel(): AgLogLevel {
-    return AgLogger._logLevel;
+    return this._config.logLevel;
   }
 
   /**
@@ -93,9 +92,9 @@ export class AgLogger {
    */
   setVerbose(value?: boolean): boolean {
     if (value !== undefined) {
-      this._verbose = value;
+      this._config.setVerbose = value;
     }
-    return this._verbose;
+    return this._config.isVerbose;
   }
 
   /**
@@ -103,7 +102,7 @@ export class AgLogger {
    * @returns The current verbose setting
    */
   get isVerbose(): boolean {
-    return this._verbose;
+    return this._config.isVerbose;
   }
 
   /**
@@ -182,7 +181,7 @@ export class AgLogger {
 
   /** Verbose log method that only outputs when verbose flag is true. */
   verbose(...args: unknown[]): void {
-    if (this._verbose) {
+    if (this._config.isVerbose) {
       this.log(...args);
     }
   }
@@ -193,7 +192,6 @@ export class AgLogger {
    */
   static resetSingleton(): void {
     AgLogger._instance = undefined;
-    AgLogger._logLevel = AG_LOGLEVEL.OFF;
   }
 }
 
