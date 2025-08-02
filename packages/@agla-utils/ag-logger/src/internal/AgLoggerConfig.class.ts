@@ -184,6 +184,8 @@ export class AgLoggerConfig {
   /**
    *  setter for logLevel
    *  @param level - The log level to set
+   *  setter for logLevel
+   *  @return logLevel
    */
   public set logLevel(level: AgLogLevel) {
     if (!isValidLogLevel(level)) {

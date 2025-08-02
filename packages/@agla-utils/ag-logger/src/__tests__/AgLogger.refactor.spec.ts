@@ -1,3 +1,4 @@
+
 // src/__tests__/AgLogger.refactor.spec.ts
 // @(#) : AgLogger Refactor Behavior Driven Development Tests
 //

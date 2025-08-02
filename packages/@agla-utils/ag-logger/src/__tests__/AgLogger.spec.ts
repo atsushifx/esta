@@ -1,8 +1,3 @@
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
-//
-// This software is released under the MIT License.
-// https://opensource.org/licenses/MIT
-
 // src/__tests__/AgLogger.spec.ts
 // @(#) : Unit tests for AgLogger class
 //

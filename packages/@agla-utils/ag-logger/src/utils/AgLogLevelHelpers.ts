@@ -33,6 +33,10 @@ export const AgToLabel = (level: AgLogLevel): AgLogLevelLabel | '' => {
  * @param label - String log level label
  * @returns Numeric log level, or undefined if invalid
  */
-export const AgToLogLevel = (label: AgLogLevelLabel): AgLogLevel => {
-  return AG_LABEL_TO_LOGLEVEL_MAP[label];
+export const AgToLogLevel = (label: string): AgLogLevel | undefined => {
+  if (!label || typeof label !== 'string') {
+    return undefined;
+  }
+  const labelIndex = label.trim().toUpperCase();
+  return AG_LABEL_TO_LOGLEVEL_MAP[labelIndex as AgLogLevelLabel];
 };

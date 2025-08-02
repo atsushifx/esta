@@ -157,12 +157,14 @@ export class AgLogger {
    * @returns The updated log level.
    */
   get isVerbose(): boolean {
+
     return this._config.isVerbose;
   }
 
   set setVerbose(value: boolean) {
     this._config.setVerbose = value;
   }
+
 
   /**
    * Gets the current log level.
