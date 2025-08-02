@@ -22,6 +22,12 @@ import { AgLogger, getLogger } from '../AgLogger.class';
 type AgLoggerForTesting = AgLogger & {
   shouldOutput: (level: AgLogLevel) => boolean;
 };
+
+// executeLogメソッドもテストするための型定義
+type TestableAgLogger = AgLogger & {
+  shouldOutput: (level: AgLogLevel) => boolean;
+  executeLog: (level: AgLogLevel, ...args: unknown[]) => void;
+};
 // プラグイン - テストで使用するコンソールロガー
 import { ConsoleLogger } from '../plugins/logger/ConsoleLogger';
 
@@ -920,6 +926,31 @@ describe('AgLogger', () => {
         testLogger.executeLog(AG_LOGLEVEL.INFO, 'test message');
 
         expect(emptyFormatter).toHaveBeenCalled();
+        expect(mockLogger).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  /**
+   * executeLog 空ログ抑制機能
+   *
+   * @description executeLogメソッドの空ログ抑制動作をテスト
+   */
+  describe('executeLog Empty Log Suppression', () => {
+    /**
+     * 正常系: 空ログ抑制の基本動作
+     */
+    describe('正常系: Basic Empty Log Suppression', () => {
+      it('should not output when message is empty and no additional arguments', () => {
+        // Given: モックロガーとフォーマッターが設定されたAgLoggerインスタンス
+        const logger = AgLogger.getLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger.setLogLevel(AG_LOGLEVEL.INFO);
+        const testableLogger = logger as TestableAgLogger;
+
+        // When: 空のメッセージ（''）で引数なしのexecuteLogを呼び出し
+        testableLogger.executeLog(AG_LOGLEVEL.INFO, '');
+
+        // Then: ロガーが呼び出されないことを確認（空ログ抑制）
         expect(mockLogger).not.toHaveBeenCalled();
       });
     });

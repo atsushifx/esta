@@ -113,20 +113,26 @@ export class AgLogger {
    * @param args - Arguments to be logged.
    */
   protected executeLog(level: AgLogLevel, ...args: unknown[]): void {
-    if (this.shouldOutput(level)) {
-      const logMessage = AgLoggerGetMessage(level, ...args);
-      const formatter = this._loggerManager.getFormatter();
-      const formattedMessage = formatter(logMessage);
-
-      // Only block logging if the formatter explicitly returns empty string
-      // and the original message had actual content (not just empty args)
-      if (formattedMessage === '' && logMessage.message !== '' && args.length > 0) {
-        return;
-      }
-
-      const logger = this._loggerManager.getLogger(level);
-      logger(formattedMessage);
+    if (!this.shouldOutput(level)) {
+      return;
     }
+
+    // Block logging if the first argument is empty string and no additional arguments
+    if (args.length === 1 && args[0] === '') {
+      return;
+    }
+
+    const logMessage = AgLoggerGetMessage(level, ...args);
+    const formatter = this._loggerManager.getFormatter();
+    const formattedMessage = formatter(logMessage);
+
+    // Block logging if the formatted message is empty but original message is not empty
+    if (formattedMessage === '' && logMessage.message !== '') {
+      return;
+    }
+
+    const logger = this._loggerManager.getLogger(level);
+    logger(formattedMessage);
   }
 
   /**
