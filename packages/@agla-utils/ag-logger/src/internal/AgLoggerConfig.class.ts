@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // utilities
-import { isValidLogLevel, validateFormatter, validateLogger } from '../utils/AgLogValidator';
+import { isValidLogLevel } from '../utils/AgLogLevelHelpers';
 
 // types
 import type { AgLoggerMap, AgLogLevel } from '../../shared/types';
@@ -220,6 +220,10 @@ export class AgLoggerConfig {
    * @since 0.2.0
    */
   public shouldOutput(level: AgLogLevel): boolean {
+    if (level === AG_LOGLEVEL.FORCE_OUTPUT) {
+      return true;
+    }
+
     if (level === AG_LOGLEVEL.VERBOSE) {
       return this.isVerbose;
     }
@@ -227,6 +231,7 @@ export class AgLoggerConfig {
     if (!isValidLogLevel(level)) {
       return false;
     }
+
     // When log level is OFF, no output should be generated
     if (this._options.logLevel === AG_LOGLEVEL.OFF) {
       return false;

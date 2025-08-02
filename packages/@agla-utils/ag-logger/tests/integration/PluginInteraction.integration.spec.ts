@@ -71,7 +71,6 @@ describe('Plugin Interaction Integration Tests', () => {
     it('should work correctly with ConsoleLogger and JsonFormatter', () => {
       setupTestContext();
       const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => { });
-      const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => { });
 
       const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -94,7 +93,6 @@ describe('Plugin Interaction Integration Tests', () => {
 
     it('should work correctly with ConsoleLogger and PlainFormatter', () => {
       setupTestContext();
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
 
       const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });

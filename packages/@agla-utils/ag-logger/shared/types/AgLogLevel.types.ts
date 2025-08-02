@@ -6,6 +6,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { findSourceMap } from "module";
+
 /**
  * Core log level numeric constants with Ag prefix.
  * Based on AWS CloudWatch Logs convention.
@@ -34,6 +36,9 @@ export const AG_LOGLEVEL = {
   DEBUG: 5,
   /** Very detailed tracing information. */
   TRACE: 6,
+
+  /** special value: force output */
+  FORCE_OUTPUT: -98,
   /** special value: verbose mode  */
   VERBOSE: -99,
 } as const;
@@ -62,6 +67,10 @@ export const AG_LABEL_TO_LOGLEVEL_MAP = {
   'DEBUG': AG_LOGLEVEL.DEBUG,
   /** Maps 'TRACE' string to numeric value 6. */
   'TRACE': AG_LOGLEVEL.TRACE,
+  // -- special values
+  /** Maps 'FORCE_OUTPUT' string to numeric value -98. */
+
+  'FORCE_OUTPUT': AG_LOGLEVEL.FORCE_OUTPUT,
   /** Maps 'VERBOSE' string to numeric value -99. */
   'VERBOSE': AG_LOGLEVEL.VERBOSE,
 } as const;
