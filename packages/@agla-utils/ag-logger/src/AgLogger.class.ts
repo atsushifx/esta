@@ -208,7 +208,7 @@ export class AgLogger {
     }
 
     const logMessage = AgLoggerGetMessage(level, ...args);
-    const formatter = this._config.formatter;
+    const formatter = this.getFormatter();
     const formattedMessage = formatter(logMessage);
 
     // Only block logging if the formatter explicitly returns empty string

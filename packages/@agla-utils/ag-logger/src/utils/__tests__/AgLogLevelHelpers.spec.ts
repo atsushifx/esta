@@ -14,16 +14,37 @@ import type { AgLogLevel } from '../../../shared/types';
 import { AgToLabel } from '../AgLogLevelHelpers';
 import { isValidLogLevel } from '../AgLogValidators';
 
-describe('LogLevel Helper Functions', () => {
+describe('ログレベル文字列変換機能', () => {
   describe('AgToLabel function', () => {
-    it('should convert numeric log level to uppercase string', () => {
+    it('should convert OFF level to uppercase string', () => {
       expect(AgToLabel(AG_LOGLEVEL.OFF)).toBe('OFF');
+    });
+
+    it('should convert FATAL level to uppercase string', () => {
       expect(AgToLabel(AG_LOGLEVEL.FATAL)).toBe('FATAL');
+    });
+
+    it('should convert ERROR level to uppercase string', () => {
       expect(AgToLabel(AG_LOGLEVEL.ERROR)).toBe('ERROR');
+    });
+
+    it('should convert WARN level to uppercase string', () => {
       expect(AgToLabel(AG_LOGLEVEL.WARN)).toBe('WARN');
+    });
+
+    it('should convert INFO level to uppercase string', () => {
       expect(AgToLabel(AG_LOGLEVEL.INFO)).toBe('INFO');
+    });
+
+    it('should convert DEBUG level to uppercase string', () => {
       expect(AgToLabel(AG_LOGLEVEL.DEBUG)).toBe('DEBUG');
+    });
+
+    it('should convert TRACE level to uppercase string', () => {
       expect(AgToLabel(AG_LOGLEVEL.TRACE)).toBe('TRACE');
+    });
+
+    it('should convert VERBOSE level to uppercase string', () => {
       expect(AgToLabel(AG_LOGLEVEL.VERBOSE)).toBe('VERBOSE');
     });
 
@@ -37,8 +58,17 @@ describe('LogLevel Helper Functions', () => {
 
     it('should return empty string for invalid negative number', () => {
       expect(AgToLabel(-1 as AgLogLevel)).toBe('');
+    });
+
+    it('should return empty string for invalid positive number', () => {
       expect(AgToLabel(99 as AgLogLevel)).toBe('');
+    });
+
+    it('should return empty string for null input', () => {
       expect(AgToLabel(null as unknown as AgLogLevel)).toBe('');
+    });
+
+    it('should return empty string for undefined input', () => {
       expect(AgToLabel(undefined as unknown as AgLogLevel)).toBe('');
     });
 

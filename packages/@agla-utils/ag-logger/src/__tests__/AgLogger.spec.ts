@@ -25,14 +25,15 @@ import type { AgLogLevel } from '../../shared/types';
 // テスト対象 - AgLoggerクラスのメイン実装とgetLogger関数
 import { AgLogger, createLogger } from '../AgLogger.class';
 
-// logger
+// プラグイン - テストで使用するコンソールロガー
 import { ConsoleLogger } from '../plugins/logger/ConsoleLogger';
+
 
 // テスト用モック関数
 const mockLogger = vi.fn();
 const mockFormatter = vi.fn().mockImplementation((msg) => msg.message ?? msg);
 
-// テスト用拡張型定義
+// executeLogメソッドもテストするための型定義
 type TestableAgLogger = AgLogger & {
   executeLog: (level: AgLogLevel, ...args: unknown[]) => void;
   shouldOutput: (level: AgLogLevel) => boolean;
