@@ -46,28 +46,16 @@ export class AgLoggerConfig {
   private static readonly DECIMAL_RADIX = 10;
 
   /**
-   * Default logger function used when no specific logger is configured.
-   * Initialized to NullLogger to disable logging by default.
+   * Internal options storage containing all configuration settings.
+   * Initialized with secure defaults to disable logging by default.
    */
-  private _defaultLogger: AgLoggerFunction = NullLogger;
-
-  /**
-   * Default formatter function used to format log messages.
-   * Initialized to NullFormatter to disable formatting by default.
-   */
-  public _formatter: AgFormatFunction = NullFormatter;
-
-  /**
-   * Current log level setting that determines which messages are processed.
-   * Initialized to AG_LOGLEVEL.OFF to disable all logging by default.
-   */
-  public _logLevel: AgLogLevel = AG_LOGLEVEL.OFF;
-
-  /**
-   * Verbose mode setting that controls additional output behavior.
-   * Initialized to false to disable verbose output by default.
-   */
-  public _verbose: boolean = false;
+  private _options: Required<AgLoggerOptions> = {
+    defaultLogger: NullLogger,
+    formatter: NullFormatter,
+    logLevel: AG_LOGLEVEL.OFF,
+    verbose: false,
+    loggerMap: {},
+  };
 
   /**
    * Map of log levels to their corresponding logger functions.
@@ -98,13 +86,13 @@ export class AgLoggerConfig {
    */
   private createDefaultLoggerMap(): Map<AgLogLevel, AgLoggerFunction> {
     const map = new Map<AgLogLevel, AgLoggerFunction>();
-    map.set(AG_LOGLEVEL.OFF, this._defaultLogger);
-    map.set(AG_LOGLEVEL.FATAL, this._defaultLogger);
-    map.set(AG_LOGLEVEL.ERROR, this._defaultLogger);
-    map.set(AG_LOGLEVEL.WARN, this._defaultLogger);
-    map.set(AG_LOGLEVEL.INFO, this._defaultLogger);
-    map.set(AG_LOGLEVEL.DEBUG, this._defaultLogger);
-    map.set(AG_LOGLEVEL.TRACE, this._defaultLogger);
+    map.set(AG_LOGLEVEL.OFF, this._options.defaultLogger);
+    map.set(AG_LOGLEVEL.FATAL, this._options.defaultLogger);
+    map.set(AG_LOGLEVEL.ERROR, this._options.defaultLogger);
+    map.set(AG_LOGLEVEL.WARN, this._options.defaultLogger);
+    map.set(AG_LOGLEVEL.INFO, this._options.defaultLogger);
+    map.set(AG_LOGLEVEL.DEBUG, this._options.defaultLogger);
+    map.set(AG_LOGLEVEL.TRACE, this._options.defaultLogger);
     return map;
   }
 
@@ -133,7 +121,7 @@ export class AgLoggerConfig {
    */
   public getLoggerFunction(level: AgLogLevel): AgLoggerFunction {
     this.validateLogLevel(level);
-    return this._loggerMap.get(level) ?? this._defaultLogger;
+    return this._loggerMap.get(level) ?? this._options.defaultLogger;
   }
 
   /**
@@ -141,7 +129,7 @@ export class AgLoggerConfig {
    * @returns The configured formatter function
    */
   public getFormatter(): AgFormatFunction {
-    return this._formatter;
+    return this._options.formatter;
   }
 
   /**
@@ -149,7 +137,7 @@ export class AgLoggerConfig {
    * @returns The current log level
    */
   public getLogLevel(): AgLogLevel {
-    return this._logLevel;
+    return this._options.logLevel;
   }
 
   /**
@@ -157,7 +145,7 @@ export class AgLoggerConfig {
    * @returns The current verbose setting
    */
   public getVerbose(): boolean {
-    return this._verbose;
+    return this._options.verbose;
   }
 
   /**
@@ -191,8 +179,8 @@ export class AgLoggerConfig {
    */
   public setLogLevel(level: AgLogLevel): AgLogLevel {
     this.validateLogLevel(level);
-    this._logLevel = level;
-    return this._logLevel;
+    this._options.logLevel = level;
+    return this._options.logLevel;
   }
 
   /**
@@ -226,8 +214,8 @@ export class AgLoggerConfig {
    * @since 0.2.0
    */
   public setVerbose(value: boolean): boolean {
-    this._verbose = value;
-    return this._verbose;
+    this._options.verbose = value;
+    return this._options.verbose;
   }
 
   /**
@@ -260,14 +248,14 @@ export class AgLoggerConfig {
    */
   public shouldOutput(level: AgLogLevel): boolean {
     // When log level is OFF, no output should be generated
-    if (this._logLevel === AG_LOGLEVEL.OFF) {
+    if (this._options.logLevel === AG_LOGLEVEL.OFF) {
       return false;
     }
 
     // For other levels, only show messages at or below the configured level
     // Lower numbers = less verbose, higher numbers = more verbose
     // So we show messages when their level is <= the configured level
-    return level <= this._logLevel;
+    return level <= this._options.logLevel;
   }
 
   /**
@@ -298,7 +286,7 @@ export class AgLoggerConfig {
    * @since 0.2.0
    */
   public shouldOutputVerbose(): boolean {
-    return this._verbose;
+    return this._options.verbose;
   }
 
   /**
@@ -325,14 +313,14 @@ export class AgLoggerConfig {
   public setLoggerConfig(options: AgLoggerOptions): void {
     // Apply defaultLogger setting if provided
     if (options.defaultLogger !== undefined) {
-      this._defaultLogger = options.defaultLogger;
+      this._options.defaultLogger = options.defaultLogger;
       // When defaultLogger is set via setLoggerConfig, initialize all loggerMap entries
       this.initializeLoggerMapWithDefault();
     }
 
     // Apply formatter setting if provided
     if (options.formatter !== undefined) {
-      this._formatter = options.formatter;
+      this._options.formatter = options.formatter;
     }
 
     // Apply logLevel setting if provided
@@ -347,6 +335,7 @@ export class AgLoggerConfig {
 
     // Apply loggerMap setting if provided (this overrides the defaultLogger initialization above)
     if (options.loggerMap !== undefined) {
+      this._options.loggerMap = { ...this._options.loggerMap, ...options.loggerMap };
       this.updateLoggerMap(options.loggerMap);
     }
   }
@@ -360,7 +349,7 @@ export class AgLoggerConfig {
   private initializeLoggerMapWithDefault(): void {
     Object.values(AG_LOGLEVEL).forEach((level) => {
       if (typeof level === 'number') {
-        this._loggerMap.set(level as AgLogLevel, this._defaultLogger);
+        this._loggerMap.set(level as AgLogLevel, this._options.defaultLogger);
       }
     });
   }

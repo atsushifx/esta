@@ -59,17 +59,17 @@ describe('AgLoggerConfig', () => {
 
   it('should initialize with NullFormatter as default formatter', () => {
     const config = new AgLoggerConfig();
-    expect(config._formatter).toBe(NullFormatter);
+    expect(config.getFormatter()).toBe(NullFormatter);
   });
 
   it('should initialize with AG_LOGLEVEL.OFF as default log level', () => {
     const config = new AgLoggerConfig();
-    expect(config._logLevel).toBe(AG_LOGLEVEL.OFF);
+    expect(config.getLogLevel()).toBe(AG_LOGLEVEL.OFF);
   });
 
   it('should initialize with verbose as false', () => {
     const config = new AgLoggerConfig();
-    expect(config._verbose).toBe(DISABLE);
+    expect(config.getVerbose()).toBe(DISABLE);
   });
 
   it('should initialize all log levels with NullLogger', () => {
@@ -306,7 +306,7 @@ describe('AgLoggerConfig', () => {
     config.setLoggerConfig(options);
 
     // Verify formatter was applied
-    expect(config._formatter).toBe(testFormatter);
+    expect(config.getFormatter()).toBe(testFormatter);
   });
 
   it('should apply logLevel setting', () => {
