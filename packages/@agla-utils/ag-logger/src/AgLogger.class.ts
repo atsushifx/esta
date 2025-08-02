@@ -99,6 +99,14 @@ export class AgLogger {
   }
 
   /**
+   * Gets the current verbose setting.
+   * @returns The current verbose setting
+   */
+  get isVerbose(): boolean {
+    return this._verbose;
+  }
+
+  /**
    * Internal method to perform logging if the log level is enabled.
    * Formats the message and invokes the appropriate logger function.
    *

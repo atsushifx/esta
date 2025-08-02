@@ -481,6 +481,19 @@ describe('AgLogger', () => {
     /**
      * 正常系: 基本的なverbose動作
      */
+    describe('isVerbose getter', () => {
+      it('should return false as default value', () => {
+        const logger = AgLogger.getLogger();
+        expect(logger.isVerbose).toBe(false);
+      });
+
+      it('should return true when verbose is enabled', () => {
+        const logger = AgLogger.getLogger();
+        logger.setVerbose(true);
+        expect(logger.isVerbose).toBe(true);
+      });
+    });
+
     describe('正常系: Basic Verbose Operations', () => {
       it('should manage verbose state correctly', () => {
         const logger = AgLogger.getLogger();

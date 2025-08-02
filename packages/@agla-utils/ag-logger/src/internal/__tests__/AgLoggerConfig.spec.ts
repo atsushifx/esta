@@ -148,6 +148,24 @@ describe('AgLoggerConfig', () => {
     expect(config.getVerbose()).toBe(DISABLE);
   });
 
+  describe('isVerbose getter', () => {
+    it('should return false as default value', () => {
+      const config = new AgLoggerConfig();
+      expect(config.isVerbose).toBe(false);
+    });
+
+    it('should have isVerbose getter that returns boolean type', () => {
+      const config = new AgLoggerConfig();
+      expect(typeof config.isVerbose).toBe('boolean');
+    });
+
+    it('should return true when verbose is enabled', () => {
+      const config = new AgLoggerConfig();
+      config.setVerbose(true);
+      expect(config.isVerbose).toBe(true);
+    });
+  });
+
   it('should set log level correctly', () => {
     const config = new AgLoggerConfig();
 

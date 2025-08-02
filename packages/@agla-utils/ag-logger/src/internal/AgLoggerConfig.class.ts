@@ -164,6 +164,14 @@ export class AgLoggerConfig {
   }
 
   /**
+   * Gets the current verbose setting.
+   * @returns The current verbose setting
+   */
+  public get isVerbose(): boolean {
+    return this._options.verbose;
+  }
+
+  /**
    * Sets the log level for the configuration.
    *
    * Updates the current log level after validating that the provided level is valid.
