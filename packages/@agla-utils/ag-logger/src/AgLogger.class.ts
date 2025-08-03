@@ -20,8 +20,9 @@ import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 // plugins
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
-import { isValidLogger, validateFormatter, validateLogLevel } from '@/utils/AgLogValidators';
+import { isValidLogger, validateFormatter, validateLogLevel } from './utils/AgLogValidators';
 import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
+
 
 /**
  * Abstract logger class providing singleton instance management,
@@ -164,7 +165,6 @@ export class AgLogger {
   set setVerbose(value: boolean) {
     this._config.setVerbose = value;
   }
-
 
   /**
    * Gets the current log level.

@@ -173,7 +173,7 @@ export class TBufferLogger {
    */
   createLoggerMap(): AgLoggerMap {
     return {
-      [AG_LOGLEVEL.OFF]: () => {}, // No-op for OFF level
+      [AG_LOGLEVEL.OFF]: () => { }, // No-op for OFF level
       [AG_LOGLEVEL.FATAL]: (message: string | AgLogMessage) => this.fatal(message),
       [AG_LOGLEVEL.ERROR]: (message: string | AgLogMessage) => this.error(message),
       [AG_LOGLEVEL.WARN]: (message: string | AgLogMessage) => this.warn(message),

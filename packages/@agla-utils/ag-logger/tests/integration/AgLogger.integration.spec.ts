@@ -170,7 +170,7 @@ describe('AgLogger Integration Tests', () => {
             name: 'ConsoleLogger + JsonFormatter',
             logger: ConsoleLogger,
             formatter: JsonFormatter,
-            setupSpy: () => vi.spyOn(console, 'info').mockImplementation(() => { }),
+            setupSpy: () => vi.spyOn(console, 'info').mockImplementation(() => {}),
             verify: (spy: TVitestMock) => {
               const [output] = spy.mock.calls[0];
               expect(() => JSON.parse(output)).not.toThrow();
@@ -698,8 +698,9 @@ describe('AgLogger Integration Tests', () => {
             return result;
           } catch {
             // フォールバック処理
-            return `${logMessage.timestamp ?? new Date().toISOString()} [${logMessage.level ?? 'UNKNOWN'}] ${logMessage.message ?? ''
-              }`;
+            return `${logMessage.timestamp ?? new Date().toISOString()} [${logMessage.level ?? 'UNKNOWN'}] ${
+              logMessage.message ?? ''
+            }`;
           }
         });
 
@@ -756,8 +757,9 @@ describe('AgLogger Integration Tests', () => {
             }
           };
 
-          return `${logMessage.timestamp} [${logMessage.level}] ${logMessage.message} ${safeStringify(logMessage.args)
-            }`;
+          return `${logMessage.timestamp} [${logMessage.level}] ${logMessage.message} ${
+            safeStringify(logMessage.args)
+          }`;
         });
 
         const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: safeFormatter });

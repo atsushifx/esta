@@ -52,10 +52,6 @@ describe('ログレベル文字列変換機能', () => {
       expect(AgToLabel(AG_LOGLEVEL.FORCE_OUTPUT)).toBe('');
     });
 
-    it('should return empty string for FORCE_OUTPUT level', () => {
-      expect(AgToLabel(AG_LOGLEVEL.FORCE_OUTPUT)).toBe('');
-    });
-
     it('should return empty string for invalid negative number', () => {
       expect(AgToLabel(-1 as AgLogLevel)).toBe('');
     });
@@ -73,7 +69,6 @@ describe('ログレベル文字列変換機能', () => {
     });
 
     it('should return consistent format', () => {
-      // All returned strings should be uppercase (except FORCE_OUTPUT which returns empty string)
       // All returned strings should be uppercase (except FORCE_OUTPUT which returns empty string)
       Object.values(AG_LOGLEVEL).forEach((level) => {
         const label = AgToLabel(level);
