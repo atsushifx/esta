@@ -13,15 +13,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { AG_LOGLEVEL } from '../../shared/types';
 // テスト対象 - createLogger関数（ロガー作成のエントリーポイント）
 import { createLogger } from '@/AgLogger.class';
-// テスト対象 - createLogger関数（ロガー作成のエントリーポイント）
-import { createLogger } from '@/AgLogger.class';
-
-// --- types ---
-import type { AG_LABEL_TO_LOGLEVEL_MAP } from '../../shared/types';
 
 // Type definitions derived from log level constants
-type TLogLevelLabels = keyof typeof AG_LABEL_TO_LOGLEVEL_MAP;
-type TAgLoggerMethods = Lowercase<Exclude<TLogLevelLabels, 'OFF'>>;
 type TMockConsoleMethods = keyof typeof mockConsole;
 type TCircularObject = { name: string; self?: TCircularObject };
 
@@ -75,14 +68,14 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
         logger.logLevel = AG_LOGLEVEL.TRACE;
 
         const testCases = [
-          { method: 'error', level: 'ERROR', consoleMethod: 'error' },
-          { method: 'warn', level: 'WARN', consoleMethod: 'warn' },
-          { method: 'info', level: 'INFO', consoleMethod: 'info' },
-          { method: 'debug', level: 'DEBUG', consoleMethod: 'debug' },
+          { method: logger.error, level: 'ERROR', consoleMethod: 'error' },
+          { method: logger.warn, level: 'WARN', consoleMethod: 'warn' },
+          { method: logger.info, level: 'INFO', consoleMethod: 'info' },
+          { method: logger.debug, level: 'DEBUG', consoleMethod: 'debug' },
         ];
 
         testCases.forEach(({ method, level, consoleMethod }) => {
-          (logger[method as TAgLoggerMethods] as (msg: string) => void)(`${method} message`);
+          method(`${level} message`);
 
           expect(mockConsole[consoleMethod as TMockConsoleMethods]).toHaveBeenCalledTimes(1);
           const consoleMock = mockConsole[consoleMethod as TMockConsoleMethods];
@@ -91,7 +84,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
           const parsedLog = JSON.parse(logOutput);
           expect(parsedLog).toMatchObject({
             level,
-            message: `${method} message`,
+            message: `${level} message`,
           });
           expect(parsedLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
 
@@ -373,12 +366,12 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
 
         logger.log('Generic log message', { data: 'test' });
 
-        expect(mockConsole.info).toHaveBeenCalledTimes(1);
-        const [logOutput] = mockConsole.info.mock.calls[0];
+        expect(mockConsole.log).toHaveBeenCalledTimes(1);
+        const [logOutput] = mockConsole.log.mock.calls[0];
         const parsedLog = JSON.parse(logOutput);
 
         expect(parsedLog).toMatchObject({
-          level: 'INFO',
+          level: '',
           message: 'Generic log message',
           args: [{ data: 'test' }],
         });

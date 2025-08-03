@@ -1,5 +1,5 @@
 // src/tests/e2e/AgLogger.parameterOmission.spec.ts
-// @(#) : AgLogger E2E Test - Parameter omission and setManager functionality
+// @(#) : AgLogger E2E Test - Parameter omission and setLoggerConfig functionality
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -28,10 +28,10 @@ const mockConsole = {
 };
 
 /**
- * AgLogger E2Eテストスイート - パラメーター省略とsetManager機能
+ * AgLogger E2Eテストスイート - パラメーター省略とsetLoggerConfig機能
  *
  * @description getLogger呼び出しでのパラメーター省略と
- * setManagerメソッド機能をカバーするE2Eテスト
+ * setLoggerConfigメソッド機能をカバーするE2Eテスト
  * 設定継承、動的設定変更、シングルトン動作を実環境で検証
  *
  * @testType End-to-End Test
@@ -42,7 +42,7 @@ const mockConsole = {
  * - 動的ログ設定変更
  * - 設定ファイルや環境変数による設定更新
  */
-describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
+describe('AgLogger E2E Tests - Parameter Omission and setLoggerConfig', () => {
   const setupTestContext = (): void => {
     vi.clearAllMocks();
     Object.assign(console, mockConsole);
@@ -109,43 +109,43 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
   });
 
   /**
-   * setManagerメソッド機能テストスイート
+   * setLoggerConfigメソッド機能テストスイート
    *
-   * @description setManagerメソッドのロガーやフォーマッター設定更新能力をテストする
+   * @description setLoggerConfigメソッドのロガーやフォーマッター設定更新能力をテストする
    * 全設定同時更新、部分設定更新、個別コンポーネント更新の動作を検証
    *
-   * @testFocus setManager Method Functionality
+   * @testFocus setLoggerConfig Method Functionality
    * @scenarios
    * - 全設定の同時更新（defaultLogger + formatter）
    * - 部分設定の別々更新（formatterのみ、defaultLoggerのみ）
    * - 設定変更後のログ出力品質確認
    */
-  describe('setManager method functionality', () => {
-    it('updates all settings at once via setManager', () => {
+  describe('setLoggerConfig method functionality', () => {
+    it('updates all settings at once via setLoggerConfig', () => {
       setupTestContext();
       const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
 
-      // Change settings via setManager
-      logger.setManager({
+      // Change settings via setLoggerConfig
+      logger.setLoggerConfig({
         defaultLogger: ConsoleLogger,
         formatter: PlainFormatter,
       });
 
-      logger.info('Log after setManager update');
+      logger.info('Log after setLoggerConfig update');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(1);
       const [logOutput] = mockConsole.info.mock.calls[0];
-      expect(logOutput).toMatch(/\[INFO\] Log after setManager update$/);
+      expect(logOutput).toMatch(/\[INFO\] Log after setLoggerConfig update$/);
     });
 
-    it('updates partial settings via setManager', () => {
+    it('updates partial settings via setLoggerConfig', () => {
       setupTestContext();
       const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
 
       // Change only formatter
-      logger.setManager({
+      logger.setLoggerConfig({
         formatter: PlainFormatter,
       });
 
@@ -156,13 +156,13 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
       expect(logOutput).toMatch(/\[INFO\] Log after partial settings update$/);
     });
 
-    it('updates only defaultLogger via setManager', () => {
+    it('updates only defaultLogger via setLoggerConfig', () => {
       setupTestContext();
       const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
 
       // Change only defaultLogger
-      logger.setManager({
+      logger.setLoggerConfig({
         defaultLogger: ConsoleLogger,
       });
 
@@ -184,7 +184,7 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
    * @testFocus Combined Usage Scenarios
    * @scenarios
    * - 設定変更 + パラメーター省略の組み合わせ
-   * - 複数setManager呼び出しでの設定上書き動作
+   * - 複数setLoggerConfig呼び出しでの設定上書き動作
    * - インスタンス同一性の保持と設定共有
    * - 継続的なログ出力品質の保証
    */
@@ -196,8 +196,8 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
       logger1.logLevel = AG_LOGLEVEL.INFO;
       logger1.info('Initial setup');
 
-      // Change settings via setManager
-      logger1.setManager({
+      // Change settings via setLoggerConfig
+      logger1.setLoggerConfig({
         formatter: PlainFormatter,
       });
       logger1.info('After settings update');
@@ -217,19 +217,19 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
       expect(logs[2]).toMatch(/\[INFO\] After parameter omission$/);
     });
 
-    it('overwrites settings via multiple setManager calls', () => {
+    it('overwrites settings via multiple setLoggerConfig calls', () => {
       setupTestContext();
       const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
 
       // First settings update
-      logger.setManager({
+      logger.setLoggerConfig({
         defaultLogger: ConsoleLogger,
       });
       logger.info('First settings update');
 
       // Second settings update
-      logger.setManager({
+      logger.setLoggerConfig({
         formatter: PlainFormatter,
       });
       logger.info('Second settings update');

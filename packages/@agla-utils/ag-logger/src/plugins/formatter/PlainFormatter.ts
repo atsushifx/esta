@@ -28,7 +28,11 @@ export const PlainFormatter: AgFormatFunction = (logMessage: AgLogMessage): stri
     ? ` ${logMessage.args.map((arg) => JSON.stringify(arg)).join(' ')}`
     : '';
 
-  return `${timestamp} [${levelLabel}] ${message}${argsString}`;
+  if (levelLabel) {
+    return `${timestamp} [${levelLabel}] ${message}${argsString}`;
+  } else {
+    return `${timestamp} ${message}${argsString}`;
+  }
 };
 
 export default PlainFormatter;

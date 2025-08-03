@@ -35,6 +35,7 @@ export class AgLoggerManager {
     this.formatter = NullFormatter;
     this.loggerMap = {
       [AG_LOGLEVEL.VERBOSE]: NullLogger,
+      [AG_LOGLEVEL.FORCE_OUTPUT]: NullLogger,
       [AG_LOGLEVEL.OFF]: NullLogger,
       [AG_LOGLEVEL.FATAL]: NullLogger,
       [AG_LOGLEVEL.ERROR]: NullLogger,

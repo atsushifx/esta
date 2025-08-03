@@ -104,7 +104,7 @@ describe('AgLogger Integration Tests', () => {
         const mockLogger = vi.fn();
         const mockFormatter = vi.fn().mockReturnValue('shared format');
 
-        logger1.setManager({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger1.setLoggerConfig({ defaultLogger: mockLogger, formatter: mockFormatter });
         logger2.logLevel = AG_LOGLEVEL.INFO;
         logger2.info('test message');
 
@@ -127,7 +127,7 @@ describe('AgLogger Integration Tests', () => {
           throw new Error('Formatter error');
         });
 
-        expect(() => logger1.setManager({ formatter: throwingFormatter })).not.toThrow();
+        expect(() => logger1.setLoggerConfig({ formatter: throwingFormatter })).not.toThrow();
 
         const logger2 = AgLogger.createLogger();
         // 同じインスタンスであることを確認
@@ -170,7 +170,7 @@ describe('AgLogger Integration Tests', () => {
             name: 'ConsoleLogger + JsonFormatter',
             logger: ConsoleLogger,
             formatter: JsonFormatter,
-            setupSpy: () => vi.spyOn(console, 'info').mockImplementation(() => { }),
+            setupSpy: () => vi.spyOn(console, 'info').mockImplementation(() => {}),
             verify: (spy: TVitestMock) => {
               const [output] = spy.mock.calls[0];
               expect(() => JSON.parse(output)).not.toThrow();
@@ -242,7 +242,7 @@ describe('AgLogger Integration Tests', () => {
 
         // システム復旧
         const workingLogger = vi.fn();
-        logger.setManager({ defaultLogger: workingLogger });
+        logger.setLoggerConfig({ defaultLogger: workingLogger });
 
         expect(() => logger.info('recovery test')).not.toThrow();
         expect(workingLogger).toHaveBeenCalled();
@@ -340,10 +340,10 @@ describe('AgLogger Integration Tests', () => {
         const finalFormatter = vi.fn().mockReturnValue('final format');
 
         // 段階的な設定更新
-        logger.setManager({ defaultLogger: vi.fn() });
-        logger.setManager({ loggerMap: { [AG_LOGLEVEL.ERROR]: vi.fn() } });
-        logger.setManager({ formatter: finalFormatter });
-        logger.setManager({ defaultLogger: finalLogger });
+        logger.setLoggerConfig({ defaultLogger: vi.fn() });
+        logger.setLoggerConfig({ loggerMap: { [AG_LOGLEVEL.ERROR]: vi.fn() } });
+        logger.setLoggerConfig({ formatter: finalFormatter });
+        logger.setLoggerConfig({ defaultLogger: finalLogger });
 
         logger.logLevel = AG_LOGLEVEL.INFO;
         logger.info('test message');
@@ -367,13 +367,13 @@ describe('AgLogger Integration Tests', () => {
         });
 
         // 最初の設定は成功
-        logger.setManager({ formatter: conflictingFormatter1 });
+        logger.setLoggerConfig({ formatter: conflictingFormatter1 });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
         expect(() => logger.info('test1')).not.toThrow();
 
         // 競合する設定でエラー
-        logger.setManager({ formatter: conflictingFormatter2 });
+        logger.setLoggerConfig({ formatter: conflictingFormatter2 });
 
         expect(() => logger.info('test2')).toThrow('Formatter conflict');
       });
@@ -401,7 +401,7 @@ describe('AgLogger Integration Tests', () => {
           if (i % 10 === 0) {
             // 10回ごとに設定変更
             const useFirst = i % 20 === 0;
-            logger.setManager({
+            logger.setLoggerConfig({
               defaultLogger: useFirst ? mockLogger1 : mockLogger2,
               formatter: useFirst ? mockFormatter1 : mockFormatter2,
             });
@@ -569,7 +569,7 @@ describe('AgLogger Integration Tests', () => {
         expect(logger2.isVerbose).toBe(true);
 
         // 設定変更後もverbose状態を維持
-        logger2.setManager({ defaultLogger: vi.fn() });
+        logger2.setLoggerConfig({ defaultLogger: vi.fn() });
         expect(logger1.isVerbose).toBe(true);
       });
     });
@@ -698,8 +698,9 @@ describe('AgLogger Integration Tests', () => {
             return result;
           } catch {
             // フォールバック処理
-            return `${logMessage.timestamp ?? new Date().toISOString()} [${logMessage.level ?? 'UNKNOWN'}] ${logMessage.message ?? ''
-              }`;
+            return `${logMessage.timestamp ?? new Date().toISOString()} [${logMessage.level ?? 'UNKNOWN'}] ${
+              logMessage.message ?? ''
+            }`;
           }
         });
 
@@ -756,8 +757,9 @@ describe('AgLogger Integration Tests', () => {
             }
           };
 
-          return `${logMessage.timestamp} [${logMessage.level}] ${logMessage.message} ${safeStringify(logMessage.args)
-            }`;
+          return `${logMessage.timestamp} [${logMessage.level}] ${logMessage.message} ${
+            safeStringify(logMessage.args)
+          }`;
         });
 
         const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: safeFormatter });

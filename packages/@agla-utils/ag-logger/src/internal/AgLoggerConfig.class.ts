@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // utilities
-import { isValidLogLevel } from '../utils/AgLogLevelHelpers';
+import { isValidLogLevel } from '../utils/AgLogValidators';
 
 // types
 import type { AgLoggerMap, AgLogLevel } from '../../shared/types';
@@ -90,6 +90,7 @@ export class AgLoggerConfig {
   private clearLoggerMap(): void {
     this._loggerMap.clear();
     this._loggerMap.set(AG_LOGLEVEL.VERBOSE, NullLogger);
+    this._loggerMap.set(AG_LOGLEVEL.FORCE_OUTPUT, NullLogger);
     this._loggerMap.set(AG_LOGLEVEL.OFF, NullLogger);
     this._loggerMap.set(AG_LOGLEVEL.FATAL, NullLogger);
     this._loggerMap.set(AG_LOGLEVEL.ERROR, NullLogger);
@@ -151,14 +152,14 @@ export class AgLoggerConfig {
   /**
    * Sets the formatter function.
    * @param formatter - The formatter function to set
-  */
+   */
   protected set formatter(formatter: AgFormatFunction) {
     this._options.formatter = formatter;
   }
 
   /**
-     * getter for Verbose
-     */
+   * getter for Verbose
+   */
   public get isVerbose(): boolean {
     return this._options.verbose;
   }
@@ -170,8 +171,6 @@ export class AgLoggerConfig {
     this._options.verbose = value;
   }
 
-
-
   /**
    *  getter for logLevel
    *  @return logLevel
@@ -182,7 +181,7 @@ export class AgLoggerConfig {
 
   /**
    *  setter for logLevel
-   *  @return logLevel
+   *  @param level - The log level to set
    */
   public set logLevel(level: AgLogLevel) {
     if (!isValidLogLevel(level)) {
@@ -220,16 +219,16 @@ export class AgLoggerConfig {
    * @since 0.2.0
    */
   public shouldOutput(level: AgLogLevel): boolean {
+    if (!isValidLogLevel(level)) {
+      return false;
+    }
+
     if (level === AG_LOGLEVEL.FORCE_OUTPUT) {
       return true;
     }
 
     if (level === AG_LOGLEVEL.VERBOSE) {
       return this.isVerbose;
-    }
-
-    if (!isValidLogLevel(level)) {
-      return false;
     }
 
     // When log level is OFF, no output should be generated

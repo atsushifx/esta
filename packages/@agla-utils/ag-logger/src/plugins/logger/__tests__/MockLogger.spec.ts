@@ -11,12 +11,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 // import test target
 import { AG_LOGLEVEL } from '../../../../shared/types';
-import type { AG_LABEL_TO_LOGLEVEL_MAP, AgLogLevel, AgLogMessage } from '../../../../shared/types';
+import type { AgFormattedLogMessage, AgLogLevel, AgLogMessage } from '../../../../shared/types';
 import { MockLogger } from '../MockLogger';
-
-// Type definitions derived from log level constants
-type TLogLevelLabels = keyof typeof AG_LABEL_TO_LOGLEVEL_MAP;
-type TMockLoggerMethods = Lowercase<Exclude<TLogLevelLabels, 'OFF'>>;
 
 /**
  * MockLoggerプラグインの包括的ユニットテストスイート
@@ -52,16 +48,16 @@ describe('MockLogger', () => {
     describe('Log Message Capture', () => {
       it('should capture messages for all log levels', () => {
         const testCases = [
-          { level: AG_LOGLEVEL.FATAL, method: 'fatal', message: 'fatal error' },
-          { level: AG_LOGLEVEL.ERROR, method: 'error', message: 'error message' },
-          { level: AG_LOGLEVEL.WARN, method: 'warn', message: 'warning message' },
-          { level: AG_LOGLEVEL.INFO, method: 'info', message: 'info message' },
-          { level: AG_LOGLEVEL.DEBUG, method: 'debug', message: 'debug message' },
-          { level: AG_LOGLEVEL.TRACE, method: 'trace', message: 'trace message' },
+          { level: AG_LOGLEVEL.FATAL, method: (msg: string) => mockLogger.fatal(msg), message: 'fatal error' },
+          { level: AG_LOGLEVEL.ERROR, method: (msg: string) => mockLogger.error(msg), message: 'error message' },
+          { level: AG_LOGLEVEL.WARN, method: (msg: string) => mockLogger.warn(msg), message: 'warning message' },
+          { level: AG_LOGLEVEL.INFO, method: (msg: string) => mockLogger.info(msg), message: 'info message' },
+          { level: AG_LOGLEVEL.DEBUG, method: (msg: string) => mockLogger.debug(msg), message: 'debug message' },
+          { level: AG_LOGLEVEL.TRACE, method: (msg: string) => mockLogger.trace(msg), message: 'trace message' },
         ];
 
         testCases.forEach(({ level, method, message }) => {
-          (mockLogger[method as TMockLoggerMethods] as (msg: string) => void)(message);
+          method(message);
           expect(mockLogger.getMessages(level)).toEqual([message]);
           mockLogger.clearMessages(level);
         });
@@ -119,18 +115,22 @@ describe('MockLogger', () => {
 
         // Act & Assert
         const testCases = [
-          { method: 'fatal', level: AG_LOGLEVEL.FATAL },
-          { method: 'error', level: AG_LOGLEVEL.ERROR },
-          { method: 'warn', level: AG_LOGLEVEL.WARN },
-          { method: 'info', level: AG_LOGLEVEL.INFO },
-          { method: 'debug', level: AG_LOGLEVEL.DEBUG },
-          { method: 'trace', level: AG_LOGLEVEL.TRACE },
-          { method: 'verbose', level: AG_LOGLEVEL.VERBOSE }, // verbose stores in VERBOSE
+          { method: (msg: AgFormattedLogMessage) => mockLogger.fatal(msg), name: 'fatal', level: AG_LOGLEVEL.FATAL },
+          { method: (msg: AgFormattedLogMessage) => mockLogger.error(msg), name: 'error', level: AG_LOGLEVEL.ERROR },
+          { method: (msg: AgFormattedLogMessage) => mockLogger.warn(msg), name: 'warn', level: AG_LOGLEVEL.WARN },
+          { method: (msg: AgFormattedLogMessage) => mockLogger.info(msg), name: 'info', level: AG_LOGLEVEL.INFO },
+          { method: (msg: AgFormattedLogMessage) => mockLogger.debug(msg), name: 'debug', level: AG_LOGLEVEL.DEBUG },
+          { method: (msg: AgFormattedLogMessage) => mockLogger.trace(msg), name: 'trace', level: AG_LOGLEVEL.TRACE },
+          {
+            method: (msg: AgFormattedLogMessage) => mockLogger.verbose(msg),
+            name: 'verbose',
+            level: AG_LOGLEVEL.VERBOSE,
+          },
         ];
 
-        testCases.forEach(({ method, level }) => {
-          const logMessage = createLogMessage(level, `${method} structured message`);
-          (mockLogger[method as TMockLoggerMethods] as (msg: AgLogMessage) => void)(logMessage);
+        testCases.forEach(({ method, name, level }) => {
+          const logMessage = createLogMessage(level, `${name} structured message`);
+          method(logMessage);
           expect(mockLogger.getMessages(level)).toContain(logMessage);
           mockLogger.clearMessages(level);
         });
@@ -327,9 +327,9 @@ describe('MockLogger', () => {
       });
 
       it('should throw error for invalid negative numbers near VERBOSE range with exact format', () => {
-        const nearVerboseLevel = -98 as unknown as AgLogLevel;
+        const nearVerboseLevel = -97 as unknown as AgLogLevel;
         expect(() => mockLogger.getMessages(nearVerboseLevel))
-          .toThrow('MockLogger: Invalid log level: -98');
+          .toThrow(`MockLogger: Invalid log level: ${nearVerboseLevel}`);
       });
 
       it('should throw error for decimal numbers with exact format', () => {

@@ -91,37 +91,42 @@ export class E2eMockLogger {
   // Logger methods
   fatal(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
-    mockLogger.fatal(message);
+    mockLogger.executeLog(AG_LOGLEVEL.FATAL, message);
   }
 
   error(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
-    mockLogger.error(message);
+    mockLogger.executeLog(AG_LOGLEVEL.ERROR, message);
   }
 
   warn(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
-    mockLogger.warn(message);
+    mockLogger.executeLog(AG_LOGLEVEL.WARN, message);
   }
 
   info(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
-    mockLogger.info(message);
+    mockLogger.executeLog(AG_LOGLEVEL.INFO, message);
   }
 
   debug(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
-    mockLogger.debug(message);
+    mockLogger.executeLog(AG_LOGLEVEL.DEBUG, message);
   }
 
   trace(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
-    mockLogger.trace(message);
+    mockLogger.executeLog(AG_LOGLEVEL.TRACE, message);
   }
 
   verbose(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
-    mockLogger.verbose(message);
+    mockLogger.executeLog(AG_LOGLEVEL.VERBOSE, message);
+  }
+
+  log(message: AgFormattedLogMessage): void {
+    const mockLogger = this.getCurrentMockLogger();
+    mockLogger.executeLog(AG_LOGLEVEL.FORCE_OUTPUT, message);
   }
 
   /**
@@ -190,7 +195,6 @@ export class E2eMockLogger {
    */
   createLoggerMap(): AgLoggerMap {
     return {
-      [AG_LOGLEVEL.VERBOSE]: (message: AgFormattedLogMessage) => this.verbose(message),
       [AG_LOGLEVEL.OFF]: () => {},
       [AG_LOGLEVEL.FATAL]: (message: AgFormattedLogMessage) => this.fatal(message),
       [AG_LOGLEVEL.ERROR]: (message: AgFormattedLogMessage) => this.error(message),
@@ -198,6 +202,9 @@ export class E2eMockLogger {
       [AG_LOGLEVEL.INFO]: (message: AgFormattedLogMessage) => this.info(message),
       [AG_LOGLEVEL.DEBUG]: (message: AgFormattedLogMessage) => this.debug(message),
       [AG_LOGLEVEL.TRACE]: (message: AgFormattedLogMessage) => this.trace(message),
+      // logger for special log level
+      [AG_LOGLEVEL.VERBOSE]: (message: AgFormattedLogMessage) => this.verbose(message),
+      [AG_LOGLEVEL.FORCE_OUTPUT]: (message: AgFormattedLogMessage) => this.log(message),
     };
   }
 }

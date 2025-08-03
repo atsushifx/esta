@@ -70,7 +70,7 @@ describe('Plugin Interaction Integration Tests', () => {
   describe('Logger-Formatter Combinations', () => {
     it('should work correctly with ConsoleLogger and JsonFormatter', () => {
       setupTestContext();
-      const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => { });
+      const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
       const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -93,7 +93,7 @@ describe('Plugin Interaction Integration Tests', () => {
 
     it('should work correctly with ConsoleLogger and PlainFormatter', () => {
       setupTestContext();
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
       const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
       logger.logLevel = AG_LOGLEVEL.WARN;
@@ -186,11 +186,11 @@ describe('Plugin Interaction Integration Tests', () => {
     it('should use correct console methods with JsonFormatter', () => {
       setupTestContext();
       const consoleSpies = {
-        error: vi.spyOn(console, 'error').mockImplementation(() => { }),
-        warn: vi.spyOn(console, 'warn').mockImplementation(() => { }),
-        info: vi.spyOn(console, 'info').mockImplementation(() => { }),
-        debug: vi.spyOn(console, 'debug').mockImplementation(() => { }),
-        log: vi.spyOn(console, 'log').mockImplementation(() => { }),
+        error: vi.spyOn(console, 'error').mockImplementation(() => {}),
+        warn: vi.spyOn(console, 'warn').mockImplementation(() => {}),
+        info: vi.spyOn(console, 'info').mockImplementation(() => {}),
+        debug: vi.spyOn(console, 'debug').mockImplementation(() => {}),
+        log: vi.spyOn(console, 'log').mockImplementation(() => {}),
       };
 
       const logger = createLogger({
@@ -228,11 +228,11 @@ describe('Plugin Interaction Integration Tests', () => {
     it('should use correct console methods with PlainFormatter', () => {
       setupTestContext();
       const consoleSpies = {
-        error: vi.spyOn(console, 'error').mockImplementation(() => { }),
-        warn: vi.spyOn(console, 'warn').mockImplementation(() => { }),
-        info: vi.spyOn(console, 'info').mockImplementation(() => { }),
-        debug: vi.spyOn(console, 'debug').mockImplementation(() => { }),
-        log: vi.spyOn(console, 'log').mockImplementation(() => { }),
+        error: vi.spyOn(console, 'error').mockImplementation(() => {}),
+        warn: vi.spyOn(console, 'warn').mockImplementation(() => {}),
+        info: vi.spyOn(console, 'info').mockImplementation(() => {}),
+        debug: vi.spyOn(console, 'debug').mockImplementation(() => {}),
+        log: vi.spyOn(console, 'log').mockImplementation(() => {}),
       };
 
       const logger = createLogger({

@@ -34,6 +34,9 @@ export const ConsoleLoggerMap: AgLoggerMap = {
   [AG_LOGLEVEL.VERBOSE]: (formattedMessage: AgFormattedLogMessage) => {
     console.debug(formattedMessage);
   },
+  [AG_LOGLEVEL.FORCE_OUTPUT]: (formattedMessage: AgFormattedLogMessage) => {
+    console.log(formattedMessage);
+  },
   [AG_LOGLEVEL.OFF]: NullLogger,
   [AG_LOGLEVEL.FATAL]: (formattedMessage: AgFormattedLogMessage) => {
     console.error(formattedMessage);

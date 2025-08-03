@@ -274,9 +274,9 @@ describe('AgLogger E2E Tests - Plain Format with Console Logger', () => {
 
         logger.log('General log message');
 
-        expect(mockConsole.info).toHaveBeenCalledTimes(1);
-        const [logOutput] = mockConsole.info.mock.calls[0];
-        expect(logOutput).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z \[INFO\] General log message$/);
+        expect(mockConsole.log).toHaveBeenCalledTimes(1);
+        const [logOutput] = mockConsole.log.mock.calls[0];
+        expect(logOutput).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z General log message$/);
       });
     });
   });

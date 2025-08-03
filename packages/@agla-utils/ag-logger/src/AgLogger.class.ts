@@ -11,7 +11,7 @@ import { AG_LOGLEVEL } from '../shared/types';
 import type { AgLogLevel } from '../shared/types';
 import { AgLoggerError } from '../shared/types/AgLoggerError.types';
 // interfaces
-import type { AgLoggerOptions } from '../shared/types/AgLogger.interface';
+import type { AgLoggerFunction, AgLoggerOptions } from '../shared/types/AgLogger.interface';
 // constants
 import { AG_LOGGER_ERROR_CATEGORIES } from '../shared/constants/agLoggerError.constants';
 
@@ -21,6 +21,7 @@ import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
 import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
+import { validateLogLevel } from './utils/AgLogValidators';
 
 /**
  * Abstract logger class providing singleton instance management,
@@ -33,6 +34,16 @@ export class AgLogger {
 
   protected constructor() {
     this._config = new AgLoggerConfig();
+
+    // Bind methods to ensure proper 'this' context when methods are extracted
+    this.fatal = this.fatal.bind(this);
+    this.error = this.error.bind(this);
+    this.warn = this.warn.bind(this);
+    this.info = this.info.bind(this);
+    this.debug = this.debug.bind(this);
+    this.trace = this.trace.bind(this);
+    this.log = this.log.bind(this);
+    this.verbose = this.verbose.bind(this);
   }
 
   /**
@@ -53,24 +64,36 @@ export class AgLogger {
     return instance;
   }
 
+  /**
+   * Returns the singleton instance of AgLogger without configuration.
+   * Simply returns the existing instance.
+   *
+   * @returns The singleton AgLogger instance.
+   * @throws AgLoggerError when instance not created
+   */
   static getLogger(): AgLogger {
-    if (AgLogger._instance === undefined) {
-      throw new AgLoggerError(AG_LOGGER_ERROR_CATEGORIES.INITIALIZE_ERROR, 'Logger instance not created. Call createLogger() first.');
+    if (!this._instance) {
+      throw new AgLoggerError(
+        AG_LOGGER_ERROR_CATEGORIES.INITIALIZE_ERROR,
+        'Logger instance not created. Call createLogger() first.',
+      );
     }
-    return AgLogger._instance;
+    return this._instance;
   }
 
   /**
-   * Checks if a given log level passes the configured log level filter.
+   * Configures the logger manager with the specified options.
+   * If ConsoleLogger is specified without a logger map,
+   * ConsoleLoggerMap will be automatically applied.
    *
-   * @param level - Log level to check.
-   * @returns True if the level should be logged; otherwise false.
+   * @param options - Configuration options for the logger.
    */
-  private shouldOutput(level: AgLogLevel): boolean {
-    if (this.logLevel === AG_LOGLEVEL.OFF) {
-      return false;
+  public setLoggerConfig(options: AgLoggerOptions): void {
+    const enhancedOptions = { ...options };
+    if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
+      enhancedOptions.loggerMap = ConsoleLoggerMap;
     }
-    return (level <= this.logLevel);
+    this._config.setLoggerConfig(enhancedOptions);
   }
 
   /**
@@ -87,7 +110,6 @@ export class AgLogger {
     this._config.setVerbose = value;
   }
 
-
   /**
    * Gets the current log level.
    * @returns The current log level
@@ -96,8 +118,28 @@ export class AgLogger {
     return this._config.logLevel;
   }
 
-  public set logLevel(level: AgLogLevel) {
-    this._config.logLevel = level;
+  set logLevel(value: AgLogLevel) {
+    validateLogLevel(value);
+    this._config.logLevel = value;
+  }
+
+  /**
+   * Checks if a given log level passes the configured log level filter.
+   *
+   * @param level - Log level to check.
+   * @returns True if the level should be logged; otherwise false.
+   */
+  protected shouldOutput(level: AgLogLevel): boolean {
+    return this._config.shouldOutput(level);
+  }
+
+  public getLoggerFunction(level: AgLogLevel): AgLoggerFunction {
+    return this._config.getLoggerFunction(level);
+  }
+
+  public setLogger(level: AgLogLevel, logger: AgLoggerFunction): boolean {
+    validateLogLevel(level);
+    return this._config.setLogger(level, logger);
   }
 
   /**
@@ -118,7 +160,7 @@ export class AgLogger {
     }
 
     const logMessage = AgLoggerGetMessage(level, ...args);
-    const formatter = this._config.formatter
+    const formatter = this._config.formatter;
     const formattedMessage = formatter(logMessage);
 
     // Only block logging if the formatter explicitly returns empty string
@@ -127,24 +169,8 @@ export class AgLogger {
       return;
     }
 
-    const logger = this._config.getLoggerFunction(level);
+    const logger = this.getLoggerFunction(level);
     logger(formattedMessage);
-  }
-
-
-  /**
-   * Configures the logger manager with the specified options.
-   * If ConsoleLogger is specified without a logger map,
-   * ConsoleLoggerMap will be automatically applied.
-   *
-   * @param options - Configuration options for the logger.
-   */
-  setLoggerConfig(options: AgLoggerOptions): void {
-    const enhancedOptions = { ...options };
-    if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
-      enhancedOptions.loggerMap = ConsoleLoggerMap;
-    }
-    this._config.setLoggerConfig(enhancedOptions);
   }
 
   /** Logs a message at FATAL level. */
@@ -177,15 +203,15 @@ export class AgLogger {
     this.executeLog(AG_LOGLEVEL.TRACE, ...args);
   }
 
-  /** General log method logging at INFO level. */
+  /** General log method that always outputs (FORCE_OUTPUT level). */
   log(...args: unknown[]): void {
-    this.executeLog(AG_LOGLEVEL.INFO, ...args);
+    this.executeLog(AG_LOGLEVEL.FORCE_OUTPUT, ...args);
   }
 
   /** Verbose log method that only outputs when verbose flag is true. */
   verbose(...args: unknown[]): void {
-    if (this._config.isVerbose) {
-      this.log(...args);
+    if (this.isVerbose) {
+      this.executeLog(AG_LOGLEVEL.VERBOSE, ...args);
     }
   }
 

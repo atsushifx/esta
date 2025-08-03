@@ -11,7 +11,8 @@ import { describe, expect, it } from 'vitest';
 // Import helper functions
 import { AG_LOGLEVEL } from '../../../shared/types';
 import type { AgLogLevel } from '../../../shared/types';
-import { AgToLabel, isValidLogLevel } from '../AgLogLevelHelpers';
+import { AgToLabel } from '../AgLogLevelHelpers';
+import { isValidLogLevel } from '../AgLogValidators';
 
 describe('LogLevel Helper Functions', () => {
   describe('AgToLabel function', () => {
@@ -26,6 +27,10 @@ describe('LogLevel Helper Functions', () => {
       expect(AgToLabel(AG_LOGLEVEL.VERBOSE)).toBe('VERBOSE');
     });
 
+    it("should return '' in special value force output", () => {
+      expect(AgToLabel(AG_LOGLEVEL.FORCE_OUTPUT)).toBe('');
+    });
+
     it("should return '' for invalid log levels", () => {
       expect(AgToLabel(-1 as AgLogLevel)).toBe('');
       expect(AgToLabel(99 as AgLogLevel)).toBe('');
@@ -34,19 +39,27 @@ describe('LogLevel Helper Functions', () => {
     });
 
     it('should return consistent format', () => {
-      // All returned strings should be uppercase
+      // All returned strings should be uppercase (except FORCE_OUTPUT which returns empty string)
       Object.values(AG_LOGLEVEL).forEach((level) => {
         const label = AgToLabel(level);
         expect(label).toBe(label.toUpperCase());
-        expect(label).toMatch(/^[A-Z]+$/);
+        if (level !== AG_LOGLEVEL.FORCE_OUTPUT) {
+          expect(label).toMatch(/^[A-Z_]+$/);
+        } else {
+          expect(label).toBe('');
+        }
       });
     });
 
     it('should handle all AG_LOGLEVEL values', () => {
-      // Test all known log level values
+      // Test all known log level values (except FORCE_OUTPUT which returns empty string)
       Object.entries(AG_LOGLEVEL).forEach(([key, value]) => {
         const stringLabel = AgToLabel(value);
-        expect(stringLabel).toBe(key);
+        if (key === 'FORCE_OUTPUT') {
+          expect(stringLabel).toBe('');
+        } else {
+          expect(stringLabel).toBe(key);
+        }
       });
     });
 
@@ -151,7 +164,7 @@ describe('LogLevel Helper Functions', () => {
     describe('エッジケース (Edge cases with numbers)', () => {
       it('should return false for out-of-range negative numbers', () => {
         expect(isValidLogLevel(-1 as AgLogLevel)).toBe(false);
-        expect(isValidLogLevel(-98 as AgLogLevel)).toBe(false);
+        expect(isValidLogLevel(-97 as AgLogLevel)).toBe(false);
         expect(isValidLogLevel(-100 as AgLogLevel)).toBe(false);
         expect(isValidLogLevel(-1000 as AgLogLevel)).toBe(false);
       });

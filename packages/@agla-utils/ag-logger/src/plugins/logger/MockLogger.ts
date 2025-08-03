@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // libs
-import { isValidLogLevel } from '@/utils/AgLogLevelHelpers';
+import { isValidLogLevel } from '@/utils/AgLogValidators';
 // constants
 import { AG_LOGLEVEL, AG_LOGLEVEL_KEYS } from '../../../shared/types';
 // types
@@ -33,7 +33,7 @@ import type {
  */
 export class MockLogger {
   private messages: Map<AgLogLevel, AgFormattedLogMessage[]> = new Map([
-    [AG_LOGLEVEL.VERBOSE, []], // VERBOSE (-99)
+    // buffer for standard log levels
     [AG_LOGLEVEL.OFF, []], // OFF (0) - not used for actual logging
     [AG_LOGLEVEL.FATAL, []], // FATAL (1)
     [AG_LOGLEVEL.ERROR, []], // ERROR (2)
@@ -41,19 +41,10 @@ export class MockLogger {
     [AG_LOGLEVEL.INFO, []], // INFO (4)
     [AG_LOGLEVEL.DEBUG, []], // DEBUG (5)
     [AG_LOGLEVEL.TRACE, []], // TRACE (6)
+    // buffer for special log levels
+    [AG_LOGLEVEL.VERBOSE, []], // VERBOSE (-99)
+    [AG_LOGLEVEL.FORCE_OUTPUT, []], // FORCE_OUTPUT (-98)
   ]);
-
-  /**
-   * Deep clone a message to ensure immutability.
-   * @param message - The message to clone
-   * @returns Deep clone of the message
-   */
-  private deepClone(message: AgFormattedLogMessage): AgFormattedLogMessage {
-    if (typeof message === 'string' || typeof message === 'number' || message === null || message === undefined) {
-      return message;
-    }
-    return JSON.parse(JSON.stringify(message));
-  }
 
   /**
    * Validates if the provided log level is valid.
@@ -67,32 +58,40 @@ export class MockLogger {
   }
 
   // Logger methods
+  public executeLog(level: AgLogLevel, message: AgFormattedLogMessage): void {
+    this.messages.get(level)!.push(message);
+  }
+
   fatal(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.FATAL)!.push(message);
+    this.executeLog(AG_LOGLEVEL.FATAL, message);
   }
 
   error(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.ERROR)!.push(message);
+    this.executeLog(AG_LOGLEVEL.ERROR, message);
   }
 
   warn(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.WARN)!.push(message);
+    this.executeLog(AG_LOGLEVEL.WARN, message);
   }
 
   info(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.INFO)!.push(message);
+    this.executeLog(AG_LOGLEVEL.INFO, message);
   }
 
   debug(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.DEBUG)!.push(message);
+    this.executeLog(AG_LOGLEVEL.DEBUG, message);
   }
 
   trace(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.TRACE)!.push(message);
+    this.executeLog(AG_LOGLEVEL.TRACE, message);
   }
 
   verbose(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.VERBOSE)!.push(message);
+    this.executeLog(AG_LOGLEVEL.VERBOSE, message);
+  }
+
+  log(message: AgFormattedLogMessage): void {
+    this.executeLog(AG_LOGLEVEL.FORCE_OUTPUT, message);
   }
 
   // Query methods
@@ -121,6 +120,7 @@ export class MockLogger {
 
   clearAllMessages(): void {
     this.messages.set(AG_LOGLEVEL.VERBOSE, []);
+    this.messages.set(AG_LOGLEVEL.FORCE_OUTPUT, []);
     this.messages.set(AG_LOGLEVEL.OFF, []);
     this.messages.set(AG_LOGLEVEL.FATAL, []);
     this.messages.set(AG_LOGLEVEL.ERROR, []);
@@ -172,7 +172,6 @@ export class MockLogger {
    */
   createLoggerMap(): AgLoggerMap {
     return {
-      [AG_LOGLEVEL.VERBOSE]: (message: string | AgLogMessage) => this.verbose(message),
       [AG_LOGLEVEL.OFF]: () => {}, // No-op for OFF level
       [AG_LOGLEVEL.FATAL]: (message: string | AgLogMessage) => this.fatal(message),
       [AG_LOGLEVEL.ERROR]: (message: string | AgLogMessage) => this.error(message),
@@ -180,6 +179,9 @@ export class MockLogger {
       [AG_LOGLEVEL.INFO]: (message: string | AgLogMessage) => this.info(message),
       [AG_LOGLEVEL.DEBUG]: (message: string | AgLogMessage) => this.debug(message),
       [AG_LOGLEVEL.TRACE]: (message: string | AgLogMessage) => this.trace(message),
+      // special log
+      [AG_LOGLEVEL.VERBOSE]: (message: string | AgLogMessage) => this.verbose(message),
+      [AG_LOGLEVEL.FORCE_OUTPUT]: (message: string | AgLogMessage) => this.log(message),
     };
   }
 }

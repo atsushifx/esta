@@ -178,7 +178,7 @@ describe('AgLoggerConfig', () => {
 
     it('should return true when verbose is enabled', () => {
       const config = new AgLoggerConfig();
-      config.setVerbose(true);
+      config.setVerbose = ENABLE;
       expect(config.isVerbose).toBe(true);
     });
   });
@@ -344,7 +344,7 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Create a test logger function
-    const testLogger = (_message: string | AgLogMessage): void => {/* test logger */ };
+    const testLogger = (_message: string | AgLogMessage): void => {/* test logger */};
 
     // Apply configuration with defaultLogger
     const options: AgLoggerOptions = {
@@ -402,7 +402,7 @@ describe('AgLoggerConfig', () => {
 
   it('should have setLogger method that can be called', () => {
     const config = new AgLoggerConfig();
-    const testLogger = (_message: string | AgLogMessage): void => {/* test logger */ };
+    const testLogger = (_message: string | AgLogMessage): void => {/* test logger */};
 
     // Test that setLogger method exists and can be called
     expect(typeof config.setLogger).toBe('function');
@@ -415,7 +415,7 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Create test logger
-    const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */ };
+    const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */};
 
     // Verify initial state is NullLogger
     expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(NullLogger);
@@ -433,9 +433,9 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Create test loggers
-    const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */ };
-    const testWarnLogger = (_message: string | AgLogMessage): void => {/* test warn logger */ };
-    const testInfoLogger = (_message: string | AgLogMessage): void => {/* test info logger */ };
+    const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */};
+    const testWarnLogger = (_message: string | AgLogMessage): void => {/* test warn logger */};
+    const testInfoLogger = (_message: string | AgLogMessage): void => {/* test info logger */};
 
     // Verify initial state
     expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(NullLogger);
@@ -459,8 +459,8 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Create test loggers
-    const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */ };
-    const testWarnLogger = (_message: string | AgLogMessage): void => {/* test warn logger */ };
+    const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */};
+    const testWarnLogger = (_message: string | AgLogMessage): void => {/* test warn logger */};
 
     // Verify initial state
     expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(NullLogger);
@@ -486,8 +486,8 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Create test loggers
-    const testDefaultLogger = (_message: string | AgLogMessage): void => {/* test default logger */ };
-    const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */ };
+    const testDefaultLogger = (_message: string | AgLogMessage): void => {/* test default logger */};
+    const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */};
 
     // Set a default logger via setLoggerConfig - this initializes all loggerMap entries
     const options: AgLoggerOptions = {
@@ -513,8 +513,8 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Create test loggers
-    const testDefaultLogger = (_message: string | AgLogMessage): void => {/* test default logger */ };
-    const testSpecificLogger = (_message: string | AgLogMessage): void => {/* test specific logger */ };
+    const testDefaultLogger = (_message: string | AgLogMessage): void => {/* test default logger */};
+    const testSpecificLogger = (_message: string | AgLogMessage): void => {/* test specific logger */};
 
     // Set defaultLogger via setLoggerConfig which initializes all levels
     const options: AgLoggerOptions = {
@@ -541,8 +541,8 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Create test loggers
-    const testDefaultLogger1 = (_message: string | AgLogMessage): void => {/* test default logger 1 */ };
-    const testDefaultLogger2 = (_message: string | AgLogMessage): void => {/* test default logger 2 */ };
+    const testDefaultLogger1 = (_message: string | AgLogMessage): void => {/* test default logger 1 */};
+    const testDefaultLogger2 = (_message: string | AgLogMessage): void => {/* test default logger 2 */};
 
     // Set first defaultLogger
     const options1: AgLoggerOptions = {
@@ -571,9 +571,9 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Create test loggers
-    const testDefaultLogger = (_message: string | AgLogMessage): void => {/* test default logger */ };
-    const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */ };
-    const testWarnLogger = (_message: string | AgLogMessage): void => {/* test warn logger */ };
+    const testDefaultLogger = (_message: string | AgLogMessage): void => {/* test default logger */};
+    const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */};
+    const testWarnLogger = (_message: string | AgLogMessage): void => {/* test warn logger */};
 
     // Apply configuration with both defaultLogger and loggerMap
     const options: AgLoggerOptions = {
@@ -599,7 +599,7 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Create test logger
-    const testDefaultLogger = (_message: string | AgLogMessage): void => {/* test default logger */ };
+    const testDefaultLogger = (_message: string | AgLogMessage): void => {/* test default logger */};
 
     // Set defaultLogger
     const options: AgLoggerOptions = {
@@ -618,8 +618,8 @@ describe('AgLoggerConfig', () => {
     const config = new AgLoggerConfig();
 
     // Create test loggers
-    const testDefaultLogger = (_message: string | AgLogMessage): void => {/* test default logger */ };
-    const testSpecificLogger = (_message: string | AgLogMessage): void => {/* test specific logger */ };
+    const testDefaultLogger = (_message: string | AgLogMessage): void => {/* test default logger */};
+    const testSpecificLogger = (_message: string | AgLogMessage): void => {/* test specific logger */};
 
     // Set defaultLogger and specific logger for ERROR level
     const options: AgLoggerOptions = {
@@ -685,7 +685,7 @@ describe('AgLoggerConfig', () => {
   describe('setLogger()', () => {
     it('should set logger function for specified log level', () => {
       const config = new AgLoggerConfig();
-      const testLogger = (_message: string | AgLogMessage): void => {/* test logger */ };
+      const testLogger = (_message: string | AgLogMessage): void => {/* test logger */};
 
       config.setLogger(AG_LOGLEVEL.ERROR, testLogger);
       expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(testLogger);
@@ -693,8 +693,8 @@ describe('AgLoggerConfig', () => {
 
     it('should set different logger functions for different levels', () => {
       const config = new AgLoggerConfig();
-      const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */ };
-      const testWarnLogger = (_message: string | AgLogMessage): void => {/* test warn logger */ };
+      const testErrorLogger = (_message: string | AgLogMessage): void => {/* test error logger */};
+      const testWarnLogger = (_message: string | AgLogMessage): void => {/* test warn logger */};
 
       config.setLogger(AG_LOGLEVEL.ERROR, testErrorLogger);
       config.setLogger(AG_LOGLEVEL.WARN, testWarnLogger);
@@ -707,7 +707,7 @@ describe('AgLoggerConfig', () => {
 
     it('should return false for invalid log levels', () => {
       const config = new AgLoggerConfig();
-      const testLogger = (_message: string | AgLogMessage): void => {/* test logger */ };
+      const testLogger = (_message: string | AgLogMessage): void => {/* test logger */};
 
       expect(config.setLogger(999 as AgLogLevel, testLogger)).toBe(false);
       expect(config.setLogger(-1 as AgLogLevel, testLogger)).toBe(false);
@@ -718,7 +718,7 @@ describe('AgLoggerConfig', () => {
 
     it('should return true for valid log levels', () => {
       const config = new AgLoggerConfig();
-      const testLogger = (_message: string | AgLogMessage): void => {/* test logger */ };
+      const testLogger = (_message: string | AgLogMessage): void => {/* test logger */};
 
       expect(config.setLogger(AG_LOGLEVEL.ERROR, testLogger)).toBe(true);
       expect(config.setLogger(AG_LOGLEVEL.WARN, testLogger)).toBe(true);
@@ -727,7 +727,7 @@ describe('AgLoggerConfig', () => {
 
     it('should not modify logger map when invalid log level is provided', () => {
       const config = new AgLoggerConfig();
-      const testLogger = (_message: string | AgLogMessage): void => {/* test logger */ };
+      const testLogger = (_message: string | AgLogMessage): void => {/* test logger */};
       const originalLoggerFunction = config.getLoggerFunction(AG_LOGLEVEL.ERROR);
 
       // Attempt to set logger with invalid level
@@ -739,8 +739,8 @@ describe('AgLoggerConfig', () => {
 
     it('should allow overwriting existing logger for same level', () => {
       const config = new AgLoggerConfig();
-      const firstLogger = (_message: string | AgLogMessage): void => {/* first logger */ };
-      const secondLogger = (_message: string | AgLogMessage): void => {/* second logger */ };
+      const firstLogger = (_message: string | AgLogMessage): void => {/* first logger */};
+      const secondLogger = (_message: string | AgLogMessage): void => {/* second logger */};
 
       config.setLogger(AG_LOGLEVEL.ERROR, firstLogger);
       expect(config.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(firstLogger);

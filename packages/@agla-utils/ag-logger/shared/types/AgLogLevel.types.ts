@@ -6,8 +6,6 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { findSourceMap } from "module";
-
 /**
  * Core log level numeric constants with Ag prefix.
  * Based on AWS CloudWatch Logs convention.
