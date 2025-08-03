@@ -11,8 +11,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 // ログレベル定数 - E2Eテストで使用するログレベル定義
 import { AG_LOGLEVEL } from '../../shared/types';
-// テスト対象 - getLogger関数（ロガー取得のエントリーポイント）
-import { getLogger } from '@/AgLogger.class';
+// テスト対象 - createLogger関数（ロガー作成のエントリーポイント）
+import { createLogger } from '@/AgLogger.class';
+// テスト対象 - createLogger関数（ロガー作成のエントリーポイント）
+import { createLogger } from '@/AgLogger.class';
 
 // --- types ---
 import type { AG_LABEL_TO_LOGLEVEL_MAP } from '../../shared/types';
@@ -216,7 +218,7 @@ describe('AgLogger E2E Tests - JSON Format with Console Logger', () => {
     describe('正常系: Basic Filtering Operations', () => {
       it('should filter logs based on current level with JSON output', () => {
         setupTestContext();
-        const logger = getLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
+        const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
 
         // INFO レベルに設定
         logger.setLogLevel(AG_LOGLEVEL.INFO);

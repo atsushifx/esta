@@ -32,6 +32,37 @@ export const AG_LOGGER_ERROR_CATEGORIES = {
   INVALID_LOGGER: 'AG_LOGGER_INVALID_LOGGER',
   /** Invalid configuration options. Used when configuration object contains invalid or incompatible options. */
   INVALID_CONFIG: 'AG_LOGGER_INVALID_CONFIG',
+  /** Logger initialization error. Used when trying to get logger instance before creating it. */
+  INITIALIZE_ERROR: 'AG_LOGGER_INITIALIZE_ERROR',
+} as const;
+
+/**
+ * Error messages for AgLogger validation errors.
+ * These constants provide consistent error messages throughout the AgLogger system.
+ * Each message describes a specific validation failure scenario.
+ *
+ * @example
+ * ```typescript
+ * import { AG_LOGGER_ERROR_MESSAGES } from './agLoggerError.constants';
+ *
+ * // Usage in validation
+ * throw new AgLoggerError(
+ *   AG_LOGGER_ERROR_CATEGORIES.INVALID_CONFIGURATION,
+ *   AG_LOGGER_ERROR_MESSAGES.INVALID_FORMATTER
+ * );
+ * ```
+ */
+export const AG_LOGGER_ERROR_MESSAGES = {
+  /** Message when formatter is null, undefined, or not a function */
+  INVALID_FORMATTER: 'formatter must be a valid function',
+  /** Message when defaultLogger is null, undefined, or not a function */
+  INVALID_DEFAULT_LOGGER: 'defaultLogger must be a valid function',
+  /** Message when configuration object is null */
+  NULL_CONFIGURATION: 'Cannot read properties of null',
+  /** Message when trying to access logger before creation */
+  LOGGER_NOT_CREATED: 'Logger instance not created. Call createLogger() first.',
+  /** Logger initialization error. Used when trying to get logger instance before creating it. */
+  INITIALIZE_ERROR: 'AG_LOGGER_INITIALIZE_ERROR',
 } as const;
 
 /**

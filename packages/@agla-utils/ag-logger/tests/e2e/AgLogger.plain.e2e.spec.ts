@@ -11,8 +11,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 // ログレベル定数 - E2Eテストで使用するログレベル定義
 import { AG_LOGLEVEL } from '../../shared/types';
-// テスト対象 - getLogger関数（ロガー取得のエントリーポイント）
-import { getLogger } from '@/AgLogger.class';
+// テスト対象 - createLogger関数（ロガー作成のエントリーポイント）
+import { createLogger } from '@/AgLogger.class';
 // プラグイン - 人間可読な平文フォーマッター
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
 // プラグイン - コンソール出力ロガー

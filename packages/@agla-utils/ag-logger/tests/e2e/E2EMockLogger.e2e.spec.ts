@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { getLogger } from '@/AgLogger.class';
+import { createLogger } from '@/AgLogger.class';
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
 import { E2eMockLogger as E2EMockLoggerWithTestId } from '@/plugins/logger/E2eMockLogger';
 import { describe, expect, it } from 'vitest';
@@ -140,7 +140,7 @@ describe('E2EMockLoggerWithTestId', () => {
         ctx.onTestFinished(() => mockLogger.endTest());
 
         const loggerFunction = mockLogger.createLoggerFunction();
-        const logger = getLogger({ defaultLogger: loggerFunction, formatter: PlainFormatter });
+        const logger = createLogger({ defaultLogger: loggerFunction, formatter: PlainFormatter });
 
         logger.setLogLevel(AG_LOGLEVEL.INFO);
         logger.info('Test message via plugin');
@@ -155,7 +155,7 @@ describe('E2EMockLoggerWithTestId', () => {
         ctx.onTestFinished(() => mockLogger.endTest());
 
         const loggerMap = mockLogger.createLoggerMap();
-        const logger = getLogger({
+        const logger = createLogger({
           defaultLogger: mockLogger.createLoggerFunction(),
           formatter: PlainFormatter,
           loggerMap: loggerMap,

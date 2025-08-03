@@ -14,8 +14,8 @@ import { AG_LOGLEVEL } from '../../shared/types';
 
 // Type definitions for vitest mocks
 type TVitestMock = ReturnType<typeof vi.fn>;
-// テスト対象 - メインAgLoggerクラスとgetLogger関数
-import { AgLogger, getLogger } from '@/AgLogger.class';
+// テスト対象 - メインAgLoggerクラス
+import { AgLogger } from '@/AgLogger.class';
 // テスト対象 - ロガー・フォーマッター管理クラス
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 // フォーマッタープラグイン
@@ -74,9 +74,10 @@ describe('AgLogger Integration Tests', () => {
       it('should maintain singleton consistency across all entry points', () => {
         setupTestContext();
 
-        const logger1 = getLogger();
+        AgLogger.createLogger();
+        const logger1 = AgLogger.createLogger();
         const logger2 = AgLogger.getLogger();
-        const logger3 = getLogger();
+        const logger3 = AgLogger.createLogger();
 
         expect(logger1).toBe(logger2);
         expect(logger2).toBe(logger3);
@@ -85,8 +86,9 @@ describe('AgLogger Integration Tests', () => {
       it('should share state and configuration across instances', () => {
         setupTestContext();
 
-        const logger1 = getLogger();
-        const logger2 = getLogger();
+        AgLogger.createLogger();
+        const logger1 = AgLogger.createLogger();
+        const logger2 = AgLogger.createLogger();
 
         // ログレベル設定の共有
         logger1.setLogLevel(AG_LOGLEVEL.DEBUG);
@@ -116,7 +118,7 @@ describe('AgLogger Integration Tests', () => {
       it('should maintain singleton integrity during errors', () => {
         setupTestContext();
 
-        const logger1 = getLogger();
+        const logger1 = AgLogger.createLogger();
 
         // エラーを引き起こす設定
         const throwingFormatter = vi.fn(() => {
@@ -125,7 +127,7 @@ describe('AgLogger Integration Tests', () => {
 
         expect(() => logger1.setManager({ formatter: throwingFormatter })).not.toThrow();
 
-        const logger2 = getLogger();
+        const logger2 = AgLogger.createLogger();
         // 同じインスタンスであることを確認
         expect(logger1).toBe(logger2);
       });
@@ -138,7 +140,7 @@ describe('AgLogger Integration Tests', () => {
       it('should handle rapid singleton access patterns', () => {
         setupTestContext();
 
-        const loggers = Array.from({ length: 100 }, () => getLogger());
+        const loggers = Array.from({ length: 100 }, () => AgLogger.createLogger());
 
         // 全て同じインスタンスであることを確認
         loggers.forEach((logger) => {
@@ -166,7 +168,7 @@ describe('AgLogger Integration Tests', () => {
             name: 'ConsoleLogger + JsonFormatter',
             logger: ConsoleLogger,
             formatter: JsonFormatter,
-            setupSpy: () => vi.spyOn(console, 'info').mockImplementation(() => {}),
+            setupSpy: () => vi.spyOn(console, 'info').mockImplementation(() => { }),
             verify: (spy: TVitestMock) => {
               const [output] = spy.mock.calls[0];
               expect(() => JSON.parse(output)).not.toThrow();
@@ -268,7 +270,7 @@ describe('AgLogger Integration Tests', () => {
           throw new Error('Error logger failed');
         });
 
-        const logger = getLogger({
+        const logger = AgLogger.createLogger({
           defaultLogger: mockLogger,
           formatter: PlainFormatter,
           loggerMap: {
@@ -303,7 +305,7 @@ describe('AgLogger Integration Tests', () => {
         const warnLogger = vi.fn();
         const defaultLogger = vi.fn();
 
-        const logger = getLogger({
+        const logger = AgLogger.createLogger({
           defaultLogger: defaultLogger,
           formatter: PlainFormatter,
           loggerMap: {
@@ -328,7 +330,7 @@ describe('AgLogger Integration Tests', () => {
       it('should maintain configuration through multiple updates', () => {
         setupTestContext();
 
-        const logger = getLogger();
+        const logger = AgLogger.createLogger();
         const finalLogger = vi.fn();
         const finalFormatter = vi.fn().mockReturnValue('final format');
 
@@ -353,7 +355,7 @@ describe('AgLogger Integration Tests', () => {
       it('should handle configuration conflicts gracefully', () => {
         setupTestContext();
 
-        const logger = getLogger();
+        const logger = AgLogger.createLogger();
         const conflictingFormatter1 = vi.fn().mockReturnValue('format1');
         const conflictingFormatter2 = vi.fn(() => {
           throw new Error('Formatter conflict');
@@ -428,7 +430,7 @@ describe('AgLogger Integration Tests', () => {
           [AG_LOGLEVEL.DEBUG]: vi.fn(),
         };
 
-        const logger = getLogger({
+        const logger = AgLogger.createLogger({
           defaultLogger: loggers[AG_LOGLEVEL.INFO],
           formatter: JsonFormatter,
           loggerMap: loggers,
@@ -501,7 +503,7 @@ describe('AgLogger Integration Tests', () => {
         setupTestContext();
 
         const mockLogger = vi.fn();
-        const logger = getLogger({ defaultLogger: mockLogger, formatter: PlainFormatter });
+        const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: PlainFormatter });
 
         const levels = [AG_LOGLEVEL.ERROR, AG_LOGLEVEL.WARN, AG_LOGLEVEL.INFO, AG_LOGLEVEL.DEBUG];
 
@@ -691,9 +693,8 @@ describe('AgLogger Integration Tests', () => {
             return result;
           } catch {
             // フォールバック処理
-            return `${logMessage.timestamp ?? new Date().toISOString()} [${logMessage.level ?? 'UNKNOWN'}] ${
-              logMessage.message ?? ''
-            }`;
+            return `${logMessage.timestamp ?? new Date().toISOString()} [${logMessage.level ?? 'UNKNOWN'}] ${logMessage.message ?? ''
+              }`;
           }
         });
 
@@ -750,9 +751,8 @@ describe('AgLogger Integration Tests', () => {
             }
           };
 
-          return `${logMessage.timestamp} [${logMessage.level}] ${logMessage.message} ${
-            safeStringify(logMessage.args)
-          }`;
+          return `${logMessage.timestamp} [${logMessage.level}] ${logMessage.message} ${safeStringify(logMessage.args)
+            }`;
         });
 
         const logger = getLogger({ defaultLogger: mockLogger, formatter: safeFormatter });
@@ -910,7 +910,7 @@ describe('AgLogger Integration Tests', () => {
         });
         const normalLogger = vi.fn();
 
-        const logger = getLogger({
+        const logger = AgLogger.createLogger({
           defaultLogger: normalLogger,
           formatter: PlainFormatter,
           loggerMap: {

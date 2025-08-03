@@ -151,17 +151,10 @@ export class AgLoggerConfig {
    * Gets the current log level setting.
    * @returns The current log level
    */
-  public getLogLevel(): AgLogLevel {
+  public get logLevel(): AgLogLevel {
     return this._options.logLevel;
   }
 
-  /**
-   * Gets the current verbose setting.
-   * @returns The current verbose setting
-   */
-  public getVerbose(): boolean {
-    return this._options.verbose;
-  }
 
   /**
    * Sets the log level for the configuration.
@@ -192,12 +185,18 @@ export class AgLoggerConfig {
    *
    * @since 0.2.0
    */
-  public setLogLevel(level: AgLogLevel): boolean {
+  public set logLevel(level: AgLogLevel) {
     if (!isValidLogLevel(level)) {
-      return false;
+      this._options.logLevel = level;
     }
-    this._options.logLevel = level;
-    return true;
+  }
+
+  /**
+   * Gets the current verbose setting.
+   * @returns The current verbose setting
+   */
+  get isVerbose(): boolean {
+    return this._options.verbose;
   }
 
   /**
@@ -343,7 +342,7 @@ export class AgLoggerConfig {
 
     // Apply logLevel setting if provided
     if (options.logLevel !== undefined) {
-      this.setLogLevel(options.logLevel);
+      this.logLevel = options.logLevel;
     }
 
     // Apply verbose setting if provided

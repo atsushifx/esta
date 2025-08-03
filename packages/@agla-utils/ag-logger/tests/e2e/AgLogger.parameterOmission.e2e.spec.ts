@@ -11,8 +11,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 // ログレベル定数 - E2Eテストで使用するログレベル定義
 import { AG_LOGLEVEL } from '../../shared/types';
-// テスト対象 - getLogger関数（ロガー取得のエントリーポイント）
-import { getLogger } from '@/AgLogger.class';
+// テスト対象 - createLogger関数（ロガー作成のエントリーポイント）
+import { createLogger } from '@/AgLogger.class';
 // プラグイン - 人間可読な平文フォーマッター
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
 // プラグイン - コンソール出力ロガー
@@ -49,9 +49,9 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
   };
 
   /**
-   * getLoggerパラメーター省略動作テストスイート
+   * createLoggerパラメーター省略動作テストスイート
    *
-   * @description 初期設定後のgetLoggerでの全パラメーター省略時に
+   * @description 初期設定後のcreateLoggerでの全パラメーター省略時に
    * 以前の設定が再利用されることをテストする
    * 設定継承、シングルトン動作、部分省略時の動作を検証
    *
@@ -59,9 +59,9 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
    * @scenarios
    * - 初期設定後の全パラメーター省略時の設定継承
    * - 部分パラメーター省略時の既存設定使用
-   * - 複数getLogger呼び出しでのシングルトン動作確認
+   * - 複数createLogger呼び出しでのシングルトン動作確認
    */
-  describe('Parameter omission behavior in getLogger', () => {
+  describe('Parameter omission behavior in createLogger', () => {
     it('uses previous settings when all parameters are omitted after initial setup', () => {
       setupTestContext();
       // Initial setup
@@ -69,9 +69,9 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
       logger1.setLogLevel(AG_LOGLEVEL.INFO);
       logger1.info('Log after initial setup');
 
-      // getLogger with all parameters omitted
-      const logger2 = getLogger();
-      logger2.info('Log after parameter omission in getLogger');
+      // createLogger with all parameters omitted
+      const logger2 = createLogger();
+      logger2.info('Log after parameter omission in createLogger');
 
       expect(mockConsole.info).toHaveBeenCalledTimes(2);
 
@@ -79,13 +79,13 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
       const [secondLog] = mockConsole.info.mock.calls[1];
 
       expect(firstLog).toMatch(/\[INFO\] Log after initial setup$/);
-      expect(secondLog).toMatch(/\[INFO\] Log after parameter omission in getLogger$/);
+      expect(secondLog).toMatch(/\[INFO\] Log after parameter omission in createLogger$/);
     });
 
     it('uses previous settings when only partial parameters are omitted', () => {
       setupTestContext();
       // Initial setup
-      getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
+      createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
 
       // Omit formatter only
       const logger = getLogger({ defaultLogger: ConsoleLogger });
@@ -99,9 +99,9 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
 
     it('ensures singleton behavior', () => {
       setupTestContext();
-      const logger1 = getLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
-      const logger2 = getLogger();
-      const logger3 = getLogger({ defaultLogger: ConsoleLogger });
+      const logger1 = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
+      const logger2 = createLogger();
+      const logger3 = createLogger({ defaultLogger: ConsoleLogger });
 
       expect(logger1).toBe(logger2);
       expect(logger2).toBe(logger3);
@@ -202,8 +202,8 @@ describe('AgLogger E2E Tests - Parameter Omission and setManager', () => {
       });
       logger1.info('After settings update');
 
-      // getLogger with omitted parameters
-      const logger2 = getLogger();
+      // createLogger with omitted parameters
+      const logger2 = createLogger();
       logger2.info('After parameter omission');
 
       // Ensure same instance

@@ -9,15 +9,19 @@
 // types
 import { AG_LOGLEVEL } from '../shared/types';
 import type { AgLogLevel } from '../shared/types';
+import { AgLoggerError } from '../shared/types/AgLoggerError.types';
 // interfaces
 import type { AgLoggerOptions } from '../shared/types/AgLogger.interface';
+// constants
+import { AG_LOGGER_ERROR_CATEGORIES } from '../shared/constants/agLoggerError.constants';
 
 // core
-import { AgLoggerManager } from './AgLoggerManager.class';
+import { AgLoggerConfig } from '@/internal/AgLoggerConfig.class';
 // plugins
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
 import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
+import { format } from 'path';
 
 /**
  * Abstract logger class providing singleton instance management,
@@ -27,11 +31,12 @@ import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
 export class AgLogger {
   private static _instance: AgLogger | undefined;
   private static _logLevel: AgLogLevel = AG_LOGLEVEL.OFF;
-  private _loggerManager: AgLoggerManager;
+  private _config: AgLoggerConfig;
+
   private _verbose: boolean = false;
 
   protected constructor() {
-    this._loggerManager = AgLoggerManager.getManager();
+    this._config = new AgLoggerConfig();
   }
 
   /**
@@ -41,15 +46,22 @@ export class AgLogger {
    * @param options - Optional configuration options for logger setup.
    * @returns The singleton AgLogger instance.
    */
-  static getLogger(options?: AgLoggerOptions): AgLogger {
+  static createLogger(options?: AgLoggerOptions): AgLogger {
     const instance = (AgLogger._instance ??= new AgLogger());
 
-    // If configuration is passed, delegate to setManager for unified handling
+    // If configuration is passed, delegate to setLoggerConfig for unified handling
     if (options !== undefined) {
-      instance.setManager(options);
+      instance.setLoggerConfig(options);
     }
 
     return instance;
+  }
+
+  static getLogger(): AgLogger {
+    if (AgLogger._instance === undefined) {
+      throw new AgLoggerError(AG_LOGGER_ERROR_CATEGORIES.LOGGER, 'Logger instance not created. Call createLogger() first.');
+    }
+    return AgLogger._instance;
   }
 
   /**
@@ -58,7 +70,7 @@ export class AgLogger {
    * @param level - Log level to check.
    * @returns True if the level should be logged; otherwise false.
    */
-  private isOutputLevel(level: AgLogLevel): boolean {
+  private shouldOutput(level: AgLogLevel): boolean {
     if (AgLogger._logLevel === AG_LOGLEVEL.OFF) {
       return false;
     }
@@ -106,21 +118,29 @@ export class AgLogger {
    * @param args - Arguments to be logged.
    */
   protected executeLog(level: AgLogLevel, ...args: unknown[]): void {
-    if (this.isOutputLevel(level)) {
-      const logMessage = AgLoggerGetMessage(level, ...args);
-      const formatter = this._loggerManager.getFormatter();
-      const formattedMessage = formatter(logMessage);
-
-      // Only block logging if the formatter explicitly returns empty string
-      // and the original message had actual content (not just empty args)
-      if (formattedMessage === '' && logMessage.message !== '' && args.length > 0) {
-        return;
-      }
-
-      const logger = this._loggerManager.getLogger(level);
-      logger(formattedMessage);
+    if (!this._config.shouldOutput(level)) {
+      return;
     }
+
+    // Block logging if the first argument is empty string and no additional arguments
+    if (args.length === 1 && args[0] === '') {
+      return;
+    }
+
+    const logMessage = AgLoggerGetMessage(level, ...args);
+    const formatter = this._config.getFormatter();
+    const formattedMessage = formatter(logMessage);
+
+    // Only block logging if the formatter explicitly returns empty string
+    // and the original message had actual content (not just empty args)
+    if (formattedMessage === '') {
+      return;
+    }
+
+    const logger = this._config.getLoggerFunction(level)
+    logger(formattedMessage);
   }
+
 
   /**
    * Configures the logger manager with the specified options.
@@ -129,12 +149,12 @@ export class AgLogger {
    *
    * @param options - Configuration options for the logger.
    */
-  setManager(options: AgLoggerOptions): void {
+  setLoggerConfig(options: AgLoggerOptions): void {
     const enhancedOptions = { ...options };
     if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
       enhancedOptions.loggerMap = ConsoleLoggerMap;
     }
-    this._loggerManager.setManager(enhancedOptions);
+    this._config.setLoggerConfig(enhancedOptions);
   }
 
   /** Logs a message at FATAL level. */
@@ -197,12 +217,12 @@ export class AgLogger {
  * @param options - Optional configuration options for the logger.
  * @returns The singleton AgLogger instance.
  */
-export const getLogger = (options?: AgLoggerOptions): AgLogger => {
-  if (options?.defaultLogger === ConsoleLogger && !options.loggerMap) {
-    options = { ...options, loggerMap: ConsoleLoggerMap };
-  }
+export const createLogger = (options?: AgLoggerOptions): AgLogger => {
+  return AgLogger.createLogger(options);
+};
 
-  return AgLogger.getLogger(options);
+export const getLogger = (): AgLogger => {
+  return AgLogger.getLogger();
 };
 
 export default AgLogger;
