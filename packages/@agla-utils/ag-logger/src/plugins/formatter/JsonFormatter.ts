@@ -19,9 +19,10 @@ import { AgToLabel } from '../../utils/AgLogLevelHelpers';
  * @returns A JSON string representing the structured log entry.
  */
 export const JsonFormatter = (logMessage: AgLogMessage): string => {
+  const levelLabel = AgToLabel(logMessage.logLevel);
   const logEntry = {
     timestamp: logMessage.timestamp.toISOString(),
-    level: AgToLabel(logMessage.logLevel),
+    ...(levelLabel && { level: levelLabel }),
     message: logMessage.message,
     ...(logMessage.args.length > 0 && { args: logMessage.args }),
   };

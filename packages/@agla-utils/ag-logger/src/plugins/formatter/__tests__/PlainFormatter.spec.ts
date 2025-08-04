@@ -92,6 +92,21 @@ describe('PlainFormatter', () => {
   });
 
   /**
+   * Tests FORCE_OUTPUT level formatting without brackets.
+   */
+  it('formats FORCE_OUTPUT level without brackets', () => {
+    const logMessage: AgLogMessage = {
+      logLevel: AG_LOGLEVEL.FORCE_OUTPUT,
+      timestamp: new Date('2025-01-01T12:00:00.000Z'),
+      message: 'Force output message',
+      args: [],
+    };
+
+    const result = PlainFormatter(logMessage);
+    expect(result).toBe('2025-01-01T12:00:00Z Force output message');
+  });
+
+  /**
    * Tests formatting with an empty message string.
    */
   it('formats correctly even with an empty message', () => {
@@ -103,7 +118,7 @@ describe('PlainFormatter', () => {
     };
 
     const result = PlainFormatter(logMessage);
-    expect(result).toBe('2025-12-31T23:59:59Z [WARN]  {"warning":"empty message"}');
+    expect(result).toBe('2025-12-31T23:59:59Z [WARN] {"warning":"empty message"}');
   });
 
   /**

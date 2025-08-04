@@ -25,6 +25,8 @@ export default mergeConfig(baseConfig, {
       // Unit Test (develop test) exec only sub repositories
       '**/__tests__/*.test.ts',
       '**/__tests__/*.spec.ts',
+      '**/__tests__/**/*.test.ts',
+      '**/__tests__/**/*.spec.ts',
     ],
     cacheDir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),
     // sequential test execution to avoid singleton state conflicts

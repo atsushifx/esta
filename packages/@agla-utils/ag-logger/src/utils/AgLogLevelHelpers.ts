@@ -19,6 +19,8 @@ export const AgToLabel = (level: AgLogLevel): AgLogLevelLabel | '' => {
   if (!isValidLogLevel(level)) {
     return '' as AgLogLevelLabel;
   }
+
+  // FORCE_OUTPUT時は空文字を返してラベルを表示しない
   if (level === AG_LOGLEVEL.FORCE_OUTPUT) {
     return '' as AgLogLevelLabel;
   }

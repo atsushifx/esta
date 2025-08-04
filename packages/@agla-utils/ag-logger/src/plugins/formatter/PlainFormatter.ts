@@ -25,14 +25,12 @@ export const PlainFormatter: AgFormatFunction = (logMessage: AgLogMessage): stri
   const levelLabel = AgToLabel(logMessage.logLevel);
   const message = logMessage.message;
   const argsString = logMessage.args.length > 0
-    ? ` ${logMessage.args.map((arg) => JSON.stringify(arg)).join(' ')}`
+    ? ` ${logMessage.args.map((arg) => JSON.stringify(arg)).join(' ')}`.trim()
     : '';
+  const messagePart = `${message} ${argsString}`.trim();
 
-  if (levelLabel) {
-    return `${timestamp} [${levelLabel}] ${message}${argsString}`;
-  } else {
-    return `${timestamp} ${message}${argsString}`;
-  }
+  const labelPart = levelLabel ? `[${levelLabel}] ` : '';
+  return `${timestamp} ${labelPart}${messagePart}`.trim();
 };
 
 export default PlainFormatter;

@@ -172,6 +172,7 @@ export class MockLogger {
    */
   createLoggerMap(): AgLoggerMap {
     return {
+      // default logger
       [AG_LOGLEVEL.OFF]: () => {}, // No-op for OFF level
       [AG_LOGLEVEL.FATAL]: (message: string | AgLogMessage) => this.fatal(message),
       [AG_LOGLEVEL.ERROR]: (message: string | AgLogMessage) => this.error(message),
@@ -179,7 +180,7 @@ export class MockLogger {
       [AG_LOGLEVEL.INFO]: (message: string | AgLogMessage) => this.info(message),
       [AG_LOGLEVEL.DEBUG]: (message: string | AgLogMessage) => this.debug(message),
       [AG_LOGLEVEL.TRACE]: (message: string | AgLogMessage) => this.trace(message),
-      // special log
+      // special logger
       [AG_LOGLEVEL.VERBOSE]: (message: string | AgLogMessage) => this.verbose(message),
       [AG_LOGLEVEL.FORCE_OUTPUT]: (message: string | AgLogMessage) => this.log(message),
     };

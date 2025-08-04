@@ -132,6 +132,26 @@ describe('JsonFormatter', () => {
   });
 
   /**
+   * Tests FORCE_OUTPUT level formatting without level field.
+   */
+  it('formats FORCE_OUTPUT level without level field', () => {
+    const logMessage: AgLogMessage = {
+      logLevel: AG_LOGLEVEL.FORCE_OUTPUT,
+      timestamp: new Date('2025-01-01T12:00:00.000Z'),
+      message: 'Force output message',
+      args: [],
+    };
+
+    const result = JsonFormatter(logMessage);
+    const parsed = JSON.parse(result);
+
+    expect(parsed.timestamp).toBe('2025-01-01T12:00:00.000Z');
+    expect(parsed.level).toBeUndefined();
+    expect(parsed.message).toBe('Force output message');
+    expect(parsed.args).toBeUndefined();
+  });
+
+  /**
    * Tests JSON formatting with an empty message string.
    */
   it('formats correctly even with an empty message', () => {
