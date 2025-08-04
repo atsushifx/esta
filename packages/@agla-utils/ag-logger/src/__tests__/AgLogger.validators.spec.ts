@@ -1,4 +1,4 @@
-// src/__tests__/AgLogger.validator.spec.ts
+// Copyright (c) 2025 // src/__tests__/AgLogger.validator.spec.ts
 // @(#) : AgLogger validator error check behavior tests
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>

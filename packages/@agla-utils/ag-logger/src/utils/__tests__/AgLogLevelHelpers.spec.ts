@@ -79,14 +79,16 @@ describe('ログレベル文字列変換機能', () => {
       });
     });
 
-    it('should handle all AG_LOGLEVEL (except FORCE_OUTPUT) values', () => {
-      // All returned strings should be uppercase (except FORCE_OUTPUT which returns empty string)
-      Object.entries(AG_LOGLEVEL)
-        .filter(([_key, value]) => (value !== AG_LOGLEVEL.FORCE_OUTPUT))
-        .forEach(([key, value]) => {
-          const stringLabel = AgToLabel(value);
+    it('should handle all AG_LOGLEVEL values', () => {
+      // Test all known log level values (except FORCE_OUTPUT which returns empty string)
+      Object.entries(AG_LOGLEVEL).forEach(([key, value]) => {
+        const stringLabel = AgToLabel(value);
+        if (key === 'FORCE_OUTPUT') {
+          expect(stringLabel).toBe('');
+        } else {
           expect(stringLabel).toBe(key);
-        });
+        }
+      });
     });
 
     it('should perform lookups efficiently', () => {
