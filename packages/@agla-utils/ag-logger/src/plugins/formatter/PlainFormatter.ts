@@ -10,7 +10,17 @@
 import type { AgFormatFunction, AgLogMessage } from '../../../shared/types';
 
 // utils
+import { valueToString } from '@/utils/AgLogValidators';
 import { AgToLabel } from '../../utils/AgLogLevelHelpers';
+
+const argsToString = (args: readonly unknown[]): string => {
+  if (args.length === 0) {
+    return '';
+  }
+
+  const message = args.map((arg) => JSON.stringify(arg) ?? valueToString(arg)).join(' ').trim();
+  return message;
+};
 
 /**
  * Formats a log message into a plain text string.
@@ -23,12 +33,7 @@ import { AgToLabel } from '../../utils/AgLogLevelHelpers';
 export const PlainFormatter: AgFormatFunction = (logMessage: AgLogMessage): string => {
   const timestamp = logMessage.timestamp.toISOString().replace(/\.\d{3}Z$/, 'Z');
   const levelLabel = AgToLabel(logMessage.logLevel);
-  const message = logMessage.message;
-  const argsString = logMessage.args.length > 0
-    ? ` ${logMessage.args.map((arg) => JSON.stringify(arg)).join(' ')}`.trim()
-    : '';
-  const messagePart = `${message} ${argsString}`.trim();
-
+  const messagePart = `${logMessage.message} ${argsToString(logMessage.args)}`.trim();
   const labelPart = levelLabel ? `[${levelLabel}] ` : '';
   return `${timestamp} ${labelPart}${messagePart}`.trim();
 };

@@ -7,7 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 // libs
-import { isValidLogLevel } from '@/utils/AgLogValidators';
+import { isValidLogLevel } from '../../utils/AgLogValidators';
+
 // constants
 import { AG_LOGLEVEL, AG_LOGLEVEL_KEYS } from '../../../shared/types';
 // types
@@ -172,7 +173,6 @@ export class MockLogger {
    */
   createLoggerMap(): AgLoggerMap {
     return {
-      // default logger
       [AG_LOGLEVEL.OFF]: () => {}, // No-op for OFF level
       [AG_LOGLEVEL.FATAL]: (message: string | AgLogMessage) => this.fatal(message),
       [AG_LOGLEVEL.ERROR]: (message: string | AgLogMessage) => this.error(message),

@@ -18,7 +18,7 @@
 thumbs.db
 
 #	logs, patches
-*.log*
+*.log
 *.diff
 *.patch
 

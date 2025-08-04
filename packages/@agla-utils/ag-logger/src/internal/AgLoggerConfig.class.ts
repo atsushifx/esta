@@ -13,13 +13,10 @@ import { isValidLogLevel } from '../utils/AgLogValidators';
 import type { AgLoggerMap, AgLogLevel } from '../../shared/types';
 import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions } from '../../shared/types/AgLogger.interface';
 // constants
-import { AG_LOGGER_ERROR_CATEGORIES } from '../../shared/constants/agLoggerError.constants';
 import { AG_LOGLEVEL } from '../../shared/types';
 // plugins
 import { NullFormatter } from '../plugins/formatter/NullFormatter';
 import { NullLogger } from '../plugins/logger/NullLogger';
-// error classes
-import { AgLoggerError } from '../../shared/types/AgLoggerError.types';
 
 /**
  * Internal configuration management class for AgLogger.
@@ -281,6 +278,7 @@ export class AgLoggerConfig {
    * to the internal configuration state.
    *
    * @param options - The configuration options to apply
+   * @returns True if configuration was applied successfully, false if validation failed
    *
    * @example
    * ```typescript
@@ -289,51 +287,20 @@ export class AgLoggerConfig {
    *   logLevel: AG_LOGLEVEL.INFO,
    *   verbose: true
    * };
-   * config.setLoggerConfig(options);
+   * const success = config.setLoggerConfig(options);
    * ```
    *
    * @since 0.2.0
    */
   public setLoggerConfig(options: AgLoggerOptions): void {
-    // Apply defaultLogger setting if provided
-    if (options.defaultLogger !== undefined) {
-      this._options.defaultLogger = options.defaultLogger;
-    }
-
-    // Apply formatter setting if provided
-    if (options.formatter !== undefined) {
-      this._options.formatter = options.formatter;
-    }
-
-    // Apply logLevel setting if provided
-    if (options.logLevel !== undefined) {
-      this.logLevel = options.logLevel;
-    }
-
-    // Apply verbose setting if provided
-    if (options.verbose !== undefined) {
-      this.setVerbose = options.verbose;
-    }
+    // Update options
+    this._options = { ...this._options, ...options };
 
     // Apply loggerMap setting if provided (this overrides the defaultLogger initialization above)
     if (options.loggerMap !== undefined) {
       this._options.loggerMap = { ...this._options.loggerMap, ...options.loggerMap };
       this.updateLoggerMap(options.loggerMap);
     }
-  }
-
-  /**
-   * Initializes all logger map entries with the current defaultLogger.
-   * This is called when defaultLogger is set via setLoggerConfig to ensure
-   * all levels use the new defaultLogger as base configuration.
-   * @private
-   */
-  private initializeLoggerMapWithDefault(): void {
-    Object.values(AG_LOGLEVEL).forEach((level) => {
-      if (typeof level === 'number') {
-        this._loggerMap.set(level as AgLogLevel, this._options.defaultLogger);
-      }
-    });
   }
 
   /**
@@ -372,22 +339,5 @@ export class AgLoggerConfig {
     }
     this._loggerMap.set(level, logger);
     return true;
-  }
-
-  /**
-   * Validates a log level and throws an error if invalid.
-   *
-   * @param level - The log level to validate
-   * @throws {AgLoggerError} When an invalid log level is provided
-   *
-   * @internal Used internally for input validation with error throwing
-   */
-  validateLogLevel(level: AgLogLevel): void {
-    if (!isValidLogLevel(level)) {
-      throw new AgLoggerError(
-        AG_LOGGER_ERROR_CATEGORIES.INVALID_LOG_LEVEL,
-        `Invalid log level: ${level}`,
-      );
-    }
   }
 }

@@ -231,12 +231,11 @@ describe('Error Handling Performance', () => {
 
   describe('Error recovery performance', () => {
     it('should recover from errors efficiently', () => {
-      let shouldThrow = true;
       let callCount = 0;
 
       const flakyLogger = vi.fn().mockImplementation(() => {
         callCount++;
-        if (shouldThrow && callCount % 10 === 0) {
+        if (callCount % 10 === 0) {
           throw new Error('Intermittent error');
         }
         return 'logged successfully';
@@ -244,7 +243,7 @@ describe('Error Handling Performance', () => {
 
       const logger = AgLogger.createLogger({
         defaultLogger: flakyLogger,
-        formatter: (msg) => msg.message ?? msg,
+        formatter: (msg) => msg.message || msg,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
 

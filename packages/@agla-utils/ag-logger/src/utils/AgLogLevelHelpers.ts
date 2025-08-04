@@ -6,12 +6,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { isValidLogLevel } from '@/utils/AgLogValidators';
 import { AG_LABEL_TO_LOGLEVEL_MAP, AG_LOGLEVEL, AG_LOGLEVEL_TO_LABEL_MAP } from '../../shared/types';
 import type { AgLogLevel, AgLogLevelLabel } from '../../shared/types';
+import { isValidLogLevel } from './AgLogValidators';
 
 /**
- * Convert numeric log level to string label
+ * Convert numeric log level to string label using map reference
  * @param level - Numeric log level
  * @returns String label for the log level, or empty string if invalid
  */
@@ -20,7 +20,7 @@ export const AgToLabel = (level: AgLogLevel): AgLogLevelLabel | '' => {
     return '' as AgLogLevelLabel;
   }
 
-  // FORCE_OUTPUT時は空文字を返してラベルを表示しない
+  // Special handling for FORCE_OUTPUT - return empty string
   if (level === AG_LOGLEVEL.FORCE_OUTPUT) {
     return '' as AgLogLevelLabel;
   }
@@ -29,9 +29,9 @@ export const AgToLabel = (level: AgLogLevel): AgLogLevelLabel | '' => {
 };
 
 /**
- * Convert numeric log level to numeric log level (identity function for consistency)
- * @param level - Numeric log level
- * @returns The same numeric log level
+ * Convert string label to numeric log level using map reference
+ * @param label - String log level label
+ * @returns Numeric log level, or undefined if invalid
  */
 export const AgToLogLevel = (label: AgLogLevelLabel): AgLogLevel => {
   return AG_LABEL_TO_LOGLEVEL_MAP[label];

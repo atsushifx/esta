@@ -31,11 +31,7 @@ describe('LogLevel Helper Functions', () => {
       expect(AgToLabel(AG_LOGLEVEL.FORCE_OUTPUT)).toBe('');
     });
 
-    it('should return empty string for FORCE_OUTPUT level', () => {
-      expect(AgToLabel(AG_LOGLEVEL.FORCE_OUTPUT)).toBe('');
-    });
-
-    it('should return empty string for invalid negative number', () => {
+    it('should return empty string for invalid number / undefined / null', () => {
       expect(AgToLabel(-1 as AgLogLevel)).toBe('');
       expect(AgToLabel(99 as AgLogLevel)).toBe('');
       expect(AgToLabel(null as unknown as AgLogLevel)).toBe('');
@@ -44,26 +40,23 @@ describe('LogLevel Helper Functions', () => {
 
     it('should return consistent format', () => {
       // All returned strings should be uppercase (except FORCE_OUTPUT which returns empty string)
-      // All returned strings should be uppercase (except FORCE_OUTPUT which returns empty string)
-      Object.values(AG_LOGLEVEL).forEach((level) => {
-        const label = AgToLabel(level);
-        expect(label).toBe(label.toUpperCase());
-        if (level !== AG_LOGLEVEL.FORCE_OUTPUT) {
-          expect(label).toMatch(/^[A-Z_]+$/);
-        }
-      });
+      Object.values(AG_LOGLEVEL)
+        .filter((level) => (level !== AG_LOGLEVEL.FORCE_OUTPUT))
+        .forEach((level) => {
+          const label = AgToLabel(level);
+          expect(label).toBe(label.toUpperCase());
+          expect(label).toMatch(/^[A-Z]+$/);
+        });
     });
 
-    it('should handle all AG_LOGLEVEL values', () => {
-      // Test all known log level values (except FORCE_OUTPUT which returns empty string)
-      Object.entries(AG_LOGLEVEL).forEach(([key, value]) => {
-        const stringLabel = AgToLabel(value);
-        if (key === 'FORCE_OUTPUT') {
-          expect(stringLabel).toBe('');
-        } else {
+    it('should handle all AG_LOGLEVEL (except FORCE_OUTPUT) values', () => {
+      // All returned strings should be uppercase (except FORCE_OUTPUT which returns empty string)
+      Object.entries(AG_LOGLEVEL)
+        .filter(([_key, value]) => (value !== AG_LOGLEVEL.FORCE_OUTPUT))
+        .forEach(([key, value]) => {
+          const stringLabel = AgToLabel(value);
           expect(stringLabel).toBe(key);
-        }
-      });
+        });
     });
 
     it('should perform lookups efficiently', () => {

@@ -247,12 +247,12 @@ describe('AgLogger ログレベル制御', () => {
   describe('無効なログレベルのエラーハンドリング', () => {
     describe('型検証エラー', () => {
       const testCases = [
-        { value: undefined, description: 'undefined', expected: 'invalid loglevel (undefined)' },
-        { value: null, description: 'null', expected: 'invalid loglevel (null)' },
-        { value: 'string', description: '文字列', expected: 'invalid loglevel (string)' },
-        { value: true, description: 'boolean', expected: 'invalid loglevel (true)' },
-        { value: { invalid: true }, description: 'オブジェクト', expected: 'invalid loglevel ([object Object])' },
-        { value: [1, 2, 3], description: '配列', expected: 'invalid loglevel (1,2,3)' },
+        { value: undefined, description: 'undefined', expected: 'Invalid log level (undefined)' },
+        { value: null, description: 'null', expected: 'Invalid log level (null)' },
+        { value: 'string', description: '文字列', expected: 'Invalid log level ("string")' },
+        { value: true, description: 'boolean', expected: 'Invalid log level (true)' },
+        { value: { invalid: true }, description: 'オブジェクト', expected: 'Invalid log level (object)' },
+        { value: [1, 2, 3], description: '配列', expected: 'Invalid log level ([1,2,3])' },
       ];
 
       testCases.forEach(({ value, description, expected }) => {
@@ -279,7 +279,7 @@ describe('AgLogger ログレベル制御', () => {
 
           expect(() => {
             logger.logLevel = value as AgLogLevel;
-          }).toThrow(`invalid loglevel (${value})`);
+          }).toThrow(`Invalid log level (${value})`);
         });
       });
     });

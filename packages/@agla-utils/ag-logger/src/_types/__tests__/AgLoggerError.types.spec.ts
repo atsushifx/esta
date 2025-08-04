@@ -12,8 +12,9 @@ import { describe, expect, it } from 'vitest';
 import { AgLoggerError } from '../../../shared/types/AgLoggerError.types';
 // base error class for inheritance testing
 import { AglaError } from '../../../shared/types/AglaError.types';
-// error categories
-import { AG_LOGGER_ERROR_CATEGORIES } from '../../../shared/constants/agLoggerError.constants';
+// error categories & messages
+import { ERROR_TYPES } from 'shared/constants';
+import type { TErrorType } from 'shared/constants';
 
 /**
  * Test suite for AgLoggerError class.
@@ -24,7 +25,7 @@ describe('AgLoggerError', () => {
     const errorCode = 'TEST_CODE';
     const errorMessage = 'Test error message';
     const context = { level: 999, operation: 'test' };
-    const error = new AgLoggerError(errorCode, errorMessage, context);
+    const error = new AgLoggerError(errorCode as TErrorType, errorMessage, context);
 
     expect(error).toBeInstanceOf(AgLoggerError);
     expect(error).toBeInstanceOf(AglaError);
@@ -38,9 +39,9 @@ describe('AgLoggerError', () => {
 
   it('should work with predefined error categories', () => {
     const errorMessage = 'Invalid log level provided';
-    const error = new AgLoggerError(AG_LOGGER_ERROR_CATEGORIES.INVALID_LOG_LEVEL, errorMessage);
+    const error = new AgLoggerError(ERROR_TYPES.CONFIG, errorMessage);
 
-    expect(error.errorType).toBe('AG_LOGGER_INVALID_LOG_LEVEL');
+    expect(error.errorType).toBe(ERROR_TYPES.CONFIG);
     expect(error.message).toBe(errorMessage);
   });
 
@@ -49,8 +50,8 @@ describe('AgLoggerError', () => {
     const errorMessage = 'Test message';
     const context = { field: 'value' };
 
-    const errorWithoutContext = new AgLoggerError(errorCode, errorMessage);
-    const errorWithContext = new AgLoggerError(errorCode, errorMessage, context);
+    const errorWithoutContext = new AgLoggerError(errorCode as TErrorType, errorMessage);
+    const errorWithContext = new AgLoggerError(errorCode as TErrorType, errorMessage, context);
 
     expect(errorWithoutContext.toString()).toBe('TEST_CODE: Test message');
     expect(errorWithContext.toString()).toBe('TEST_CODE: Test message {"field":"value"}');

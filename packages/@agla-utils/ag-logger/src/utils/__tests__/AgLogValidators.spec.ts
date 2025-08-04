@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { AG_LOGGER_ERROR_CATEGORIES } from '../../../shared/constants/agLoggerError.constants';
+import { AG_LOGGER_ERROR_MESSAGES, ERROR_TYPES } from '../../../shared/constants/agErrorMessages';
 import { AgLoggerError } from '../../../shared/types/AgLoggerError.types';
 import { AG_LOGLEVEL, type AgLogLevel } from '../../../shared/types/AgLogLevel.types';
 
@@ -13,8 +13,8 @@ const validateLogLevel = (level: AgLogLevel): void => {
 
   if (!validLogLevels.includes(level)) {
     throw new AgLoggerError(
-      AG_LOGGER_ERROR_CATEGORIES.INVALID_LOG_LEVEL,
-      `Invalid log level: ${level}`,
+      ERROR_TYPES.VALIDATION,
+      `${AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.VALIDATION].INVALID_LOG_LEVEL} (${level})`,
     );
   }
 };
@@ -57,51 +57,51 @@ describe('validateLogLevel', () => {
   describe('invalid log levels', () => {
     it('should throw AgLoggerError for out-of-range positive number', () => {
       expect(() => validateLogLevel(999 as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => validateLogLevel(999 as AgLogLevel)).toThrow('Invalid log level: 999');
+      expect(() => validateLogLevel(999 as AgLogLevel)).toThrow('Invalid log level (999)');
     });
 
     it('should throw AgLoggerError for out-of-range negative number', () => {
       expect(() => validateLogLevel(-1 as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => validateLogLevel(-1 as AgLogLevel)).toThrow('Invalid log level: -1');
+      expect(() => validateLogLevel(-1 as AgLogLevel)).toThrow('Invalid log level (-1)');
     });
 
     it('should throw AgLoggerError for decimal number', () => {
       expect(() => validateLogLevel(1.5 as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => validateLogLevel(1.5 as AgLogLevel)).toThrow('Invalid log level: 1.5');
+      expect(() => validateLogLevel(1.5 as AgLogLevel)).toThrow('Invalid log level (1.5)');
     });
 
     it('should throw AgLoggerError for string value', () => {
       expect(() => validateLogLevel('INVALID' as unknown as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => validateLogLevel('INVALID' as unknown as AgLogLevel)).toThrow('Invalid log level: INVALID');
+      expect(() => validateLogLevel('INVALID' as unknown as AgLogLevel)).toThrow('Invalid log level (INVALID)');
     });
 
     it('should throw AgLoggerError for null value', () => {
       expect(() => validateLogLevel(null as unknown as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => validateLogLevel(null as unknown as AgLogLevel)).toThrow('Invalid log level: null');
+      expect(() => validateLogLevel(null as unknown as AgLogLevel)).toThrow('Invalid log level (null)');
     });
 
     it('should throw AgLoggerError for undefined value', () => {
       expect(() => validateLogLevel(undefined as unknown as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => validateLogLevel(undefined as unknown as AgLogLevel)).toThrow('Invalid log level: undefined');
+      expect(() => validateLogLevel(undefined as unknown as AgLogLevel)).toThrow('Invalid log level (undefined)');
     });
 
     it('should throw AgLoggerError for boolean value', () => {
       expect(() => validateLogLevel(true as unknown as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => validateLogLevel(true as unknown as AgLogLevel)).toThrow('Invalid log level: true');
+      expect(() => validateLogLevel(true as unknown as AgLogLevel)).toThrow('Invalid log level (true)');
     });
 
     it('should throw AgLoggerError for object value', () => {
       const objectValue = { level: 1 };
       expect(() => validateLogLevel(objectValue as unknown as AgLogLevel)).toThrow(AgLoggerError);
       expect(() => validateLogLevel(objectValue as unknown as AgLogLevel)).toThrow(
-        'Invalid log level: [object Object]',
+        'Invalid log level ([object Object])',
       );
     });
 
     it('should throw AgLoggerError for array value', () => {
       const arrayValue = [1, 2, 3];
       expect(() => validateLogLevel(arrayValue as unknown as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => validateLogLevel(arrayValue as unknown as AgLogLevel)).toThrow('Invalid log level: 1,2,3');
+      expect(() => validateLogLevel(arrayValue as unknown as AgLogLevel)).toThrow('Invalid log level (1,2,3)');
     });
   });
 
@@ -112,7 +112,7 @@ describe('validateLogLevel', () => {
         expect.fail('Expected error to be thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(AgLoggerError);
-        expect((error as AgLoggerError).errorType).toBe(AG_LOGGER_ERROR_CATEGORIES.INVALID_LOG_LEVEL);
+        expect((error as AgLoggerError).errorType).toBe(ERROR_TYPES.VALIDATION);
       }
     });
 
@@ -122,7 +122,7 @@ describe('validateLogLevel', () => {
         expect.fail('Expected error to be thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(AgLoggerError);
-        expect((error as AgLoggerError).message).toContain('Invalid log level: -100');
+        expect((error as AgLoggerError).message).toContain('Invalid log level (-100)');
       }
     });
   });

@@ -20,6 +20,8 @@
 // testing
 import { describe, expect, it } from 'vitest';
 
+// error
+
 // constants
 import { DISABLE, ENABLE } from '../../../shared/constants/common.constants';
 import { AG_LOGLEVEL } from '../../../shared/types';
@@ -27,16 +29,16 @@ import { AG_LOGLEVEL } from '../../../shared/types';
 // types
 import type { AgLogLevel, AgLogMessage } from '../../../shared/types';
 import type { AgLoggerOptions } from '../../../shared/types/AgLogger.interface';
+import { AgLoggerError } from '../../../shared/types/AgLoggerError.types';
 
 // target
 import { AgLoggerConfig } from '../AgLoggerConfig.class';
 // plugins
 import { NullFormatter } from '../../plugins/formatter/NullFormatter';
 import { NullLogger } from '../../plugins/logger/NullLogger';
-// errors
-import { AG_LOGGER_ERROR_CATEGORIES } from '../../../shared/constants/agLoggerError.constants';
-import { AgLoggerError } from '../../../shared/types/AgLoggerError.types';
-// error classes
+// utilities
+import { ERROR_TYPES } from 'shared/constants';
+import { validateLogLevel } from '../../utils/AgLogValidators';
 
 /**
  * Test suite for AgLoggerConfig internal class.
@@ -646,37 +648,28 @@ describe('AgLoggerConfig', () => {
   // TDD: validateLogLevel() function tests
   describe('validateLogLevel()', () => {
     it('should not throw for valid log levels', () => {
-      const config = new AgLoggerConfig();
-
       // Test all valid log levels
-      expect(() => config.validateLogLevel(AG_LOGLEVEL.OFF)).not.toThrow();
-      expect(() => config.validateLogLevel(AG_LOGLEVEL.FATAL)).not.toThrow();
-      expect(() => config.validateLogLevel(AG_LOGLEVEL.ERROR)).not.toThrow();
-      expect(() => config.validateLogLevel(AG_LOGLEVEL.WARN)).not.toThrow();
-      expect(() => config.validateLogLevel(AG_LOGLEVEL.INFO)).not.toThrow();
-      expect(() => config.validateLogLevel(AG_LOGLEVEL.DEBUG)).not.toThrow();
-      expect(() => config.validateLogLevel(AG_LOGLEVEL.TRACE)).not.toThrow();
+      expect(() => validateLogLevel(AG_LOGLEVEL.OFF)).not.toThrow();
+      expect(() => validateLogLevel(AG_LOGLEVEL.FATAL)).not.toThrow();
+      expect(() => validateLogLevel(AG_LOGLEVEL.ERROR)).not.toThrow();
+      expect(() => validateLogLevel(AG_LOGLEVEL.WARN)).not.toThrow();
+      expect(() => validateLogLevel(AG_LOGLEVEL.INFO)).not.toThrow();
+      expect(() => validateLogLevel(AG_LOGLEVEL.DEBUG)).not.toThrow();
+      expect(() => validateLogLevel(AG_LOGLEVEL.TRACE)).not.toThrow();
     });
 
     it('should throw AgLoggerError for invalid log levels', () => {
-      const config = new AgLoggerConfig();
-
-      // Test invalid log levels
-      expect(() => config.validateLogLevel(999 as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => config.validateLogLevel(-1 as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => config.validateLogLevel('INVALID' as unknown as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => config.validateLogLevel(null as unknown as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => config.validateLogLevel(undefined as unknown as AgLogLevel)).toThrow(AgLoggerError);
+      // Test invalid log levels (out of range numbers)
+      expect(() => validateLogLevel(999 as unknown as AgLogLevel)).toThrow(AgLoggerError);
+      expect(() => validateLogLevel(-1 as unknown as AgLogLevel)).toThrow(AgLoggerError);
     });
 
     it('should throw error with correct error category', () => {
-      const config = new AgLoggerConfig();
-
       try {
-        config.validateLogLevel(999 as AgLogLevel);
+        validateLogLevel(999 as unknown as AgLogLevel);
       } catch (error) {
         expect(error).toBeInstanceOf(AgLoggerError);
-        expect((error as AgLoggerError).errorType).toBe(AG_LOGGER_ERROR_CATEGORIES.INVALID_LOG_LEVEL);
+        expect((error as AgLoggerError).errorType).toBe(ERROR_TYPES.VALIDATION);
       }
     });
   });

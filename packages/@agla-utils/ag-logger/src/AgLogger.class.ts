@@ -11,17 +11,17 @@ import { AG_LOGLEVEL } from '../shared/types';
 import type { AgLogLevel } from '../shared/types';
 import { AgLoggerError } from '../shared/types/AgLoggerError.types';
 // interfaces
-import type { AgLoggerFunction, AgLoggerOptions } from '../shared/types/AgLogger.interface';
+import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions } from '../shared/types/AgLogger.interface';
 // constants
-import { AG_LOGGER_ERROR_CATEGORIES } from '../shared/constants/agLoggerError.constants';
+import { AG_LOGGER_ERROR_MESSAGES, ERROR_TYPES } from '../shared/constants/agErrorMessages';
 
 // internal
 import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 // plugins
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
+import { validateFormatter, validateLogger, validateLogLevel } from '@/utils/AgLogValidators';
 import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
-import { validateLogLevel } from './utils/AgLogValidators';
 
 /**
  * Abstract logger class providing singleton instance management,
@@ -63,7 +63,6 @@ export class AgLogger {
 
     return instance;
   }
-
   /**
    * Returns the singleton instance of AgLogger without configuration.
    * Simply returns the existing instance.
@@ -74,8 +73,8 @@ export class AgLogger {
   static getLogger(): AgLogger {
     if (!this._instance) {
       throw new AgLoggerError(
-        AG_LOGGER_ERROR_CATEGORIES.INITIALIZE_ERROR,
-        'Logger instance not created. Call createLogger() first.',
+        ERROR_TYPES.INITIALIZATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.INITIALIZATION].LOGGER_NOT_CREATED,
       );
     }
     return this._instance;
@@ -89,10 +88,27 @@ export class AgLogger {
    * @param options - Configuration options for the logger.
    */
   public setLoggerConfig(options: AgLoggerOptions): void {
+    // Validate options is not null or undefined first
+    if (options === null || options === undefined) {
+      throw new AgLoggerError(
+        ERROR_TYPES.VALIDATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.VALIDATION].NULL_CONFIGURATION,
+      );
+    }
+
+    if ('formatter' in options) {
+      validateFormatter(options.formatter);
+    }
+    if ('defaultLogger' in options) {
+      validateLogger(options.defaultLogger);
+    }
+
+    // If ConsoleLogger is specified without a logger map, apply ConsoleLoggerMap
     const enhancedOptions = { ...options };
     if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
       enhancedOptions.loggerMap = ConsoleLoggerMap;
     }
+    // set config
     this._config.setLoggerConfig(enhancedOptions);
   }
 
@@ -133,6 +149,9 @@ export class AgLogger {
     return this._config.shouldOutput(level);
   }
 
+  public getFormatter(): AgFormatFunction {
+    return this._config.formatter;
+  }
   public getLoggerFunction(level: AgLogLevel): AgLoggerFunction {
     return this._config.getLoggerFunction(level);
   }
