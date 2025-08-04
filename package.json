@@ -44,7 +44,6 @@
     "@commitlint/types": "^19.8.1",
     "@eslint/js": "^9.31.0",
     "@ls-lint/ls-lint": "^2.3.1",
-    "@mizchi/lsmcp": "^0.8.3",
     "@secretlint/secretlint-rule-preset-recommend": "^9.3.4",
     "@textlint/types": "^14.8.4",
     "@types/node": "^22.16.5",
