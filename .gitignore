@@ -59,6 +59,10 @@ $~*
 # CLAUDE Memory file
 CLAUDE*.md
 
+# serena mcp
+**/.serena/
+.erena/
+
 #  Test Result
 **/*results/*
 

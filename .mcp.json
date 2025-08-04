@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "serena-mcp": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "C:/app/develop/mcp/serena",
+        "serena-mcp-server",
+        "--context",
+        "ide-assistant",
+        "--project",
+        "C:/Users/atsushifx/workspaces/develop/esta"
+      ],
+      "env": {}
+    }
+  }
+}
