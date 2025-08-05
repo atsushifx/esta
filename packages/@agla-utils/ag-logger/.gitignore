@@ -26,6 +26,15 @@ thumbs.db
 .env.key*
 .env*
 
+
+## AI settings
+# mcp server's ignore
+.mcp.json
+.serena/
+.lsmcp/
+
+
+
 #	backup/swap/temp
 $~*
 ~*

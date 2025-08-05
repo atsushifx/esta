@@ -59,9 +59,11 @@ $~*
 # CLAUDE Memory file
 CLAUDE*.md
 
-# serena mcp
-**/.serena/
-.erena/
+## mcp settings/server's config
+.mcp.json
+# mcp server's folder
+.serena/
+.lsmcp
 
 #  Test Result
 **/*results/*
