@@ -1,4 +1,4 @@
-// src/plugins/logger/MockLogger.ts
+// src/plugins/logger/_bufferLogger.ts
 // @(#) : Mock Logger for Unit and Integration Testing
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -32,7 +32,7 @@ import type {
  * - Thread-safe for single-threaded test scenarios
  * - Deep immutability for message objects
  */
-export class MockLogger {
+export class TBufferLogger {
   private messages: Map<AgLogLevel, AgFormattedLogMessage[]> = new Map([
     // buffer for standard log levels
     [AG_LOGLEVEL.OFF, []], // OFF (0) - not used for actual logging
@@ -186,3 +186,8 @@ export class MockLogger {
     };
   }
 }
+
+// Export for backward compatibility
+export const MockLogger = {
+  buffer: TBufferLogger,
+} as const;

@@ -11,8 +11,10 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 // import test target
 import { AG_LOGLEVEL } from '../../../../shared/types';
-import type { AgFormattedLogMessage, AgLogLevel, AgLogMessage } from '../../../../shared/types';
 import { MockLogger } from '../MockLogger';
+// types
+import type { AgFormattedLogMessage, AgLogLevel, AgLogMessage } from '../../../../shared/types';
+import type { TBufferLogger } from '../MockLogger';
 
 /**
  * MockLoggerプラグインの包括的ユニットテストスイート
@@ -28,10 +30,10 @@ import { MockLogger } from '../MockLogger';
  * - エッジケース: 境界値、特殊条件、不変性
  */
 describe('MockLogger', () => {
-  let mockLogger: MockLogger;
+  let mockLogger: TBufferLogger;
 
   beforeEach(() => {
-    mockLogger = new MockLogger();
+    mockLogger = new MockLogger.buffer();
   });
 
   /**
@@ -216,7 +218,7 @@ describe('MockLogger', () => {
 
       it('should support error message management with new methods', () => {
         // 新しいmockLoggerインスタンスを使用してテストを分離
-        const testLogger = new MockLogger();
+        const testLogger = new MockLogger.buffer();
         testLogger.error('error message');
 
         expect(testLogger.getMessages(AG_LOGLEVEL.ERROR)).toEqual(['error message']);
@@ -366,7 +368,7 @@ describe('MockLogger', () => {
     });
 
     it('should handle empty state operations safely', () => {
-      const emptyLogger = new MockLogger();
+      const emptyLogger = new MockLogger.buffer();
 
       expect(emptyLogger.getLastMessage(AG_LOGLEVEL.ERROR)).toBeNull();
       expect(emptyLogger.getTotalMessageCount()).toBe(0);

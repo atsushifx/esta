@@ -20,6 +20,7 @@ import type {
   AgLogMessage,
   AgLogMessageCollection,
 } from '../../../shared/types';
+import type { TBufferLogger } from './MockLogger';
 
 /**
  * Mock logger for E2E testing that supports parallel test execution.
@@ -29,13 +30,13 @@ import type {
 export class E2eMockLogger {
   private testIdentifier: string;
   private currentTestId: string | null;
-  private mockLoggers: Map<string, MockLogger>;
+  private mockLoggers: Map<string, TBufferLogger>;
 
   constructor(identifier?: string) {
     const trimmedIdentifier = typeof identifier === 'string' ? identifier.trim() : '';
     this.testIdentifier = trimmedIdentifier ? getNormalizedBasename(trimmedIdentifier) : 'e2e-default';
     this.currentTestId = null;
-    this.mockLoggers = new Map<string, MockLogger>();
+    this.mockLoggers = new Map<string, TBufferLogger>();
   }
 
   /**
@@ -63,7 +64,7 @@ export class E2eMockLogger {
       : trimmedTestId;
 
     // Create new MockLogger instance for this test
-    this.mockLoggers.set(finalTestId, new MockLogger());
+    this.mockLoggers.set(finalTestId, new MockLogger.buffer());
     this.currentTestId = finalTestId;
   }
 
@@ -133,7 +134,7 @@ export class E2eMockLogger {
    * Get the MockLogger instance for the current test.
    * Validates that there is an active test before returning.
    */
-  private getCurrentMockLogger(): MockLogger {
+  private getCurrentMockLogger(): TBufferLogger {
     if (!this.currentTestId) {
       throw new Error('No active test. Call startTest() before logging.');
     }
