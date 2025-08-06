@@ -174,6 +174,12 @@ export class AgLogger {
     return this._config.logLevel;
   }
 
+  /**
+   * Sets the global log level filter.
+   *
+   * @param level - Log level to set.
+   * @returns The updated log level.
+   */
   set logLevel(level: AgLogLevel) {
     const validatedLogLevel = validateLogLevel(level);
     this._config.logLevel = validatedLogLevel;
