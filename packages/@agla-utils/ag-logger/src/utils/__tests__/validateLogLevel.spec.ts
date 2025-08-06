@@ -1,4 +1,7 @@
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//import { describe, expect, it } from 'vitest';
 import { describe, expect, it } from 'vitest';
+
 import { AG_LOGLEVEL } from '../../../shared/types';
 import type { AgLogLevel } from '../../../shared/types';
 import { AgLoggerError } from '../../../shared/types/AgLoggerError.types.js';
@@ -85,8 +88,8 @@ describe('validateLogLevel', () => {
     });
 
     it('should throw AgLoggerError when input is function', () => {
-      expect(() => validateLogLevel((() => {}) as unknown as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => validateLogLevel((() => {}) as unknown as AgLogLevel)).toThrow('Invalid log level (function');
+      expect(() => validateLogLevel((() => { }) as unknown as AgLogLevel)).toThrow(AgLoggerError);
+      expect(() => validateLogLevel((() => { }) as unknown as AgLogLevel)).toThrow('Invalid log level (function');
     });
   });
 
@@ -164,3 +167,7 @@ describe('validateLogLevel', () => {
     });
   });
 });
+
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
