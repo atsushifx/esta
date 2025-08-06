@@ -215,9 +215,9 @@ describe('MockFormatter', () => {
     });
 
     /**
-     * Tests that json formatter returns parseable JSON string.
+     * Tests that json formatter returns parsable JSON string.
      */
-    it('returns parseable JSON string', () => {
+    it('returns parsable JSON string', () => {
       // Arrange
       const logMessage: AgLogMessage = {
         logLevel: AG_LOGLEVEL.INFO,

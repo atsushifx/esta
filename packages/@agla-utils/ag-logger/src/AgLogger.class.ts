@@ -169,7 +169,10 @@ export class AgLogger {
    * @param args - Arguments to be logged.
    */
   protected executeLog(level: AgLogLevel, ...args: unknown[]): void {
-    if (!this.shouldOutput(level)) {
+    // Input validation for logLevel
+    validateLogLevel(level);
+
+    if (!this._config.shouldOutput(level)) {
       return;
     }
 
