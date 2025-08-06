@@ -15,7 +15,7 @@ export const valueToString = (value: unknown): string => {
   if (value === null || value === undefined) {
     return String(value);
   } else if (Array.isArray(value)) {
-    return (value.length > 0) ? `[${String(value)}]` : 'array';
+    return (value.length <= 0) ? 'array' : `[${String(value)}]`;
   } else if (typeof value === 'function') {
     return (value.name === '') ? 'function' : 'function ' + value.name;
   } else if (typeof value === 'object') {
@@ -47,18 +47,23 @@ export const validateLogLevel = (logLevel: AgLogLevel): AgLogLevel => {
 };
 
 /**
+ * Checks if a given value is a valid formatter function
+ * @param formatter - Value to check
+ * @returns True if the value is a non-null, non-undefined function, false otherwise
+ */
+export const isValidFormatter = (formatter: unknown): boolean => {
+  return formatter !== null
+    && formatter !== undefined
+    && typeof formatter === 'function';
+};
+
+/**
  * Validates that a formatter function is valid.
  * @param formatter - The formatter function to validate
  * @throws {AgLoggerError} When formatter is null, undefined, or not a function
  */
-export const validateFormatter = function(formatter: unknown): void {
-  if (formatter === null || formatter === undefined) {
-    throw new AgLoggerError(
-      ERROR_TYPES.CONFIG,
-      AG_LOGGER_ERROR_MESSAGES.CONFIG.INVALID_FORMATTER,
-    );
-  }
-  if (typeof formatter !== 'function') {
+export const validateFormatter = (formatter: unknown): void => {
+  if (!isValidFormatter(formatter)) {
     throw new AgLoggerError(
       ERROR_TYPES.CONFIG,
       AG_LOGGER_ERROR_MESSAGES.CONFIG.INVALID_FORMATTER,
@@ -67,18 +72,23 @@ export const validateFormatter = function(formatter: unknown): void {
 };
 
 /**
+ * Checks if a given value is a valid logger function
+ * @param logger - Value to check
+ * @returns True if the value is a non-null, non-undefined function, false otherwise
+ */
+export const isValidLogger = (logger: unknown): boolean => {
+  return logger !== null
+    && logger !== undefined
+    && typeof logger === 'function';
+};
+
+/**
  * Validates that a logger function is valid.
  * @param logger - The logger function to validate
  * @throws {AgLoggerError} When logger is null, undefined, or not a function
  */
-export const validateLogger = function(logger: unknown): void {
-  if (logger === null || logger === undefined) {
-    throw new AgLoggerError(
-      ERROR_TYPES.CONFIG,
-      AG_LOGGER_ERROR_MESSAGES.CONFIG.INVALID_LOGGER,
-    );
-  }
-  if (typeof logger !== 'function') {
+export const validateLogger = (logger: unknown): void => {
+  if (!isValidLogger(logger)) {
     throw new AgLoggerError(
       ERROR_TYPES.CONFIG,
       AG_LOGGER_ERROR_MESSAGES.CONFIG.INVALID_LOGGER,

@@ -20,7 +20,7 @@ import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 // plugins
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
-import { validateFormatter, validateLogger, validateLogLevel } from '@/utils/AgLogValidators';
+import { isValidLogger, validateFormatter, validateLogLevel } from '@/utils/AgLogValidators';
 import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
 
 /**
@@ -100,9 +100,13 @@ export class AgLogger {
       validateFormatter(options.formatter);
     }
     if ('defaultLogger' in options) {
-      validateLogger(options.defaultLogger);
+      if (!isValidLogger(options.defaultLogger)) {
+        throw new AgLoggerError(
+          ERROR_TYPES.CONFIG,
+          AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.CONFIG].INVALID_DEFAULT_LOGGER,
+        );
+      }
     }
-
     // If ConsoleLogger is specified without a logger map, apply ConsoleLoggerMap
     const enhancedOptions = { ...options };
     if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
@@ -110,6 +114,40 @@ export class AgLogger {
     }
     // set config
     this._config.setLoggerConfig(enhancedOptions);
+  }
+
+  /**
+   * Sets a custom logger function for a specific log level.
+   * @param logLevel - The log level to set the logger for
+   * @param loggerFunction - The logger function to use for the specified level
+   * @returns true if the logger was set successfully
+   */
+  setLogger(logLevel: AgLogLevel, loggerFunction: AgLoggerFunction): boolean {
+    const validatedLogLevel = validateLogLevel(logLevel);
+    return this._config.setLogger(validatedLogLevel, loggerFunction);
+  }
+
+  /**
+   * Gets the logger function for a specific log level.
+   * @param logLevel - The log level to get the logger function for
+   * @returns The logger function for the specified level
+   */
+  getLoggerFunction(logLevel: AgLogLevel): AgLoggerFunction {
+    const validatedLogLevel = validateLogLevel(logLevel);
+    return this._config.getLoggerFunction(validatedLogLevel);
+  }
+
+  public setFormatter(formatter: AgFormatFunction): void {
+    validateFormatter(formatter);
+    this._config.formatter = formatter;
+  }
+
+  /**
+   * Gets the current formatter function.
+   * @returns The current formatter function
+   */
+  getFormatter(): AgFormatFunction {
+    return this._config.formatter;
   }
 
   /**
@@ -134,9 +172,9 @@ export class AgLogger {
     return this._config.logLevel;
   }
 
-  set logLevel(value: AgLogLevel) {
-    validateLogLevel(value);
-    this._config.logLevel = value;
+  set logLevel(level: AgLogLevel) {
+    const validatedLogLevel = validateLogLevel(level);
+    this._config.logLevel = validatedLogLevel;
   }
 
   /**
@@ -147,18 +185,6 @@ export class AgLogger {
    */
   protected shouldOutput(level: AgLogLevel): boolean {
     return this._config.shouldOutput(level);
-  }
-
-  public getFormatter(): AgFormatFunction {
-    return this._config.formatter;
-  }
-  public getLoggerFunction(level: AgLogLevel): AgLoggerFunction {
-    return this._config.getLoggerFunction(level);
-  }
-
-  public setLogger(level: AgLogLevel, logger: AgLoggerFunction): boolean {
-    validateLogLevel(level);
-    return this._config.setLogger(level, logger);
   }
 
   /**

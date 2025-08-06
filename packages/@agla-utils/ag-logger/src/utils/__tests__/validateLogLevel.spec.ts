@@ -85,8 +85,8 @@ describe('validateLogLevel', () => {
     });
 
     it('should throw AgLoggerError when input is function', () => {
-      expect(() => validateLogLevel((() => { }) as unknown as AgLogLevel)).toThrow(AgLoggerError);
-      expect(() => validateLogLevel((() => { }) as unknown as AgLogLevel)).toThrow('Invalid log level (function');
+      expect(() => validateLogLevel((() => {}) as unknown as AgLogLevel)).toThrow(AgLoggerError);
+      expect(() => validateLogLevel((() => {}) as unknown as AgLogLevel)).toThrow('Invalid log level (function');
     });
   });
 

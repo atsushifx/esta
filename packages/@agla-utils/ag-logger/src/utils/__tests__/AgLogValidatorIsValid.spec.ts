@@ -10,7 +10,53 @@ import { describe, expect, it } from 'vitest';
 import type { AgLogLevel } from '../../../shared/types';
 import { AG_LOGLEVEL } from '../../../shared/types';
 import { AgLoggerError } from '../../../shared/types/AgLoggerError.types.js';
-import { validateLogLevel } from '../AgLogValidators';
+import { isValidFormatter, isValidLogger, validateLogLevel } from '../AgLogValidators';
+
+describe('isValidFormatter', () => {
+  // atsushifx式BDD: 最初のテストのみ作成
+  it('should return false when input is undefined', () => {
+    expect(isValidFormatter(undefined)).toBe(false);
+  });
+
+  // 第二のテスト追加（前のテストが完了したので）
+  it('should return false when input is null', () => {
+    expect(isValidFormatter(null)).toBe(false);
+  });
+
+  // 第三のテスト追加: 無効なタイプ（数値）
+  it('should return false when input is not a function', () => {
+    expect(isValidFormatter(42)).toBe(false);
+  });
+
+  // 第四のテスト追加: 有効な関数
+  it('should return true when input is a function', () => {
+    const anyFunction = (): void => {};
+    expect(isValidFormatter(anyFunction)).toBe(true);
+  });
+});
+
+describe('isValidLogger', () => {
+  // atsushifx式BDD: 最初のテストのみ作成
+  it('should return false when input is undefined', () => {
+    expect(isValidLogger(undefined)).toBe(false);
+  });
+
+  // 第二のテスト追加（前のテストが完了したので）
+  it('should return false when input is null', () => {
+    expect(isValidLogger(null)).toBe(false);
+  });
+
+  // 第三のテスト追加: 無効なタイプ（数値）
+  it('should return false when input is not a function', () => {
+    expect(isValidLogger(42)).toBe(false);
+  });
+
+  // 第四のテスト追加: 有効な関数
+  it('should return true when input is a function', () => {
+    const anyFunction = (): void => {};
+    expect(isValidLogger(anyFunction)).toBe(true);
+  });
+});
 
 describe('validateLogLevel', () => {
   describe('正常系 (Valid cases)', () => {

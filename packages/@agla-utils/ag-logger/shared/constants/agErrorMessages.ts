@@ -38,6 +38,7 @@ export const AG_LOGGER_ERROR_MESSAGES = {
   [ERROR_TYPES.CONFIG]: {
     INVALID_FORMATTER: 'formatter must be a valid function',
     INVALID_LOGGER: 'logger must be a valid function',
+    INVALID_DEFAULT_LOGGER: 'defaultLogger must be a valid function',
     INVALID_CONFIG: 'Invalid configuration options provided',
   },
   [ERROR_TYPES.INITIALIZATION]: {

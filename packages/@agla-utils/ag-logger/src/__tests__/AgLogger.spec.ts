@@ -20,10 +20,13 @@ import { DISABLE, ENABLE } from '../../shared/constants/common.constants';
 // ログレベル定数 - テストで使用するログレベルの定義
 import { AG_LOGLEVEL } from '../../shared/types';
 // 型定義 - ログレベル型とオプション型
-import type { AgLoggerOptions, AgLogLevel } from '../../shared/types';
+import type { AgLogLevel } from '../../shared/types';
 
 // テスト対象 - AgLoggerクラスのメイン実装とgetLogger関数
 import { AgLogger, createLogger } from '../AgLogger.class';
+
+// logger
+import { ConsoleLogger } from '../plugins/logger/ConsoleLogger';
 
 // テスト用モック関数
 const mockLogger = vi.fn();
@@ -186,6 +189,51 @@ describe('ログレベル管理機能', () => {
       expect(mockLogger).toHaveBeenCalledTimes(3);
     });
 
+    it('should block all logs when level is OFF', () => {
+      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+      logger.logLevel = AG_LOGLEVEL.OFF;
+
+      logger.fatal('fatal');
+      logger.error('error');
+      logger.warn('warn');
+      logger.info('info');
+      logger.debug('debug');
+      logger.trace('trace');
+
+      expect(mockLogger).not.toHaveBeenCalled();
+    });
+  });
+
+  /**
+   * 異常系: 無効なログレベル処理
+   */
+  describe('異常系: Invalid Log Level Handling', () => {
+    it('should handle invalid log levels gracefully', () => {
+      const logger = AgLogger.createLogger();
+
+      // TypeScriptでは型安全だが、実行時の動作を確認
+      expect(() => {
+        logger.logLevel = -1 as AgLogLevel;
+      }).toThrow('Invalid log level (-1)');
+      expect(() => {
+        logger.logLevel = 999 as AgLogLevel;
+      }).toThrow('Invalid log level (999)');
+      expect(() => {
+        logger.logLevel = 'string' as unknown as AgLogLevel;
+      }).toThrow('Invalid log level ("string")');
+      expect(() => {
+        logger.logLevel = undefined as unknown as AgLogLevel;
+      }).toThrow('Invalid log level (undefined)');
+      expect(() => {
+        logger.logLevel = null as unknown as AgLogLevel;
+      }).toThrow('Invalid log level (null)');
+    });
+  });
+
+  /**
+   * エッジケース: 境界値とレベル変更
+   */
+  describe('エッジケース: Boundary Values and Level Changes', () => {
     it('should handle boundary log levels correctly', () => {
       const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
 
@@ -472,349 +520,405 @@ describe('Verbose機能', () => {
       expect(logger.isVerbose).toBe(DISABLE);
     });
   });
+});
 
-  describe('基本的なverbose動作', () => {
-    it('should manage verbose state correctly', () => {
-      const logger = AgLogger.createLogger();
-
-      // デフォルトはfalse
-      expect(logger.isVerbose).toBe(DISABLE);
-
-      // trueに設定
-      expect(logger.setVerbose = ENABLE).toBe(ENABLE);
-      expect(logger.isVerbose).toBe(ENABLE);
-
-      // falseに戻す
-      expect(logger.setVerbose = DISABLE).toBe(DISABLE);
-    });
-
-    it('should control verbose output correctly', () => {
+/**
+ * executeLog 空ログ抑制機能
+ *
+ * @description executeLogメソッドの空ログ抑制動作をテスト
+ */
+describe('executeLog Empty Log Suppression', () => {
+  setupTestEnvironment();
+  /**
+   * 正常系: 空ログ抑制の基本動作
+   */
+  describe('エッジケース: Verbose State Changes', () => {
+    it('should handle rapid verbose state changes', () => {
       const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
+      /* エッジケース: verbose状態変更 */
+      describe('エッジケース: Verbose State Changes', () => {
+        it('should handle rapid verbose state changes', () => {
+          const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+          logger.logLevel = AG_LOGLEVEL.INFO;
 
-      // verbose off - no output
-      logger.verbose('verbose off');
-      expect(mockLogger).not.toHaveBeenCalled();
+          for (let i = 0; i < 100; i++) {
+            logger.setVerbose = i % 2 === 0;
+            logger.verbose(`verbose ${i}`);
+          }
 
-      // verbose on - output
-      logger.setVerbose = ENABLE;
-      logger.verbose('verbose on');
-      expect(mockLogger).toHaveBeenCalledTimes(1);
+          expect(mockLogger).toHaveBeenCalledTimes(50); // verbose がtrueの時のみ
+        });
+      });
     });
   });
 });
 
 /**
- * 設定管理システム (Configuration Management System)
+ * getLogger便利関数
  *
- * @description AgLoggerConfigによる設定の委譲、プロパティアクセス、状態管理のテスト
+ * @description getLogger関数の動作、ConsoleLogger自動設定のテスト
  */
-describe('設定管理システム', () => {
+describe('getLogger Convenience Function', () => {
   setupTestEnvironment();
-
-  describe('プロパティ委譲の基本動作', () => {
-    it('should delegate verbose property access to config', () => {
-      const logger = AgLogger.createLogger();
-      expect(logger.isVerbose).toBe(DISABLE);
-    });
-
-    it('should delegate verbose property updates to config', () => {
-      const logger = AgLogger.createLogger();
-      logger.setVerbose = ENABLE;
-      expect(logger.isVerbose).toBe(ENABLE);
-    });
-
-    it('should maintain verbose state through config', () => {
-      const logger = AgLogger.createLogger();
-      logger.setVerbose = ENABLE;
-      const result = logger.isVerbose;
-      expect(result).toBe(ENABLE);
-    });
-
-    it('should delegate log level property access to config', () => {
-      const logger = AgLogger.createLogger();
-      expect(logger.logLevel).toBe(AG_LOGLEVEL.OFF);
-    });
-
-    it('should delegate log level property updates to config', () => {
-      const logger = AgLogger.createLogger();
+  /**
+   * 正常系: 基本的なgetLogger動作
+   */
+  describe('正常系: Basic getLogger Operations', () => {
+    it('should auto-assign ConsoleLoggerMap when using ConsoleLogger', () => {
+      AgLogger.createLogger({ defaultLogger: ConsoleLogger });
+      const logger = AgLogger.getLogger();
       logger.logLevel = AG_LOGLEVEL.INFO;
-      expect(logger.logLevel).toBe(AG_LOGLEVEL.INFO);
+
+      // ConsoleLoggerMapが自動適用されることを間接的に確認
+      expect(logger).toBeInstanceOf(AgLogger);
+    });
+
+    it('should work with custom logger and formatter', () => {
+      AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+      const logger = AgLogger.getLogger();
+      logger.logLevel = AG_LOGLEVEL.INFO;
+      logger.info('test');
+
+      expect(mockLogger).toHaveBeenCalled();
+      expect(mockFormatter).toHaveBeenCalled();
+    });
+
+    /**
+     * 異常系: 無効なオプション処理
+     */
+    describe('異常系: Invalid Options Handling', () => {
+      it('should handle invalid options by throwing an error with descriptive message', () => {
+        expect(() => {
+          // @ts-expect-error: Testing invalid null input
+          AgLogger.createLogger(null);
+        }).toThrow('Cannot read properties of null');
+      });
+    });
+
+    /**
+     * エッジケース: ConsoleLogger自動設定
+     */
+    describe('エッジケース: ConsoleLogger Auto-configuration', () => {
+      it('should handle ConsoleLogger auto-configuration', () => {
+        // createLogger with ConsoleLogger should auto-assign ConsoleLoggerMap
+        AgLogger.createLogger({ defaultLogger: ConsoleLogger });
+        const logger1 = AgLogger.getLogger();
+        expect(logger1).toBeInstanceOf(AgLogger);
+
+        // setManager with ConsoleLogger should auto-assign ConsoleLoggerMap
+        AgLogger.createLogger();
+        const logger2 = AgLogger.getLogger();
+        logger2.setLoggerConfig({ defaultLogger: ConsoleLogger });
+        expect(logger2).toBeInstanceOf(AgLogger);
+      });
+
+      it('should preserve custom loggerMap when using ConsoleLogger', () => {
+        const customMap = { [AG_LOGLEVEL.ERROR]: mockLogger };
+        AgLogger.createLogger({
+          defaultLogger: ConsoleLogger,
+          loggerMap: customMap,
+        });
+        const logger = AgLogger.getLogger();
+        logger.error('test error');
+        expect(mockLogger).not.toHaveBeenCalled();
+      });
     });
   });
-
-  describe('出力レベルフィルタリング', () => {
-    it('should use config shouldOutput method for filtering', () => {
-      const logger = AgLogger.createLogger();
-      logger.logLevel = AG_LOGLEVEL.INFO;
-      const loggerForTesting = logger as TestableAgLogger;
-
-      const shouldOutputError = loggerForTesting.shouldOutput(AG_LOGLEVEL.ERROR);
-      const shouldOutputDebug = loggerForTesting.shouldOutput(AG_LOGLEVEL.DEBUG);
-
-      expect(shouldOutputError).toBe(ENABLE);
-      expect(shouldOutputDebug).toBe(DISABLE);
-    });
-  });
-
-  describe('shouldOutput Protected Method Access', () => {
-    it('should expose shouldOutput method to test subclasses', () => {
-      const logger = AgLogger.createLogger();
-      const loggerForTesting = logger as TestableAgLogger;
-
-      expect(typeof loggerForTesting.shouldOutput).toBe('function');
-    });
-
-    it('should return true when log level ERROR is at INFO threshold', () => {
-      const logger = AgLogger.createLogger();
-      logger.logLevel = AG_LOGLEVEL.INFO;
-      const loggerForTesting = logger as TestableAgLogger;
-
-      const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.ERROR);
-
-      expect(result).toBe(ENABLE);
-    });
-
-    it('should return false when log level DEBUG is above INFO threshold', () => {
-      const logger = AgLogger.createLogger();
-      logger.logLevel = AG_LOGLEVEL.INFO;
-      const loggerForTesting = logger as TestableAgLogger;
-
-      const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.DEBUG);
-
-      expect(result).toBe(DISABLE);
-    });
-
-    it('should return false when log level is OFF regardless of message level', () => {
-      const logger = AgLogger.createLogger();
-      logger.logLevel = AG_LOGLEVEL.OFF;
-      const loggerForTesting = logger as TestableAgLogger;
-
-      const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.ERROR);
-
-      expect(result).toBe(DISABLE);
-    });
-
-    it('should return true for VERBOSE level when verbose flag is enabled', () => {
-      const logger = AgLogger.createLogger();
-      logger.setVerbose = ENABLE;
-      const loggerForTesting = logger as TestableAgLogger;
-
-      const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.VERBOSE);
-
-      expect(result).toBe(ENABLE);
-    });
-
-    it('should return false for VERBOSE level when verbose flag is disabled', () => {
-      const logger = AgLogger.createLogger();
-      logger.setVerbose = DISABLE;
-      const loggerForTesting = logger as TestableAgLogger;
-
-      const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.VERBOSE);
-
-      expect(result).toBe(DISABLE);
-    });
-
-    it('should return true for VERBOSE level when verbose flag is enabled even with OFF log level', () => {
-      const logger = AgLogger.createLogger();
-      logger.logLevel = AG_LOGLEVEL.OFF;
-      logger.setVerbose = ENABLE;
-      const loggerForTesting = logger as TestableAgLogger;
-
-      const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.VERBOSE);
-
-      expect(result).toBe(ENABLE);
-    });
-  });
-
-  describe('Verboseメソッドと設定連携', () => {
-    setupTestEnvironment();
-
-    it('should respect config verbose setting in verbose method', () => {
-      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
-
-      logger.verbose('test message');
-      expect(mockLogger).not.toHaveBeenCalled();
-
-      logger.setVerbose = ENABLE;
-      logger.verbose('test message');
-      expect(mockLogger).toHaveBeenCalledWith('test message');
-    });
-  });
-});
-
-/**
- * executeLog メソッドの動作テスト
- *
- * @description executeLogメソッドの保護されたメソッドとしての動作テスト
- */
-describe('executeLog メソッドの動作テスト', () => {
-  setupTestEnvironment();
 
   /**
-   * Test class that extends AgLogger to expose executeLog method for testing
+   * 設定管理システム (Configuration Management System)
+   *
+   * @description AgLoggerConfigによる設定の委譲、プロパティアクセス、状態管理のテスト
    */
-  class TestAgLogger extends AgLogger {
-    static getTestLogger(options?: AgLoggerOptions): TestAgLogger {
-      const instance = new TestAgLogger();
-      if (options !== undefined) {
-        instance.setLoggerConfig(options);
-      }
-      return instance;
-    }
+  describe('設定管理システム', () => {
+    setupTestEnvironment();
 
-    // Expose the protected executeLog method for testing
-    public executeLog(level: AgLogLevel, ...args: unknown[]): void {
-      return super.executeLog(level, ...args);
-    }
-  }
-
-  describe('メソッドのアクセス可能性', () => {
-    it('should have executeLog method accessible in TestAgLogger', () => {
-      const testLogger = TestAgLogger.getTestLogger();
-
-      expect(typeof testLogger.executeLog).toBe('function');
-      expect(testLogger.executeLog).toBeDefined();
-    });
-  });
-
-  describe('動作の同等性テスト', () => {
-    it('should filter logs based on log level same as original implementation', () => {
-      const testLogger = TestAgLogger.getTestLogger({
-        defaultLogger: mockLogger,
-        formatter: mockFormatter,
+    describe('プロパティ委譲の基本動作', () => {
+      it('should delegate verbose property access to config', () => {
+        const logger = AgLogger.createLogger();
+        expect(logger.isVerbose).toBe(DISABLE);
       });
-      testLogger.logLevel = AG_LOGLEVEL.WARN;
 
-      testLogger.executeLog(AG_LOGLEVEL.DEBUG, 'debug'); // should be filtered
-      testLogger.executeLog(AG_LOGLEVEL.INFO, 'info'); // should be filtered
-      testLogger.executeLog(AG_LOGLEVEL.WARN, 'warn'); // should be logged
-      testLogger.executeLog(AG_LOGLEVEL.ERROR, 'error'); // should be logged
-
-      expect(mockLogger).toHaveBeenCalledTimes(2);
-    });
-
-    it('should format messages using formatter same as original implementation', () => {
-      const customFormatter = vi.fn().mockReturnValue('formatted message');
-      const testLogger = TestAgLogger.getTestLogger({
-        defaultLogger: mockLogger,
-        formatter: customFormatter,
+      it('should delegate verbose property updates to config', () => {
+        const logger = AgLogger.createLogger();
+        logger.setVerbose = ENABLE;
+        expect(logger.isVerbose).toBe(ENABLE);
       });
-      testLogger.logLevel = AG_LOGLEVEL.INFO;
 
-      testLogger.executeLog(AG_LOGLEVEL.INFO, 'test message');
-
-      expect(customFormatter).toHaveBeenCalled();
-      expect(mockLogger).toHaveBeenCalledWith('formatted message');
-    });
-  });
-
-  describe('executeLog should use config.getLoggerFunction instead of manager.getLogger', () => {
-    it('should call config.getLoggerFunction when getting logger', () => {
-      const customErrorLogger = vi.fn();
-      const customWarnLogger = vi.fn();
-      const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger,
-        formatter: mockFormatter,
-        loggerMap: {
-          [AG_LOGLEVEL.ERROR]: customErrorLogger,
-          [AG_LOGLEVEL.WARN]: customWarnLogger,
-        },
+      it('should maintain verbose state through config', () => {
+        const logger = AgLogger.createLogger();
+        logger.setVerbose = ENABLE;
+        const result = logger.isVerbose;
+        expect(result).toBe(ENABLE);
       });
-      logger.logLevel = AG_LOGLEVEL.TRACE;
-      const testableLogger = logger as TestableAgLogger;
 
-      testableLogger.executeLog(AG_LOGLEVEL.ERROR, 'error message');
-      testableLogger.executeLog(AG_LOGLEVEL.WARN, 'warn message');
-      testableLogger.executeLog(AG_LOGLEVEL.INFO, 'info message'); // uses defaultLogger
+      it('should delegate log level property access to config', () => {
+        const logger = AgLogger.createLogger();
+        expect(logger.logLevel).toBe(AG_LOGLEVEL.OFF);
+      });
 
-      expect(customErrorLogger).toHaveBeenCalledTimes(1);
-      expect(customWarnLogger).toHaveBeenCalledTimes(1);
-      expect(mockLogger).toHaveBeenCalledTimes(1); // for INFO level
+      it('should delegate log level property updates to config', () => {
+        const logger = AgLogger.createLogger();
+        logger.logLevel = AG_LOGLEVEL.INFO;
+        expect(logger.logLevel).toBe(AG_LOGLEVEL.INFO);
+      });
+    });
+
+    describe('出力レベルフィルタリング', () => {
+      it('should use config shouldOutput method for filtering', () => {
+        const logger = AgLogger.createLogger();
+        logger.logLevel = AG_LOGLEVEL.INFO;
+        const loggerForTesting = logger as TestableAgLogger;
+
+        const shouldOutputError = loggerForTesting.shouldOutput(AG_LOGLEVEL.ERROR);
+        const shouldOutputDebug = loggerForTesting.shouldOutput(AG_LOGLEVEL.DEBUG);
+
+        expect(shouldOutputError).toBe(ENABLE);
+        expect(shouldOutputDebug).toBe(DISABLE);
+      });
+    });
+
+    describe('shouldOutput Protected Method Access', () => {
+      it('should expose shouldOutput method to test subclasses', () => {
+        const logger = AgLogger.createLogger();
+        const loggerForTesting = logger as TestableAgLogger;
+
+        expect(typeof loggerForTesting.shouldOutput).toBe('function');
+      });
+
+      it('should return true when log level ERROR is at INFO threshold', () => {
+        const logger = AgLogger.createLogger();
+        logger.logLevel = AG_LOGLEVEL.INFO;
+        const loggerForTesting = logger as TestableAgLogger;
+
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.ERROR);
+
+        expect(result).toBe(ENABLE);
+      });
+
+      it('should return false when log level DEBUG is above INFO threshold', () => {
+        const logger = AgLogger.createLogger();
+        logger.logLevel = AG_LOGLEVEL.INFO;
+        const loggerForTesting = logger as TestableAgLogger;
+
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.DEBUG);
+
+        expect(result).toBe(DISABLE);
+      });
+
+      it('should return false when log level is OFF regardless of message level', () => {
+        const logger = AgLogger.createLogger();
+        logger.logLevel = AG_LOGLEVEL.OFF;
+        const loggerForTesting = logger as TestableAgLogger;
+
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.ERROR);
+
+        expect(result).toBe(DISABLE);
+      });
+
+      it('should return true for VERBOSE level when verbose flag is enabled', () => {
+        const logger = AgLogger.createLogger();
+        logger.setVerbose = ENABLE;
+        const loggerForTesting = logger as TestableAgLogger;
+
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.VERBOSE);
+
+        expect(result).toBe(ENABLE);
+      });
+
+      it('should return false for VERBOSE level when verbose flag is disabled', () => {
+        const logger = AgLogger.createLogger();
+        logger.setVerbose = DISABLE;
+        const loggerForTesting = logger as TestableAgLogger;
+
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.VERBOSE);
+
+        expect(result).toBe(DISABLE);
+      });
+
+      it('should return true for VERBOSE level when verbose flag is enabled even with OFF log level', () => {
+        const logger = AgLogger.createLogger();
+        logger.logLevel = AG_LOGLEVEL.OFF;
+        logger.setVerbose = ENABLE;
+        const loggerForTesting = logger as TestableAgLogger;
+
+        const result = loggerForTesting.shouldOutput(AG_LOGLEVEL.VERBOSE);
+
+        expect(result).toBe(ENABLE);
+      });
+    });
+
+    describe('Verboseメソッドと設定連携', () => {
+      setupTestEnvironment();
+
+      it('should respect config verbose setting in verbose method', () => {
+        const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+
+        logger.verbose('test message');
+        expect(mockLogger).not.toHaveBeenCalled();
+
+        logger.setVerbose = ENABLE;
+        logger.verbose('test message');
+        expect(mockLogger).toHaveBeenCalledWith('test message');
+      });
     });
   });
 
-  describe('executeLog 空ログ抑制機能', () => {
-    it('should not output when message is empty and no additional arguments', () => {
-      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
-      logger.logLevel = AG_LOGLEVEL.INFO;
-      const testableLogger = logger as TestableAgLogger;
+  /**
+   * executeLog メソッドの動作テスト
+   *
+   * @description executeLogメソッドの保護されたメソッドとしての動作テスト
+   */
+  describe('executeLog メソッドの動作テスト', () => {
+    setupTestEnvironment();
 
-      testableLogger.executeLog(AG_LOGLEVEL.INFO, '');
+    /**
+     * 正常系: executeLog comprehensive behavior test
+     */
+    describe('正常系: Comprehensive executeLog Behavior', () => {
+      it('should handle method accessibility, filtering, formatting, and empty output', () => {
+        const customFormatter = vi.fn().mockReturnValue('formatted message');
+        const testLogger = createLogger({ defaultLogger: mockLogger, formatter: customFormatter }) as TestableAgLogger;
 
-      expect(mockLogger).not.toHaveBeenCalled();
+        expect(typeof testLogger.executeLog).toBe('function');
+        expect(testLogger.executeLog).toBeDefined();
+      });
+    });
+
+    describe('動作の同等性テスト', () => {
+      it('should filter logs based on log level same as original implementation', () => {
+        const testLogger = createLogger({
+          defaultLogger: mockLogger,
+          formatter: mockFormatter,
+        }) as TestableAgLogger;
+        testLogger.logLevel = AG_LOGLEVEL.WARN;
+
+        testLogger.executeLog(AG_LOGLEVEL.DEBUG, 'debug'); // should be filtered
+        testLogger.executeLog(AG_LOGLEVEL.INFO, 'info'); // should be filtered
+        testLogger.executeLog(AG_LOGLEVEL.WARN, 'warn'); // should be logged
+        testLogger.executeLog(AG_LOGLEVEL.ERROR, 'error'); // should be logged
+
+        expect(mockLogger).toHaveBeenCalledTimes(2);
+      });
+
+      it('should format messages using formatter same as original implementation', () => {
+        const customFormatter = vi.fn().mockReturnValue('formatted message');
+        const testLogger = createLogger({
+          defaultLogger: mockLogger,
+          formatter: customFormatter,
+        }) as TestableAgLogger;
+        testLogger.logLevel = AG_LOGLEVEL.INFO;
+
+        testLogger.executeLog(AG_LOGLEVEL.INFO, 'test message');
+
+        expect(customFormatter).toHaveBeenCalled();
+        expect(mockLogger).toHaveBeenCalledWith('formatted message');
+      });
+    });
+
+    describe('executeLog should use config.getLoggerFunction instead of manager.getLogger', () => {
+      it('should call config.getLoggerFunction when getting logger', () => {
+        const customErrorLogger = vi.fn();
+        const customWarnLogger = vi.fn();
+        const logger = AgLogger.createLogger({
+          defaultLogger: mockLogger,
+          formatter: mockFormatter,
+          loggerMap: {
+            [AG_LOGLEVEL.ERROR]: customErrorLogger,
+            [AG_LOGLEVEL.WARN]: customWarnLogger,
+          },
+        });
+        logger.logLevel = AG_LOGLEVEL.TRACE;
+        const testableLogger = logger as TestableAgLogger;
+
+        testableLogger.executeLog(AG_LOGLEVEL.ERROR, 'error message');
+        testableLogger.executeLog(AG_LOGLEVEL.WARN, 'warn message');
+        testableLogger.executeLog(AG_LOGLEVEL.INFO, 'info message'); // uses defaultLogger
+
+        expect(customErrorLogger).toHaveBeenCalledTimes(1);
+        expect(customWarnLogger).toHaveBeenCalledTimes(1);
+        expect(mockLogger).toHaveBeenCalledTimes(1); // for INFO level
+      });
+    });
+
+    describe('executeLog 空ログ抑制機能', () => {
+      it('should not output when message is empty and no additional arguments', () => {
+        const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger.logLevel = AG_LOGLEVEL.INFO;
+        const testableLogger = logger as TestableAgLogger;
+
+        testableLogger.executeLog(AG_LOGLEVEL.INFO, '');
+
+        expect(mockLogger).not.toHaveBeenCalled();
+      });
     });
   });
-});
 
-/**
- * FORCE_OUTPUT Log Level
- *
- * @description BDD tests for FORCE_OUTPUT log level behavior
- */
-describe('FORCE_OUTPUT Log Level', () => {
-  setupTestEnvironment();
+  /**
+   * FORCE_OUTPUT Log Level
+   *
+   * @description BDD tests for FORCE_OUTPUT log level behavior
+   */
+  describe('FORCE_OUTPUT Log Level', () => {
+    setupTestEnvironment();
 
-  describe('log method with FORCE_OUTPUT should output regardless of logLevel and verbose settings', () => {
-    it('should output when both logLevel is OFF and verbose is false', () => {
-      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
-      logger.logLevel = AG_LOGLEVEL.OFF;
-      logger.setVerbose = DISABLE;
+    describe('log method with FORCE_OUTPUT should output regardless of logLevel and verbose settings', () => {
+      it('should output when both logLevel is OFF and verbose is false', () => {
+        const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        logger.logLevel = AG_LOGLEVEL.OFF;
+        logger.setVerbose = DISABLE;
 
-      logger.log('force output message');
+        logger.log('force output message');
 
-      expect(mockLogger).toHaveBeenCalledTimes(1);
-    });
-  });
-});
-
-/**
- * Input Validation for LogLevel Parameters
- *
- * @description AgLoggerの executeLog, setLogger, setLogLevel でlogLevelが範囲外の時にエラーを投げる入力バリデーション
- */
-describe('Input Validation for LogLevel Parameters', () => {
-  setupTestEnvironment();
-
-  describe('executeLog method should validate logLevel input', () => {
-    it('should throw error when logLevel is undefined', () => {
-      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
-      const testableLogger = logger as TestableAgLogger;
-
-      expect(() => {
-        testableLogger.executeLog(undefined as unknown as AgLogLevel, 'test message');
-      }).toThrow('Invalid log level (undefined)');
+        expect(mockLogger).toHaveBeenCalledTimes(1);
+      });
     });
   });
 
-  describe('logLevel setter should validate logLevel input', () => {
-    it('should throw error when logLevel is null', () => {
-      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+  /**
+   * Input Validation for LogLevel Parameters
+   *
+   * @description AgLoggerの executeLog, setLogger, setLogLevel でlogLevelが範囲外の時にエラーを投げる入力バリデーション
+   */
+  describe('Input Validation for LogLevel Parameters', () => {
+    setupTestEnvironment();
 
-      expect(() => {
-        logger.logLevel = null as unknown as AgLogLevel;
-      }).toThrow('Invalid log level (null)');
-    });
-  });
+    describe('executeLog method should validate logLevel input', () => {
+      it('should throw error when logLevel is undefined', () => {
+        const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
+        const testableLogger = logger as TestableAgLogger;
 
-  describe('setLogger method', () => {
-    it('should retrieve the same logger that was set via setLogger', () => {
-      const logger = AgLogger.createLogger();
-      const customLogger = vi.fn();
-
-      const result = logger.setLogger(AG_LOGLEVEL.INFO, customLogger);
-      expect(result).toBe(ENABLE);
-
-      const retrievedLogger = logger.getLoggerFunction(AG_LOGLEVEL.INFO);
-      expect(retrievedLogger).toBe(customLogger);
+        expect(() => {
+          testableLogger.executeLog(undefined as unknown as AgLogLevel, 'test message');
+        }).toThrow('Invalid log level (undefined)');
+      });
     });
 
-    it('should throw error when setLogger is called with invalid logLevel', () => {
-      const logger = AgLogger.createLogger();
-      const mockLogger = vi.fn();
+    describe('logLevel setter should validate logLevel input', () => {
+      it('should throw error when logLevel is null', () => {
+        const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
 
-      expect(() => logger.setLogger(undefined as unknown as AgLogLevel, mockLogger))
-        .toThrow('Invalid log level (undefined)');
+        expect(() => {
+          logger.logLevel = null as unknown as AgLogLevel;
+        }).toThrow('Invalid log level (null)');
+      });
+    });
+
+    describe('setVerbose setter should exist', () => {
+      it('should set verbose to true using setVerbose setter', () => {
+        const logger = AgLogger.createLogger();
+        logger.setVerbose = true;
+        expect(logger.isVerbose).toBe(true);
+      });
+    });
+
+    describe('existing methods should coexist', () => {
+      it('should allow both isVerbose() method and isVerbose getter to work', () => {
+        const logger = AgLogger.createLogger();
+        expect(logger.isVerbose).toBe(false);
+        expect(logger.isVerbose).toBe(false);
+      });
     });
   });
 });

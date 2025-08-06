@@ -27,7 +27,7 @@ describe('AgLogger setLoggerConfig validator error check', () => {
     // Act & Assert
     expect(() => logger.setLoggerConfig(invalidOptions)).toThrow(AgLoggerError);
     expect(() => logger.setLoggerConfig(invalidOptions)).toThrow(
-      AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.CONFIG].INVALID_LOGGER,
+      AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.CONFIG].INVALID_DEFAULT_LOGGER,
     );
   });
 
@@ -41,6 +41,7 @@ describe('AgLogger setLoggerConfig validator error check', () => {
     expect(() => logger.setLoggerConfig(invalidOptions)).toThrow(
       AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.CONFIG].INVALID_FORMATTER,
     );
+    expect(() => logger.setLoggerConfig(invalidOptions)).toThrow('formatter must be a valid function');
   });
 });
 
@@ -60,8 +61,9 @@ describe('AgLogger getFormatter validator error check', () => {
 
   it('should validate and return formatter when valid formatter is set', () => {
     // Arrange
-    const logger = AgLogger.createLogger();
     const mockFormatter = (message: AgLogMessage): string => `formatted: ${message.message}`;
+    const logger = AgLogger.createLogger();
+
     logger.setLoggerConfig({ formatter: mockFormatter });
 
     // Act & Assert

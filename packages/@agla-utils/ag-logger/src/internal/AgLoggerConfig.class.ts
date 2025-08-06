@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // utilities
-import { isValidLogLevel } from '../utils/AgLogValidators';
+import { isValidFormatter, isValidLogger, isValidLogLevel } from '../utils/AgLogValidators';
 
 // types
 import type { AgLoggerMap, AgLogLevel } from '../../shared/types';
@@ -97,6 +97,8 @@ export class AgLoggerConfig {
     this._loggerMap.set(AG_LOGLEVEL.TRACE, NullLogger);
   }
 
+  /**  }
+
   /**
    * Gets a copy of the current logger map.
    * @returns Map of log levels to logger functions
@@ -150,7 +152,10 @@ export class AgLoggerConfig {
    * Sets the formatter function.
    * @param formatter - The formatter function to set
    */
-  protected set formatter(formatter: AgFormatFunction) {
+  public set formatter(formatter: AgFormatFunction) {
+    if (!isValidFormatter(formatter)) {
+      return;
+    }
     this._options.formatter = formatter;
   }
 
@@ -227,7 +232,6 @@ export class AgLoggerConfig {
     if (level === AG_LOGLEVEL.VERBOSE) {
       return this.isVerbose;
     }
-
     // When log level is OFF, no output should be generated
     if (this._options.logLevel === AG_LOGLEVEL.OFF) {
       return false;
@@ -292,8 +296,20 @@ export class AgLoggerConfig {
    *
    * @since 0.2.0
    */
-  public setLoggerConfig(options: AgLoggerOptions): void {
-    // Update options
+  public setLoggerConfig(options: AgLoggerOptions): boolean {
+    // Validate provided options
+    if ('defaultLogger' in options) {
+      if (!isValidLogger(options.defaultLogger)) {
+        return false;
+      }
+    }
+    if ('formatter' in options) {
+      if (!isValidFormatter(options.formatter)) {
+        return false;
+      }
+    }
+
+    // After validation, safely update options
     this._options = { ...this._options, ...options };
 
     // Apply loggerMap setting if provided (this overrides the defaultLogger initialization above)
@@ -301,6 +317,7 @@ export class AgLoggerConfig {
       this._options.loggerMap = { ...this._options.loggerMap, ...options.loggerMap };
       this.updateLoggerMap(options.loggerMap);
     }
+    return true;
   }
 
   /**
