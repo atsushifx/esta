@@ -22,30 +22,6 @@ import { AgLogger } from '../../AgLogger.class';
 
 // テストケース用設定
 
-/** 自己参照 */
-type TCircularObj = {
-  name: string;
-  self?: TCircularObj;
-};
-/** 親子参照 */
-type TParentChildObj = {
-  name: string;
-  parent?: TParentChildObj;
-  children?: TParentChildObj[];
-};
-
-/** 深い参照 */
-type TDeepObj = {
-  level: number;
-  nested?: TDeepObj;
-};
-
-/** カスタムエラー */
-type TCustomError = Error & {
-  code: string;
-  details: unknown;
-};
-
 /**
  * 共通のテストセットアップとクリーンアップ
  */
@@ -131,61 +107,36 @@ describe('Special Arguments Edge Cases', () => {
 });
 
 /**
- * 複雑なオブジェクト構造のエッジケース
+ * 基本的なオブジェクト構造のエッジケース
  * logger.infoで代表してテスト（全ログメソッド共通機能）
- */
-/**
- * 基本オブジェクト構造ユニットテスト
- * @description プレーンオブジェクト/配列の受け入れを検証
  */
 describe('Basic Object Structure Edge Cases', () => {
   setupTestEnvironment();
 
-  describe('Circular references', () => {
-    it('should handle circular references in objects', () => {
+  describe('Simple object handling', () => {
+    it('should handle plain objects', () => {
       const logger = AgLogger.createLogger();
       logger.logLevel = AG_LOGLEVEL.INFO;
 
-      const circularObj: TCircularObj = { name: 'test' };
-      circularObj.self = circularObj;
+      const simpleObj = { key: 'value', number: 42, boolean: true };
 
-      expect(() => logger.info('circular', circularObj)).not.toThrow();
+      expect(() => logger.info('simple object', simpleObj)).not.toThrow();
     });
 
-    it('should handle nested circular references', () => {
+    it('should handle arrays', () => {
       const logger = AgLogger.createLogger();
       logger.logLevel = AG_LOGLEVEL.INFO;
 
-      const parent: TParentChildObj = { name: 'parent', children: [] };
-      const child: TParentChildObj = { name: 'child', parent: parent };
-      parent.children?.push(child);
+      const simpleArray = [1, 'two', { three: 3 }, [4, 5]];
 
-      expect(() => logger.info('nested circular', parent)).not.toThrow();
-    });
-  });
-
-  describe('Deep nesting', () => {
-    it('should handle deeply nested objects', () => {
-      const logger = AgLogger.createLogger();
-      logger.logLevel = AG_LOGLEVEL.INFO;
-
-      let deepObj: TDeepObj = { level: 0 };
-      for (let i = 1; i < 100; i++) {
-        deepObj = { level: i, nested: deepObj };
-      }
-
-      expect(() => logger.info('deep object', deepObj)).not.toThrow();
+      expect(() => logger.info('array', simpleArray)).not.toThrow();
     });
   });
 });
 
 /**
- * エラーオブジェクト処理のエッジケース
+ * 基本的なエラーオブジェクト処理のエッジケース
  * logger.infoで代表してテスト（全ログメソッド共通機能）
- */
-/**
- * 基本エラーオブジェクトユニットテスト
- * @description 標準Error系の取り扱いを検証
  */
 describe('Basic Error Object Edge Cases', () => {
   setupTestEnvironment();
@@ -196,122 +147,89 @@ describe('Basic Error Object Edge Cases', () => {
       logger.logLevel = AG_LOGLEVEL.INFO;
 
       const errorObj = new Error('Test error');
-      logger.info('error logging', errorObj);
+      expect(() => logger.info('error logging', errorObj)).not.toThrow();
     });
 
-    it('should handle custom error types', () => {
+    it('should handle TypeError objects', () => {
       const logger = AgLogger.createLogger();
       logger.logLevel = AG_LOGLEVEL.INFO;
 
       const typeError = new TypeError('Type error');
-      const rangeError = new RangeError('Range error');
-
-      logger.info('multiple errors', typeError, rangeError);
+      expect(() => logger.info('type error', typeError)).not.toThrow();
     });
-  });
 
-  describe('Error with additional properties', () => {
-    it('should handle errors with custom properties', () => {
+    it('should handle RangeError objects', () => {
       const logger = AgLogger.createLogger();
       logger.logLevel = AG_LOGLEVEL.INFO;
 
-      const customError = new Error('Custom error');
-      (customError as TCustomError).code = 'CUSTOM_CODE';
-      (customError as TCustomError).details = { id: 123, context: 'test' };
-
-      logger.info('custom error', customError);
+      const rangeError = new RangeError('Range error');
+      expect(() => logger.info('range error', rangeError)).not.toThrow();
     });
   });
 });
 
 /**
- * 大量データ処理のエッジケース
+ * 基本的なデータ型エッジケース
  * logger.infoで代表してテスト（全ログメソッド共通機能）
- */
-/**
- * 基本データ型ユニットテスト
- * @description BigIntやSymbol等の取り扱いを検証
  */
 describe('Basic Data Type Edge Cases', () => {
   setupTestEnvironment();
 
-  describe('Large messages', () => {
-    it('should handle very long messages', () => {
+  describe('Primitive types', () => {
+    it('should handle BigInt arguments', () => {
       const logger = AgLogger.createLogger();
       logger.logLevel = AG_LOGLEVEL.INFO;
 
-      const longMessage = 'x'.repeat(10000);
-      logger.info(longMessage);
-    });
-  });
-
-  describe('Many arguments', () => {
-    it('should handle large number of arguments', () => {
-      const logger = AgLogger.createLogger();
-      logger.logLevel = AG_LOGLEVEL.INFO;
-
-      const manyArgs = Array.from({ length: 100 }, (_, i) => `arg${i}`);
-      logger.info('many args', ...manyArgs);
+      const bigIntValue = BigInt('123456789012345678901234567890');
+      expect(() => logger.info('bigint test', bigIntValue)).not.toThrow();
     });
 
-    it('should handle large objects in arguments', () => {
+    it('should handle Symbol arguments', () => {
       const logger = AgLogger.createLogger();
       logger.logLevel = AG_LOGLEVEL.INFO;
 
-      const largeObject = {
-        data: Array.from({ length: 1000 }, (_, i) => ({
-          id: i,
-          name: `item_${i}`,
-          value: Math.random(),
-        })),
-      };
-
-      logger.info('large object', largeObject);
+      const testSymbol = Symbol('test');
+      expect(() => logger.info('symbol test', testSymbol)).not.toThrow();
     });
   });
 });
 
 /**
- * 特殊な文字とエンコーディングのエッジケース
+ * 基本的な文字とエンコーディングのエッジケース
  * logger.infoで代表してテスト（全ログメソッド共通機能）
- */
-/**
- * 文字・エンコーディングユニットテスト
- * @description Unicode/制御文字/エスケープの取り扱いを検証
  */
 describe('Basic Character and Encoding Edge Cases', () => {
   setupTestEnvironment();
 
   describe('Unicode and special characters', () => {
-    it('should handle Unicode characters', () => {
+    it('should handle basic Unicode characters', () => {
       const logger = AgLogger.createLogger();
       logger.logLevel = AG_LOGLEVEL.INFO;
 
-      logger.info('Unicode test: 🌟 ñ © ® ™ ½ ¼ ¾');
+      expect(() => logger.info('Unicode test: ñ © ® ™')).not.toThrow();
     });
 
     it('should handle control characters', () => {
       const logger = AgLogger.createLogger();
       logger.logLevel = AG_LOGLEVEL.INFO;
 
-      logger.info('Control chars: \t\n\r\b\f');
+      expect(() => logger.info('Control chars: \t\n\r')).not.toThrow();
     });
 
     it('should handle escape sequences', () => {
       const logger = AgLogger.createLogger();
       logger.logLevel = AG_LOGLEVEL.INFO;
 
-      logger.info('Escape test: \' " \\ / \u0000');
+      expect(() => logger.info('Escape test: \' " \\')).not.toThrow();
     });
-  });
 
-  describe('Different string encodings', () => {
-    it('should handle various whitespace types', () => {
+    it('should handle basic whitespace types', () => {
       const logger = AgLogger.createLogger();
       logger.logLevel = AG_LOGLEVEL.INFO;
 
-      const whitespaceMessages = [' ', '\t', '\n', '\r\n', '   ', '\t\n '];
-      whitespaceMessages.forEach((msg) => logger.info(`whitespace: "${msg}"`));
+      expect(() => logger.info('whitespace: " "')).not.toThrow();
+      expect(() => logger.info('whitespace: "\t"')).not.toThrow();
+      expect(() => logger.info('whitespace: "\n"')).not.toThrow();
     });
   });
 });

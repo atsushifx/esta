@@ -20,9 +20,8 @@ import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 // plugins
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
-import { isValidLogger, validateFormatter, validateLogLevel } from './utils/AgLogValidators';
 import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
-
+import { isValidLogger, validateFormatter, validateLogLevel } from './utils/AgLogValidators';
 
 /**
  * Abstract logger class providing singleton instance management,
@@ -158,7 +157,6 @@ export class AgLogger {
    * @returns The updated log level.
    */
   get isVerbose(): boolean {
-
     return this._config.isVerbose;
   }
 
