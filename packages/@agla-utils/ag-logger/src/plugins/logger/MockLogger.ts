@@ -196,5 +196,5 @@ export class AgMockBufferLogger {
 
 // Export for backward compatibility
 export const MockLogger = {
-  buffer: AgMockBufferLogger
+  buffer: AgMockBufferLogger,
 } as const;

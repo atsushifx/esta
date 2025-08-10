@@ -14,7 +14,7 @@ import { AG_LOGLEVEL } from '../../../../shared/types';
 import { MockLogger } from '../MockLogger';
 // types
 import type { AgFormattedLogMessage, AgLogLevel, AgLogMessage } from '../../../../shared/types';
-import type { TBufferLogger } from '../MockLogger';
+import type { AgMockBufferLogger } from '../MockLogger';
 
 /**
  * MockLoggerプラグインの包括的ユニットテストスイート
@@ -30,7 +30,7 @@ import type { TBufferLogger } from '../MockLogger';
  * - エッジケース: 境界値、特殊条件、不変性
  */
 describe('MockLogger', () => {
-  let mockLogger: TBufferLogger;
+  let mockLogger: AgMockBufferLogger;
 
   beforeEach(() => {
     mockLogger = new MockLogger.buffer();
