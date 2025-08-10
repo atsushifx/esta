@@ -88,8 +88,8 @@ export class AgLogger {
    * @param options - Configuration options for the logger.
    */
   public setLoggerConfig(options: AgLoggerOptions): void {
-    // Validate options is not null or undefined first
-    if (options === null || options === undefined) {
+    // Validate options is not null or undefined first (runtime safety for type-erased environments)
+    if ((options as unknown) === null || (options as unknown) === undefined) {
       throw new AgLoggerError(
         ERROR_TYPES.VALIDATION,
         AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.VALIDATION].NULL_CONFIGURATION,
