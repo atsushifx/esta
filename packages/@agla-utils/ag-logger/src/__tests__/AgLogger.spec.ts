@@ -23,7 +23,6 @@ import { AgLogger, createLogger } from '../AgLogger.class';
 // プラグイン - テストで使用するコンソールロガー
 import { ConsoleLogger } from '../plugins/logger/ConsoleLogger';
 
-
 // テスト用モック関数
 const mockLogger = vi.fn();
 const mockFormatter = vi.fn().mockImplementation((msg) => msg.message ?? msg);
@@ -337,10 +336,8 @@ it('should handle logger and formatter function throwing errors', () => {
   expect(() => logger.info('test')).toThrow('Logger error');
 });
 
-
 describe('特殊引数とデータ処理', () => {
   setupTestEnvironment();
-
 
   it('should handle formatter function throwing errors', () => {
     const throwingFormatter = vi.fn(() => {
@@ -516,16 +513,14 @@ describe('エッジケース: Special Arguments and Data Processing', () => {
         const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: emptyFormatter });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
-        logger.info("logged");
+        logger.info('logged');
 
         // Empty formatter output gets filtered out even for empty original messages
         expect(emptyFormatter).toHaveBeenCalled();
-        expect(mockLogger).not.toHaveBeenCalled();;
+        expect(mockLogger).not.toHaveBeenCalled();
       });
     });
-
   });
-
 
   describe('特殊フォーマット出力', () => {
     it('should handle formatter returning non-string values', () => {
@@ -833,7 +828,10 @@ describe('エッジケース: Special Arguments and Data Processing', () => {
         describe('正常系: Comprehensive executeLog Behavior', () => {
           it('should handle method accessibility, filtering, formatting, and empty output', () => {
             const customFormatter = vi.fn().mockReturnValue('formatted message');
-            const testLogger = createLogger({ defaultLogger: mockLogger, formatter: customFormatter }) as TestableAgLogger;
+            const testLogger = createLogger({
+              defaultLogger: mockLogger,
+              formatter: customFormatter,
+            }) as TestableAgLogger;
 
             expect(typeof testLogger.executeLog).toBe('function');
             expect(testLogger.executeLog).toBeDefined();
@@ -977,4 +975,3 @@ describe('エッジケース: Special Arguments and Data Processing', () => {
     });
   });
 });
-

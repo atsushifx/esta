@@ -210,17 +210,17 @@ export class AgLogger {
       return;
     }
 
-    // Block logging if the first argument is empty string and no additional arguments
+    const logMessage = AgLoggerGetMessage(level, ...args);
+
+    // Suppress logs where message is empty string (but allow no args or other args)
     if (args.length === 1 && args[0] === '') {
       return;
     }
 
-    const logMessage = AgLoggerGetMessage(level, ...args);
     const formatter = this.getFormatter();
     const formattedMessage = formatter(logMessage);
 
-    // Only block logging if the formatter explicitly returns empty string
-    // and the original message had actual content (not just empty args)
+    // Don't output log if formatter returns empty string
     if (formattedMessage === '') {
       return;
     }
