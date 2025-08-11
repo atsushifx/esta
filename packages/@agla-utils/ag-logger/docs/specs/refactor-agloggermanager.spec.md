@@ -1,16 +1,14 @@
 ---
 header:
-- src: refactor-agLoggerConfig-phase1.tasks.md
-- @(#): フェーズ1: AgLoggerConfigクラス作成タスク
-title: フェーズ1: AgLoggerConfigクラス作成タスク
-description: AgLoggerConfig内部クラスの作成と関連ユニットテストをt-wada式TDDで実装するタスクドキュメント
+- src: refactor-agloggermanager.spec.md
+- @(#): AgLoggerManager 再実装 仕様
+title: AgLoggerManager 再実装 仕様
+description: AgLoggerManagerを仕様に従って、再実装するための仕様書
 version: 1.0.0
-created: 2025-07-27
-updated: 2025-08-11
+created: 2025-08-11
 authors:
   - atsushifx
 changes:
-  - 2025-07-27: 初回作成（フェーズ1タスク詳細化）
   - 2025-08-11: 仕様更新（API確定・DoD追記・失敗時のエラーポリシー明文化）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
@@ -18,97 +16,105 @@ copyright:
   - https://opensource.org/licenses/MIT
 ---
 
-# 目的 / ゴール
+# AgLoggerManager 最小仕様（更新版：setLoggerで外部注入）
 
-- `AgLogger` が依存する **内部設定クラス `AgLoggerConfig`** を新規実装し、
-  ログレベル判定・フォーマッタ・デフォルトロガー・レベル別ロガーマップ・verbose フラグの**一元管理**を行う。
-- 既存 `AgLogger` の公開 API（`setLoggerConfig`, `setLogger`, `getLoggerFunction`, `formatter`, `logLevel`, `isVerbose`, `shouldOutput` 相当）を**安全に委譲**できる状態を作る。
-- 実装は **t-wada式TDD** に従い、失敗するテスト→最小実装→リファクタリングのサイクルで進める。
+## 背景
 
-# スコープ（フェーズ1）
+- AgLogger は単一シングルトンの軽量ロガー（出力関数・フォーマッタ・レベル判定を内包）。
+- AgLoggerManager は **AgLogger への薄いフロントエンド**。生成と取得を分離し、設定は AgLogger 側（config）で行う。
+- メトリクスや拡張は別クラス/プラグインで扱う。Manager は関与しない。
 
-- `AgLoggerConfig` クラスの実装（内部クラス／単体で完結）
-- バリデーションとの連携：`validateLogLevel`, `validateFormatter`, `isValidLogger` の利用
-- コンソール用デフォルト適用ロジック（`defaultLogger === ConsoleLogger` かつ `loggerMap` 未指定時は `ConsoleLoggerMap` を適用）
-- ユニットテスト（失敗系を含む）
-- 非スコープ：トランスポート、メトリクス、非同期I/O、持続化、ホットリロード
+## 目的
 
-# 成果物
+- 「初期化」「取得」「委譲」の最小責務だけを堅牢に保証する。
+- 初期化順序や二重初期化、未初期化利用の事故を BDD で防止。
 
-- `src/internal/AgLoggerConfig.class.ts`
-- `test/internal/AgLoggerConfig.spec.ts`
-- 必要な型・定数の再確認（`AgLogLevel`, `AG_LOGLEVEL`, `AgLoggerFunction`, `AgFormatFunction`, `AgLoggerOptions` など）
+---
 
-# 仕様（API）
+## 仕様（API 契約）
 
-## `AgLoggerConfig` プロパティ
+### ライフサイクル
 
-- `logLevel: AgLogLevel`（既定: `AG_LOGLEVEL.INFO`）
-- `formatter: AgFormatFunction`（既定: `NullFormatter` を想定）
-- `defaultLogger: AgLoggerFunction`（既定: `NullLogger` を想定）
-- `loggerMap: Record<AgLogLevel, AgLoggerFunction>`（全レベルを `defaultLogger` で初期化）
-- `isVerbose: boolean`（既定: `false`）
+- `AgLoggerManager.createManager(options?: AgLoggerOptions): AgLoggerManager`
+  - **初期化専用**。AgLogger をシングルトンとして生成（`AgLogger.createLogger(options)`）し、Manager に保持。
+  - 二重初期化は**不許可**。既に作成済みなら例外。
+- `AgLoggerManager.getManager(): AgLoggerManager`
+  - **取得専用**。未初期化の場合は例外（生成はしない）。
+- `getLogger(): AgLogger`
+  - Manager が保持する **同一 AgLogger インスタンス**を返す。
+  - 未初期化の場合は例外。
+- `AgLoggerManager.resetSingleton(): void` **（テスト専用）**
+  - **Manager も AgLogger も**破棄し、未初期化状態へ戻す。
+  - 運用コードからは呼ばないことをドキュメントに明記。
+- `resetLogger(options?: AgLoggerOptions): void` **（テスト専用・任意）**
+  - **AgLogger だけ**をリセットして再生成。
+  - Manager インスタンスは維持。
 
-## `AgLoggerConfig` メソッド
+### ロガーインスタンスの外部注入
 
-- `setLoggerConfig(options: AgLoggerOptions): void`
-  - `formatter` があれば `validateFormatter` を通す
-  - `defaultLogger` があれば `isValidLogger` を通す
-  - `logLevel` があれば `validateLogLevel` を通す
-  - `defaultLogger === ConsoleLogger` かつ `loggerMap` 未指定なら `ConsoleLoggerMap` を自動適用
-  - `loggerMap` があれば **部分マップをマージ**（未指定レベルは既存を保持）
-- `setLogger(level: AgLogLevel, fn: AgLoggerFunction): boolean`
-  - `validateLogLevel(level)` 成功時のみ設定、`true` を返す
-- `getLoggerFunction(level: AgLogLevel): AgLoggerFunction`
-  - マップ未登録なら `defaultLogger` を返す
-- `shouldOutput(level: AgLogLevel): boolean`
-  - `FORCE_OUTPUT` は常に `true`
-  - `VERBOSE` は `isVerbose` が `true` の場合のみ `true`
-  - それ以外は `level >= logLevel`
-- アクセサ
-  - `get logLevel(): AgLogLevel` / `set logLevel(v: AgLogLevel)`
-  - `get isVerbose(): boolean` / `set setVerbose(v: boolean)`
-  - `get formatter(): AgFormatFunction` / `set formatter(f: AgFormatFunction)`
+- `setLogger(logger: AgLogger): void`
+  - **未初期化時に一度だけ**許可。
+  - 外部で生成した `AgLogger`（`AgLogger.createLogger(config)`など）を注入可能。
+  - 初期化済みの場合は例外。
+  - 本番では基本的に `createManager(options)` を使用し、`setLogger` はDIやテストでのみ利用。
 
-## エラーポリシー
+### ロガー関数バインド（委譲API）
 
-- `setLoggerConfig(undefined|null)` は `AgLoggerError(ERROR_TYPES.VALIDATION.NULL_CONFIGURATION)` を投げる
-- 不正な `formatter` / `defaultLogger` / `logLevel` は各 `validate*` に委譲し、該当の `AgLoggerError` を投げる
-- `setLogger` の `level` が不正な場合は例外（`validateLogLevel`）
+- `bindLoggerFunction(level: AgLogLevel, fn: AgLoggerFunction): boolean`
+  - 指定レベルにロガー関数をバインド。AgLogger の `setLogger` へ委譲。
+- `updateLoggerMap(map: Partial<AgLoggerMap<AgLoggerFunction>>): void`
+  - ロガーマップの差分/全体更新。AgLogger の `setLoggerConfig({ loggerMap: map })` へ委譲。
+- （任意の便宜メソッド）
+  - `setFormatter(formatter: AgFormatFunction): void` → `AgLogger.setFormatter`
+  - `setLevel(level: AgLogLevel): void` → `AgLogger.logLevel` setter
+  - `setVerbose(enabled: boolean): void` → `AgLogger.setVerbose` setter
 
-# 振る舞いの例（擬似コード）
+### 非目標（Out of Scope）
 
-```ts
-const cfg = new AgLoggerConfig();
-cfg.setLoggerConfig({
-  defaultLogger: ConsoleLogger,
-  logLevel: AG_LOGLEVEL.DEBUG,
-});
-cfg.setLogger(AG_LOGLEVEL.WARN, customWarnLogger);
-if (cfg.shouldOutput(AG_LOGLEVEL.INFO)) {
-  cfg.getLoggerFunction(AG_LOGLEVEL.INFO)('message');
-}
-```
+- メトリクス収集、トランスポート管理、階層ロガー、ホットリロード等はやらない。
+- AgLogger の動作ロジック（レベル判定・整形・出力）の再実装はしない。
 
-# BDD タスクリスト
+### エラーポリシー
 
-- **初期状態**
-  - [ ] 既定の `logLevel` が INFO
-  - [ ] 既定の `formatter` が `NullFormatter`
-  - [ ] 全レベルのロガーが `NullLogger`
-  - [ ] `isVerbose` が false
-- **setLoggerConfig**
-  - [ ] `null` / `undefined` 渡しで `AgLoggerError(ERROR_TYPES.VALIDATION.NULL_CONFIGURATION)`
-  - [ ] 不正な `formatter` / `defaultLogger` / `logLevel` で例外
-  - [ ] ConsoleLogger適用時の `loggerMap` 自動セット
-  - [ ] 部分マップマージ動作の確認
-- **setLogger**
-  - [ ] 正常レベル設定で true
-  - [ ] 不正レベルで例外
-- **getLoggerFunction**
-  - [ ] 登録済みロガーを返す
-  - [ ] 未登録は `defaultLogger` を返す
-- **shouldOutput**
-  - [ ] FORCE_OUTPUT 常に true
-  - [ ] VERBOSE は `isVerbose` true のときのみ
-  - [ ] その他は閾値比較
+- 未初期化で `getManager()` / `getLogger()` / `bindLoggerFunction()` / `updateLoggerMap()` を呼ぶと例外。
+- `createManager()` の二重呼び出しは例外。
+- `setLogger()` は未初期化時のみ許可。初期化済みでは例外。
+- テスト専用APIは本番コードで使用しない旨をコメントで明示。
+
+---
+
+## BDD タスクリスト
+
+### (1) 初期化ガード
+
+- [ ] 未初期化で `getManager()` を呼ぶと例外。
+- [ ] `createManager()` を2回呼ぶと例外。
+- [ ] `createManager()` 後は `getManager()` が同一参照を返す。
+
+### (2) Logger の生成・取得
+
+- [ ] `createManager(options)` 後、`getLogger()` が非 undefined。
+- [ ] `getLogger()` が `AgLogger.getLogger()` と同一参照を返す。
+- [ ] 未初期化で `getLogger()` は例外。
+
+### (3) ロガーインスタンス注入
+
+- [ ] 未初期化状態で `setLogger(AgLogger.createLogger(config))` が成功。
+- [ ] 注入後の `getLogger()` が同一インスタンスを返す。
+- [ ] 初期化済みで `setLogger()` を呼ぶと例外。
+
+### (4) 廃棄（テスト専用API）
+
+- [ ] `resetSingleton()` 後に `getManager()` は例外。
+- [ ] `resetSingleton()` 後に `createManager()` で再初期化可能。
+- [ ] （実装する場合）`resetLogger()` が Manager は同一参照のまま Logger を再生成する。
+
+### (5) 委譲の成立（インタラクション）
+
+- [ ] `bindLoggerFunction(level, fn)` が `AgLogger.setLogger` を一度だけ呼ぶ。
+- [ ] `updateLoggerMap(map)` が `AgLogger.setLoggerConfig({ loggerMap: map })` を呼ぶ。
+- [ ] （任意）`setFormatter` / `setLevel` / `setVerbose` も各委譲先が呼ばれる。
+
+### (6) スレッショルド
+
+- [ ] 例外メッセージが `/not created/i`, `/already created/i`, `/logger already initialized/i` などの正規表現に一致。

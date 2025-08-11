@@ -36,9 +36,9 @@ export default mergeConfig(baseConfig, {
     },
   },
   resolve: {
-    alias: [
-      { find: '@', replacement: path.resolve(__dirname, '../src') },
-      { find: /^@\/shared/, replacement: path.resolve(__dirname, '../shared') },
-    ],
+    alias: {
+      '@/shared': path.resolve(__dirname, '../shared'),
+      '@': path.resolve(__dirname, '../src'),
+    },
   },
 });
