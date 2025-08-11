@@ -10,7 +10,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 // 共有定数: ログレベル定義
-import { AG_LOGLEVEL } from '@/shared/types';
+import { AG_LOGLEVEL } from '../../shared/types';
 
 // テスト対象: AgLoggerとエントリーポイント
 import { AgLogger, createLogger } from '@/AgLogger.class';

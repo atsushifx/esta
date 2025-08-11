@@ -12,9 +12,9 @@ import type { TestContext } from 'vitest';
 
 // 共有型・定数: ログレベルと共通ユーティリティ
 import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
-import { ENABLE } from '@/shared/constants';
-import { AG_LOGLEVEL } from '@/shared/types';
-import type { AgFormatFunction } from '@/shared/types';
+import { ENABLE } from '../../../shared/constants';
+import { AG_LOGLEVEL } from '../../../shared/types';
+import type { AgFormatFunction } from '../../../shared/types';
 
 // テスト対象: AgLoggerとマネージャ
 import { AgLogger } from '@/AgLogger.class';
