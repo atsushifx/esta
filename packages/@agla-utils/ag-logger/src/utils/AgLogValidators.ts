@@ -15,21 +15,7 @@ import { AgLoggerError } from 'shared/types/AgLoggerError.types';
 import { AG_LOGGER_ERROR_MESSAGES, ERROR_TYPES } from '../../shared/constants/agErrorMessages';
 import { AG_LOGLEVEL } from '../../shared/types';
 import type { AgLogLevel } from '../../shared/types';
-
-export const valueToString = (value: unknown): string => {
-  if (value === null || value === undefined) {
-    return String(value);
-  } else if (Array.isArray(value)) {
-    return (value.length <= 0) ? 'array' : `[${String(value)}]`;
-  } else if (typeof value === 'function') {
-    return (value.name === '') ? 'function' : 'function ' + value.name;
-  } else if (typeof value === 'object') {
-    return 'object';
-  } else if (typeof value === 'string') {
-    return `"${value}"`;
-  }
-  return String(value);
-};
+import { valueToString } from './AgLogHelpers';
 
 export const isValidLogLevel = (logLevel: AgLogLevel): boolean => {
   return (

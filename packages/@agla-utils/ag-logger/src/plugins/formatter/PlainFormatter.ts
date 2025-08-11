@@ -10,17 +10,8 @@
 import type { AgFormatFunction, AgLogMessage } from '../../../shared/types';
 
 // utils
-import { valueToString } from '@/utils/AgLogValidators';
-import { AgToLabel } from '../../utils/AgLogLevelHelpers';
-
-const argsToString = (args: readonly unknown[]): string => {
-  if (args.length === 0) {
-    return '';
-  }
-
-  const message = args.map((arg) => JSON.stringify(arg) || valueToString(arg)).join(' ').trim();
-  return message;
-};
+import { argsToString } from '../../utils/AgLogHelpers';
+import { AgToLabel } from '../../utils/AgLogHelpers';
 
 /**
  * Formats a log message into a plain text string.
