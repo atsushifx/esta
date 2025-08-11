@@ -52,6 +52,10 @@ const setupTestEnvironment = (): void => {
   });
 };
 
+/**
+ * AgLogger.verbose ユニットテスト
+ * @description verbose状態の出力制御と独立性を検証
+ */
 describe('AgLogger.verbose method tests', () => {
   setupTestEnvironment();
 

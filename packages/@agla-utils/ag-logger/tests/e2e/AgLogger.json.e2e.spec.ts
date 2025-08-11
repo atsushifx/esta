@@ -14,9 +14,7 @@ import { AG_LOGLEVEL } from '../../shared/types';
 // テスト対象 - createLogger関数（ロガー作成のエントリーポイント）
 import { createLogger } from '@/AgLogger.class';
 
-
 // --- types ---
-
 
 // Type definitions derived from log level constants
 type TMockConsoleMethods = keyof typeof mockConsole;

@@ -8,6 +8,10 @@
 
 // types
 import type { AgFormatFunction, AgLogMessage } from '../../../shared/types';
+// utilities
+import { AgToLabel } from '../../utils/AgLogLevelHelpers';
+
+// formatter
 
 /**
  * Mock formatters for testing purposes.
@@ -27,13 +31,25 @@ export const MockFormatter = {
 
   /**
    * JSON formatter that converts the log message to a JSON string.
-   * Simple implementation for testing JSON serialization.
+   * Converts logLevel to level string for proper JSON structure.
    *
    * @param logMessage - The log message object
-   * @returns JSON string representation of the log message
+   * @returns JSON string representation of the log message with string level
    */
   json: ((logMessage: AgLogMessage): string => {
-    return JSON.stringify(logMessage);
+    const levelLabel = AgToLabel(logMessage.logLevel);
+    const logEntry = {
+      logLevel: logMessage.logLevel,
+      timestamp: logMessage.timestamp.toISOString(),
+      ...(levelLabel && { level: levelLabel }),
+      message: logMessage.message,
+      ...(logMessage.args.length > 0 && { args: logMessage.args }),
+    };
+    return JSON.stringify(logEntry);
+  }) as AgFormatFunction,
+
+  messageOnly: ((logMessage: AgLogMessage): string => {
+    return logMessage.message;
   }) as AgFormatFunction,
 } as const;
 

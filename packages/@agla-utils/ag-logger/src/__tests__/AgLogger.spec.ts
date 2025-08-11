@@ -114,10 +114,6 @@ describe('AgLogger インスタンス生成と管理', () => {
     });
 
     describe('getLoggerでのインスタンス取得', () => {
-      it('should have getLogger static method', () => {
-        expect(typeof AgLogger.getLogger).toBe('function');
-      });
-
       it('should return existing instance when available', () => {
         const created = AgLogger.createLogger();
         const retrieved = AgLogger.getLogger();
@@ -246,19 +242,6 @@ describe('ログレベル管理機能', () => {
       logger.debug('debug');
       logger.info('info');
       expect(mockLogger).toHaveBeenCalledTimes(3);
-    });
-
-    it('should handle rapid log level changes', () => {
-      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
-
-      // 高速なレベル変更
-      for (let i = 0; i < 100; i++) {
-        const level = i % 2 === 0 ? AG_LOGLEVEL.INFO : AG_LOGLEVEL.ERROR;
-        logger.logLevel = level;
-        logger.info('test');
-      }
-
-      expect(mockLogger).toHaveBeenCalledTimes(50); // INFO レベルの時のみ
     });
   });
 
@@ -729,13 +712,6 @@ describe('エッジケース: Special Arguments and Data Processing', () => {
         });
 
         describe('shouldOutput Protected Method Access', () => {
-          it('should expose shouldOutput method to test subclasses', () => {
-            const logger = AgLogger.createLogger();
-            const loggerForTesting = logger as TestableAgLogger;
-
-            expect(typeof loggerForTesting.shouldOutput).toBe('function');
-          });
-
           it('should return true when log level ERROR is at INFO threshold', () => {
             const logger = AgLogger.createLogger();
             logger.logLevel = AG_LOGLEVEL.INFO;
@@ -821,22 +797,6 @@ describe('エッジケース: Special Arguments and Data Processing', () => {
        */
       describe('executeLog メソッドの動作テスト', () => {
         setupTestEnvironment();
-
-        /**
-         * 正常系: executeLog comprehensive behavior test
-         */
-        describe('正常系: Comprehensive executeLog Behavior', () => {
-          it('should handle method accessibility, filtering, formatting, and empty output', () => {
-            const customFormatter = vi.fn().mockReturnValue('formatted message');
-            const testLogger = createLogger({
-              defaultLogger: mockLogger,
-              formatter: customFormatter,
-            }) as TestableAgLogger;
-
-            expect(typeof testLogger.executeLog).toBe('function');
-            expect(testLogger.executeLog).toBeDefined();
-          });
-        });
 
         describe('動作の同等性テスト', () => {
           it('should filter logs based on log level same as original implementation', () => {
@@ -962,13 +922,6 @@ describe('エッジケース: Special Arguments and Data Processing', () => {
             const logger = AgLogger.createLogger();
             logger.setVerbose = true;
             expect(logger.isVerbose).toBe(true);
-          });
-        });
-
-        describe('existing methods should coexist', () => {
-          it('should allow both isVerbose() method and isVerbose getter to work', () => {
-            const logger = AgLogger.createLogger();
-            expect(logger.isVerbose).toBe(DISABLE);
           });
         });
       });

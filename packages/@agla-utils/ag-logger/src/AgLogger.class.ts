@@ -20,9 +20,8 @@ import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 // plugins
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
-import { isValidLogger, validateFormatter, validateLogLevel } from './utils/AgLogValidators';
 import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
-
+import { isValidLogger, validateFormatter, validateLogLevel } from './utils/AgLogValidators';
 
 /**
  * Abstract logger class providing singleton instance management,
@@ -89,8 +88,8 @@ export class AgLogger {
    * @param options - Configuration options for the logger.
    */
   public setLoggerConfig(options: AgLoggerOptions): void {
-    // Validate options is not null or undefined first
-    if (options === null || options === undefined) {
+    // Validate options is not null or undefined first (runtime safety for type-erased environments)
+    if ((options as unknown) === null || (options as unknown) === undefined) {
       throw new AgLoggerError(
         ERROR_TYPES.VALIDATION,
         AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.VALIDATION].NULL_CONFIGURATION,
@@ -158,7 +157,6 @@ export class AgLogger {
    * @returns The updated log level.
    */
   get isVerbose(): boolean {
-
     return this._config.isVerbose;
   }
 
@@ -210,6 +208,11 @@ export class AgLogger {
       return;
     }
 
+    // Cache formatter and logger references at the start to avoid race conditions
+    // in concurrent execution scenarios where config might change
+    const formatter = this.getFormatter();
+    const logger = this.getLoggerFunction(level);
+
     const logMessage = AgLoggerGetMessage(level, ...args);
 
     // Suppress logs where message is empty string (but allow no args or other args)
@@ -217,7 +220,6 @@ export class AgLogger {
       return;
     }
 
-    const formatter = this.getFormatter();
     const formattedMessage = formatter(logMessage);
 
     // Don't output log if formatter returns empty string
@@ -225,7 +227,6 @@ export class AgLogger {
       return;
     }
 
-    const logger = this.getLoggerFunction(level);
     logger(formattedMessage);
   }
 

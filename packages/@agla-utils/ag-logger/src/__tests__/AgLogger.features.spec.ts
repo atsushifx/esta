@@ -33,6 +33,10 @@ const setupTestEnvironment = (): void => {
   });
 };
 
+/**
+ * AgLogger 特殊機能ユニットテスト
+ * @description verbose機能とFORCE_OUTPUTの振る舞いを検証
+ */
 describe('AgLogger Special Features', () => {
   setupTestEnvironment();
 

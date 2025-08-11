@@ -15,28 +15,29 @@ import { AG_LOGLEVEL } from '../../../shared/types';
 import type {
   AgFormattedLogMessage,
   AgLoggerFunction,
+  AgLoggerInterface,
   AgLoggerMap,
   AgLogLevel,
   AgLogMessage,
   AgLogMessageCollection,
 } from '../../../shared/types';
-import type { TBufferLogger } from './MockLogger';
+import type { AgMockBufferLogger } from './MockLogger';
 
 /**
  * Mock logger for E2E testing that supports parallel test execution.
  * Uses a Map to bind testId to MockLogger instances for complete isolation.
  * Each test gets its own MockLogger instance for thread-safe parallel execution.
  */
-export class E2eMockLogger {
+export class E2eMockLogger implements AgLoggerInterface {
   private testIdentifier: string;
   private currentTestId: string | null;
-  private mockLoggers: Map<string, TBufferLogger>;
+  private mockLoggers: Map<string, AgMockBufferLogger>;
 
   constructor(identifier?: string) {
     const trimmedIdentifier = typeof identifier === 'string' ? identifier.trim() : '';
     this.testIdentifier = trimmedIdentifier ? getNormalizedBasename(trimmedIdentifier) : 'e2e-default';
     this.currentTestId = null;
-    this.mockLoggers = new Map<string, TBufferLogger>();
+    this.mockLoggers = new Map<string, AgMockBufferLogger>();
   }
 
   /**
@@ -134,7 +135,7 @@ export class E2eMockLogger {
    * Get the MockLogger instance for the current test.
    * Validates that there is an active test before returning.
    */
-  private getCurrentMockLogger(): TBufferLogger {
+  private getCurrentMockLogger(): AgMockBufferLogger {
     if (!this.currentTestId) {
       throw new Error('No active test. Call startTest() before logging.');
     }

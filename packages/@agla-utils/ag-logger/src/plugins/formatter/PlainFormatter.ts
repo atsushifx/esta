@@ -18,7 +18,7 @@ const argsToString = (args: readonly unknown[]): string => {
     return '';
   }
 
-  const message = args.map((arg) => JSON.stringify(arg) ?? valueToString(arg)).join(' ').trim();
+  const message = args.map((arg) => JSON.stringify(arg) || valueToString(arg)).join(' ').trim();
   return message;
 };
 

@@ -6,29 +6,26 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// テストフレームワーク - テストの実行、アサーション、モック機能を提供
+// テストフレームワーク: テスト実行・アサーション・モック
 import { describe, expect, it, vi } from 'vitest';
 
-// ログレベル定数 - テストで使用するログレベル定義
-import { AG_LOGLEVEL } from '../../shared/types';
-// テスト対象 - createLogger関数（ロガー取得のエントリーポイント）
+// 共有定数: ログレベル定義
+import { AG_LOGLEVEL } from '@/shared/types';
+
+// テスト対象: AgLoggerとエントリーポイント
 import { AgLogger, createLogger } from '@/AgLogger.class';
-// フォーマッタープラグイン - JSON形式でのログフォーマット
+
+// プラグイン（フォーマッター）: 出力フォーマット実装
 import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
-// フォーマッタープラグイン - 出力なしのダミーフォーマット
 import { NullFormatter } from '@/plugins/formatter/NullFormatter';
-// フォーマッタープラグイン - 人間可読な平文フォーマット
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
-// ロガープラグイン - コンソール出力ロガーとレベルマップ
+
+// プラグイン（ロガー）: 出力先実装とマップ
 import { ConsoleLogger, ConsoleLoggerMap } from '@/plugins/logger/ConsoleLogger';
-// ロガープラグイン - 出力なしのダミーロガー
 import { NullLogger } from '@/plugins/logger/NullLogger';
 
 // types
-type TCircular = {
-  name: string;
-  self?: TCircular;
-};
+// 循環参照テスト用型は shared/types/index.ts の TCircularTestObject を使用
 
 /**
  * プラグイン間相互作用の統合テストスイート
@@ -68,6 +65,7 @@ describe('Plugin Interaction Integration Tests', () => {
    * - 出力品質とフォーマット正確性
    */
   describe('Logger-Formatter Combinations', () => {
+    // 目的: ConsoleLogger×JsonFormatterの基本統合動作
     it('should work correctly with ConsoleLogger and JsonFormatter', () => {
       setupTestContext();
       const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
@@ -91,6 +89,7 @@ describe('Plugin Interaction Integration Tests', () => {
       consoleSpy.mockRestore();
     });
 
+    // 目的: ConsoleLogger×PlainFormatterのフォーマット検証
     it('should work correctly with ConsoleLogger and PlainFormatter', () => {
       setupTestContext();
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -108,6 +107,7 @@ describe('Plugin Interaction Integration Tests', () => {
       consoleSpy.mockRestore();
     });
 
+    // 目的: モックロガー×JsonFormatterのJSON整形検証
     it('should work correctly with E2eMockLogger and JsonFormatter', () => {
       setupTestContext();
       const mockLogger = vi.fn();
@@ -129,6 +129,7 @@ describe('Plugin Interaction Integration Tests', () => {
       });
     });
 
+    // 目的: モックロガー×PlainFormatterの整形パターン検証
     it('should work correctly with E2eMockLogger and PlainFormatter', () => {
       setupTestContext();
       const mockLogger = vi.fn();
@@ -144,6 +145,7 @@ describe('Plugin Interaction Integration Tests', () => {
       expect(output).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z \[ERROR\] error message error details$/);
     });
 
+    // 目的: NullLogger使用時の安全な無出力動作
     it('should handle NullLogger with any formatter correctly', () => {
       setupTestContext();
       const logger = createLogger({ defaultLogger: NullLogger, formatter: JsonFormatter });
@@ -155,6 +157,7 @@ describe('Plugin Interaction Integration Tests', () => {
       }).not.toThrow();
     });
 
+    // 目的: NullFormatter使用時にロガー未呼出となる挙動
     it('should handle any logger with NullFormatter correctly', () => {
       setupTestContext();
       const mockLogger = vi.fn();
@@ -183,6 +186,7 @@ describe('Plugin Interaction Integration Tests', () => {
    * - フォーマット出力の品質検証
    */
   describe('ConsoleLoggerMap Integration', () => {
+    // 目的: ConsoleLoggerMap×JsonFormatterで適切なconsoleメソッドに振分け
     it('should use correct console methods with JsonFormatter', () => {
       setupTestContext();
       const consoleSpies = {
@@ -225,6 +229,7 @@ describe('Plugin Interaction Integration Tests', () => {
       Object.values(consoleSpies).forEach((spy) => spy.mockRestore());
     });
 
+    // 目的: ConsoleLoggerMap×PlainFormatterで適切なconsoleメソッドに振分け
     it('should use correct console methods with PlainFormatter', () => {
       setupTestContext();
       const consoleSpies = {
@@ -287,6 +292,7 @@ describe('Plugin Interaction Integration Tests', () => {
    * - データ整合性とシリアライゼーション品質
    */
   describe('Data Handling Integration', () => {
+    // 目的: 複雑オブジェクトを各プラグイン組合せで安定処理
     it('should handle complex objects correctly across all plugin combinations', () => {
       setupTestContext();
       const complexData = {
@@ -330,31 +336,9 @@ describe('Plugin Interaction Integration Tests', () => {
       expect(plainOutput).toContain('{"nested"'); // JSON.stringify representation
     });
 
-    it('should handle circular references gracefully', () => {
-      setupTestContext();
-      const circularObj: TCircular = { name: 'circular' };
-      circularObj.self = circularObj;
+    // 循環参照テストは dataProcessing.integration.spec.ts に移動済み
 
-      // Test with JsonFormatter (should handle circular references)
-      const jsonMockLogger = vi.fn();
-      const jsonLogger = createLogger({ defaultLogger: jsonMockLogger, formatter: JsonFormatter });
-      jsonLogger.logLevel = AG_LOGLEVEL.INFO;
-
-      // JSON.stringify with circular references should throw, so we expect the error to propagate
-      expect(() => {
-        jsonLogger.info('Circular object', circularObj);
-      }).toThrow();
-
-      // Test with PlainFormatter - also uses JSON.stringify
-      const plainMockLogger = vi.fn();
-      const plainLogger = createLogger({ defaultLogger: plainMockLogger, formatter: PlainFormatter });
-      plainLogger.logLevel = AG_LOGLEVEL.INFO;
-
-      expect(() => {
-        plainLogger.info('Circular object', circularObj);
-      }).toThrow();
-    });
-
+    // 目的: 大規模データ引数での性能を検証
     it('should handle large data sets efficiently', () => {
       setupTestContext();
       const largeArray = Array.from({ length: 1000 }, (_, i) => ({ id: i, data: `item${i}` }));
@@ -391,6 +375,7 @@ describe('Plugin Interaction Integration Tests', () => {
    * - メモリ使用量の適切性
    */
   describe('Performance Integration', () => {
+    // 目的: 高頻度ログ出力時の処理性能
     it('should maintain performance with high-frequency logging', () => {
       setupTestContext();
       const mockLogger = vi.fn();
@@ -412,6 +397,7 @@ describe('Plugin Interaction Integration Tests', () => {
       expect(mockLogger).toHaveBeenCalledTimes(iterations);
     });
 
+    // 目的: フィルタリングにより出力抑制時の低オーバーヘッド
     it('should not impact performance when log level filters out messages', () => {
       setupTestContext();
       const mockLogger = vi.fn();
@@ -449,6 +435,7 @@ describe('Plugin Interaction Integration Tests', () => {
    * - プラグイン切替え時の復旧能力
    */
   describe('Error Recovery Integration', () => {
+    // 目的: ロガー側エラー時でもフォーマッター呼出は実施
     it('should handle logger errors gracefully without affecting formatter', () => {
       setupTestContext();
       const throwingLogger = vi.fn().mockImplementation(() => {
@@ -467,6 +454,7 @@ describe('Plugin Interaction Integration Tests', () => {
       expect(formatterSpy).toHaveBeenCalled();
     });
 
+    // 目的: フォーマッター例外時にロガー未呼出となる挙動
     it('should handle formatter errors gracefully', () => {
       setupTestContext();
       const mockLogger = vi.fn();
@@ -485,6 +473,7 @@ describe('Plugin Interaction Integration Tests', () => {
       expect(mockLogger).not.toHaveBeenCalled();
     });
 
+    // 目的: プラグインエラー発生後もシステム安定性を維持
     it('should maintain system stability after plugin errors', () => {
       setupTestContext();
       const throwingLogger = vi.fn().mockImplementation(() => {

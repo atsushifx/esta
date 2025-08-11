@@ -35,20 +35,9 @@ export const AgToLabel = (level: AgLogLevel): AgLogLevelLabel | '' => {
  * @returns Numeric log level, or undefined if invalid
  */
 export const AgToLogLevel = (label: string): AgLogLevel | undefined => {
-<<<<<<< HEAD
   if (!label || typeof label !== 'string') {
     return undefined;
   }
   const labelIndex = label.trim().toUpperCase();
   return AG_LABEL_TO_LOGLEVEL_MAP[labelIndex as AgLogLevelLabel];
-||||||| parent of fc1acf8 (feat: メソッドsetLogger, getLoggerFunctionを追加し、logLeveでエラーがあるときはErrorスロー)
-export const AgToLogLevel = (label: AgLogLevelLabel): AgLogLevel => {
-  return AG_LABEL_TO_LOGLEVEL_MAP[label];
-=======
-  if (label == null || label == undefined || typeof label !== 'string') {
-    return undefined;
-  }
-  const labelUpper = label.trim().toUpperCase();
-  return AG_LABEL_TO_LOGLEVEL_MAP[labelUpper as AgLogLevelLabel];
->>>>>>> fc1acf8 (feat: メソッドsetLogger, getLoggerFunctionを追加し、logLeveでエラーがあるときはErrorスロー)
 };

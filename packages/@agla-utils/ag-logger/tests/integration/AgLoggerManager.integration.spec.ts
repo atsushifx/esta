@@ -6,17 +6,22 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// vitest
+// テストフレームワーク: テスト実行・アサーション・モック
 import { describe, expect, it, vi } from 'vitest';
 
-// constants
-import { AG_LOGLEVEL } from '../../shared/types';
-import type { AgLogLevel } from '../../shared/types';
-// test targets
+// 共有型・定数: ログレベル定義と型
+import { AG_LOGLEVEL } from '@/shared/types';
+import type { AgLogLevel } from '@/shared/types';
+
+// テスト対象: マネージャ本体
 import { AgLoggerManager } from '@/AgLoggerManager.class';
+
+// プラグイン（フォーマッター）: 出力フォーマット実装
 import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
 import { NullFormatter } from '@/plugins/formatter/NullFormatter';
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
+
+// プラグイン（ロガー）: 出力先実装とダミー
 import { ConsoleLogger } from '@/plugins/logger/ConsoleLogger';
 import { NullLogger } from '@/plugins/logger/NullLogger';
 
@@ -39,6 +44,7 @@ describe('AgLoggerManager Integration Tests', () => {
    * across multiple initialization scenarios.
    */
   describe('Singleton Management Integration', () => {
+    // 目的: getManager呼び出し間でシングルトン性が維持される
     it('should maintain singleton behavior across multiple getManager calls', () => {
       setupTestContext();
       const manager1 = AgLoggerManager.getManager();
@@ -49,6 +55,7 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(manager2).toBe(manager3);
     });
 
+    // 目的: 複数回アクセス時に設定の一貫性が保たれる
     it('should maintain configuration when accessed multiple times', () => {
       setupTestContext();
       const mockLogger = vi.fn();
@@ -62,6 +69,7 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(manager1.getLogger(AG_LOGLEVEL.INFO)).toBe(manager2.getLogger(AG_LOGLEVEL.INFO));
     });
 
+    // 目的: 複数回の初期化パラメータ指定で設定が更新される挙動を確認
     it('should update configuration only on first initialization with parameters', () => {
       setupTestContext();
       const firstLogger = vi.fn();
@@ -86,6 +94,7 @@ describe('AgLoggerManager Integration Tests', () => {
    * with various configuration combinations.
    */
   describe('Logger Map Management Integration', () => {
+    // 目的: ロガーマップ全面上書きの適用確認
     it('should handle complete logger map override correctly', () => {
       setupTestContext();
       const defaultLogger = vi.fn();
@@ -117,6 +126,7 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(manager.getLogger(AG_LOGLEVEL.TRACE)).toBe(debugLogger);
     });
 
+    // 目的: 部分的なロガーマップ適用時のフォールバック確認
     it('should handle partial logger map correctly', () => {
       setupTestContext();
       const defaultLogger = vi.fn();
@@ -145,6 +155,7 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(manager.getLogger(AG_LOGLEVEL.TRACE)).toBe(defaultLogger);
     });
 
+    // 目的: マップ未設定レベルでのdefaultロガーへのフォールバック
     it('should fallback to default logger for missing map entries', () => {
       setupTestContext();
       const defaultLogger = vi.fn();
@@ -164,6 +175,7 @@ describe('AgLoggerManager Integration Tests', () => {
    * across different scenarios.
    */
   describe('Formatter Integration', () => {
+    // 目的: フォーマッター取得の一貫性検証
     it('should maintain formatter consistency across logger retrievals', () => {
       setupTestContext();
       const mockFormatter = vi.fn().mockReturnValue('formatted');
@@ -176,6 +188,7 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(formatter1).toBe(mockFormatter);
     });
 
+    // 目的: フォーマッター変更が即時反映されることの確認
     it('should handle formatter changes correctly', () => {
       setupTestContext();
       const firstFormatter = vi.fn().mockReturnValue('first format');
@@ -188,6 +201,7 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(manager.getFormatter()).toBe(secondFormatter);
     });
 
+    // 目的: 複数フォーマッター型の切替互換性検証
     it('should work with different formatter types', () => {
       setupTestContext();
       const manager = AgLoggerManager.getManager();
@@ -211,6 +225,7 @@ describe('AgLoggerManager Integration Tests', () => {
    * multiple setManager calls and overrides.
    */
   describe('Complex Configuration Integration', () => {
+    // 目的: 複合的なsetManager更新での整合性維持
     it('should handle mixed configuration updates correctly', () => {
       setupTestContext();
       const manager = AgLoggerManager.getManager();
@@ -251,6 +266,7 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(manager.getFormatter()).toBe(secondFormatter); // Should remain
     });
 
+    // 目的: 旧API(setLogFunctionWithLevel等)の互換動作確認
     it('should handle legacy setManager method correctly', () => {
       setupTestContext();
       const manager = AgLoggerManager.getManager();
@@ -267,6 +283,7 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(manager.getLogger(AG_LOGLEVEL.INFO)).toBe(defaultLogger);
     });
 
+    // 目的: 複雑更新中の状態一貫性維持を検証
     it('should maintain state consistency during complex updates', () => {
       setupTestContext();
       const manager = AgLoggerManager.getManager();
@@ -310,6 +327,7 @@ describe('AgLoggerManager Integration Tests', () => {
    * in manager integration scenarios.
    */
   describe('Error Handling and Edge Cases', () => {
+    // 目的: 無効ログレベル時のフォールバック挙動
     it('should handle invalid log level gracefully', () => {
       setupTestContext();
       const manager = AgLoggerManager.getManager();
@@ -321,6 +339,7 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(manager.getLogger(invalidLevel)).toBe(defaultLogger);
     });
 
+    // 目的: 空のロガーマップ指定時の挙動確認
     it('should handle empty logger map correctly', () => {
       setupTestContext();
       const defaultLogger = vi.fn();
@@ -338,6 +357,7 @@ describe('AgLoggerManager Integration Tests', () => {
       });
     });
 
+    // 目的: ロガーマップにundefinedを含む場合の安定性
     it('should maintain stability when logger map has undefined values', () => {
       setupTestContext();
       const defaultLogger = vi.fn();
@@ -354,6 +374,7 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(manager.getLogger(AG_LOGLEVEL.ERROR)).toBe(defaultLogger);
     });
 
+    // 目的: 急速な設定変更連続時の最終状態の正当性
     it('should handle multiple rapid configuration changes', () => {
       setupTestContext();
       const manager = AgLoggerManager.getManager();

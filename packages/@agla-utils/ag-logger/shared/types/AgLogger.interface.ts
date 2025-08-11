@@ -65,6 +65,44 @@ export type AgFormatFunction = (logMessage: AgLogMessage) => AgFormattedLogMessa
 export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<AgLogLevel, T | null>;
 
 /**
+ * Interface for logger instances that provide log output methods.
+ * This interface defines the standard logging methods that should be available
+ * on logger instances used for testing and production.
+ *
+ * @example
+ * ```typescript
+ * class ConsoleLogger implements AgLoggerInterface {
+ *   fatal(message: string | AgLogMessage): void { console.error(message); }
+ *   error(message: string | AgLogMessage): void { console.error(message); }
+ *   warn(message: string | AgLogMessage): void { console.warn(message); }
+ *   info(message: string | AgLogMessage): void { console.info(message); }
+ *   debug(message: string | AgLogMessage): void { console.debug(message); }
+ *   trace(message: string | AgLogMessage): void { console.debug(message); }
+ *   verbose(message: string | AgLogMessage): void { console.debug(message); }
+ *   log(message: string | AgLogMessage): void { console.log(message); }
+ * }
+ * ```
+ */
+export type AgLoggerInterface = {
+  /** Log a fatal error message */
+  fatal(message: string | AgLogMessage): void;
+  /** Log an error message */
+  error(message: string | AgLogMessage): void;
+  /** Log a warning message */
+  warn(message: string | AgLogMessage): void;
+  /** Log an informational message */
+  info(message: string | AgLogMessage): void;
+  /** Log a debug message */
+  debug(message: string | AgLogMessage): void;
+  /** Log a trace message */
+  trace(message: string | AgLogMessage): void;
+  /** Log a verbose message */
+  verbose(message: string | AgLogMessage): void;
+  /** Log a general message */
+  log(message: string | AgLogMessage): void;
+};
+
+/**
  * Configuration options for AgLogger and AgLoggerManager instances.
  * Used to configure default logger, formatter, logger map, log level, and verbose mode for different log levels.
  *
