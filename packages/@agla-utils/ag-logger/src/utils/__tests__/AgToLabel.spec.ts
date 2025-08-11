@@ -9,7 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import { AG_LOGLEVEL, AG_LOGLEVEL_TO_LABEL_MAP } from '../../../shared/types';
 import type { AgLogLevel } from '../../../shared/types';
-import { AgToLabel } from '../AgLogLevelHelpers';
+import { AgToLabel } from '../AgLogHelpers';
 
 describe('AgToLabel: ラベルからLogLevelを取得する関数', () => {
   describe('正常ケース: 有効なLogLevelに対してラベル文字列を返す', () => {

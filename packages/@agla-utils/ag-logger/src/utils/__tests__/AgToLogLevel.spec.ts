@@ -9,7 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import { AG_LOGLEVEL } from '../../../shared/types';
 import type { AgLogLevelLabel } from '../../../shared/types';
-import { AgToLogLevel } from '../AgLogLevelHelpers';
+import { AgToLogLevel } from '../AgLogHelpers';
 
 describe('AgToLogLevel Function', () => {
   describe('正常系: Valid label conversions', () => {
