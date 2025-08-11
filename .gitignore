@@ -58,6 +58,7 @@ $~*
 
 # CLAUDE Memory file
 CLAUDE*.md
+AGENTS.md
 
 ## mcp settings/server's config
 .mcp.json
