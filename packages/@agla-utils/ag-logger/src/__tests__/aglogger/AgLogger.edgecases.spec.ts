@@ -65,6 +65,10 @@ const setupTestEnvironment = (): void => {
  * 特殊引数処理のエッジケース
  * logger.infoで代表してテスト（全ログメソッド共通機能）
  */
+/**
+ * 特殊引数処理ユニットテスト
+ * @description 非常値・特殊型の受け入れ動作を検証
+ */
 describe('Special Arguments Edge Cases', () => {
   setupTestEnvironment();
 
@@ -130,7 +134,11 @@ describe('Special Arguments Edge Cases', () => {
  * 複雑なオブジェクト構造のエッジケース
  * logger.infoで代表してテスト（全ログメソッド共通機能）
  */
-describe('Complex Object Structure Edge Cases', () => {
+/**
+ * 基本オブジェクト構造ユニットテスト
+ * @description プレーンオブジェクト/配列の受け入れを検証
+ */
+describe('Basic Object Structure Edge Cases', () => {
   setupTestEnvironment();
 
   describe('Circular references', () => {
@@ -175,7 +183,11 @@ describe('Complex Object Structure Edge Cases', () => {
  * エラーオブジェクト処理のエッジケース
  * logger.infoで代表してテスト（全ログメソッド共通機能）
  */
-describe('Error Object Edge Cases', () => {
+/**
+ * 基本エラーオブジェクトユニットテスト
+ * @description 標準Error系の取り扱いを検証
+ */
+describe('Basic Error Object Edge Cases', () => {
   setupTestEnvironment();
 
   describe('Standard error types', () => {
@@ -216,7 +228,11 @@ describe('Error Object Edge Cases', () => {
  * 大量データ処理のエッジケース
  * logger.infoで代表してテスト（全ログメソッド共通機能）
  */
-describe('Large Data Edge Cases', () => {
+/**
+ * 基本データ型ユニットテスト
+ * @description BigIntやSymbol等の取り扱いを検証
+ */
+describe('Basic Data Type Edge Cases', () => {
   setupTestEnvironment();
 
   describe('Large messages', () => {
@@ -259,7 +275,11 @@ describe('Large Data Edge Cases', () => {
  * 特殊な文字とエンコーディングのエッジケース
  * logger.infoで代表してテスト（全ログメソッド共通機能）
  */
-describe('Special Characters and Encoding Edge Cases', () => {
+/**
+ * 文字・エンコーディングユニットテスト
+ * @description Unicode/制御文字/エスケープの取り扱いを検証
+ */
+describe('Basic Character and Encoding Edge Cases', () => {
   setupTestEnvironment();
 
   describe('Unicode and special characters', () => {

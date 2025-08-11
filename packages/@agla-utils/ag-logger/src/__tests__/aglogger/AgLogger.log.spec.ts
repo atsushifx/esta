@@ -61,6 +61,10 @@ const setupTestEnvironment = (): void => {
  */
 let consoleLogSpy: ReturnType<typeof vi.spyOn>;
 
+/**
+ * AgLogger.log ユニットテスト
+ * @description 強制出力の基本挙動と引数処理を検証
+ */
 describe('AgLogger.log method tests', () => {
   setupTestEnvironment();
 

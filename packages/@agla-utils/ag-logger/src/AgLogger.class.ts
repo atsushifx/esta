@@ -210,6 +210,11 @@ export class AgLogger {
       return;
     }
 
+    // Cache formatter and logger references at the start to avoid race conditions
+    // in concurrent execution scenarios where config might change
+    const formatter = this.getFormatter();
+    const logger = this.getLoggerFunction(level);
+
     const logMessage = AgLoggerGetMessage(level, ...args);
 
     // Suppress logs where message is empty string (but allow no args or other args)
@@ -217,7 +222,6 @@ export class AgLogger {
       return;
     }
 
-    const formatter = this.getFormatter();
     const formattedMessage = formatter(logMessage);
 
     // Don't output log if formatter returns empty string
@@ -225,7 +229,6 @@ export class AgLogger {
       return;
     }
 
-    const logger = this.getLoggerFunction(level);
     logger(formattedMessage);
   }
 
