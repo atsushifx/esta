@@ -23,8 +23,6 @@ export default mergeConfig(baseConfig, {
   test: {
     include: [
       // Unit Test (develop test) exec only sub repositories
-      '**/__tests__/*.test.ts',
-      '**/__tests__/*.spec.ts',
       '**/__tests__/**/*.test.ts',
       '**/__tests__/**/*.spec.ts',
     ],
@@ -44,8 +42,9 @@ export default mergeConfig(baseConfig, {
     },
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, '../src'),
-    },
+    alias: [
+      { find: '@', replacement: path.resolve(__dirname, '../src') },
+      { find: /^@\/shared/, replacement: path.resolve(__dirname, '../shared') },
+    ],
   },
 });

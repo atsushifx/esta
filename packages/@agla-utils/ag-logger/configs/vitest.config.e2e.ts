@@ -14,7 +14,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // system config
-import { coverageConfigDefaults, mergeConfig } from 'vitest/config';
+import { mergeConfig } from 'vitest/config';
 
 // shared base config
 import baseConfig from '../../../../base/configs/vitest.config.base';
@@ -37,8 +37,9 @@ export default mergeConfig(baseConfig, {
     },
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, '../src'),
-    },
+    alias: [
+      { find: '@', replacement: path.resolve(__dirname, '../src') },
+      { find: /^@\/shared/, replacement: path.resolve(__dirname, '../shared') },
+    ],
   },
 });
