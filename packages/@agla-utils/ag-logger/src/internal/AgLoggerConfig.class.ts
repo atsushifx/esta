@@ -131,12 +131,14 @@ export class AgLoggerConfig {
 
     // Get logger from map
     const logger = this._loggerMap.get(level);
-
-    // If logger is undefined or NullLogger, return defaultLogger
-    if (logger === undefined || logger === NullLogger) {
-      return this._options.defaultLogger;
+    if (level === AG_LOGLEVEL.OFF && logger === NullLogger) { // level=OFF: NullLoggerでも可
+      return NullLogger;
     }
 
+    // If no logger function is found, fall back to defaultLogger
+    if (!logger || logger === NullLogger) {
+      return this._options.defaultLogger;
+    }
     return logger;
   }
 
@@ -157,6 +159,14 @@ export class AgLoggerConfig {
       return;
     }
     this._options.formatter = formatter;
+  }
+
+  /**
+   * Gets the configured default logger function.
+   * @returns The default logger function
+   */
+  public get defaultLogger(): AgLoggerFunction {
+    return this._options.defaultLogger;
   }
 
   /**
@@ -314,7 +324,6 @@ export class AgLoggerConfig {
 
     // Apply loggerMap setting if provided (this overrides the defaultLogger initialization above)
     if (options.loggerMap !== undefined) {
-      this._options.loggerMap = { ...this._options.loggerMap, ...options.loggerMap };
       this.updateLoggerMap(options.loggerMap);
     }
     return true;
@@ -332,13 +341,20 @@ export class AgLoggerConfig {
     this.clearLoggerMap();
 
     // Update each logger in the provided map
-    Object.keys(loggerMap).forEach((key) => {
-      const level = Number.parseInt(key, AgLoggerConfig.DECIMAL_RADIX) as AgLogLevel;
-      const logger = loggerMap[level];
-      if (logger !== undefined && logger !== null) {
-        this._loggerMap.set(level, logger);
-      }
-    });
+    Object.entries(loggerMap)
+      // 1. key, logger -> level, logger
+      .map(([key, logger]) =>
+        [
+          Number.parseInt(key, AgLoggerConfig.DECIMAL_RADIX) as AgLogLevel,
+          logger,
+        ] as const
+      )
+      // 2. logger === null を除外
+      .filter(([, logger]) => logger != null)
+      // 3. 残ったものを _loggerMap に登録
+      .forEach(([level, logger]) => {
+        this._loggerMap.set(level, logger as AgLoggerFunction);
+      });
   }
 
   /**
@@ -355,6 +371,8 @@ export class AgLoggerConfig {
       return false;
     }
     this._loggerMap.set(level, logger);
+    // Track explicit overrides in options to distinguish from initial defaults
+    this._options.loggerMap = { ...this._options.loggerMap, [level]: logger };
     return true;
   }
 }

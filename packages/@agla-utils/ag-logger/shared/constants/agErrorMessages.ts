@@ -43,6 +43,8 @@ export const AG_LOGGER_ERROR_MESSAGES = {
   },
   [ERROR_TYPES.INITIALIZATION]: {
     LOGGER_NOT_CREATED: 'Logger instance not created. Call createLogger() first.',
+    LOGGER_ALREADY_CREATED: 'Logger instance already created. Cannot create multiple instances.',
+    LOGGER_ALREADY_INITIALIZED: 'Logger already initialized. Cannot set external logger.',
     INITIALIZE_ERROR: 'Logger initialization failed',
   },
   [ERROR_TYPES.STATE]: {
