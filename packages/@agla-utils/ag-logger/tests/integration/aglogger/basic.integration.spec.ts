@@ -100,7 +100,7 @@ describe('AgLogger Basic Integration Tests', () => {
 
         // ロガーマネージャー設定の共有
         logger1.setLoggerConfig({
-          defaultLogger: mockLogger.createLoggerFunction(),
+          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: JsonFormatter,
         });
 

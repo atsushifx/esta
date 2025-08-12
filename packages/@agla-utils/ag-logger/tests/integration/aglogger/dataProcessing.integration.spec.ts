@@ -90,7 +90,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         setupTestContext();
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.createLoggerFunction(),
+          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: vi.fn().mockImplementation((logMessage) => {
             // フォーマッターで循環参照を処理するシナリオ
             try {
@@ -127,7 +127,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         });
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.createLoggerFunction(),
+          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: errorHandlingFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
@@ -169,7 +169,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         });
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.createLoggerFunction(),
+          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: resilientFormatter,
           loggerMap: mockLogger.defaultLoggerMap,
         });
@@ -235,7 +235,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         });
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.createLoggerFunction(),
+          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: safeFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
@@ -291,7 +291,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         });
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.createLoggerFunction(),
+          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: circularSafeFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
