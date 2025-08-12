@@ -30,13 +30,7 @@ export const ConsoleLogger: AgLoggerFunction = (formattedLogMessage: AgFormatted
  * Mapping of log level codes to their respective console logging functions.
  * Uses appropriate console methods per log level for better log categorization.
  */
-export const ConsoleLoggerMap: AgLoggerMap = {
-  [AG_LOGLEVEL.VERBOSE]: (formattedMessage: AgFormattedLogMessage) => {
-    console.debug(formattedMessage);
-  },
-  [AG_LOGLEVEL.FORCE_OUTPUT]: (formattedMessage: AgFormattedLogMessage) => {
-    console.log(formattedMessage);
-  },
+export const ConsoleLoggerMap: Partial<AgLoggerMap> = {
   [AG_LOGLEVEL.OFF]: NullLogger,
   [AG_LOGLEVEL.FATAL]: (formattedMessage: AgFormattedLogMessage) => {
     console.error(formattedMessage);
@@ -55,6 +49,13 @@ export const ConsoleLoggerMap: AgLoggerMap = {
   },
   [AG_LOGLEVEL.TRACE]: (formattedMessage: AgFormattedLogMessage) => {
     console.debug(formattedMessage);
+  },
+  // special level
+  [AG_LOGLEVEL.VERBOSE]: (formattedMessage: AgFormattedLogMessage) => {
+    console.debug(formattedMessage);
+  },
+  [AG_LOGLEVEL.LOG]: (formattedMessage: AgFormattedLogMessage) => {
+    console.log(formattedMessage);
   },
 };
 

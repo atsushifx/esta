@@ -195,7 +195,7 @@ export class E2eMockLogger implements AgLoggerInterface {
    * Create AgLoggerMap for the current test.
    * This provides level-specific logging functions.
    */
-  createLoggerMap(): AgLoggerMap {
+  createLoggerMap(): Partial<AgLoggerMap> {
     return {
       [AG_LOGLEVEL.OFF]: () => {},
       [AG_LOGLEVEL.FATAL]: (message: AgFormattedLogMessage) => this.fatal(message),
@@ -206,7 +206,7 @@ export class E2eMockLogger implements AgLoggerInterface {
       [AG_LOGLEVEL.TRACE]: (message: AgFormattedLogMessage) => this.trace(message),
       // logger for special log level
       [AG_LOGLEVEL.VERBOSE]: (message: AgFormattedLogMessage) => this.verbose(message),
-      [AG_LOGLEVEL.FORCE_OUTPUT]: (message: AgFormattedLogMessage) => this.log(message),
+      [AG_LOGLEVEL.LOG]: (message: AgFormattedLogMessage) => this.log(message),
     };
   }
 }

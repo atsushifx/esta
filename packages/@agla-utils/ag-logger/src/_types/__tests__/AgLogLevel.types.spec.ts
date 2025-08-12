@@ -59,8 +59,8 @@ describe('AgLogLevel Types and Constants Tests', () => {
      */
     it('should define special log level constants with correct negative values', () => {
       expect(AG_LOGLEVEL.LOG).toBe(-12);
-      expect(AG_LOGLEVEL.FORCE_OUTPUT).toBe(-98);
-      expect(AG_LOGLEVEL.VERBOSE).toBe(-99);
+      expect(AG_LOGLEVEL.VERBOSE).toBe(-11);
+      expect(AG_LOGLEVEL.DEFAULT).toBe(-99);
     });
 
     /**
@@ -92,7 +92,7 @@ describe('AgLogLevel Types and Constants Tests', () => {
     it('should accept all valid log level numeric values', () => {
       const validLogLevels: AgLogLevel[] = [
         AG_LOGLEVEL.VERBOSE,
-        AG_LOGLEVEL.FORCE_OUTPUT,
+        AG_LOGLEVEL.DEFAULT,
         AG_LOGLEVEL.LOG,
         AG_LOGLEVEL.OFF,
         AG_LOGLEVEL.FATAL,
@@ -116,8 +116,8 @@ describe('AgLogLevel Types and Constants Tests', () => {
       expect(AG_LOGLEVEL_VALUES).toHaveLength(10);
       expect(AG_LOGLEVEL_VALUES).toEqual(expect.arrayContaining([
         -99,
-        -98,
         -12,
+        -11,
         0,
         1,
         2,
@@ -145,7 +145,7 @@ describe('AgLogLevel Types and Constants Tests', () => {
     it('should accept all valid log level label strings', () => {
       const validLabels: AgLogLevelLabel[] = [
         'VERBOSE',
-        'FORCE_OUTPUT',
+        'DEFAULT',
         'LOG',
         'OFF',
         'FATAL',
@@ -170,7 +170,7 @@ describe('AgLogLevel Types and Constants Tests', () => {
       expect(AG_LOGLEVEL_KEYS).toHaveLength(10);
       expect(AG_LOGLEVEL_KEYS).toEqual(expect.arrayContaining([
         'VERBOSE',
-        'FORCE_OUTPUT',
+        'DEFAULT',
         'LOG',
         'OFF',
         'FATAL',
@@ -205,7 +205,7 @@ describe('AgLogLevel Types and Constants Tests', () => {
       expect(AG_LOGLEVEL_TO_LABEL_MAP[AG_LOGLEVEL.DEBUG]).toBe('DEBUG');
       expect(AG_LOGLEVEL_TO_LABEL_MAP[AG_LOGLEVEL.TRACE]).toBe('TRACE');
       expect(AG_LOGLEVEL_TO_LABEL_MAP[AG_LOGLEVEL.LOG]).toBe('LOG');
-      expect(AG_LOGLEVEL_TO_LABEL_MAP[AG_LOGLEVEL.FORCE_OUTPUT]).toBe('FORCE_OUTPUT');
+      expect(AG_LOGLEVEL_TO_LABEL_MAP[AG_LOGLEVEL.DEFAULT]).toBe('DEFAULT');
       expect(AG_LOGLEVEL_TO_LABEL_MAP[AG_LOGLEVEL.VERBOSE]).toBe('VERBOSE');
     });
 
@@ -221,7 +221,7 @@ describe('AgLogLevel Types and Constants Tests', () => {
       expect(AG_LABEL_TO_LOGLEVEL_MAP['DEBUG']).toBe(AG_LOGLEVEL.DEBUG);
       expect(AG_LABEL_TO_LOGLEVEL_MAP['TRACE']).toBe(AG_LOGLEVEL.TRACE);
       expect(AG_LABEL_TO_LOGLEVEL_MAP['LOG']).toBe(AG_LOGLEVEL.LOG);
-      expect(AG_LABEL_TO_LOGLEVEL_MAP['FORCE_OUTPUT']).toBe(AG_LOGLEVEL.FORCE_OUTPUT);
+      expect(AG_LABEL_TO_LOGLEVEL_MAP['LOG']).toBe(AG_LOGLEVEL.LOG);
       expect(AG_LABEL_TO_LOGLEVEL_MAP['VERBOSE']).toBe(AG_LOGLEVEL.VERBOSE);
     });
 
@@ -254,7 +254,7 @@ describe('AgLogLevel Types and Constants Tests', () => {
       const minLogLevel = Math.min(...AG_LOGLEVEL_VALUES);
       const maxLogLevel = Math.max(...AG_LOGLEVEL_VALUES);
 
-      expect(minLogLevel).toBe(AG_LOGLEVEL.VERBOSE);
+      expect(minLogLevel).toBe(AG_LOGLEVEL.DEFAULT);
       expect(maxLogLevel).toBe(AG_LOGLEVEL.TRACE);
       expect(minLogLevel).toBeLessThan(maxLogLevel);
     });
@@ -270,9 +270,9 @@ describe('AgLogLevel Types and Constants Tests', () => {
       expect(AG_LOGLEVEL.INFO).toBeLessThan(AG_LOGLEVEL.DEBUG);
       expect(AG_LOGLEVEL.DEBUG).toBeLessThan(AG_LOGLEVEL.TRACE);
 
-      expect(AG_LOGLEVEL.VERBOSE).toBeLessThan(AG_LOGLEVEL.FORCE_OUTPUT);
-      expect(AG_LOGLEVEL.FORCE_OUTPUT).toBeLessThan(AG_LOGLEVEL.LOG);
-      expect(AG_LOGLEVEL.LOG).toBeLessThan(AG_LOGLEVEL.OFF);
+      expect(AG_LOGLEVEL.DEFAULT).toBeLessThan(AG_LOGLEVEL.LOG);
+      expect(AG_LOGLEVEL.LOG).toBeLessThan(AG_LOGLEVEL.VERBOSE);
+      expect(AG_LOGLEVEL.VERBOSE).toBeLessThan(AG_LOGLEVEL.OFF);
     });
 
     /**

@@ -35,12 +35,12 @@ export const AG_LOGLEVEL = {
   /** Very detailed tracing information. */
   TRACE: 6,
   // special level
-  /** special level: force output mode */
-  LOG: -12,
-  /** Special level: emits even if filters would suppress (history suggests -98). */
-  FORCE_OUTPUT: -98,
   /** special level: verbose mode */
-  VERBOSE: -99,
+  VERBOSE: -11,
+  /** special level: LOG output (force output) */
+  LOG: -12,
+  /** Special level: default (defaultLogger: LogLevel  is same for INFO) */
+  DEFAULT: -99,
 } as const;
 
 /**
