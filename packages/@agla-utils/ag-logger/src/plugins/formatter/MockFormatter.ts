@@ -9,7 +9,7 @@
 // types
 import type { AgFormatFunction, AgLogMessage } from '../../../shared/types';
 // utilities
-import { AgToLabel } from '../../utils/AgLogLevelHelpers';
+import { AgToLabel } from '../../utils/AgLogHelpers';
 
 // formatter
 
@@ -39,8 +39,8 @@ export const MockFormatter = {
   json: ((logMessage: AgLogMessage): string => {
     const levelLabel = AgToLabel(logMessage.logLevel);
     const logEntry = {
-      logLevel: logMessage.logLevel,
       timestamp: logMessage.timestamp.toISOString(),
+      logLevel: logMessage.logLevel,
       ...(levelLabel && { level: levelLabel }),
       message: logMessage.message,
       ...(logMessage.args.length > 0 && { args: logMessage.args }),

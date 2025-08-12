@@ -10,7 +10,7 @@
 import type { AgLogMessage } from '../../../shared/types';
 
 // utilities
-import { AgToLabel } from '../../utils/AgLogLevelHelpers';
+import { AgToLabel } from '../../utils/AgLogHelpers';
 
 /**
  * Formats a log message into a JSON string.
