@@ -73,11 +73,11 @@ describe('AgLogger Configuration Integration Tests', () => {
         const defaultLogger = new MockLogger.buffer();
 
         const logger = AgLogger.createLogger({
-          defaultLogger: defaultLogger.createLoggerFunction(),
+          defaultLogger: defaultLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: MockFormatter.passthrough,
           loggerMap: {
-            [AG_LOGLEVEL.ERROR]: errorLogger.createLoggerFunction(AG_LOGLEVEL.ERROR),
-            [AG_LOGLEVEL.WARN]: warnLogger.createLoggerFunction(AG_LOGLEVEL.WARN),
+            [AG_LOGLEVEL.ERROR]: errorLogger.getLoggerFunction(AG_LOGLEVEL.ERROR),
+            [AG_LOGLEVEL.WARN]: warnLogger.getLoggerFunction(AG_LOGLEVEL.WARN),
           },
         });
 
@@ -113,12 +113,12 @@ describe('AgLogger Configuration Integration Tests', () => {
         const tempLogger1 = new MockLogger.buffer();
         const tempLogger2 = new MockLogger.buffer();
 
-        logger.setLoggerConfig({ defaultLogger: tempLogger1.createLoggerFunction() });
+        logger.setLoggerConfig({ defaultLogger: tempLogger1.getLoggerFunction(AG_LOGLEVEL.INFO) });
         logger.setLoggerConfig({
-          loggerMap: { [AG_LOGLEVEL.ERROR]: tempLogger2.createLoggerFunction(AG_LOGLEVEL.ERROR) },
+          loggerMap: { [AG_LOGLEVEL.ERROR]: tempLogger2.getLoggerFunction(AG_LOGLEVEL.ERROR) },
         });
         logger.setLoggerConfig({ formatter: MockFormatter.json });
-        logger.setLoggerConfig({ defaultLogger: finalLogger.createLoggerFunction() });
+        logger.setLoggerConfig({ defaultLogger: finalLogger.getLoggerFunction(AG_LOGLEVEL.INFO) });
 
         logger.logLevel = AG_LOGLEVEL.INFO;
         logger.info('test message');

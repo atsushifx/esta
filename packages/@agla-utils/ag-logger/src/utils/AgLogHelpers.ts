@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 import { AG_LABEL_TO_LOGLEVEL_MAP, AG_LOGLEVEL, AG_LOGLEVEL_TO_LABEL_MAP } from '../../shared/types';
-import type { AgLogLevel, AgLogLevelLabel } from '../../shared/types';
+import type { AgFormattedLogMessage, AgLoggerFunction, AgLogLevel, AgLogLevelLabel } from '../../shared/types';
 import { isValidLogLevel } from './AgLogValidators';
 
 /**
@@ -103,4 +103,33 @@ export const argsToString = (args: readonly unknown[]): string => {
 
   const message = args.map((arg) => JSON.stringify(arg) || valueToString(arg)).join(' ').trim();
   return message;
+};
+
+/**
+ * Creates a logger function that can be registered in loggerMap.
+ * Takes a module function and returns a function compatible with AgLoggerFunction.
+ *
+ * @param moduleFunc - The function to wrap (e.g., this.executeLog, this.debug, console.error)
+ * @returns A function that takes logLevel and message and calls the module function
+ *
+ * @example
+ * ```typescript
+ * // For this.executeLog(level, message)
+ * const loggerFunc = createLoggerFunction((level, message) => this.executeLog(level, message));
+ *
+ * // For this.debug(message)
+ * const debugFunc = createLoggerFunction((level, message) => this.debug(message));
+ *
+ * // For console.error(formattedMessage)
+ * const consoleFunc = createLoggerFunction((level, message) => console.error(message));
+ * ```
+ */
+export const createLoggerFunction = (
+  moduleFunc: (level: AgLogLevel, message: AgFormattedLogMessage) => void,
+): AgLoggerFunction => {
+  return (formattedMessage: AgFormattedLogMessage): void => {
+    // Extract level information if available, otherwise use a default level
+    // Since we only have the formatted message, we'll pass a default level
+    moduleFunc(AG_LOGLEVEL.INFO, formattedMessage);
+  };
 };

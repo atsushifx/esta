@@ -99,7 +99,7 @@ describe('AgLogger Filtering Integration Tests', () => {
         setupTestContext();
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.createLoggerFunction(),
+          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.OFF;
@@ -193,7 +193,7 @@ describe('AgLogger Filtering Integration Tests', () => {
         setupTestContext();
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.createLoggerFunction(),
+          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: MockFormatter.messageOnly,
           loggerMap: mockLogger.defaultLoggerMap,
         });
@@ -243,7 +243,7 @@ describe('AgLogger Filtering Integration Tests', () => {
         });
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.createLoggerFunction(),
+          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: throwingFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
@@ -263,7 +263,7 @@ describe('AgLogger Filtering Integration Tests', () => {
         setupTestContext();
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.createLoggerFunction(),
+          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: PlainFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;

@@ -7,7 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 // libs
+import { createLoggerFunction } from '../../utils/AgLogHelpers';
 import { isValidLogLevel } from '../../utils/AgLogValidators';
+import { NullLogger } from './NullLogger';
 
 // constants
 import { AG_LOGLEVEL, AG_LOGLEVEL_KEYS } from '../../../shared/types';
@@ -65,6 +67,7 @@ export class AgMockBufferLogger {
 
   // Logger methods
   public executeLog(level: AgLogLevel, message: AgFormattedLogMessage): void {
+    this.validateLogLevel(level);
     this.messages.get(level)!.push(message);
   }
 
@@ -162,16 +165,13 @@ export class AgMockBufferLogger {
   }
 
   /**
-   * Create AgLoggerFunction for testing.
-   * This can be used as a plugin for ag-logger.
-   * @param level - Log level for the logger function (defaults to INFO)
+   * Gets the logger function for a specific log level.
+   * @param logLevel - The log level to get the logger function for
+   * @returns The logger function for the specified level
    */
-  createLoggerFunction(level: AgLogLevel = AG_LOGLEVEL.INFO): AgLoggerFunction {
-    return (formattedLogMessage: string | AgLogMessage): void => {
-      // Use the provided level parameter - this allows different logging levels
-      // to be handled by different logger instances
-      this.executeLog(level, formattedLogMessage);
-    };
+  getLoggerFunction(logLevel: AgLogLevel): AgLoggerFunction {
+    this.validateLogLevel(logLevel);
+    return this.defaultLoggerMap[logLevel] ?? NullLogger;
   }
 
   /**
@@ -180,16 +180,32 @@ export class AgMockBufferLogger {
    */
   createLoggerMap(): AgLoggerMap {
     return {
-      [AG_LOGLEVEL.OFF]: () => {}, // No-op for OFF level
-      [AG_LOGLEVEL.FATAL]: (message: AgFormattedLogMessage) => this.fatal(message),
-      [AG_LOGLEVEL.ERROR]: (message: AgFormattedLogMessage) => this.error(message),
-      [AG_LOGLEVEL.WARN]: (message: AgFormattedLogMessage) => this.warn(message),
-      [AG_LOGLEVEL.INFO]: (message: AgFormattedLogMessage) => this.info(message),
-      [AG_LOGLEVEL.DEBUG]: (message: AgFormattedLogMessage) => this.debug(message),
-      [AG_LOGLEVEL.TRACE]: (message: AgFormattedLogMessage) => this.trace(message),
+      [AG_LOGLEVEL.OFF]: createLoggerFunction(() => {}), // No-op for OFF level
+      [AG_LOGLEVEL.FATAL]: createLoggerFunction((logLevel: AgLogLevel, message: AgFormattedLogMessage) =>
+        this.fatal(message)
+      ),
+      [AG_LOGLEVEL.ERROR]: createLoggerFunction((logLevel: AgLogLevel, message: AgFormattedLogMessage) =>
+        this.error(message)
+      ),
+      [AG_LOGLEVEL.WARN]: createLoggerFunction((logLevel: AgLogLevel, message: AgFormattedLogMessage) =>
+        this.warn(message)
+      ),
+      [AG_LOGLEVEL.INFO]: createLoggerFunction((logLevel: AgLogLevel, message: AgFormattedLogMessage) =>
+        this.info(message)
+      ),
+      [AG_LOGLEVEL.DEBUG]: createLoggerFunction((logLevel: AgLogLevel, message: AgFormattedLogMessage) =>
+        this.debug(message)
+      ),
+      [AG_LOGLEVEL.TRACE]: createLoggerFunction((logLevel: AgLogLevel, message: AgFormattedLogMessage) =>
+        this.trace(message)
+      ),
       // special logger
-      [AG_LOGLEVEL.VERBOSE]: (message: AgFormattedLogMessage) => this.verbose(message),
-      [AG_LOGLEVEL.FORCE_OUTPUT]: (message: AgFormattedLogMessage) => this.log(message),
+      [AG_LOGLEVEL.VERBOSE]: createLoggerFunction((logLevel: AgLogLevel, message: AgFormattedLogMessage) =>
+        this.verbose(message)
+      ),
+      [AG_LOGLEVEL.FORCE_OUTPUT]: createLoggerFunction((logLevel: AgLogLevel, message: AgFormattedLogMessage) =>
+        this.log(message)
+      ),
     };
   }
 }

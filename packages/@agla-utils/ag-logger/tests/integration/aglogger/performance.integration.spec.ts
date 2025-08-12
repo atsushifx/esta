@@ -58,7 +58,7 @@ describe('AgLogger Performance Integration Tests', () => {
 
       const mockFormatter = vi.fn().mockImplementation((msg) => msg.message ?? msg);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -114,7 +114,7 @@ describe('AgLogger Performance Integration Tests', () => {
       const { mockLogger } = createMock(ctx);
       const mockFormatter = vi.fn().mockImplementation((msg) => msg.message ?? msg);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
       });
 
@@ -138,7 +138,7 @@ describe('AgLogger Performance Integration Tests', () => {
       const { mockLogger } = createMock(ctx);
       const mockFormatter = vi.fn().mockImplementation((msg) => msg.message ?? msg);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
         loggerMap: mockLogger.defaultLoggerMap,
       });
@@ -164,7 +164,7 @@ describe('AgLogger Performance Integration Tests', () => {
       const { mockLogger } = createMock(ctx);
       // Setup
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
         loggerMap: mockLogger.defaultLoggerMap,
       });
@@ -195,7 +195,7 @@ describe('AgLogger Performance Integration Tests', () => {
     it('should handle very long messages', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -210,7 +210,7 @@ describe('AgLogger Performance Integration Tests', () => {
     it('should handle large number of arguments', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -225,7 +225,7 @@ describe('AgLogger Performance Integration Tests', () => {
     it('should handle large objects in arguments', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -249,7 +249,7 @@ describe('AgLogger Performance Integration Tests', () => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       for (let i = 0; i < 50; i++) {
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.createLoggerFunction(),
+          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
           formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
@@ -264,7 +264,7 @@ describe('AgLogger Performance Integration Tests', () => {
     it('should maintain state consistency under stress', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
       });
 
@@ -289,7 +289,7 @@ describe('AgLogger Performance Integration Tests', () => {
     it('should maintain consistency with rapid state changes and complex data', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
         loggerMap: mockLogger.createLoggerMap(),
       });
@@ -328,7 +328,7 @@ describe('AgLogger Performance Integration Tests', () => {
       });
 
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: stressFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -351,7 +351,7 @@ describe('AgLogger Performance Integration Tests', () => {
     it('should handle Unicode characters in high-volume processing', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;

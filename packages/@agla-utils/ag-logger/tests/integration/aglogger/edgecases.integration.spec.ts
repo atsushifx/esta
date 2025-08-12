@@ -65,7 +65,7 @@ describe('AgLogger Complex Edge Cases Integration Tests', () => {
     it('should handle deeply nested objects', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -90,7 +90,7 @@ describe('AgLogger Complex Edge Cases Integration Tests', () => {
     it('should handle errors with custom properties', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -113,7 +113,7 @@ describe('AgLogger Complex Edge Cases Integration Tests', () => {
     it('should handle multiple error types simultaneously', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -137,7 +137,7 @@ describe('AgLogger Complex Edge Cases Integration Tests', () => {
     it('should handle various whitespace types consistently', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.createLoggerFunction(),
+        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
