@@ -260,9 +260,9 @@ export class AgLogger {
     this.executeLog(AG_LOGLEVEL.TRACE, ...args);
   }
 
-  /** General log method that always outputs (FORCE_OUTPUT level). */
+  /** General log method that always outputs (LOG level). */
   log(...args: unknown[]): void {
-    this.executeLog(AG_LOGLEVEL.FORCE_OUTPUT, ...args);
+    this.executeLog(AG_LOGLEVEL.LOG, ...args);
   }
 
   /** Verbose log method that only outputs when verbose flag is true. */

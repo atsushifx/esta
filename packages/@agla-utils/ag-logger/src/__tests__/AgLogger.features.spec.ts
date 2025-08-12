@@ -135,9 +135,9 @@ describe('AgLogger Special Features', () => {
   });
 });
 
-describe('FORCE_OUTPUT Log Level', () => {
+describe('LOG Log Level', () => {
   setupTestEnvironment();
-  describe('正常系: Basic FORCE_OUTPUT functionality', () => {
+  describe('正常系: Basic LOG functionality', () => {
     it('should output when both logLevel is OFF and verbose is false', () => {
       const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
       logger.logLevel = AG_LOGLEVEL.OFF;
@@ -181,8 +181,8 @@ describe('FORCE_OUTPUT Log Level', () => {
     });
   });
 
-  describe('異常系: FORCE_OUTPUT error scenarios', () => {
-    it('should handle FORCE_OUTPUT with throwing logger', () => {
+  describe('異常系: LOG error scenarios', () => {
+    it('should handle LOG with throwing logger', () => {
       const throwingLogger = vi.fn(() => {
         throw new Error('Logger error');
       });
@@ -192,7 +192,7 @@ describe('FORCE_OUTPUT Log Level', () => {
       expect(() => logger.log('force output')).toThrow('Logger error');
     });
 
-    it('should handle FORCE_OUTPUT with throwing formatter', () => {
+    it('should handle LOG with throwing formatter', () => {
       const throwingFormatter = vi.fn(() => {
         throw new Error('Formatter error');
       });
@@ -203,8 +203,8 @@ describe('FORCE_OUTPUT Log Level', () => {
     });
   });
 
-  describe('エッジケース: FORCE_OUTPUT edge cases', () => {
-    it('should handle FORCE_OUTPUT with empty message', () => {
+  describe('エッジケース: LOG edge cases', () => {
+    it('should handle LOG with empty message', () => {
       const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
       logger.logLevel = AG_LOGLEVEL.OFF;
 
@@ -213,7 +213,7 @@ describe('FORCE_OUTPUT Log Level', () => {
       expect(mockLogger).not.toHaveBeenCalled(); // Empty messages are suppressed
     });
 
-    it('should handle FORCE_OUTPUT with no arguments', () => {
+    it('should handle LOG with no arguments', () => {
       const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
       logger.logLevel = AG_LOGLEVEL.OFF;
 
@@ -223,7 +223,7 @@ describe('FORCE_OUTPUT Log Level', () => {
       expect(mockLogger).toHaveBeenCalledTimes(1);
     });
 
-    it('should handle FORCE_OUTPUT with complex objects', () => {
+    it('should handle LOG with complex objects', () => {
       const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
       logger.logLevel = AG_LOGLEVEL.OFF;
 
@@ -406,7 +406,7 @@ describe('Configuration Management', () => {
         [AG_LOGLEVEL.INFO]: vi.fn(),
         [AG_LOGLEVEL.DEBUG]: vi.fn(),
         [AG_LOGLEVEL.TRACE]: vi.fn(),
-        [AG_LOGLEVEL.FORCE_OUTPUT]: vi.fn(),
+        [AG_LOGLEVEL.LOG]: vi.fn(),
       };
 
       const logger = AgLogger.createLogger({
@@ -430,7 +430,7 @@ describe('Configuration Management', () => {
       expect(loggerMap[AG_LOGLEVEL.INFO]).toHaveBeenCalledTimes(1);
       expect(loggerMap[AG_LOGLEVEL.DEBUG]).toHaveBeenCalledTimes(1);
       expect(loggerMap[AG_LOGLEVEL.TRACE]).toHaveBeenCalledTimes(1);
-      expect(loggerMap[AG_LOGLEVEL.FORCE_OUTPUT]).toHaveBeenCalledTimes(1);
+      expect(loggerMap[AG_LOGLEVEL.LOG]).toHaveBeenCalledTimes(1);
       expect(mockLogger).not.toHaveBeenCalled(); // All mapped, default not used
     });
 

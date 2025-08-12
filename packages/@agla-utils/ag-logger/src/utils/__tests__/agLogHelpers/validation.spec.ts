@@ -15,8 +15,8 @@ describe('AgLogHelpers: Validation Functions', () => {
   describe('isValidLogLevel: LogLevel validation', () => {
     describe('正常系: Valid LogLevel inputs', () => {
       describe('Standard log levels', () => {
-        it('should return true for FORCE_OUTPUT level', () => {
-          expect(isValidLogLevel(AG_LOGLEVEL.FORCE_OUTPUT)).toBe(true);
+        it('should return true for LOG level', () => {
+          expect(isValidLogLevel(AG_LOGLEVEL.LOG)).toBe(true);
         });
 
         it('should return true for OFF level', () => {
@@ -55,7 +55,7 @@ describe('AgLogHelpers: Validation Functions', () => {
       describe('Numeric literal validation', () => {
         it('should return true for numeric literals matching AG_LOGLEVEL values', () => {
           expect(isValidLogLevel(-99 as AgLogLevel)).toBe(true); // VERBOSE
-          expect(isValidLogLevel(-98 as AgLogLevel)).toBe(true); // FORCE_OUTPUT
+          expect(isValidLogLevel(-12 as AgLogLevel)).toBe(true); // LOG
           expect(isValidLogLevel(0 as AgLogLevel)).toBe(true); // OFF
           expect(isValidLogLevel(1 as AgLogLevel)).toBe(true); // FATAL
           expect(isValidLogLevel(2 as AgLogLevel)).toBe(true); // ERROR
@@ -98,7 +98,7 @@ describe('AgLogHelpers: Validation Functions', () => {
           expect(isValidLogLevel('1' as unknown as AgLogLevel)).toBe(false);
           expect(isValidLogLevel('4' as unknown as AgLogLevel)).toBe(false);
           expect(isValidLogLevel('-99' as unknown as AgLogLevel)).toBe(false);
-          expect(isValidLogLevel('-98' as unknown as AgLogLevel)).toBe(false);
+          expect(isValidLogLevel('-12' as unknown as AgLogLevel)).toBe(false);
         });
 
         it('should return false for log level label strings', () => {
@@ -234,7 +234,7 @@ describe('AgLogHelpers: Validation Functions', () => {
         it('should return false for boundary edge values', () => {
           expect(isValidLogLevel(-101 as AgLogLevel)).toBe(false); // Just below VERBOSE
           expect(isValidLogLevel(7 as AgLogLevel)).toBe(false); // Just above TRACE
-          expect(isValidLogLevel(-97 as AgLogLevel)).toBe(false); // Between FORCE_OUTPUT and VERBOSE
+          expect(isValidLogLevel(-97 as AgLogLevel)).toBe(false); // Between LOG and VERBOSE
         });
       });
 
@@ -316,8 +316,8 @@ describe('AgLogHelpers: Validation Functions', () => {
       });
 
       it('should handle gaps in the enum correctly', () => {
-        // There's a gap between FORCE_OUTPUT(-98) and VERBOSE(-99)
-        expect(isValidLogLevel(-98 as AgLogLevel)).toBe(true); // FORCE_OUTPUT
+        // There's a gap between LOG(-12) and VERBOSE(-99)
+        expect(isValidLogLevel(-12 as AgLogLevel)).toBe(true); // LOG
         expect(isValidLogLevel(-99 as AgLogLevel)).toBe(true); // VERBOSE
 
         // Values in the gap should be invalid

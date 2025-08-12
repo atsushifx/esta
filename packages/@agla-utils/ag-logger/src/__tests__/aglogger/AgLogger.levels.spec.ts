@@ -161,8 +161,8 @@ describe('AgLogger Log Level Management', () => {
     });
   });
 
-  describe('FORCE_OUTPUT Special Behavior', () => {
-    it('should output FORCE_OUTPUT regardless of logLevel and verbose settings', () => {
+  describe('LOG Special Behavior', () => {
+    it('should output LOG regardless of logLevel and verbose settings', () => {
       const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
       logger.logLevel = AG_LOGLEVEL.OFF;
       logger.setVerbose = DISABLE;
