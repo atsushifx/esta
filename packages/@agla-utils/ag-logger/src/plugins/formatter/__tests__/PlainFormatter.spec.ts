@@ -92,11 +92,11 @@ describe('PlainFormatter', () => {
   });
 
   /**
-   * Tests FORCE_OUTPUT level formatting without brackets.
+   * Tests LOG level formatting without brackets.
    */
-  it('formats FORCE_OUTPUT level without brackets', () => {
+  it('formats LOG level without brackets', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AG_LOGLEVEL.FORCE_OUTPUT,
+      logLevel: AG_LOGLEVEL.LOG,
       timestamp: new Date('2025-01-01T12:00:00.000Z'),
       message: 'Force output message',
       args: [],

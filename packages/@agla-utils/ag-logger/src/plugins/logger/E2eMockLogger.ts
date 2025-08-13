@@ -128,7 +128,7 @@ export class E2eMockLogger implements AgLoggerInterface {
 
   log(message: AgFormattedLogMessage): void {
     const mockLogger = this.getCurrentMockLogger();
-    mockLogger.executeLog(AG_LOGLEVEL.FORCE_OUTPUT, message);
+    mockLogger.executeLog(AG_LOGLEVEL.LOG, message);
   }
 
   /**
