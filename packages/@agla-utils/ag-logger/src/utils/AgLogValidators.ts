@@ -17,9 +17,10 @@ import { AG_LOGLEVEL } from '../../shared/types';
 import type { AgLogLevel } from '../../shared/types';
 import { valueToString } from './AgLogHelpers';
 
-export const isValidLogLevel = (logLevel: AgLogLevel): boolean => {
+export const isValidLogLevel = (logLevel: AgLogLevel | undefined): boolean => {
   return (
-    typeof logLevel === 'number'
+    logLevel !== undefined
+    && typeof logLevel === 'number'
     && Object.values(AG_LOGLEVEL).includes(logLevel)
   );
 };
@@ -85,4 +86,31 @@ export const validateLogger = (logger: unknown): void => {
       AG_LOGGER_ERROR_MESSAGES.CONFIG.INVALID_LOGGER,
     );
   }
+};
+
+/**
+ * Checks if a given log level is a standard log level (0-6 range).
+ * Standard log levels are OFF(0), FATAL(1), ERROR(2), WARN(3), INFO(4), DEBUG(5), TRACE(6).
+ * Special log levels like VERBOSE(-11), LOG(-12), DEFAULT(-99) are not standard levels.
+ *
+ * @param logLevel - Log level to check
+ * @returns True if the level is a standard level (0-6), false otherwise
+ *
+ * @example
+ * ```typescript
+ * isStandardLogLevel(AG_LOGLEVEL.INFO);    // true
+ * isStandardLogLevel(AG_LOGLEVEL.VERBOSE); // false
+ * isStandardLogLevel(-1);                  // false
+ * isStandardLogLevel(7);                   // false
+ * ```
+ */
+export const isStandardLogLevel = (logLevel: AgLogLevel | undefined): boolean => {
+  // Early type check for performance
+  if (logLevel === undefined || !isValidLogLevel(logLevel)) {
+    return false;
+  }
+
+  // Check integer constraint and range in one go
+  return logLevel >= AG_LOGLEVEL.OFF // 0
+    && logLevel <= AG_LOGLEVEL.TRACE; // 6
 };
