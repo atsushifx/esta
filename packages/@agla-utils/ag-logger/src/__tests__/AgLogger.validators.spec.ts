@@ -135,12 +135,14 @@ describe('AgLogger Input Validation', () => {
         it('should accept special log levels', () => {
           expect(() => validateLogLevel(AG_LOGLEVEL.VERBOSE)).not.toThrow();
           expect(() => validateLogLevel(AG_LOGLEVEL.LOG)).not.toThrow();
+          expect(() => validateLogLevel(AG_LOGLEVEL.DEFAULT)).not.toThrow();
         });
 
         it('should return the same valid log level value', () => {
           expect(validateLogLevel(AG_LOGLEVEL.INFO)).toBe(AG_LOGLEVEL.INFO);
           expect(validateLogLevel(AG_LOGLEVEL.VERBOSE)).toBe(AG_LOGLEVEL.VERBOSE);
           expect(validateLogLevel(AG_LOGLEVEL.LOG)).toBe(AG_LOGLEVEL.LOG);
+          expect(validateLogLevel(AG_LOGLEVEL.DEFAULT)).toBe(AG_LOGLEVEL.DEFAULT);
         });
       });
 
