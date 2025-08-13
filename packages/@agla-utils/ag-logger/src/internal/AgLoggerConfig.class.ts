@@ -247,6 +247,10 @@ export class AgLoggerConfig {
       return false;
     }
 
+    if (level === AG_LOGLEVEL.DEFAULT) {
+      return AG_LOGLEVEL.INFO <= this._options.logLevel;
+    }
+
     // For other levels, only show messages at or below the configured level
     // Lower numbers = less verbose, higher numbers = more verbose
     // So we show messages when their level is <= the configured level
