@@ -100,7 +100,7 @@ describe('AgLogger Basic Integration Tests', () => {
 
         // ロガーマネージャー設定の共有
         logger1.setLoggerConfig({
-          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+          defaultLogger: mockLogger.getLoggerFunction(),
           formatter: JsonFormatter,
         });
 
@@ -108,7 +108,7 @@ describe('AgLogger Basic Integration Tests', () => {
         logger2.info('test message');
 
         expect(mockLogger.getTotalMessageCount()).toBe(1);
-        const message = mockLogger.getLastMessage(AG_LOGLEVEL.INFO) as string;
+        const message = mockLogger.getLastMessage(AG_LOGLEVEL.DEFAULT) as string;
         expect(() => JSON.parse(message)).not.toThrow();
         const parsed = JSON.parse(message);
         expect(parsed.message).toBe('test message');

@@ -132,11 +132,11 @@ describe('JsonFormatter', () => {
   });
 
   /**
-   * Tests FORCE_OUTPUT level formatting without level field.
+   * Tests LOG level formatting without level field.
    */
-  it('formats FORCE_OUTPUT level without level field', () => {
+  it('formats LOG level without level field', () => {
     const logMessage: AgLogMessage = {
-      logLevel: AG_LOGLEVEL.FORCE_OUTPUT,
+      logLevel: AG_LOGLEVEL.LOG,
       timestamp: new Date('2025-01-01T12:00:00.000Z'),
       message: 'Force output message',
       args: [],

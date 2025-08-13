@@ -12,7 +12,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { AG_LOGGER_ERROR_MESSAGES, ERROR_TYPES } from '../../shared/constants';
 import { AG_LOGLEVEL } from '../../shared/types';
 
-import { AgLoggerError } from '../../shared/types/AgLoggerError.types';
 // Types
 import type { AgLogLevel, AgLogMessage } from '../../shared/types';
 // Test target
@@ -84,7 +83,7 @@ describe('AgLogger Input Validation', () => {
         const logger = AgLogger.createLogger();
         const invalidOptions = { defaultLogger: undefined };
 
-        expect(() => logger.setLoggerConfig(invalidOptions)).toThrow(AgLoggerError);
+        expect(() => logger.setLoggerConfig(invalidOptions)).toThrow('defaultLogger must be a valid function');
         expect(() => logger.setLoggerConfig(invalidOptions)).toThrow(
           AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.CONFIG].INVALID_DEFAULT_LOGGER,
         );
@@ -94,7 +93,7 @@ describe('AgLogger Input Validation', () => {
         const logger = AgLogger.createLogger();
         const invalidOptions = { formatter: undefined };
 
-        expect(() => logger.setLoggerConfig(invalidOptions)).toThrow(AgLoggerError);
+        expect(() => logger.setLoggerConfig(invalidOptions)).toThrow('formatter must be a valid function');
         expect(() => logger.setLoggerConfig(invalidOptions)).toThrow(
           AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.CONFIG].INVALID_FORMATTER,
         );
@@ -135,24 +134,26 @@ describe('AgLogger Input Validation', () => {
 
         it('should accept special log levels', () => {
           expect(() => validateLogLevel(AG_LOGLEVEL.VERBOSE)).not.toThrow();
-          expect(() => validateLogLevel(AG_LOGLEVEL.FORCE_OUTPUT)).not.toThrow();
+          expect(() => validateLogLevel(AG_LOGLEVEL.LOG)).not.toThrow();
+          expect(() => validateLogLevel(AG_LOGLEVEL.DEFAULT)).not.toThrow();
         });
 
         it('should return the same valid log level value', () => {
           expect(validateLogLevel(AG_LOGLEVEL.INFO)).toBe(AG_LOGLEVEL.INFO);
           expect(validateLogLevel(AG_LOGLEVEL.VERBOSE)).toBe(AG_LOGLEVEL.VERBOSE);
-          expect(validateLogLevel(AG_LOGLEVEL.FORCE_OUTPUT)).toBe(AG_LOGLEVEL.FORCE_OUTPUT);
+          expect(validateLogLevel(AG_LOGLEVEL.LOG)).toBe(AG_LOGLEVEL.LOG);
+          expect(validateLogLevel(AG_LOGLEVEL.DEFAULT)).toBe(AG_LOGLEVEL.DEFAULT);
         });
       });
 
       describe('Invalid type cases', () => {
         it('should throw AgLoggerError for non-number types', () => {
-          expect(() => validateLogLevel(undefined as unknown as AgLogLevel)).toThrow(AgLoggerError);
-          expect(() => validateLogLevel(null as unknown as AgLogLevel)).toThrow(AgLoggerError);
-          expect(() => validateLogLevel('invalid' as unknown as AgLogLevel)).toThrow(AgLoggerError);
-          expect(() => validateLogLevel(true as unknown as AgLogLevel)).toThrow(AgLoggerError);
-          expect(() => validateLogLevel({} as unknown as AgLogLevel)).toThrow(AgLoggerError);
-          expect(() => validateLogLevel([] as unknown as AgLogLevel)).toThrow(AgLoggerError);
+          expect(() => validateLogLevel(undefined as unknown as AgLogLevel)).toThrow('Invalid log level (undefined)');
+          expect(() => validateLogLevel(null as unknown as AgLogLevel)).toThrow('Invalid log level (null)');
+          expect(() => validateLogLevel('invalid' as unknown as AgLogLevel)).toThrow('Invalid log level ("invalid")');
+          expect(() => validateLogLevel(true as unknown as AgLogLevel)).toThrow('Invalid log level (true)');
+          expect(() => validateLogLevel({} as unknown as AgLogLevel)).toThrow('Invalid log level (object)');
+          expect(() => validateLogLevel([] as unknown as AgLogLevel)).toThrow('Invalid log level (array)');
         });
 
         it('should provide descriptive error messages for invalid types', () => {
@@ -187,8 +188,8 @@ describe('AgLogger Input Validation', () => {
           // Valid boundaries
           expect(validateLogLevel(0)).toBe(AG_LOGLEVEL.OFF);
           expect(validateLogLevel(6)).toBe(AG_LOGLEVEL.TRACE);
-          expect(validateLogLevel(-99)).toBe(AG_LOGLEVEL.VERBOSE);
-          expect(validateLogLevel(-98)).toBe(AG_LOGLEVEL.FORCE_OUTPUT);
+          expect(validateLogLevel(-99)).toBe(AG_LOGLEVEL.DEFAULT);
+          expect(validateLogLevel(-12)).toBe(AG_LOGLEVEL.LOG);
         });
 
         it('should reject values just outside boundaries', () => {
@@ -220,10 +221,10 @@ describe('AgLogger Input Validation', () => {
 
         expect(() => {
           logger.logLevel = 999 as AgLogLevel;
-        }).toThrow(AgLoggerError);
+        }).toThrow('Invalid log level (999)');
         expect(() => {
           logger.logLevel = 'invalid' as unknown as AgLogLevel;
-        }).toThrow(AgLoggerError);
+        }).toThrow('Invalid log level ("invalid")');
       });
     });
 
@@ -249,8 +250,8 @@ describe('AgLogger Input Validation', () => {
         const logger = AgLogger.createLogger() as TestableAgLogger;
         logger.logLevel = AG_LOGLEVEL.OFF;
 
-        // FORCE_OUTPUT should always output
-        expect(logger.shouldOutput(AG_LOGLEVEL.FORCE_OUTPUT)).toBe(true);
+        // LOG should always output
+        expect(logger.shouldOutput(AG_LOGLEVEL.LOG)).toBe(true);
 
         // VERBOSE should be controlled by verbose setting
         logger.setVerbose = true;

@@ -58,22 +58,22 @@ describe('AgLogger Performance Integration Tests', () => {
 
       const mockFormatter = vi.fn().mockImplementation((msg) => msg.message ?? msg);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+        defaultLogger: mockLogger.getLoggerFunction(),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
 
       // First test synchronous logging to verify setup
       logger.info('sync test');
-      expect(mockLogger.getMessageCount(AG_LOGLEVEL.INFO)).toBe(1);
-      mockLogger.clearMessages(AG_LOGLEVEL.INFO);
+      expect(mockLogger.getMessageCount(AG_LOGLEVEL.DEFAULT)).toBe(1);
+      mockLogger.clearMessages(AG_LOGLEVEL.DEFAULT);
 
       // 同期での高速連続実行テスト（async問題を回避）
       for (let i = 0; i < 10; i++) {
         logger.info(`message ${i}`);
       }
 
-      expect(mockLogger.getMessageCount(AG_LOGLEVEL.INFO)).toBe(10); // 10 loop messages
+      expect(mockLogger.getMessageCount(AG_LOGLEVEL.DEFAULT)).toBe(10); // 10 loop messages
       expect(mockFormatter).toHaveBeenCalledTimes(11); // 1 sync + 10 loop
     });
 
@@ -114,7 +114,7 @@ describe('AgLogger Performance Integration Tests', () => {
       const { mockLogger } = createMock(ctx);
       const mockFormatter = vi.fn().mockImplementation((msg) => msg.message ?? msg);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+        defaultLogger: mockLogger.getLoggerFunction(),
         formatter: mockFormatter,
       });
 
@@ -125,7 +125,7 @@ describe('AgLogger Performance Integration Tests', () => {
         logger.info('test');
       }
 
-      expect(mockLogger.getMessages(AG_LOGLEVEL.INFO)).toHaveLength(50); // INFO レベルの時のみ
+      expect(mockLogger.getMessages(AG_LOGLEVEL.DEFAULT)).toHaveLength(50); // INFO レベルの時のみ
 
       ctx.onTestFinished(() => {
         AgLogger.resetSingleton();
@@ -138,7 +138,7 @@ describe('AgLogger Performance Integration Tests', () => {
       const { mockLogger } = createMock(ctx);
       const mockFormatter = vi.fn().mockImplementation((msg) => msg.message ?? msg);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+        defaultLogger: mockLogger.getLoggerFunction(),
         formatter: mockFormatter,
         loggerMap: mockLogger.defaultLoggerMap,
       });
@@ -164,7 +164,7 @@ describe('AgLogger Performance Integration Tests', () => {
       const { mockLogger } = createMock(ctx);
       // Setup
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+        defaultLogger: mockLogger.getLoggerFunction(),
         formatter: mockFormatter,
         loggerMap: mockLogger.defaultLoggerMap,
       });
@@ -195,7 +195,7 @@ describe('AgLogger Performance Integration Tests', () => {
     it('should handle very long messages', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+        defaultLogger: mockLogger.getLoggerFunction(),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -203,14 +203,14 @@ describe('AgLogger Performance Integration Tests', () => {
       const longMessage = 'x'.repeat(10000);
       logger.info(longMessage);
 
-      expect(mockLogger.getMessageCount(AG_LOGLEVEL.INFO)).toBe(1);
+      expect(mockLogger.getMessageCount(AG_LOGLEVEL.DEFAULT)).toBe(1);
     });
 
     // 目的: 引数の大量投入時の堅牢性
     it('should handle large number of arguments', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+        defaultLogger: mockLogger.getLoggerFunction(),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -225,7 +225,7 @@ describe('AgLogger Performance Integration Tests', () => {
     it('should handle large objects in arguments', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+        defaultLogger: mockLogger.getLoggerFunction(),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -249,7 +249,7 @@ describe('AgLogger Performance Integration Tests', () => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       for (let i = 0; i < 50; i++) {
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+          defaultLogger: mockLogger.getLoggerFunction(),
           formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
@@ -264,7 +264,7 @@ describe('AgLogger Performance Integration Tests', () => {
     it('should maintain state consistency under stress', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+        defaultLogger: mockLogger.getLoggerFunction(),
         formatter: mockFormatter,
       });
 
@@ -289,7 +289,7 @@ describe('AgLogger Performance Integration Tests', () => {
     it('should maintain consistency with rapid state changes and complex data', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+        defaultLogger: mockLogger.getLoggerFunction(),
         formatter: mockFormatter,
         loggerMap: mockLogger.createLoggerMap(),
       });
@@ -328,7 +328,7 @@ describe('AgLogger Performance Integration Tests', () => {
       });
 
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+        defaultLogger: mockLogger.getLoggerFunction(),
         formatter: stressFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;
@@ -351,7 +351,7 @@ describe('AgLogger Performance Integration Tests', () => {
     it('should handle Unicode characters in high-volume processing', (ctx) => {
       const { mockLogger, mockFormatter } = createMock(ctx);
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+        defaultLogger: mockLogger.getLoggerFunction(),
         formatter: mockFormatter,
       });
       logger.logLevel = AG_LOGLEVEL.INFO;

@@ -49,8 +49,8 @@ describe('AgLogHelpers: Conversion Functions', () => {
       });
 
       describe('Special log levels', () => {
-        it('should return empty string for FORCE_OUTPUT level', () => {
-          expect(AgToLabel(AG_LOGLEVEL.FORCE_OUTPUT)).toBe('');
+        it('should return empty string for LOG level', () => {
+          expect(AgToLabel(AG_LOGLEVEL.LOG)).toBe('');
         });
       });
 
@@ -58,16 +58,16 @@ describe('AgLogHelpers: Conversion Functions', () => {
         it('should get correct values from AG_LOGLEVEL_TO_LABEL_MAP', () => {
           Object.values(AG_LOGLEVEL).forEach((level) => {
             const result = AgToLabel(level);
-            const expected = level === AG_LOGLEVEL.FORCE_OUTPUT
+            const expected = (level === AG_LOGLEVEL.LOG)
               ? ''
               : AG_LOGLEVEL_TO_LABEL_MAP[level];
             expect(result).toBe(expected);
           });
         });
 
-        it('should handle all AG_LOGLEVEL (except FORCE_OUTPUT) values consistently', () => {
+        it('should handle all AG_LOGLEVEL (except LOG) values consistently', () => {
           Object.entries(AG_LOGLEVEL)
-            .filter(([_key, value]) => (value !== AG_LOGLEVEL.FORCE_OUTPUT))
+            .filter(([_key, value]) => (value !== AG_LOGLEVEL.LOG))
             .forEach(([key, value]) => {
               const stringLabel = AgToLabel(value);
               expect(stringLabel).toBe(key);
@@ -76,7 +76,7 @@ describe('AgLogHelpers: Conversion Functions', () => {
 
         it('should return consistent uppercase format', () => {
           Object.values(AG_LOGLEVEL)
-            .filter((level) => (level !== AG_LOGLEVEL.FORCE_OUTPUT))
+            .filter((level) => (level !== AG_LOGLEVEL.LOG))
             .forEach((level) => {
               const label = AgToLabel(level);
               expect(label).toBe(label.toUpperCase());
@@ -185,6 +185,8 @@ describe('AgLogHelpers: Conversion Functions', () => {
           expect(AgToLogLevel('DEBUG' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.DEBUG);
           expect(AgToLogLevel('TRACE' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.TRACE);
           expect(AgToLogLevel('VERBOSE' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.VERBOSE);
+          expect(AgToLogLevel('LOG' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.LOG);
+          expect(AgToLogLevel('DEFAULT' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.DEFAULT);
         });
       });
 
@@ -198,6 +200,8 @@ describe('AgLogHelpers: Conversion Functions', () => {
           expect(AgToLogLevel('debug' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.DEBUG);
           expect(AgToLogLevel('trace' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.TRACE);
           expect(AgToLogLevel('verbose' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.VERBOSE);
+          expect(AgToLogLevel('log' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.LOG);
+          expect(AgToLogLevel('default' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.DEFAULT);
         });
 
         it('should handle mixed case string labels', () => {
@@ -209,6 +213,8 @@ describe('AgLogHelpers: Conversion Functions', () => {
           expect(AgToLogLevel('Debug' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.DEBUG);
           expect(AgToLogLevel('Trace' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.TRACE);
           expect(AgToLogLevel('Verbose' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.VERBOSE);
+          expect(AgToLogLevel('Log' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.LOG);
+          expect(AgToLogLevel('Default' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.DEFAULT);
         });
       });
     });
@@ -217,7 +223,6 @@ describe('AgLogHelpers: Conversion Functions', () => {
       describe('Invalid string labels', () => {
         it('should return undefined for invalid string labels', () => {
           expect(AgToLogLevel('INVALID' as AgLogLevelLabel)).toBeUndefined();
-          expect(AgToLogLevel('LOG' as AgLogLevelLabel)).toBeUndefined();
           expect(AgToLogLevel('LEVEL' as AgLogLevelLabel)).toBeUndefined();
           expect(AgToLogLevel('UNKNOWN' as AgLogLevelLabel)).toBeUndefined();
         });

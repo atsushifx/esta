@@ -90,7 +90,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         setupTestContext();
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+          defaultLogger: mockLogger.getLoggerFunction(),
           formatter: vi.fn().mockImplementation((logMessage) => {
             // フォーマッターで循環参照を処理するシナリオ
             try {
@@ -127,7 +127,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         });
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+          defaultLogger: mockLogger.getLoggerFunction(),
           formatter: errorHandlingFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
@@ -140,7 +140,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         expect(capturedError).toBeTruthy();
         expect(capturedError).toContain('circular');
         expect(mockLogger.getTotalMessageCount()).toBe(1);
-        const messages = mockLogger.getMessages(AG_LOGLEVEL.INFO);
+        const messages = mockLogger.getMessages(AG_LOGLEVEL.DEFAULT);
         expect(messages[0]).toContain('Circular Reference:');
         expect(messages[0]).toContain('Testing circular reference handling');
       });
@@ -169,7 +169,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         });
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+          defaultLogger: mockLogger.getLoggerFunction(),
           formatter: resilientFormatter,
           loggerMap: mockLogger.defaultLoggerMap,
         });
@@ -235,7 +235,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         });
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+          defaultLogger: mockLogger.getLoggerFunction(),
           formatter: safeFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
@@ -262,7 +262,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         expect(() => logger.info('Deep circular reference test', deepCircular)).not.toThrow();
         expect(mockLogger.getTotalMessageCount()).toBe(1);
 
-        const logOutput = mockLogger.getMessages(AG_LOGLEVEL.INFO)[0];
+        const logOutput = mockLogger.getMessages(AG_LOGLEVEL.DEFAULT)[0];
         expect(logOutput).toContain('Deep circular reference test');
         expect(logOutput).toContain('[Circular]');
       });
@@ -291,7 +291,7 @@ describe('AgLogger Data Processing Integration Tests', () => {
         });
 
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+          defaultLogger: mockLogger.getLoggerFunction(),
           formatter: circularSafeFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;

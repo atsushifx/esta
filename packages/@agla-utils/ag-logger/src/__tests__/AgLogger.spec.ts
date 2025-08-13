@@ -868,14 +868,14 @@ describe('エッジケース: Special Arguments and Data Processing', () => {
       });
 
       /**
-       * FORCE_OUTPUT Log Level
+       * LOG Log Level
        *
-       * @description BDD tests for FORCE_OUTPUT log level behavior
+       * @description BDD tests for LOG log level behavior
        */
-      describe('FORCE_OUTPUT Log Level', () => {
+      describe('LOG Log Level', () => {
         setupTestEnvironment();
 
-        describe('log method with FORCE_OUTPUT should output regardless of logLevel and verbose settings', () => {
+        describe('log method with LOG should output regardless of logLevel and verbose settings', () => {
           it('should output when both logLevel is OFF and verbose is false', () => {
             const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
             logger.logLevel = AG_LOGLEVEL.OFF;

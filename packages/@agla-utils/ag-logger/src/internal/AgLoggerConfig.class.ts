@@ -87,7 +87,7 @@ export class AgLoggerConfig {
   private clearLoggerMap(): void {
     this._loggerMap.clear();
     this._loggerMap.set(AG_LOGLEVEL.VERBOSE, NullLogger);
-    this._loggerMap.set(AG_LOGLEVEL.FORCE_OUTPUT, NullLogger);
+    this._loggerMap.set(AG_LOGLEVEL.LOG, NullLogger);
     this._loggerMap.set(AG_LOGLEVEL.OFF, NullLogger);
     this._loggerMap.set(AG_LOGLEVEL.FATAL, NullLogger);
     this._loggerMap.set(AG_LOGLEVEL.ERROR, NullLogger);
@@ -235,7 +235,7 @@ export class AgLoggerConfig {
       return false;
     }
 
-    if (level === AG_LOGLEVEL.FORCE_OUTPUT) {
+    if (level === AG_LOGLEVEL.LOG) {
       return true;
     }
 
@@ -245,6 +245,10 @@ export class AgLoggerConfig {
     // When log level is OFF, no output should be generated
     if (this._options.logLevel === AG_LOGLEVEL.OFF) {
       return false;
+    }
+
+    if (level === AG_LOGLEVEL.DEFAULT) {
+      return AG_LOGLEVEL.INFO <= this._options.logLevel;
     }
 
     // For other levels, only show messages at or below the configured level

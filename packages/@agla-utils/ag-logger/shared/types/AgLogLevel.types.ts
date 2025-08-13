@@ -34,67 +34,14 @@ export const AG_LOGLEVEL = {
   DEBUG: 5,
   /** Very detailed tracing information. */
   TRACE: 6,
-  /** special value: force output mode */
-  FORCE_OUTPUT: -98,
-  /** special value: verbose mode  */
-  VERBOSE: -99,
+  // special level
+  /** special level: verbose mode */
+  VERBOSE: -11,
+  /** special level: LOG output (force output) */
+  LOG: -12,
+  /** Special level: default (defaultLogger: LogLevel  is same for INFO) */
+  DEFAULT: -99,
 } as const;
-
-/**
- * Label to numeric log level conversion map.
- * Used for configuration file integration and string-to-numeric conversion.
- *
- * @example
- * ```typescript
- * const level = AG_LABEL_TO_LOGLEVEL_MAP['INFO']; // Returns 4
- * ```
- */
-export const AG_LABEL_TO_LOGLEVEL_MAP = {
-  /** Maps 'OFF' string to numeric value 0. */
-  'OFF': AG_LOGLEVEL.OFF,
-  /** Maps 'FATAL' string to numeric value 1. */
-  'FATAL': AG_LOGLEVEL.FATAL,
-  /** Maps 'ERROR' string to numeric value 2. */
-  'ERROR': AG_LOGLEVEL.ERROR,
-  /** Maps 'WARN' string to numeric value 3. */
-  'WARN': AG_LOGLEVEL.WARN,
-  /** Maps 'INFO' string to numeric value 4. */
-  'INFO': AG_LOGLEVEL.INFO,
-  /** Maps 'DEBUG' string to numeric value 5. */
-  'DEBUG': AG_LOGLEVEL.DEBUG,
-  /** Maps 'TRACE' string to numeric value 6. */
-  'TRACE': AG_LOGLEVEL.TRACE,
-  // -- special values
-  /** Maps 'FORCE_OUTPUT' string to numeric value -98. */
-  'FORCE_OUTPUT': AG_LOGLEVEL.FORCE_OUTPUT,
-  /** Maps 'VERBOSE' string to numeric value -99. */
-  'VERBOSE': AG_LOGLEVEL.VERBOSE,
-} as const;
-
-/**
- * Numeric to label log level conversion map (auto-generated).
- * Used for numeric-to-string conversion in formatters and utilities.
- *
- * @example
- * ```typescript
- * const label = AG_LOGLEVEL_TO_LABEL_MAP[4]; // Returns 'INFO'
- * ```
- */
-export const AG_LOGLEVEL_TO_LABEL_MAP = Object.fromEntries(
-  Object.entries(AG_LABEL_TO_LOGLEVEL_MAP).map(([key, value]) => [value, key]),
-) as Record<AgLogLevel, AgLogLevelLabel>;
-
-/**
- * Numeric log level type derived from AG_LOGLEVEL values.
- * Represents all valid numeric log level values (0-6).
- *
- * @example
- * ```typescript
- * const level: AgLogLevel = AG_LOGLEVEL.INFO; // Valid
- * const invalid: AgLogLevel = 7; // Type error
- * ```
- */
-export type AgLogLevel = typeof AG_LOGLEVEL[keyof typeof AG_LOGLEVEL];
 
 /**
  * String log level label type derived from AG_LABEL_TO_LOGLEVEL_MAP keys.
@@ -106,27 +53,48 @@ export type AgLogLevel = typeof AG_LOGLEVEL[keyof typeof AG_LOGLEVEL];
  * const invalid: AgLogLevelLabel = 'INVALID'; // Type error
  * ```
  */
-export type AgLogLevelLabel = keyof typeof AG_LABEL_TO_LOGLEVEL_MAP;
+export type AgLogLevel = typeof AG_LOGLEVEL[keyof typeof AG_LOGLEVEL];
+
+export const AG_LOGLEVEL_VALUES = Object.values(AG_LOGLEVEL) as AgLogLevel[];
 
 /**
- * Log level key type derived from AG_LOGLEVEL keys.
- * Represents all valid log level constant names.
+ * String log level label type derived from AG_LABEL_TO_LOGLEVEL_MAP keys.
+ * Represents all valid string log level labels.
  *
  * @example
  * ```typescript
- * const key: AgLogLevelKey = 'INFO'; // Valid
- * const invalid: AgLogLevelKey = 'INVALID'; // Type error
+ * const label: AgLogLevelLabel = 'INFO'; // Valid
+ * const invalid: AgLogLevelLabel = 'INVALID'; // Type error
  * ```
  */
-export type AgLogLevelKey = keyof typeof AG_LOGLEVEL;
+export type AgLogLevelLabel = keyof typeof AG_LOGLEVEL;
+
+export const AG_LOGLEVEL_KEYS = Object.keys(AG_LOGLEVEL) as AgLogLevelLabel[];
 
 /**
- * Array of all log level keys in AG_LOGLEVEL.
- * Useful for iteration and functional programming operations.
+ * Map of string log level labels to their corresponding numeric log levels.
+ * Used for conversion between string and numeric log levels.
  *
  * @example
  * ```typescript
- * AG_LOGLEVEL_KEYS.forEach(key => console.log(AG_LOGLEVEL[key]));
+ * const logLevel: AgLogLevel = AG_LABEL_TO_LOGLEVEL_MAP['INFO']; // 4
  * ```
  */
-export const AG_LOGLEVEL_KEYS = Object.keys(AG_LOGLEVEL) as AgLogLevelKey[];
+export const AG_LOGLEVEL_TO_LABEL_MAP = Object.fromEntries(
+  (Object.entries(AG_LOGLEVEL) as [AgLogLevelLabel, AgLogLevel][])
+    .map(([label, value]) => [value, label]),
+) as Record<AgLogLevel, AgLogLevelLabel>;
+
+/**
+ * Map of string log level labels to their corresponding numeric log levels.
+ * Used for conversion between string and numeric log levels.
+ *
+ * @example
+ * ```typescript
+ * const logLevel: AgLogLevel = AG_LABEL_TO_LOGLEVEL_MAP['INFO']; // 4
+ * ```
+ */
+export const AG_LABEL_TO_LOGLEVEL_MAP = Object.fromEntries(
+  (Object.entries(AG_LOGLEVEL) as [AgLogLevelLabel, AgLogLevel][])
+    .map(([label, value]) => [label, value]),
+) as Record<AgLogLevelLabel, AgLogLevel>;

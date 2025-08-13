@@ -73,7 +73,7 @@ describe('AgLogger Configuration Integration Tests', () => {
         const defaultLogger = new MockLogger.buffer();
 
         const logger = AgLogger.createLogger({
-          defaultLogger: defaultLogger.getLoggerFunction(AG_LOGLEVEL.INFO),
+          defaultLogger: defaultLogger.getLoggerFunction(),
           formatter: MockFormatter.passthrough,
           loggerMap: {
             [AG_LOGLEVEL.ERROR]: errorLogger.getLoggerFunction(AG_LOGLEVEL.ERROR),
@@ -113,18 +113,18 @@ describe('AgLogger Configuration Integration Tests', () => {
         const tempLogger1 = new MockLogger.buffer();
         const tempLogger2 = new MockLogger.buffer();
 
-        logger.setLoggerConfig({ defaultLogger: tempLogger1.getLoggerFunction(AG_LOGLEVEL.INFO) });
+        logger.setLoggerConfig({ defaultLogger: tempLogger1.getLoggerFunction() });
         logger.setLoggerConfig({
           loggerMap: { [AG_LOGLEVEL.ERROR]: tempLogger2.getLoggerFunction(AG_LOGLEVEL.ERROR) },
         });
         logger.setLoggerConfig({ formatter: MockFormatter.json });
-        logger.setLoggerConfig({ defaultLogger: finalLogger.getLoggerFunction(AG_LOGLEVEL.INFO) });
+        logger.setLoggerConfig({ defaultLogger: finalLogger.getLoggerFunction() });
 
         logger.logLevel = AG_LOGLEVEL.INFO;
         logger.info('test message');
 
         expect(finalLogger.getTotalMessageCount()).toBe(1);
-        const message = finalLogger.getLastMessage(AG_LOGLEVEL.INFO) as string;
+        const message = finalLogger.getLastMessage(AG_LOGLEVEL.DEFAULT) as string;
         expect(() => JSON.parse(message)).not.toThrow();
         const parsed = JSON.parse(message);
         expect(parsed.message).toBe('test message');

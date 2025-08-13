@@ -50,7 +50,7 @@ describe('AgLoggerManager Integration Tests', () => {
     [AG_LOGLEVEL.TRACE]: NullLogger,
     //
     [AG_LOGLEVEL.VERBOSE]: NullLogger,
-    [AG_LOGLEVEL.FORCE_OUTPUT]: NullLogger,
+    [AG_LOGLEVEL.LOG]: NullLogger,
   };
   /**
    * Tests singleton behavior and instance management
