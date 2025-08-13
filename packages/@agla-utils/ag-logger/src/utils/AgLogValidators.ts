@@ -17,25 +17,27 @@ import { AG_LOGLEVEL } from '../../shared/types';
 import type { AgLogLevel } from '../../shared/types';
 import { valueToString } from './AgLogHelpers';
 
-export const isValidLogLevel = (logLevel: AgLogLevel | undefined): boolean => {
+export const isValidLogLevel = (logLevel: unknown): boolean => {
   return (
     logLevel !== undefined
+    && logLevel !== null
     && typeof logLevel === 'number'
-    && Object.values(AG_LOGLEVEL).includes(logLevel)
+    && Number.isInteger(logLevel)
+    && Object.values(AG_LOGLEVEL).includes(logLevel as AgLogLevel)
   );
 };
 
 /**
  * validate log level and throw error if invalid
  */
-export const validateLogLevel = (logLevel: AgLogLevel): AgLogLevel => {
+export const validateLogLevel = (logLevel: unknown): AgLogLevel => {
   if (!isValidLogLevel(logLevel)) {
     throw new AgLoggerError(
       ERROR_TYPES.VALIDATION,
       `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (${valueToString(logLevel)})`,
     );
   }
-  return logLevel;
+  return logLevel as AgLogLevel;
 };
 
 /**
