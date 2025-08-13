@@ -50,12 +50,17 @@ describe('AgLogHelpers: Validation Functions', () => {
         it('should return true for VERBOSE level', () => {
           expect(isValidLogLevel(AG_LOGLEVEL.VERBOSE)).toBe(true);
         });
+
+        it('should return true for DEFAULT level', () => {
+          expect(isValidLogLevel(AG_LOGLEVEL.DEFAULT)).toBe(true);
+        });
       });
 
       describe('Numeric literal validation', () => {
         it('should return true for numeric literals matching AG_LOGLEVEL values', () => {
-          expect(isValidLogLevel(-99 as AgLogLevel)).toBe(true); // VERBOSE
+          expect(isValidLogLevel(-99 as AgLogLevel)).toBe(true); // DEFAULT
           expect(isValidLogLevel(-12 as AgLogLevel)).toBe(true); // LOG
+          expect(isValidLogLevel(-11 as AgLogLevel)).toBe(true); // VERBOSE
           expect(isValidLogLevel(0 as AgLogLevel)).toBe(true); // OFF
           expect(isValidLogLevel(1 as AgLogLevel)).toBe(true); // FATAL
           expect(isValidLogLevel(2 as AgLogLevel)).toBe(true); // ERROR

@@ -186,6 +186,7 @@ describe('AgLogHelpers: Conversion Functions', () => {
           expect(AgToLogLevel('TRACE' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.TRACE);
           expect(AgToLogLevel('VERBOSE' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.VERBOSE);
           expect(AgToLogLevel('LOG' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.LOG);
+          expect(AgToLogLevel('DEFAULT' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.DEFAULT);
         });
       });
 
@@ -200,6 +201,7 @@ describe('AgLogHelpers: Conversion Functions', () => {
           expect(AgToLogLevel('trace' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.TRACE);
           expect(AgToLogLevel('verbose' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.VERBOSE);
           expect(AgToLogLevel('log' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.LOG);
+          expect(AgToLogLevel('default' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.DEFAULT);
         });
 
         it('should handle mixed case string labels', () => {
@@ -212,6 +214,7 @@ describe('AgLogHelpers: Conversion Functions', () => {
           expect(AgToLogLevel('Trace' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.TRACE);
           expect(AgToLogLevel('Verbose' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.VERBOSE);
           expect(AgToLogLevel('Log' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.LOG);
+          expect(AgToLogLevel('Default' as AgLogLevelLabel)).toBe(AG_LOGLEVEL.DEFAULT);
         });
       });
     });
