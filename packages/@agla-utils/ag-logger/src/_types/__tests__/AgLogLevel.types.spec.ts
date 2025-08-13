@@ -221,7 +221,7 @@ describe('AgLogLevel Types and Constants Tests', () => {
       expect(AG_LABEL_TO_LOGLEVEL_MAP['DEBUG']).toBe(AG_LOGLEVEL.DEBUG);
       expect(AG_LABEL_TO_LOGLEVEL_MAP['TRACE']).toBe(AG_LOGLEVEL.TRACE);
       expect(AG_LABEL_TO_LOGLEVEL_MAP['LOG']).toBe(AG_LOGLEVEL.LOG);
-      expect(AG_LABEL_TO_LOGLEVEL_MAP['LOG']).toBe(AG_LOGLEVEL.LOG);
+      expect(AG_LABEL_TO_LOGLEVEL_MAP['DEFAULT']).toBe(AG_LOGLEVEL.DEFAULT);
       expect(AG_LABEL_TO_LOGLEVEL_MAP['VERBOSE']).toBe(AG_LOGLEVEL.VERBOSE);
     });
 
