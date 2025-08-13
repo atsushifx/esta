@@ -12,6 +12,7 @@ import type { TestContext } from 'vitest';
 
 // 共有型・定数: ログレベルとverbose制御
 import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import { isStandardLogLevel } from '@/utils/AgLogValidators';
 import { DISABLE, ENABLE } from '../../../shared/constants';
 import { AG_LOGLEVEL } from '../../../shared/types';
 import type { AgFormatFunction } from '../../../shared/types';
@@ -104,9 +105,9 @@ describe('AgLogger Filtering Integration Tests', () => {
         });
         logger.logLevel = AG_LOGLEVEL.OFF;
 
-        // 全レベルでフィルタリング
+        // 標準レベルのみでフィルタリング（特殊レベルは設定不可のため除外）
         Object.values(AG_LOGLEVEL).forEach((level) => {
-          if (typeof level === 'number') {
+          if (typeof level === 'number' && isStandardLogLevel(level)) {
             logger.logLevel = level;
             logger.logLevel = AG_LOGLEVEL.OFF;
             logger.info('test');

@@ -21,7 +21,7 @@ import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
 import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
-import { isValidLogger, validateFormatter, validateLogLevel } from './utils/AgLogValidators';
+import { isStandardLogLevel, isValidLogger, validateFormatter, validateLogLevel } from './utils/AgLogValidators';
 
 /**
  * Abstract logger class providing singleton instance management,
@@ -112,8 +112,25 @@ export class AgLogger {
     if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
       enhancedOptions.loggerMap = ConsoleLoggerMap;
     }
+    if ('logLevel' in options) {
+      if (!isStandardLogLevel(options.logLevel)) {
+        throw new AgLoggerError(
+          ERROR_TYPES.VALIDATION,
+          AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.VALIDATION].SPECIAL_LOG_LEVEL_NOT_ALLOWED,
+        );
+      }
+    }
+
     // set config
-    this._config.setLoggerConfig(enhancedOptions);
+    const configResult = this._config.setLoggerConfig(enhancedOptions);
+    if (!configResult) {
+      // Check if the failure was due to special log level
+      // Generic configuration error for other validation failures
+      throw new AgLoggerError(
+        ERROR_TYPES.CONFIG,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.CONFIG].INVALID_CONFIG,
+      );
+    }
   }
 
   /**
@@ -180,6 +197,13 @@ export class AgLogger {
    */
   set logLevel(level: AgLogLevel) {
     const validatedLogLevel = validateLogLevel(level);
+    // Special log levels (VERBOSE, LOG, DEFAULT) cannot be set as default log level
+    if (!isStandardLogLevel(validatedLogLevel)) {
+      throw new AgLoggerError(
+        ERROR_TYPES.VALIDATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.VALIDATION].SPECIAL_LOG_LEVEL_NOT_ALLOWED,
+      );
+    }
     this._config.logLevel = validatedLogLevel;
   }
 

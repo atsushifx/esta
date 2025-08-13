@@ -212,8 +212,8 @@ describe('AgLogger Input Validation', () => {
 
         expect(() => {
           logger.logLevel = AG_LOGLEVEL.VERBOSE;
-        }).not.toThrow();
-        expect(logger.logLevel).toBe(AG_LOGLEVEL.VERBOSE);
+        }).toThrow('Special log levels cannot be set as default log level');
+        expect(logger.logLevel).toBe(AG_LOGLEVEL.INFO); // Should remain unchanged
       });
 
       it('should throw error for invalid log level assignment', () => {
