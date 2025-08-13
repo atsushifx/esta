@@ -156,7 +156,7 @@ export class AgMockBufferLogger {
    * @param logLevel - The log level to get the logger function for
    * @returns The logger function for the specified level
    */
-  getLoggerFunction(logLevel: AgLogLevel): AgLoggerFunction {
+  getLoggerFunction(logLevel: AgLogLevel = AG_LOGLEVEL.DEFAULT): AgLoggerFunction {
     this.validateLogLevel(logLevel);
     return this.defaultLoggerMap[logLevel] ?? NullLogger;
   }
@@ -166,7 +166,7 @@ export class AgMockBufferLogger {
    * This provides level-specific logging functions.
    */
   createLoggerMap(): AgLoggerMap {
-    return Object.fromEntries(
+    const _loggerMap = Object.fromEntries(
       (Object.values(AG_LOGLEVEL) as AgLogLevel[]).map((level) => [
         level,
         level === AG_LOGLEVEL.OFF
@@ -174,6 +174,8 @@ export class AgMockBufferLogger {
           : ((message: AgFormattedLogMessage): void => this.executeLog(level, message)).bind(this),
       ]),
     ) as AgLoggerMap;
+    _loggerMap[AG_LOGLEVEL.DEFAULT] = this.default.bind(this);
+    return _loggerMap;
   }
 }
 
