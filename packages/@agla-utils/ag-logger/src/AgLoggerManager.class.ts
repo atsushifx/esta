@@ -165,22 +165,6 @@ export class AgLoggerManager {
 
     this.logger.setLoggerConfig({ loggerMap: map });
   }
-
-  /**
-   * Resets the singleton instance for testing purposes.
-   * WARNING: This method is for testing only and should not be used in production code.
-   */
-  /**
-   * Sets a logger function for a specific log level (legacy method).
-   *
-   * @param level - The log level to set the logger for
-   * @param fn - The logger function to set
-   * @throws AgLoggerError if logger not initialized
-   */
-  setLogFunctionWithLevel(level: AgLogLevel, fn: AgLoggerFunction): void {
-    this.bindLoggerFunction(level, fn);
-  }
-
   /**
    * Sets the default logger for a specific level (legacy method).
    *
@@ -218,3 +202,4 @@ export class AgLoggerManager {
     AgLoggerManager.instance = undefined;
   }
 }
+export default AgLoggerManager;

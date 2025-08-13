@@ -216,7 +216,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const manager = AgLoggerManager.getManager();
       // getFormatter method not available on manager - test removed
 
-      manager.setManager({ formatter: secondFormatter });
+      manager.setLoggerConfig({ formatter: secondFormatter });
       // getFormatter method not available on manager - test removed
     });
 
@@ -227,11 +227,11 @@ describe('AgLoggerManager Integration Tests', () => {
       const manager = AgLoggerManager.getManager();
 
       // Test with JsonFormatter
-      manager.setManager({ formatter: JsonFormatter });
+      manager.setLoggerConfig({ formatter: JsonFormatter });
       // getFormatter method not available on manager - test removed
-      manager.setManager({ formatter: PlainFormatter });
+      manager.setLoggerConfig({ formatter: PlainFormatter });
       // getFormatter method not available on manager - test removed
-      manager.setManager({ formatter: NullFormatter });
+      manager.setLoggerConfig({ formatter: NullFormatter });
       // getFormatter method not available on manager - test removed
     });
   });
@@ -250,7 +250,7 @@ describe('AgLoggerManager Integration Tests', () => {
       // Initial configuration
       const firstLogger = vi.fn();
       const firstFormatter = vi.fn().mockReturnValue('first');
-      manager.setManager({
+      manager.setLoggerConfig({
         defaultLogger: firstLogger,
         formatter: firstFormatter,
         loggerMap: defaultLoggerMap, // ALl is Null: return defaultLogger
@@ -260,16 +260,16 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(logger.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe(firstLogger);
       // getFormatter method not available on manager - test removed
       const secondFormatter = vi.fn().mockReturnValue('second');
-      manager.setManager({ formatter: secondFormatter });
+      manager.setLoggerConfig({ formatter: secondFormatter });
 
       // getFormatter method not available on manager - test removed
       const secondLogger = vi.fn();
-      manager.setManager({ defaultLogger: secondLogger });
+      manager.setLoggerConfig({ defaultLogger: secondLogger });
 
       expect(logger.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe(secondLogger);
       // getFormatter method not available on manager - test removed
       const errorLogger = vi.fn();
-      manager.setManager({
+      manager.setLoggerConfig({
         loggerMap: { [AG_LOGLEVEL.ERROR]: errorLogger },
       });
 
@@ -278,22 +278,21 @@ describe('AgLoggerManager Integration Tests', () => {
       // getFormatter method not available on manager - test removed
     });
 
-    // 目的: 旧API(setLogFunctionWithLevel等)の互換動作確認
-    it('should handle legacy setManager method correctly', () => {
+    // 目的: 旧API(bindLoggerFunction等)の互換動作確認
+    it('should handle legacy setLoggerConfig method correctly', () => {
       setupTestContext();
       AgLoggerManager.createManager({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
       const manager = AgLoggerManager.getManager();
       const logger = manager.getLogger();
       const customLogger = vi.fn();
 
-      // Test single-level logger setting with setLogFunctionWithLevel
-      manager.setLogFunctionWithLevel(AG_LOGLEVEL.ERROR, customLogger);
+      // Test single-level logger setting with bindLoggerFunction
+      manager.bindLoggerFunction(AG_LOGLEVEL.ERROR, customLogger);
       expect(logger.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(customLogger);
 
       // Test setting default logger for a level
       const defaultLogger = vi.fn();
-      manager.setManager({ defaultLogger });
-      manager.setDefaultLogFunction(AG_LOGLEVEL.INFO);
+      manager.setLoggerConfig({ defaultLogger: defaultLogger, loggerMap: defaultLoggerMap });
       expect(logger.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe(defaultLogger);
     });
 
@@ -310,7 +309,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const formatter = JsonFormatter;
 
       // Complex initial setup
-      manager.setManager({
+      manager.setLoggerConfig({
         defaultLogger,
         formatter,
         loggerMap: {
@@ -325,7 +324,7 @@ describe('AgLoggerManager Integration Tests', () => {
       expect(logger.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe(defaultLogger);
       // getFormatter method not available on manager - test removed
       const newDefaultLogger = vi.fn();
-      manager.setManager({ defaultLogger: newDefaultLogger });
+      manager.setLoggerConfig({ defaultLogger: newDefaultLogger });
 
       // When default logger is updated, only non-overridden levels use it
       // Levels explicitly in loggerMap remain mapped to their custom loggers
@@ -383,7 +382,7 @@ describe('AgLoggerManager Integration Tests', () => {
       const manager = AgLoggerManager.getManager();
       const logger = manager.getLogger();
 
-      manager.setManager({
+      manager.setLoggerConfig({
         defaultLogger,
         loggerMap: {
           [AG_LOGLEVEL.ERROR]: undefined,
@@ -406,7 +405,7 @@ describe('AgLoggerManager Integration Tests', () => {
 
       // Rapid configuration changes
       loggers.forEach((logger, index) => {
-        manager.setManager({
+        manager.setLoggerConfig({
           defaultLogger: logger,
           formatter: formatters[index],
         });

@@ -21,7 +21,7 @@ import { AG_LOGLEVEL } from '../../shared/types/AgLogLevel.types';
  * AgLoggerManager仕様準拠BDDテストスイート
  *
  * @description atsushifx式BDD厳格プロセスに従った実装
- * 仕様書: docs/specs/refactor-agloggermanager.spec.md に基づく
+ * 仕様書: docs/specs/refactor-agLoggerManager.spec.md に基づく
  *
  * @testType Unit Test (BDD)
  * @testTarget AgLoggerManager Class

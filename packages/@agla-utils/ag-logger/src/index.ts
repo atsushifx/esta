@@ -22,8 +22,8 @@ export { AG_LOGLEVEL } from '../shared/types';
 export type { AgLogLevel, AgLogLevelLabel } from '../shared/types';
 
 // logger main
-export { AgLogger, getLogger } from './AgLogger.class';
-export { AgLoggerManager } from './AgLoggerManager.class';
+export * from './AgLogger.class';
+export * from './AgLoggerManager.class';
 
 // plugins: logger
 export { ConsoleLogger } from './plugins/logger/ConsoleLogger';
