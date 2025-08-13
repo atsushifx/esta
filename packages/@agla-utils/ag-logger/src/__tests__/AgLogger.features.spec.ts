@@ -239,14 +239,16 @@ describe('LOG Log Level', () => {
       expect(mockLogger).toHaveBeenCalledTimes(1);
     });
 
-    it('should work with VERBOSE level (edge boundary)', () => {
+    it('should prevent VERBOSE level from being set as default log level', () => {
       const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: mockFormatter });
-      logger.logLevel = AG_LOGLEVEL.VERBOSE;
-      logger.setVerbose = false;
 
-      logger.log('force with VERBOSE level');
+      // Special log levels cannot be set as default log level
+      expect(() => {
+        logger.logLevel = AG_LOGLEVEL.VERBOSE;
+      }).toThrow('Special log levels cannot be set as default log level');
 
-      expect(mockLogger).toHaveBeenCalledTimes(1);
+      // Verify log level remains unchanged (default OFF)
+      expect(logger.logLevel).toBe(AG_LOGLEVEL.OFF);
     });
   });
 });

@@ -30,6 +30,7 @@ export const UNKNOWN_ERROR_MESSAGE = 'Unknown error' as const;
 export const AG_LOGGER_ERROR_MESSAGES = {
   [ERROR_TYPES.VALIDATION]: {
     INVALID_LOG_LEVEL: 'Invalid log level',
+    SPECIAL_LOG_LEVEL_NOT_ALLOWED: 'Special log levels cannot be set as default log level',
     INVALID_MESSAGE_TYPE: 'Message must be a string',
     INVALID_TESTID_TYPE: 'testId must be a non-empty string',
     INVALID_TESTID_LENGTH: 'testId must be 255 characters or less',
