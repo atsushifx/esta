@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // utilities
-import { isValidFormatter, isValidLogger, isValidLogLevel } from '../utils/AgLogValidators';
+import { isStandardLogLevel, isValidFormatter, isValidLogger, isValidLogLevel } from '../utils/AgLogValidators';
 
 // types
 import type { AgLoggerMap, AgLogLevel } from '../../shared/types';
@@ -199,6 +199,10 @@ export class AgLoggerConfig {
     if (!isValidLogLevel(level)) {
       return;
     }
+    // Special log levels (VERBOSE, LOG, DEFAULT) cannot be set as default log level
+    if (!isStandardLogLevel(level)) {
+      return;
+    }
     this._options.logLevel = level;
   }
 
@@ -319,6 +323,12 @@ export class AgLoggerConfig {
     }
     if ('formatter' in options) {
       if (!isValidFormatter(options.formatter)) {
+        return false;
+      }
+    }
+    // Validate logLevel if provided - special levels cannot be set as default log level
+    if ('logLevel' in options) {
+      if (!isStandardLogLevel(options.logLevel)) {
         return false;
       }
     }
