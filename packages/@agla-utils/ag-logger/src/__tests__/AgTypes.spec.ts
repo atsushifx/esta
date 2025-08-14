@@ -7,10 +7,10 @@
 // https://opensource.org/licenses/MIT
 
 import { describe, expect, it } from 'vitest';
-import { AG_LOGLEVEL } from '../../../shared/types';
-import type { AgLoggerOptions, AgLogLevel, AgLogMessage } from '../../../shared/types';
-import type { AglaError } from '../../../shared/types';
-import { AgLoggerError } from '../../../shared/types';
+import { AG_LOGLEVEL } from '../../shared/types';
+import type { AgLoggerOptions, AgLogLevel, AgLogMessage } from '../../shared/types';
+import type { AglaError } from '../../shared/types';
+import { AgLoggerError } from '../../shared/types';
 
 /**
  * AgLogger Type System Consolidated Test Suite
@@ -26,13 +26,19 @@ describe('AgLogger Type System', () => {
   describe('AgLogLevel: Log level type system', () => {
     describe('列挙値の定義', () => {
       it('should have all expected log level values', () => {
-        expect(AG_LOGLEVEL.OFF).toBe(0);
-        expect(AG_LOGLEVEL.FATAL).toBe(1);
-        expect(AG_LOGLEVEL.ERROR).toBe(2);
-        expect(AG_LOGLEVEL.WARN).toBe(3);
-        expect(AG_LOGLEVEL.INFO).toBe(4);
-        expect(AG_LOGLEVEL.DEBUG).toBe(5);
-        expect(AG_LOGLEVEL.TRACE).toBe(6);
+        const expectedLogLevels = [
+          { level: AG_LOGLEVEL.OFF, expected: 0 },
+          { level: AG_LOGLEVEL.FATAL, expected: 1 },
+          { level: AG_LOGLEVEL.ERROR, expected: 2 },
+          { level: AG_LOGLEVEL.WARN, expected: 3 },
+          { level: AG_LOGLEVEL.INFO, expected: 4 },
+          { level: AG_LOGLEVEL.DEBUG, expected: 5 },
+          { level: AG_LOGLEVEL.TRACE, expected: 6 },
+        ] as const;
+
+        expectedLogLevels.forEach(({ level, expected }) => {
+          expect(level).toBe(expected);
+        });
       });
 
       it('should have special log level values', () => {
@@ -42,11 +48,17 @@ describe('AgLogger Type System', () => {
       });
 
       it('should maintain proper log level hierarchy', () => {
-        expect(AG_LOGLEVEL.FATAL).toBeLessThan(AG_LOGLEVEL.ERROR);
-        expect(AG_LOGLEVEL.ERROR).toBeLessThan(AG_LOGLEVEL.WARN);
-        expect(AG_LOGLEVEL.WARN).toBeLessThan(AG_LOGLEVEL.INFO);
-        expect(AG_LOGLEVEL.INFO).toBeLessThan(AG_LOGLEVEL.DEBUG);
-        expect(AG_LOGLEVEL.DEBUG).toBeLessThan(AG_LOGLEVEL.TRACE);
+        const hierarchyTests = [
+          { lower: AG_LOGLEVEL.FATAL, higher: AG_LOGLEVEL.ERROR },
+          { lower: AG_LOGLEVEL.ERROR, higher: AG_LOGLEVEL.WARN },
+          { lower: AG_LOGLEVEL.WARN, higher: AG_LOGLEVEL.INFO },
+          { lower: AG_LOGLEVEL.INFO, higher: AG_LOGLEVEL.DEBUG },
+          { lower: AG_LOGLEVEL.DEBUG, higher: AG_LOGLEVEL.TRACE },
+        ] as const;
+
+        hierarchyTests.forEach(({ lower, higher }) => {
+          expect(lower).toBeLessThan(higher);
+        });
       });
     });
 

@@ -112,7 +112,13 @@ export class AgLoggerManager {
    * @param options - Partial logger configuration options to update
    * @throws AgLoggerError if logger not initialized
    */
-  setManager(options: AgLoggerOptions): void {
+  /**
+   * Updates the logger configuration by delegating to AgLogger.setLoggerConfig.
+   *
+   * @param options - Partial logger configuration options to update
+   * @throws AgLoggerError if logger not initialized
+   */
+  setLoggerConfig(options: AgLoggerOptions): void {
     if (this.logger === undefined) {
       throw new AgLoggerError(
         ERROR_TYPES.INITIALIZATION,
@@ -139,7 +145,7 @@ export class AgLoggerManager {
       );
     }
 
-    this.logger.setLogger(level, fn);
+    this.logger.setLoggerFunction(level, fn);
     return true;
   }
 
@@ -181,7 +187,19 @@ export class AgLoggerManager {
    * @param level - The log level to set default logger for
    * @throws AgLoggerError if logger not initialized
    */
-  setDefaultLogFunction(level: AgLogLevel): void {
+  /**
+   * Removes the custom logger function for a specific level, reverting to default.
+   *
+   * @param level - The log level to remove custom logger function for
+   * @throws AgLoggerError if logger not initialized
+   */
+  /**
+   * Removes the custom logger function for a specific level, reverting to default.
+   *
+   * @param level - The log level to remove custom logger function for
+   * @throws AgLoggerError if logger not initialized
+   */
+  removeLoggerFunction(level: AgLogLevel): void {
     if (this.logger === undefined) {
       throw new AgLoggerError(
         ERROR_TYPES.INITIALIZATION,
@@ -189,8 +207,8 @@ export class AgLoggerManager {
       );
     }
 
-    // Reset the specified level to use the default logger by removing it from the logger map
-    this.logger.setLoggerConfig({ loggerMap: { [level]: NullLogger } });
+    // Reset the specified level to use the default logger by setting NullLogger
+    this.logger.setLoggerFunction(level, NullLogger);
   }
 
   static resetSingleton(): void {

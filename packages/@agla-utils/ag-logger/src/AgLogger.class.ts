@@ -139,7 +139,7 @@ export class AgLogger {
    * @param loggerFunction - The logger function to use for the specified level
    * @returns true if the logger was set successfully
    */
-  setLogger(logLevel: AgLogLevel, loggerFunction: AgLoggerFunction): boolean {
+  setLoggerFunction(logLevel: AgLogLevel, loggerFunction: AgLoggerFunction): boolean {
     const validatedLogLevel = validateLogLevel(logLevel);
     return this._config.setLogger(validatedLogLevel, loggerFunction);
   }
@@ -302,21 +302,5 @@ export class AgLogger {
     AgLogger._instance = undefined;
   }
 }
-
-/**
- * Convenience function to get the AgLogger singleton instance.
- * If ConsoleLogger is specified as default without a logger map,
- * ConsoleLoggerMap is automatically applied.
- *
- * @param options - Optional configuration options for the logger.
- * @returns The singleton AgLogger instance.
- */
-export const createLogger = (options?: AgLoggerOptions): AgLogger => {
-  return AgLogger.createLogger(options);
-};
-
-export const getLogger = (): AgLogger => {
-  return AgLogger.getLogger();
-};
 
 export default AgLogger;

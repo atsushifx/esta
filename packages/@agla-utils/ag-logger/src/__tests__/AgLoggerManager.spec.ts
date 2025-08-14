@@ -164,18 +164,18 @@ describe('AgLoggerManager', () => {
    */
   describe('委譲の成立（インタラクション）', () => {
     // 最初のテストのみ作成（atsushifx式BDD厳格プロセス）
-    it('should call AgLogger.setLogger once when bindLoggerFunction is called', () => {
+    it('should call AgLogger.setLoggerFunction once when bindLoggerFunction is called', () => {
       const manager = AgLoggerManager.createManager();
       const logger = manager.getLogger();
       const mockFunction: AgLoggerFunction = vi.fn();
 
-      // AgLoggerのsetLoggerメソッドをスパイ
-      const setLoggerSpy = vi.spyOn(logger, 'setLogger');
+      // AgLoggerのsetLoggerFunctionメソッドをスパイ
+      const setLoggerFunctionSpy = vi.spyOn(logger, 'setLoggerFunction');
 
       manager.bindLoggerFunction(AG_LOGLEVEL.INFO, mockFunction);
 
-      expect(setLoggerSpy).toHaveBeenCalledOnce();
-      expect(setLoggerSpy).toHaveBeenCalledWith(AG_LOGLEVEL.INFO, mockFunction);
+      expect(setLoggerFunctionSpy).toHaveBeenCalledOnce();
+      expect(setLoggerFunctionSpy).toHaveBeenCalledWith(AG_LOGLEVEL.INFO, mockFunction);
     });
 
     // 2番目のテスト追加
@@ -194,6 +194,36 @@ describe('AgLoggerManager', () => {
 
       expect(setLoggerConfigSpy).toHaveBeenCalledOnce();
       expect(setLoggerConfigSpy).toHaveBeenCalledWith({ loggerMap: mockLoggerMap });
+    });
+
+    // 3番目のテスト追加
+    it('should call AgLogger.setLoggerConfig when setLoggerConfig is called', () => {
+      const manager = AgLoggerManager.createManager();
+      const logger = manager.getLogger();
+      const mockOptions = { logLevel: AG_LOGLEVEL.DEBUG };
+
+      // AgLoggerのsetLoggerConfigメソッドをスパイ
+      const setLoggerConfigSpy = vi.spyOn(logger, 'setLoggerConfig');
+
+      manager.setLoggerConfig(mockOptions);
+
+      expect(setLoggerConfigSpy).toHaveBeenCalledOnce();
+      expect(setLoggerConfigSpy).toHaveBeenCalledWith(mockOptions);
+    });
+
+    // 4番目のテスト追加（BDDカテゴリ5完了）
+    it('should call AgLogger.setLoggerFunction when removeLoggerFunction is called', () => {
+      const manager = AgLoggerManager.createManager();
+      const logger = manager.getLogger();
+
+      // AgLoggerのsetLoggerFunctionメソッドをスパイ
+      const setLoggerFunctionSpy = vi.spyOn(logger, 'setLoggerFunction');
+
+      manager.removeLoggerFunction(AG_LOGLEVEL.INFO);
+
+      expect(setLoggerFunctionSpy).toHaveBeenCalledOnce();
+      // NullLoggerで置換されることを確認
+      expect(setLoggerFunctionSpy).toHaveBeenCalledWith(AG_LOGLEVEL.INFO, expect.any(Function));
     });
   });
 

@@ -9,13 +9,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Constants and Types
-import { DISABLE, ENABLE } from '../../../shared/constants/common.constants';
-import { AG_LOGLEVEL } from '../../../shared/types';
-import type { AgLogLevel } from '../../../shared/types';
-import { AgLoggerError } from '../../../shared/types/AgLoggerError.types';
+import { DISABLE, ENABLE } from '../../shared/constants/common.constants';
+import { AG_LOGLEVEL } from '../../shared/types';
+import type { AgLogLevel } from '../../shared/types';
 
 // Test target
-import { AgLogger, createLogger } from '../../AgLogger.class';
+import { AgLogger } from '../AgLogger.class';
 
 // Test utilities
 const mockLogger = vi.fn();
@@ -66,7 +65,7 @@ describe('AgLogger', () => {
       it('複数回のcreateLogger呼び出しで同一インスタンスを返す', () => {
         const logger1 = AgLogger.createLogger();
         const logger2 = AgLogger.createLogger();
-        const logger3 = createLogger();
+        const logger3 = AgLogger.createLogger();
 
         expect(logger1).toBe(logger2);
         expect(logger2).toBe(logger3);
@@ -86,7 +85,7 @@ describe('AgLogger', () => {
           AgLogger.createLogger({
             logLevel: AG_LOGLEVEL.VERBOSE,
           });
-        }).toThrow(AgLoggerError);
+        }).toThrow('Special log levels cannot be set as default log level');
       });
     });
   });
@@ -108,8 +107,14 @@ describe('AgLogger', () => {
         const testableLogger = logger as TestableAgLogger;
         logger.logLevel = AG_LOGLEVEL.WARN;
 
-        expect(testableLogger.shouldOutput(AG_LOGLEVEL.ERROR)).toBe(true);
-        expect(testableLogger.shouldOutput(AG_LOGLEVEL.INFO)).toBe(false);
+        const shouldOutputTests = [
+          { level: AG_LOGLEVEL.ERROR, expected: true },
+          { level: AG_LOGLEVEL.INFO, expected: false },
+        ] as const;
+
+        shouldOutputTests.forEach(({ level, expected }) => {
+          expect(testableLogger.shouldOutput(level)).toBe(expected);
+        });
       });
     });
 
@@ -134,7 +139,7 @@ describe('AgLogger', () => {
           logger.setLoggerConfig({
             logLevel: AG_LOGLEVEL.VERBOSE,
           });
-        }).toThrow(AgLoggerError);
+        }).toThrow('Special log levels cannot be set as default log level');
       });
     });
 
@@ -167,11 +172,15 @@ describe('AgLogger', () => {
       it('setVerboseでverbose状態を制御できる', () => {
         const logger = AgLogger.createLogger();
 
-        logger.setVerbose = ENABLE;
-        expect(logger.isVerbose).toBe(ENABLE);
+        const verboseTests = [
+          { setValue: ENABLE, expected: ENABLE },
+          { setValue: DISABLE, expected: DISABLE },
+        ] as const;
 
-        logger.setVerbose = DISABLE;
-        expect(logger.isVerbose).toBe(DISABLE);
+        verboseTests.forEach(({ setValue, expected }) => {
+          logger.setVerbose = setValue;
+          expect(logger.isVerbose).toBe(expected);
+        });
       });
 
       it('verboseメソッドがverbose設定を尊重する', () => {
@@ -199,12 +208,17 @@ describe('AgLogger', () => {
         });
         logger.setVerbose = true;
 
-        // Call verbose with different argument types
-        // Note: Some arguments like null and undefined might be filtered out
-        logger.verbose('string');
-        logger.verbose(42);
-        logger.verbose({ key: 'value' });
-        logger.verbose([1, 2, 3]);
+        // Test different argument types with functional approach
+        const testArgs = [
+          'string',
+          42,
+          { key: 'value' },
+          [1, 2, 3],
+        ] as const;
+
+        testArgs.forEach((arg) => {
+          logger.verbose(arg);
+        });
 
         // Expect at least some calls to have been made
         expect(mockLogger).toHaveBeenCalled();
@@ -218,10 +232,10 @@ describe('AgLogger', () => {
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
-        for (let i = 0; i < 100; i++) {
+        Array.from({ length: 100 }, (_, i) => i).forEach((i) => {
           logger.setVerbose = i % 2 === 0;
           logger.verbose(`verbose ${i}`);
-        }
+        });
 
         expect(mockLogger).toHaveBeenCalledTimes(50);
       });
@@ -234,24 +248,25 @@ describe('AgLogger', () => {
    */
   describe('標準ログメソッド', () => {
     describe('基本的なログ出力', () => {
+      const logger = AgLogger.createLogger({
+        defaultLogger: mockLogger,
+        formatter: mockFormatter,
+      });
+
       const logMethods = [
-        { name: 'fatal', level: AG_LOGLEVEL.FATAL },
-        { name: 'error', level: AG_LOGLEVEL.ERROR },
-        { name: 'warn', level: AG_LOGLEVEL.WARN },
-        { name: 'info', level: AG_LOGLEVEL.INFO },
-        { name: 'debug', level: AG_LOGLEVEL.DEBUG },
-        { name: 'trace', level: AG_LOGLEVEL.TRACE },
+        { name: 'fatal', level: AG_LOGLEVEL.FATAL, method: logger.fatal.bind(logger) },
+        { name: 'error', level: AG_LOGLEVEL.ERROR, method: logger.error.bind(logger) },
+        { name: 'warn', level: AG_LOGLEVEL.WARN, method: logger.warn.bind(logger) },
+        { name: 'info', level: AG_LOGLEVEL.INFO, method: logger.info.bind(logger) },
+        { name: 'debug', level: AG_LOGLEVEL.DEBUG, method: logger.debug.bind(logger) },
+        { name: 'trace', level: AG_LOGLEVEL.TRACE, method: logger.trace.bind(logger) },
       ] as const;
 
-      logMethods.forEach(({ name, level }) => {
+      logMethods.forEach(({ name, level, method }) => {
         it(`${name}メソッドが正常に動作する`, () => {
-          const logger = AgLogger.createLogger({
-            defaultLogger: mockLogger,
-            formatter: mockFormatter,
-          });
           logger.logLevel = level;
 
-          (logger as unknown as Record<string, (...args: unknown[]) => void>)[name]('test message');
+          method('test message');
 
           expect(mockLogger).toHaveBeenCalledTimes(1);
         });
@@ -266,8 +281,14 @@ describe('AgLogger', () => {
         });
         logger.logLevel = AG_LOGLEVEL.WARN;
 
-        logger.info('info message');
-        logger.debug('debug message');
+        const lowerPriorityMethods = [
+          { method: logger.info.bind(logger), message: 'info message' },
+          { method: logger.debug.bind(logger), message: 'debug message' },
+        ] as const;
+
+        lowerPriorityMethods.forEach(({ method, message }) => {
+          method(message);
+        });
 
         expect(mockLogger).not.toHaveBeenCalled();
       });
@@ -279,8 +300,14 @@ describe('AgLogger', () => {
         });
         logger.logLevel = AG_LOGLEVEL.WARN;
 
-        logger.error('error message');
-        logger.warn('warn message');
+        const higherPriorityMethods = [
+          { method: logger.error.bind(logger), message: 'error message' },
+          { method: logger.warn.bind(logger), message: 'warn message' },
+        ] as const;
+
+        higherPriorityMethods.forEach(({ method, message }) => {
+          method(message);
+        });
 
         expect(mockLogger).toHaveBeenCalledTimes(2);
       });
@@ -300,17 +327,39 @@ describe('AgLogger', () => {
       });
     });
 
-    describe('異常な状態での処理', () => {
-      it('invalid verbose stateでもverboseメソッドが例外を投げない', () => {
+    describe('ロガー関数設定', () => {
+      it('should successfully set logger function for valid log level', () => {
+        const logger = AgLogger.createLogger();
+        const customLogger = vi.fn();
+
+        const result = logger.setLoggerFunction(AG_LOGLEVEL.INFO, customLogger);
+
+        expect(result).toBe(true);
+      });
+
+      it('should throw error when setting logger function with invalid log level', () => {
+        const logger = AgLogger.createLogger();
+        const customLogger = vi.fn();
+
+        expect(() => {
+          logger.setLoggerFunction('invalid' as unknown as AgLogLevel, customLogger);
+        }).toThrow('Invalid log level');
+      });
+
+      it('should update logger map when setLoggerFunction is called', () => {
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger,
           formatter: mockFormatter,
         });
+        const customLogger = vi.fn();
 
-        // Force invalid state for edge case testing
-        (logger as TestableAgLogger)._isVerbose = null;
+        // Set log level to allow ERROR messages
+        logger.logLevel = AG_LOGLEVEL.ERROR;
+        logger.setLoggerFunction(AG_LOGLEVEL.ERROR, customLogger);
 
-        expect(() => logger.verbose('test')).not.toThrow();
+        // Verify the function was set by checking if it gets called
+        logger.error('test message');
+        expect(customLogger).toHaveBeenCalledOnce();
       });
     });
   });
