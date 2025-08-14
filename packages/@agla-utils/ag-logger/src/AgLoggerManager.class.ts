@@ -200,7 +200,6 @@ export class AgLoggerManager {
       AgLogger.resetSingleton();
     }
     AgLoggerManager.instance = undefined;
-    AgManager = undefined;
   }
 }
 export default AgLoggerManager;
