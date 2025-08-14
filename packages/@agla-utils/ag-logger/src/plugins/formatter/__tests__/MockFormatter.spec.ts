@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // vitest imports
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 // constants
 import { AG_LOGLEVEL } from '../../../../shared/types';
@@ -404,6 +404,210 @@ describe('MockFormatter', () => {
     });
   });
 
+  describe('errorThrow formatter', () => {
+    /**
+     * Tests that errorThrow formatter throws the specified error message when called.
+     */
+    it('throws the specified error message when formatting is called', () => {
+      // Arrange
+      const errorMessage = 'Test error from formatter';
+      const logMessage: AgLogMessage = {
+        logLevel: AG_LOGLEVEL.ERROR,
+        timestamp: new Date('2025-01-01T12:00:00.000Z'),
+        message: 'This should trigger an error',
+        args: [],
+      };
+
+      // Act & Assert
+      expect(() => {
+        MockFormatter.errorThrow(errorMessage)(logMessage);
+      }).toThrow(errorMessage);
+    });
+
+    /**
+     * Tests that errorThrow formatter throws Error instance with correct message.
+     */
+    it('throws Error instance with correct message', () => {
+      // Arrange
+      const errorMessage = 'Custom formatter error';
+      const logMessage: AgLogMessage = {
+        logLevel: AG_LOGLEVEL.WARN,
+        timestamp: new Date('2025-01-01T12:00:00.000Z'),
+        message: 'Test message',
+        args: [{ test: 'data' }],
+      };
+
+      // Act & Assert
+      expect(() => {
+        MockFormatter.errorThrow(errorMessage)(logMessage);
+      }).toThrow(Error);
+
+      try {
+        MockFormatter.errorThrow(errorMessage)(logMessage);
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe(errorMessage);
+      }
+    });
+
+    /**
+     * Tests that errorThrow formatter works with different error messages.
+     */
+    it('works with different error messages', () => {
+      // Arrange
+      const testCases = [
+        'Simple error',
+        'Error with special chars: "\'\\n\\t',
+        'Unicode error: 🚨 エラーが発生しました',
+        '',
+        ' ',
+      ];
+      const logMessage: AgLogMessage = {
+        logLevel: AG_LOGLEVEL.FATAL,
+        timestamp: new Date('2025-01-01T12:00:00.000Z'),
+        message: 'Test message',
+        args: [],
+      };
+
+      testCases.forEach((errorMessage) => {
+        // Act & Assert
+        expect(() => {
+          MockFormatter.errorThrow(errorMessage)(logMessage);
+        }).toThrow(errorMessage);
+      });
+    });
+
+    /**
+     * Tests that errorThrow formatter preserves error message regardless of log message content.
+     */
+    it('preserves error message regardless of log message content', () => {
+      // Arrange
+      const errorMessage = 'Consistent error message';
+      const testLogMessages: AgLogMessage[] = [
+        {
+          logLevel: AG_LOGLEVEL.INFO,
+          timestamp: new Date('2025-01-01T12:00:00.000Z'),
+          message: 'Different message 1',
+          args: [],
+        },
+        {
+          logLevel: AG_LOGLEVEL.DEBUG,
+          timestamp: new Date('2025-06-15T14:30:45.123Z'),
+          message: 'Different message 2',
+          args: [{ complex: { nested: 'data' } }],
+        },
+        {
+          logLevel: AG_LOGLEVEL.ERROR,
+          timestamp: new Date('1970-01-01T00:00:00.000Z'),
+          message: '',
+          args: [null, undefined, 42, 'string'],
+        },
+      ];
+
+      testLogMessages.forEach((logMessage) => {
+        // Act & Assert
+        expect(() => {
+          MockFormatter.errorThrow(errorMessage)(logMessage);
+        }).toThrow(errorMessage);
+
+        try {
+          MockFormatter.errorThrow(errorMessage)(logMessage);
+        } catch (error) {
+          expect((error as Error).message).toBe(errorMessage);
+        }
+      });
+    });
+
+    /**
+     * Tests that errorThrow formatter function can be created multiple times with different messages.
+     */
+    it('can be created multiple times with different messages', () => {
+      // Arrange
+      const errorMessage1 = 'First error message';
+      const errorMessage2 = 'Second error message';
+      const logMessage: AgLogMessage = {
+        logLevel: AG_LOGLEVEL.TRACE,
+        timestamp: new Date('2025-01-01T12:00:00.000Z'),
+        message: 'Test message',
+        args: [],
+      };
+
+      // Act & Assert
+      const formatter1 = MockFormatter.errorThrow(errorMessage1);
+      const formatter2 = MockFormatter.errorThrow(errorMessage2);
+
+      expect(() => formatter1(logMessage)).toThrow(errorMessage1);
+      expect(() => formatter2(logMessage)).toThrow(errorMessage2);
+
+      // Verify they are independent
+      expect(() => formatter1(logMessage)).not.toThrow(errorMessage2);
+      expect(() => formatter2(logMessage)).not.toThrow(errorMessage1);
+    });
+  });
+
+  describe('messageOnly formatter', () => {
+    /**
+     * Tests that messageOnly formatter returns only the message string.
+     */
+    it('returns only the message string', () => {
+      // Arrange
+      const logMessage: AgLogMessage = {
+        logLevel: AG_LOGLEVEL.INFO,
+        timestamp: new Date('2025-01-01T12:00:00.000Z'),
+        message: 'Test message only',
+        args: [{ extra: 'data' }],
+      };
+
+      // Act
+      const result = MockFormatter.messageOnly(logMessage) as string;
+
+      // Assert
+      expect(result).toBe('Test message only');
+      expect(typeof result).toBe('string');
+    });
+
+    /**
+     * Tests that messageOnly formatter handles empty messages.
+     */
+    it('handles empty messages', () => {
+      // Arrange
+      const logMessage: AgLogMessage = {
+        logLevel: AG_LOGLEVEL.WARN,
+        timestamp: new Date('2025-01-01T12:00:00.000Z'),
+        message: '',
+        args: [],
+      };
+
+      // Act
+      const result = MockFormatter.messageOnly(logMessage) as string;
+
+      // Assert
+      expect(result).toBe('');
+      expect(typeof result).toBe('string');
+    });
+
+    /**
+     * Tests that messageOnly formatter works with special characters.
+     */
+    it('works with special characters and unicode', () => {
+      // Arrange
+      const specialMessage = 'Special chars: "\'\\n\\t\\r and Unicode: 🚀 日本語';
+      const logMessage: AgLogMessage = {
+        logLevel: AG_LOGLEVEL.DEBUG,
+        timestamp: new Date('2025-01-01T12:00:00.000Z'),
+        message: specialMessage,
+        args: [],
+      };
+
+      // Act
+      const result = MockFormatter.messageOnly(logMessage) as string;
+
+      // Assert
+      expect(result).toBe(specialMessage);
+      expect(typeof result).toBe('string');
+    });
+  });
+
   describe('type safety', () => {
     /**
      * Tests that both formatters maintain proper TypeScript type safety.
@@ -433,6 +637,349 @@ describe('MockFormatter', () => {
 
       expect(jsonResult).toSatisfy((result: string) => {
         return typeof result === 'string';
+      });
+    });
+  });
+
+  /**
+   * Statistics tracking functionality tests.
+   * Tests that each formatter method tracks usage statistics including
+   * call count and last processed log message.
+   */
+  describe('statistics tracking functionality', () => {
+    const createTestLogMessage = (message: string): AgLogMessage => ({
+      timestamp: new Date('2025-01-01T00:00:00.000Z'),
+      logLevel: AG_LOGLEVEL.INFO,
+      message,
+      args: [],
+    });
+
+    beforeEach(() => {
+      // Reset statistics before each test to ensure clean state
+      MockFormatter.resetStats();
+    });
+
+    /**
+     * Tests that passthrough formatter tracks call count correctly.
+     * When passthrough formatter is called multiple times,
+     * Then the call count should increment appropriately.
+     */
+    describe('passthrough formatter call count tracking', () => {
+      it('should track single call correctly', () => {
+        // Arrange
+        const logMessage = createTestLogMessage('test message');
+
+        // Act
+        MockFormatter.passthrough(logMessage);
+
+        // Assert
+        const stats = MockFormatter.getStats('passthrough');
+        expect(stats).not.toBeNull();
+        expect(stats!.callCount).toBe(1);
+      });
+
+      it('should track multiple calls correctly', () => {
+        // Arrange
+        const logMessage1 = createTestLogMessage('first message');
+        const logMessage2 = createTestLogMessage('second message');
+
+        // Act
+        MockFormatter.passthrough(logMessage1);
+        MockFormatter.passthrough(logMessage2);
+
+        // Assert
+        const stats = MockFormatter.getStats('passthrough');
+        expect(stats).not.toBeNull();
+        expect(stats!.callCount).toBe(2);
+      });
+    });
+
+    /**
+     * Tests that json formatter tracks call count correctly.
+     * When json formatter is called multiple times,
+     * Then the call count should increment appropriately.
+     */
+    describe('json formatter call count tracking', () => {
+      it('should track single call correctly', () => {
+        // Arrange
+        const logMessage = createTestLogMessage('test message');
+
+        // Act
+        MockFormatter.json(logMessage);
+
+        // Assert
+        const stats = MockFormatter.getStats('json');
+        expect(stats).not.toBeNull();
+        expect(stats!.callCount).toBe(1);
+      });
+
+      it('should track multiple calls correctly', () => {
+        // Arrange
+        const logMessage1 = createTestLogMessage('first message');
+        const logMessage2 = createTestLogMessage('second message');
+
+        // Act
+        MockFormatter.json(logMessage1);
+        MockFormatter.json(logMessage2);
+
+        // Assert
+        const stats = MockFormatter.getStats('json');
+        expect(stats).not.toBeNull();
+        expect(stats!.callCount).toBe(2);
+      });
+    });
+
+    /**
+     * Tests that messageOnly formatter tracks call count correctly.
+     * When messageOnly formatter is called multiple times,
+     * Then the call count should increment appropriately.
+     */
+    describe('messageOnly formatter call count tracking', () => {
+      it('should track single call correctly', () => {
+        // Arrange
+        const logMessage = createTestLogMessage('test message');
+
+        // Act
+        MockFormatter.messageOnly(logMessage);
+
+        // Assert
+        const stats = MockFormatter.getStats('messageOnly');
+        expect(stats).not.toBeNull();
+        expect(stats!.callCount).toBe(1);
+      });
+
+      it('should track multiple calls correctly', () => {
+        // Arrange
+        const logMessage1 = createTestLogMessage('first message');
+        const logMessage2 = createTestLogMessage('second message');
+
+        // Act
+        MockFormatter.messageOnly(logMessage1);
+        MockFormatter.messageOnly(logMessage2);
+
+        // Assert
+        const stats = MockFormatter.getStats('messageOnly');
+        expect(stats).not.toBeNull();
+        expect(stats!.callCount).toBe(2);
+      });
+    });
+
+    /**
+     * Tests that errorThrow formatter tracks call count correctly.
+     * When errorThrow formatter is called multiple times,
+     * Then the call count should increment appropriately even when throwing.
+     */
+    describe('errorThrow formatter call count tracking', () => {
+      it('should track single call correctly when throwing error', () => {
+        // Arrange
+        const logMessage = createTestLogMessage('test message');
+        const errorFormatter = MockFormatter.errorThrow('Test error');
+
+        // Act & Assert
+        expect(() => errorFormatter(logMessage)).toThrow('Test error');
+
+        const stats = MockFormatter.getStats('errorThrow');
+        expect(stats).not.toBeNull();
+        expect(stats!.callCount).toBe(1);
+      });
+
+      it('should track multiple calls correctly when throwing errors', () => {
+        // Arrange
+        const logMessage1 = createTestLogMessage('first message');
+        const logMessage2 = createTestLogMessage('second message');
+        const errorFormatter = MockFormatter.errorThrow('Test error');
+
+        // Act & Assert
+        expect(() => errorFormatter(logMessage1)).toThrow('Test error');
+        expect(() => errorFormatter(logMessage2)).toThrow('Test error');
+
+        const stats = MockFormatter.getStats('errorThrow');
+        expect(stats).not.toBeNull();
+        expect(stats!.callCount).toBe(2);
+      });
+    });
+
+    /**
+     * Tests that formatters track the last processed log message correctly.
+     * When formatters are called with different messages,
+     * Then getLastMessage should return the most recent message.
+     */
+    describe('last message tracking', () => {
+      it('should track last message for passthrough formatter', () => {
+        // Arrange
+        const firstMessage = createTestLogMessage('first message');
+        const secondMessage = createTestLogMessage('second message');
+
+        // Act
+        MockFormatter.passthrough(firstMessage);
+        MockFormatter.passthrough(secondMessage);
+
+        // Assert
+        const lastMessage = MockFormatter.getLastMessage('passthrough');
+        expect(lastMessage).toEqual(secondMessage);
+      });
+
+      it('should track last message for json formatter', () => {
+        // Arrange
+        const firstMessage = createTestLogMessage('first message');
+        const secondMessage = createTestLogMessage('second message');
+
+        // Act
+        MockFormatter.json(firstMessage);
+        MockFormatter.json(secondMessage);
+
+        // Assert
+        const lastMessage = MockFormatter.getLastMessage('json');
+        expect(lastMessage).toEqual(secondMessage);
+      });
+
+      it('should track last message for messageOnly formatter', () => {
+        // Arrange
+        const firstMessage = createTestLogMessage('first message');
+        const secondMessage = createTestLogMessage('second message');
+
+        // Act
+        MockFormatter.messageOnly(firstMessage);
+        MockFormatter.messageOnly(secondMessage);
+
+        // Assert
+        const lastMessage = MockFormatter.getLastMessage('messageOnly');
+        expect(lastMessage).toEqual(secondMessage);
+      });
+
+      it('should track last message for errorThrow formatter even when throwing', () => {
+        // Arrange
+        const firstMessage = createTestLogMessage('first message');
+        const secondMessage = createTestLogMessage('second message');
+        const errorFormatter = MockFormatter.errorThrow('Test error');
+
+        // Act & Assert
+        expect(() => errorFormatter(firstMessage)).toThrow('Test error');
+        expect(() => errorFormatter(secondMessage)).toThrow('Test error');
+
+        const lastMessage = MockFormatter.getLastMessage('errorThrow');
+        expect(lastMessage).toEqual(secondMessage);
+      });
+    });
+
+    /**
+     * Tests getAllStats functionality.
+     * When multiple formatters are used,
+     * Then getAllStats should return statistics for all formatters.
+     */
+    describe('getAllStats functionality', () => {
+      it('should return statistics for all formatters after usage', () => {
+        // Arrange
+        const logMessage = createTestLogMessage('test message');
+        const errorFormatter = MockFormatter.errorThrow('Test error');
+
+        // Act
+        MockFormatter.passthrough(logMessage);
+        MockFormatter.json(logMessage);
+        MockFormatter.messageOnly(logMessage);
+        expect(() => errorFormatter(logMessage)).toThrow('Test error');
+
+        // Assert
+        const allStats = MockFormatter.getAllStats();
+        expect(allStats).toHaveProperty('passthrough');
+        expect(allStats).toHaveProperty('json');
+        expect(allStats).toHaveProperty('messageOnly');
+        expect(allStats).toHaveProperty('errorThrow');
+
+        expect(allStats.passthrough.callCount).toBe(1);
+        expect(allStats.json.callCount).toBe(1);
+        expect(allStats.messageOnly.callCount).toBe(1);
+        expect(allStats.errorThrow.callCount).toBe(1);
+      });
+    });
+
+    /**
+     * Tests resetStats functionality.
+     * When resetStats is called,
+     * Then all statistics should be reset to initial values.
+     */
+    describe('resetStats functionality', () => {
+      it('should reset all statistics to initial values', () => {
+        // Arrange
+        const logMessage = createTestLogMessage('test message');
+        const errorFormatter = MockFormatter.errorThrow('Test error');
+
+        // Use all formatters to generate statistics
+        MockFormatter.passthrough(logMessage);
+        MockFormatter.json(logMessage);
+        MockFormatter.messageOnly(logMessage);
+        expect(() => errorFormatter(logMessage)).toThrow('Test error');
+
+        // Act
+        MockFormatter.resetStats();
+
+        // Assert
+        const allStats = MockFormatter.getAllStats();
+        expect(allStats.passthrough.callCount).toBe(0);
+        expect(allStats.passthrough.lastMessage).toBeNull();
+        expect(allStats.json.callCount).toBe(0);
+        expect(allStats.json.lastMessage).toBeNull();
+        expect(allStats.messageOnly.callCount).toBe(0);
+        expect(allStats.messageOnly.lastMessage).toBeNull();
+        expect(allStats.errorThrow.callCount).toBe(0);
+        expect(allStats.errorThrow.lastMessage).toBeNull();
+      });
+    });
+
+    /**
+     * Tests resetFormatterStats functionality.
+     * When resetFormatterStats is called for a specific formatter,
+     * Then only that formatter's statistics should be reset.
+     */
+    describe('resetFormatterStats functionality', () => {
+      it('should reset only specified formatter statistics', () => {
+        // Arrange
+        const logMessage = createTestLogMessage('test message');
+
+        MockFormatter.passthrough(logMessage);
+        MockFormatter.json(logMessage);
+
+        // Act
+        MockFormatter.resetFormatterStats('passthrough');
+
+        // Assert
+        const passthroughStats = MockFormatter.getStats('passthrough');
+        const jsonStats = MockFormatter.getStats('json');
+
+        expect(passthroughStats!.callCount).toBe(0);
+        expect(passthroughStats!.lastMessage).toBeNull();
+        expect(jsonStats!.callCount).toBe(1);
+        expect(jsonStats!.lastMessage).toEqual(logMessage);
+      });
+    });
+
+    /**
+     * Tests getStats with invalid formatter name.
+     * When getStats is called with non-existent formatter name,
+     * Then it should return null.
+     */
+    describe('getStats with invalid formatter', () => {
+      it('should return null for non-existent formatter', () => {
+        // Act
+        const stats = MockFormatter.getStats('nonExistentFormatter');
+
+        // Assert
+        expect(stats).toBeNull();
+      });
+    });
+
+    /**
+     * Tests getLastMessage with invalid formatter name.
+     * When getLastMessage is called with non-existent formatter name,
+     * Then it should return null.
+     */
+    describe('getLastMessage with invalid formatter', () => {
+      it('should return null for non-existent formatter', () => {
+        // Act
+        const lastMessage = MockFormatter.getLastMessage('nonExistentFormatter');
+
+        // Assert
+        expect(lastMessage).toBeNull();
       });
     });
   });
