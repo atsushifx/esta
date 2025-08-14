@@ -13,7 +13,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { AG_LOGLEVEL } from '../../shared/types';
 
 // テスト対象: AgLoggerとエントリーポイント
-import { AgLogger, createLogger } from '@/AgLogger.class';
+import { AgLogger } from '@/AgLogger.class';
 
 // プラグイン（フォーマッター）: 出力フォーマット実装
 import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
@@ -70,7 +70,7 @@ describe('Plugin Interaction Integration Tests', () => {
       setupTestContext();
       const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
-      const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
+      const logger = AgLogger.createLogger({ defaultLogger: ConsoleLogger, formatter: JsonFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
       logger.info('test message', { data: 'value' });
 
@@ -94,7 +94,7 @@ describe('Plugin Interaction Integration Tests', () => {
       setupTestContext();
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-      const logger = createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
+      const logger = AgLogger.createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
       logger.logLevel = AG_LOGLEVEL.WARN;
       logger.warn('warning message', 'additional info');
 
@@ -112,7 +112,7 @@ describe('Plugin Interaction Integration Tests', () => {
       setupTestContext();
       const mockLogger = vi.fn();
 
-      const logger = createLogger({ defaultLogger: mockLogger, formatter: JsonFormatter });
+      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: JsonFormatter });
       logger.logLevel = AG_LOGLEVEL.DEBUG;
       logger.debug('debug message', { debug: true });
 
@@ -134,7 +134,7 @@ describe('Plugin Interaction Integration Tests', () => {
       setupTestContext();
       const mockLogger = vi.fn();
 
-      const logger = createLogger({ defaultLogger: mockLogger, formatter: PlainFormatter });
+      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: PlainFormatter });
       logger.logLevel = AG_LOGLEVEL.ERROR;
       logger.error('error message', 'error details');
 
@@ -148,7 +148,7 @@ describe('Plugin Interaction Integration Tests', () => {
     // 目的: NullLogger使用時の安全な無出力動作
     it('should handle NullLogger with any formatter correctly', () => {
       setupTestContext();
-      const logger = createLogger({ defaultLogger: NullLogger, formatter: JsonFormatter });
+      const logger = AgLogger.createLogger({ defaultLogger: NullLogger, formatter: JsonFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
 
       // Should not throw and should complete silently
@@ -162,7 +162,7 @@ describe('Plugin Interaction Integration Tests', () => {
       setupTestContext();
       const mockLogger = vi.fn();
 
-      const logger = createLogger({ defaultLogger: mockLogger, formatter: NullFormatter });
+      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: NullFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
       logger.info('test message');
 
@@ -197,7 +197,7 @@ describe('Plugin Interaction Integration Tests', () => {
         log: vi.spyOn(console, 'log').mockImplementation(() => {}),
       };
 
-      const logger = createLogger({
+      const logger = AgLogger.createLogger({
         defaultLogger: ConsoleLogger,
         formatter: JsonFormatter,
         loggerMap: ConsoleLoggerMap,
@@ -240,7 +240,7 @@ describe('Plugin Interaction Integration Tests', () => {
         log: vi.spyOn(console, 'log').mockImplementation(() => {}),
       };
 
-      const logger = createLogger({
+      const logger = AgLogger.createLogger({
         defaultLogger: ConsoleLogger,
         formatter: PlainFormatter,
         loggerMap: ConsoleLoggerMap,
@@ -311,7 +311,7 @@ describe('Plugin Interaction Integration Tests', () => {
 
       // Test with JsonFormatter
       const jsonMockLogger = vi.fn();
-      const jsonLogger = createLogger({ defaultLogger: jsonMockLogger, formatter: JsonFormatter });
+      const jsonLogger = AgLogger.createLogger({ defaultLogger: jsonMockLogger, formatter: JsonFormatter });
       jsonLogger.logLevel = AG_LOGLEVEL.INFO;
       jsonLogger.info('Complex data', complexData);
 
@@ -324,7 +324,7 @@ describe('Plugin Interaction Integration Tests', () => {
 
       // Test with PlainFormatter
       const plainMockLogger = vi.fn();
-      const plainLogger = createLogger({ defaultLogger: plainMockLogger, formatter: PlainFormatter });
+      const plainLogger = AgLogger.createLogger({ defaultLogger: plainMockLogger, formatter: PlainFormatter });
       plainLogger.logLevel = AG_LOGLEVEL.INFO;
       plainLogger.info('Complex data', complexData);
 
@@ -344,7 +344,7 @@ describe('Plugin Interaction Integration Tests', () => {
       const largeArray = Array.from({ length: 1000 }, (_, i) => ({ id: i, data: `item${i}` }));
 
       const mockLogger = vi.fn();
-      const logger = createLogger({ defaultLogger: mockLogger, formatter: JsonFormatter });
+      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: JsonFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
 
       const startTime = Date.now();
@@ -379,7 +379,7 @@ describe('Plugin Interaction Integration Tests', () => {
     it('should maintain performance with high-frequency logging', () => {
       setupTestContext();
       const mockLogger = vi.fn();
-      const logger = createLogger({ defaultLogger: mockLogger, formatter: PlainFormatter });
+      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: JsonFormatter });
       logger.logLevel = AG_LOGLEVEL.DEBUG;
 
       const iterations = 1000;
@@ -401,7 +401,7 @@ describe('Plugin Interaction Integration Tests', () => {
     it('should not impact performance when log level filters out messages', () => {
       setupTestContext();
       const mockLogger = vi.fn();
-      const logger = createLogger({ defaultLogger: mockLogger, formatter: JsonFormatter });
+      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: JsonFormatter });
       logger.logLevel = AG_LOGLEVEL.ERROR;
 
       const iterations = 1000;
@@ -443,7 +443,7 @@ describe('Plugin Interaction Integration Tests', () => {
       });
       const formatterSpy = vi.fn().mockReturnValue('formatted message');
 
-      const logger = createLogger({ defaultLogger: throwingLogger, formatter: formatterSpy });
+      const logger = AgLogger.createLogger({ defaultLogger: throwingLogger, formatter: formatterSpy });
       logger.logLevel = AG_LOGLEVEL.INFO;
 
       expect(() => {
@@ -462,7 +462,7 @@ describe('Plugin Interaction Integration Tests', () => {
         throw new Error('Formatter error');
       });
 
-      const logger = createLogger({ defaultLogger: mockLogger, formatter: throwingFormatter });
+      const logger = AgLogger.createLogger({ defaultLogger: mockLogger, formatter: throwingFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
 
       expect(() => {
@@ -480,7 +480,7 @@ describe('Plugin Interaction Integration Tests', () => {
         throw new Error('Temporary error');
       });
 
-      const logger = createLogger({ defaultLogger: throwingLogger, formatter: PlainFormatter });
+      const logger = AgLogger.createLogger({ defaultLogger: throwingLogger, formatter: PlainFormatter });
       logger.logLevel = AG_LOGLEVEL.INFO;
 
       // First call throws
