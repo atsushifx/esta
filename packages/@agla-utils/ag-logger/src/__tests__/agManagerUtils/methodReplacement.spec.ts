@@ -1,5 +1,5 @@
-// src/__tests__/AgLoggerManager.methodReplacement.spec.ts
-// @(#) : AgLoggerManager Method Replacement Tests - Ensures AgManager automatic management
+// src/__tests__/agManagerUtils/AgManagerUtils.methodReplacement.spec.ts
+// @(#) : AgManagerUtils Method Replacement Tests - Ensures AgManager automatic management
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -10,13 +10,13 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 // テスト対象: AgLoggerManagerとAgManager（index経由で自動初期化を有効化）
-import { AgLoggerManager, AgManager, createManager } from '../index';
+import { AgLoggerManager, AgManager, createManager } from '../../index';
 
 // 共有定数: ログレベル定義
-import { AG_LOGLEVEL } from '../../shared/types';
+import { AG_LOGLEVEL } from '../../../shared/types';
 
 /**
- * AgLoggerManager Method Replacement Tests
+ * AgManagerUtils Method Replacement Tests
  *
  * @description setupManagerによるメソッド置き換えでAgManagerが自動管理されることをテスト
  * atsushifx式BDD構造でメソッド置き換え機能の正確性を検証

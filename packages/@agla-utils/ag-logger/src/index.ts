@@ -37,5 +37,10 @@ export { NullFormatter } from './plugins/formatter/NullFormatter';
 export { PlainFormatter } from './plugins/formatter/PlainFormatter';
 
 // utilities
+export * from './AgManagerUtils';
 export { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
 export { createTestId } from './utils/testIdUtils';
+
+// setup: モジュール読み込み時に自動初期化
+import { setupManager } from './AgManagerUtils';
+setupManager();

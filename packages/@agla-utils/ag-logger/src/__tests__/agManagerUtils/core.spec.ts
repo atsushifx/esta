@@ -1,5 +1,5 @@
-// src/utils/__tests__/managerUtilities.spec.ts
-// @(#) : Unit tests for manager utility functions (atsushifx-style BDD)
+// src/__tests__/agManagerUtils/AgManagerUtils.spec.ts
+// @(#) : Unit tests for AgManagerUtils (atsushifx-style BDD)
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -17,7 +17,7 @@ import { AgLogger } from '../../AgLogger.class';
 import { AgLoggerManager } from '../../AgLoggerManager.class';
 
 /**
- * manager utility functions 仕様準拠BDDテストスイート
+ * AgManagerUtils 仕様準拠BDDテストスイート
  *
  * @description atsushifx式BDD厳格プロセスに従った実装
  * createManagerとgetLoggerユーティリティ関数の統合テスト
