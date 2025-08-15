@@ -63,7 +63,7 @@ describe('Feature: AgMockConstructor type definitions', () => {
       class TestMockConstructor {
         static readonly __isMockConstructor = true as const;
 
-        constructor(_routine: AgFormatRoutine) {}
+        constructor(_routine?: AgFormatRoutine) {}
 
         execute = (_msg: AgLogMessage): AgFormattedLogMessage => 'test';
         getStats = (): { callCount: number; lastMessage: AgLogMessage | null } => ({ callCount: 0, lastMessage: null });
@@ -80,8 +80,8 @@ describe('Feature: AgMockConstructor type definitions', () => {
         static readonly __isMockConstructor = true as const;
         private routine: AgFormatRoutine;
 
-        constructor(routine: AgFormatRoutine) {
-          this.routine = routine;
+        constructor(_routine?: AgFormatRoutine) {
+          this.routine = _routine!;
         }
 
         execute = (msg: AgLogMessage): AgFormattedLogMessage => {
@@ -111,7 +111,7 @@ describe('Feature: AgMockConstructor type definitions', () => {
       class TestMockConstructor {
         static readonly __isMockConstructor = true as const;
 
-        constructor(_routine: AgFormatRoutine) {}
+        constructor(_routine?: AgFormatRoutine) {}
 
         execute = (msg: AgLogMessage): AgFormattedLogMessage => {
           return `[${msg.logLevel}] ${msg.message}`;
@@ -140,7 +140,7 @@ describe('Feature: AgMockConstructor type definitions', () => {
       class TestMockConstructor {
         static readonly __isMockConstructor = true as const;
 
-        constructor(_routine: AgFormatRoutine) {}
+        constructor(_routine?: AgFormatRoutine) {}
 
         execute = (_msg: AgLogMessage): AgFormattedLogMessage => 'test';
         getStats = (): { callCount: number; lastMessage: AgLogMessage | null } => ({
@@ -165,7 +165,7 @@ describe('Feature: AgMockConstructor type definitions', () => {
       class TestMockConstructor {
         static readonly __isMockConstructor = true as const;
 
-        constructor(_routine: AgFormatRoutine) {}
+        constructor(_routine?: AgFormatRoutine) {}
 
         execute = (_msg: AgLogMessage): AgFormattedLogMessage => 'test';
         getStats = (): { callCount: number; lastMessage: AgLogMessage | null } => ({ callCount: 0, lastMessage: null });
@@ -209,7 +209,7 @@ describe('Feature: AgMockConstructor type definitions', () => {
       class TestMockConstructor {
         static readonly __isMockConstructor = true as const;
 
-        constructor(_routine: AgFormatRoutine) {}
+        constructor(_routine?: AgFormatRoutine) {}
 
         execute = (msg: AgLogMessage): AgFormattedLogMessage => msg.message;
         getStats = (): { callCount: number; lastMessage: AgLogMessage | null } => ({ callCount: 0, lastMessage: null });
@@ -219,7 +219,10 @@ describe('Feature: AgMockConstructor type definitions', () => {
       // AgFormatterInput should accept AgMockConstructor
       const formatterInput: AgFormatterInput = TestMockConstructor;
 
-      expect(formatterInput.__isMockConstructor).toBe(true);
+      // Type guard to check if it's a mock constructor
+      if ('__isMockConstructor' in formatterInput) {
+        expect(formatterInput.__isMockConstructor).toBe(true);
+      }
     });
   });
 

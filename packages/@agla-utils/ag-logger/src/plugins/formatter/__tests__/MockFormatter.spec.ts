@@ -188,6 +188,125 @@ describe('MockFormatter', () => {
         expect(result).toBe('DEBUG: Test message');
       });
     });
+
+    describe('errorThrow 動的エラーメッセージフォーマッタ', () => {
+      it('デフォルトエラーメッセージでErrorを投げる', () => {
+        const FormatterClass = MockFormatter.errorThrow;
+        const dummyRoutine: AgFormatRoutine = (msg) => msg;
+        const instance = new FormatterClass(dummyRoutine);
+
+        const testMessage: AgLogMessage = {
+          timestamp: new Date('2025-01-01T00:00:00.000Z'),
+          logLevel: AG_LOGLEVEL.INFO,
+          message: 'Test message',
+          args: [],
+        };
+
+        // デフォルトエラーメッセージでErrorを投げることを確認
+        expect(() => instance.execute(testMessage)).toThrow('Default mock error');
+      });
+
+      it('カスタムデフォルトエラーメッセージを設定できる', () => {
+        const FormatterClass = MockFormatter.errorThrow;
+        const customDefaultMessage = 'Custom default error';
+        const dummyRoutine: AgFormatRoutine = (msg) => msg;
+        const instance = new FormatterClass(dummyRoutine, customDefaultMessage);
+
+        const testMessage: AgLogMessage = {
+          timestamp: new Date('2025-01-01T00:00:00.000Z'),
+          logLevel: AG_LOGLEVEL.INFO,
+          message: 'Test message',
+          args: [],
+        };
+
+        // カスタムデフォルトエラーメッセージでErrorを投げることを確認
+        expect(() => instance.execute(testMessage)).toThrow(customDefaultMessage);
+      });
+
+      it('setErrorMessageで実行時にエラーメッセージを変更できる', () => {
+        const FormatterClass = MockFormatter.errorThrow;
+        const dummyRoutine: AgFormatRoutine = (msg) => msg;
+        const instance = new FormatterClass(dummyRoutine);
+
+        const testMessage: AgLogMessage = {
+          timestamp: new Date('2025-01-01T00:00:00.000Z'),
+          logLevel: AG_LOGLEVEL.INFO,
+          message: 'Test message',
+          args: [],
+        };
+
+        // 初期メッセージで確認
+        expect(() => instance.execute(testMessage)).toThrow('Default mock error');
+
+        // エラーメッセージを変更
+        const newErrorMessage = 'Updated error message';
+        instance.setErrorMessage(newErrorMessage);
+
+        // 変更後のメッセージで確認
+        expect(() => instance.execute(testMessage)).toThrow(newErrorMessage);
+
+        // さらに変更
+        const anotherErrorMessage = 'Another error message';
+        instance.setErrorMessage(anotherErrorMessage);
+
+        // 再度変更後のメッセージで確認
+        expect(() => instance.execute(testMessage)).toThrow(anotherErrorMessage);
+      });
+
+      it('getErrorMessageで現在のエラーメッセージを取得できる', () => {
+        const FormatterClass = MockFormatter.errorThrow;
+        const customDefault = 'Initial error message';
+        const dummyRoutine: AgFormatRoutine = (msg) => msg;
+        const instance = new FormatterClass(dummyRoutine, customDefault);
+
+        // 初期メッセージの確認
+        expect(instance.getErrorMessage()).toBe(customDefault);
+
+        // メッセージ変更後の確認
+        const newMessage = 'Changed error message';
+        instance.setErrorMessage(newMessage);
+        expect(instance.getErrorMessage()).toBe(newMessage);
+      });
+
+      it('errorThrowも統計機能を持つ', () => {
+        const FormatterClass = MockFormatter.errorThrow;
+        const dummyRoutine: AgFormatRoutine = (msg) => msg;
+        const instance = new FormatterClass(dummyRoutine);
+
+        // 初期状態の統計を確認
+        const initialStats = instance.getStats();
+        expect(initialStats.callCount).toBe(0);
+        expect(initialStats.lastMessage).toBeNull();
+
+        const testMessage: AgLogMessage = {
+          timestamp: new Date('2025-01-01T00:00:00.000Z'),
+          logLevel: AG_LOGLEVEL.INFO,
+          message: 'Test message',
+          args: [],
+        };
+
+        // executeでエラーが投げられても統計は更新される
+        expect(() => instance.execute(testMessage)).toThrow();
+
+        const statsAfterExecution = instance.getStats();
+        expect(statsAfterExecution.callCount).toBe(1);
+        expect(statsAfterExecution.lastMessage).toEqual(testMessage);
+
+        // エラーメッセージ変更後も統計は継続
+        instance.setErrorMessage('New error');
+        expect(() => instance.execute(testMessage)).toThrow('New error');
+
+        const statsAfterChange = instance.getStats();
+        expect(statsAfterChange.callCount).toBe(2);
+        expect(statsAfterChange.lastMessage).toEqual(testMessage);
+
+        // resetで統計をクリアできる
+        instance.reset();
+        const statsAfterReset = instance.getStats();
+        expect(statsAfterReset.callCount).toBe(0);
+        expect(statsAfterReset.lastMessage).toBeNull();
+      });
+    });
   });
 
   describe('AgLoggerConfig統合テスト', () => {

@@ -26,8 +26,9 @@ export type AgMockConstructor = {
 
   /**
    * Constructor function that creates instances with execute, getStats, and reset methods.
+   * The routine parameter is optional - if not provided, a default passthrough routine will be used.
    */
-  new(routine: AgFormatRoutine): {
+  new(routine?: AgFormatRoutine): {
     execute: AgFormatFunction;
     getStats(): { callCount: number; lastMessage: AgLogMessage | null };
     reset(): void;

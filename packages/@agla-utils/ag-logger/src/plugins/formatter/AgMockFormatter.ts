@@ -40,17 +40,31 @@ export class AgMockFormatter {
   static readonly __isMockConstructor = true as const;
 
   /**
+   * Default passthrough routine that returns the message as-is.
+   * Used when no routine is provided to the constructor.
+   */
+  private static readonly DEFAULT_PASSTHROUGH_ROUTINE: AgFormatRoutine = (msg) => msg;
+
+  /**
    * Statistics tracking properties
    */
   private callCount = 0;
   private lastMessage: AgLogMessage | null = null;
 
   /**
-   * Constructor accepting a format routine function
-   *
-   * @param formatRoutine - Format routine function that processes AgLogMessage
+   * The format routine function used for message formatting
    */
-  constructor(private formatRoutine: AgFormatRoutine) {}
+  private formatRoutine: AgFormatRoutine;
+
+  /**
+   * Constructor accepting an optional format routine function.
+   * If no routine is provided, uses a default passthrough routine.
+   *
+   * @param formatRoutine - Optional format routine function that processes AgLogMessage
+   */
+  constructor(formatRoutine?: AgFormatRoutine) {
+    this.formatRoutine = formatRoutine ?? AgMockFormatter.DEFAULT_PASSTHROUGH_ROUTINE;
+  }
 
   /**
    * Execute method that formats messages and tracks statistics.
@@ -68,44 +82,29 @@ export class AgMockFormatter {
    * @param msg - Log message to format
    * @returns Formatted log message from the routine
    */
-  public readonly execute: AgFormatFunction = (msg: AgLogMessage): AgFormattedLogMessage => {
-    // フォーマッタの呼び出し回数のカウント
+  execute: AgFormatFunction = (msg: AgLogMessage): AgFormattedLogMessage => {
     this.callCount++;
-
-    // 最終メッセージの取得処理
     this.lastMessage = msg;
-
-    // 設定されたフォーマットルーチンの呼び出し
     return this.formatRoutine(msg);
   };
 
   /**
-   * Get current statistics including call count and last message.
+   * Gets statistics about formatter usage.
    *
-   * 呼び出し回数などのstatsをテスト用に変数へ引き渡す処理：
-   * - callCount: フォーマッタの呼び出し回数
-   * - lastMessage: 最後に処理されたメッセージ
-   *
-   * @returns Statistics object with callCount and lastMessage
+   * @returns Statistics object containing call count and last message
    */
-  getStats(): { callCount: number; lastMessage: AgLogMessage | null } {
-    return {
-      callCount: this.callCount,
-      lastMessage: this.lastMessage,
-    };
-  }
+  getStats = (): { callCount: number; lastMessage: AgLogMessage | null } => ({
+    callCount: this.callCount,
+    lastMessage: this.lastMessage,
+  });
 
   /**
-   * Reset all statistics to initial state.
-   *
-   * 統計情報をクリア：
-   * - callCountを0にリセット
-   * - lastMessageをnullにリセット
+   * Resets formatter statistics to initial state.
    */
-  reset(): void {
+  reset = (): void => {
     this.callCount = 0;
     this.lastMessage = null;
-  }
+  };
 }
 
 export default AgMockFormatter;

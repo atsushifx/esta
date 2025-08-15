@@ -18,7 +18,7 @@ import {
 // types
 import type { AgLoggerMap, AgLogLevel } from '../../shared/types';
 import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions } from '../../shared/types/AgLogger.interface';
-import type { AgFormatRoutine } from './types/AgMockConstructor.class';
+
 // constants
 import { AG_LOGLEVEL } from '../../shared/types';
 // plugins
@@ -333,9 +333,9 @@ export class AgLoggerConfig {
     if ('formatter' in options) {
       const input = options.formatter as unknown;
       if (isAgMockConstructor(input)) {
-        // デフォルトルーチン: 透過（AgLogMessageをそのまま返す）
-        const passthrough: AgFormatRoutine = (msg) => msg;
-        const instance = new input(passthrough);
+        // AgMockConstructor自体がデフォルトルーチンを提供
+        const instance = new input();
+        this._formatterInstance = instance;
         resolvedOptions = { ...options, formatter: instance.execute };
       } else if (!isValidFormatter(options.formatter)) {
         return false;

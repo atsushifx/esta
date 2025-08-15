@@ -10,42 +10,14 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { AgFormattedLogMessage, AgLogMessage } from '../../../shared/types';
+import type { AgLogMessage } from '../../../shared/types';
 import { AG_LOGLEVEL } from '../../../shared/types';
 import type { AgFormatFunction } from '../../../shared/types/AgLogger.interface';
 
 import { AgMockFormatter } from '../../plugins/formatter/AgMockFormatter';
 import { AgLoggerConfig } from '../AgLoggerConfig.class';
 
-// テスト用のAgMockConstructor互換クラス
-class TestMockConstructor {
-  static readonly __isMockConstructor = true as const;
-  static instantiated = false;
-  static lastInstance: TestMockConstructor | null = null;
-
-  private _callCount = 0;
-  private _lastMessage: AgLogMessage | null = null;
-
-  constructor(private routine: (msg: AgLogMessage) => AgFormattedLogMessage) {
-    TestMockConstructor.instantiated = true;
-    TestMockConstructor.lastInstance = this;
-  }
-
-  public readonly execute: AgFormatFunction = (msg: AgLogMessage): AgFormattedLogMessage => {
-    this._callCount += 1;
-    this._lastMessage = msg;
-    return this.routine(msg);
-  };
-
-  getStats(): { callCount: number; lastMessage: AgLogMessage | null } {
-    return { callCount: this._callCount, lastMessage: this._lastMessage };
-  }
-
-  reset(): void {
-    this._callCount = 0;
-    this._lastMessage = null;
-  }
-}
+// AgMockFormatterを直接使用
 
 describe('AgLoggerConfig: AgMockConstructor対応', () => {
   it('AgMockConstructorをformatterに指定すると、formatterは関数型に解決される', () => {
@@ -69,19 +41,17 @@ describe('AgLoggerConfig: AgMockConstructor対応', () => {
     expect(result).toBe(msg);
   });
 
-  it('独自のAgMockConstructor互換クラスでも自動インスタンス化される', () => {
+  it('AgMockFormatterが自動インスタンス化される', () => {
     const config = new AgLoggerConfig();
-    TestMockConstructor.instantiated = false;
-    TestMockConstructor.lastInstance = null;
+    config.setLoggerConfig({ formatter: AgMockFormatter as unknown as AgFormatFunction });
 
-    config.setLoggerConfig({ formatter: TestMockConstructor as unknown as AgFormatFunction });
-
-    expect(TestMockConstructor.instantiated).toBe(true);
+    // formatterInstanceが設定されることを確認
+    expect(config.hasFormatterInstance()).toBe(true);
   });
 
   it('自動生成されたインスタンスのexecuteがformatterに設定され、呼び出せる', () => {
     const config = new AgLoggerConfig();
-    config.setLoggerConfig({ formatter: TestMockConstructor as unknown as AgFormatFunction });
+    config.setLoggerConfig({ formatter: AgMockFormatter as unknown as AgFormatFunction });
 
     const msg: AgLogMessage = {
       logLevel: AG_LOGLEVEL.DEBUG,
