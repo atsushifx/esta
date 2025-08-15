@@ -1,0 +1,53 @@
+// src/internal/types/AgMockConstructor.class.ts
+// @(#) : AgMockConstructor Class and Type Definitions
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+import type { AgFormatFunction, AgFormattedLogMessage, AgLogMessage } from '../../../shared/types';
+
+/**
+ * Format routine function type that processes AgLogMessage and returns formatted output.
+ * Can return either a string, AgLogMessage object, or throw an error.
+ */
+export type AgFormatRoutine = (msg: AgLogMessage) => AgFormattedLogMessage | never;
+
+/**
+ * Type defining the contract for mock formatter constructors.
+ * Represents a constructor function that creates mock formatter instances with statistics tracking.
+ */
+export type AgMockConstructor = {
+  /**
+   * Static marker property to identify mock constructors.
+   * Used by type guards and automatic instantiation logic.
+   */
+  readonly __isMockConstructor: true;
+
+  /**
+   * Constructor function that creates instances with execute, getStats, and reset methods.
+   */
+  new(routine: AgFormatRoutine): {
+    execute: AgFormatFunction;
+    getStats(): { callCount: number; lastMessage: AgLogMessage | null };
+    reset(): void;
+  };
+};
+
+/**
+ * Union type representing valid formatter inputs.
+ * Can be either a standard format function or a mock constructor.
+ */
+export type AgFormatterInput = AgFormatFunction | AgMockConstructor;
+
+/**
+ * Type guard function to check if a value implements the AgMockConstructor interface.
+ */
+export const isAgMockConstructor = (value: unknown): value is AgMockConstructor => {
+  if (typeof value !== 'function') {
+    return false;
+  }
+
+  const constructor = value as { __isMockConstructor?: unknown };
+  return constructor.__isMockConstructor === true;
+};

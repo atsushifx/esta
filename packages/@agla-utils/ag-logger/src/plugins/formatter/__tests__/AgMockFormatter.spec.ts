@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 // Import types and modules
 import type { AgLogLevel, AgLogMessage } from '../../../../shared/types';
-import type { AgFormatRoutine } from '../../../internal/types/AgMockConstructor.interface';
+import type { AgFormatRoutine } from '../../../internal/types/AgMockConstructor.class';
 import { AgMockFormatter } from '../AgMockFormatter';
 
 /**
