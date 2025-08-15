@@ -39,15 +39,3 @@ export type AgMockConstructor = {
  * Can be either a standard format function or a mock constructor.
  */
 export type AgFormatterInput = AgFormatFunction | AgMockConstructor;
-
-/**
- * Type guard function to check if a value implements the AgMockConstructor interface.
- */
-export const isAgMockConstructor = (value: unknown): value is AgMockConstructor => {
-  if (typeof value !== 'function') {
-    return false;
-  }
-
-  const constructor = value as { __isMockConstructor?: unknown };
-  return constructor.__isMockConstructor === true;
-};

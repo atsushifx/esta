@@ -1,212 +1,88 @@
-// src/plugins/formatter/MockFormatter.ts
-// @(#) : Mock Formatter for Testing
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (C) 2025 atsushifx
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgFormatFunction, AgLogMessage } from '../../../shared/types';
+import type { AgFormatRoutine, AgMockConstructor } from '../../internal/types/AgMockConstructor.class';
+
+// plugins
+import { AgMockFormatter } from './AgMockFormatter';
 // utilities
 import { AgToLabel } from '../../utils/AgLogHelpers';
 
 /**
- * Statistics for individual formatter methods.
- * Tracks usage count and the last processed message for each formatter.
+ * MockFormatter.ts
+ *
+ * カリー化されたファクトリ関数を提供し、カスタムルーチンをbindした
+ * MockFormatterクラスを生成する機能を実装
  */
-type MockFormatterStats = {
-  callCount: number;
-  lastMessage: AgLogMessage | null;
+
+/**
+ * カリー化されたファクトリ関数
+ * カスタムルーチンを受け取り、そのルーチンをbindしたMockFormatterクラスを返す
+ *
+ * @param formatRoutine - カスタムフォーマットルーチン
+ * @returns カスタムルーチンをbindしたMockFormatterクラス
+ */
+export const createMockFormatter = (formatRoutine: AgFormatRoutine): AgMockConstructor => {
+  return class extends AgMockFormatter {
+    static readonly __isMockConstructor = true as const;
+
+    constructor() {
+      super(formatRoutine);
+    }
+  };
 };
 
 /**
- * Internal statistics storage for all formatter methods.
- * Maintains call counts and last processed messages for tracking usage.
- */
-const formatterStats: Record<string, MockFormatterStats> = {
-  passthrough: { callCount: 0, lastMessage: null },
-  json: { callCount: 0, lastMessage: null },
-  messageOnly: { callCount: 0, lastMessage: null },
-  errorThrow: { callCount: 0, lastMessage: null },
-};
-
-/**
- * Records usage statistics for a formatter method.
- * Increments call count and stores the last processed message.
- *
- * @param formatterName - Name of the formatter being used
- * @param logMessage - The log message being processed
- */
-const recordUsage = (formatterName: string, logMessage: AgLogMessage): void => {
-  const stats = formatterStats[formatterName];
-  stats.callCount++;
-  stats.lastMessage = logMessage;
-};
-
-// formatter
-
-/**
- * Mock formatters for testing purposes.
- * Contains simple formatter functions that can be used in unit tests.
- * Each formatter tracks usage statistics including call count and last processed message.
- *
- * @example
- * ```typescript
- * // Use formatters normally
- * const result = MockFormatter.passthrough(logMessage);
- * const json = MockFormatter.json(logMessage);
- *
- * // Check usage statistics
- * const stats = MockFormatter.getStats('passthrough');
- * console.log(stats.callCount); // 1
- *
- * // Reset statistics
- * MockFormatter.resetStats();
- * ```
+ * MockFormatter - 使いやすいプリセット付きのファクトリオブジェクト
+ * 直感的なAPIを提供し、よく使われるフォーマットパターンをプリセットとして用意
  */
 export const MockFormatter = {
   /**
-   * Passthrough formatter that returns the log message as-is.
-   * Useful for testing when you want to verify the raw AgLogMessage object.
-   *
-   * @param logMessage - The log message object
-   * @returns The same log message object unchanged
+   * カスタムルーチン用ファクトリ
+   * ユーザー定義のフォーマットルーチンでMockFormatterを作成
    */
-  passthrough: ((logMessage: AgLogMessage): AgLogMessage => {
-    recordUsage('passthrough', logMessage);
-    return logMessage;
-  }) as AgFormatFunction,
+  withRoutine: createMockFormatter,
 
   /**
-   * JSON formatter that converts the log message to a JSON string.
-   * Converts logLevel to level string for proper JSON structure.
-   *
-   * @param logMessage - The log message object
-   * @returns JSON string representation of the log message with string level
+   * JSON形式でログメッセージをフォーマット
    */
-  json: ((logMessage: AgLogMessage): string => {
-    recordUsage('json', logMessage);
-    const levelLabel = AgToLabel(logMessage.logLevel);
+  json: createMockFormatter((msg) => {
+    const levelLabel = AgToLabel(msg.logLevel);
     const logEntry = {
-      timestamp: logMessage.timestamp.toISOString(),
-      logLevel: logMessage.logLevel,
+      timestamp: msg.timestamp.toISOString(),
+      logLevel: msg.logLevel,
       ...(levelLabel && { level: levelLabel }),
-      message: logMessage.message,
-      ...(logMessage.args.length > 0 && { args: logMessage.args }),
+      message: msg.message,
+      ...(msg.args.length > 0 && { args: msg.args }),
     };
     return JSON.stringify(logEntry);
-  }) as AgFormatFunction,
-
-  messageOnly: ((logMessage: AgLogMessage): string => {
-    recordUsage('messageOnly', logMessage);
-    return logMessage.message;
-  }) as AgFormatFunction,
+  }),
 
   /**
-   * Error throwing formatter factory that creates a formatter function.
-   * When the returned formatter is called, it throws an Error with the specified message.
-   * Useful for testing error handling in logger systems.
+   * メッセージ部分のみを抽出
+   */
+  messageOnly: createMockFormatter((msg) => msg.message),
+
+  /**
+   * パススルーフォーマット（ログメッセージをそのまま返す）
+   */
+  passthrough: createMockFormatter((msg) => msg),
+
+  /**
+   * タイムスタンプ付きでメッセージをフォーマット
+   */
+  timestamped: createMockFormatter((msg) => `[${new Date().toISOString()}] ${msg.message}`),
+
+  /**
+   * プレフィックス付きファクトリ関数
+   * 指定したプレフィックスでメッセージをフォーマット
    *
-   * @param errorMessage - The error message to throw when the formatter is called
-   * @returns A formatter function that throws an Error with the specified message
+   * @param prefix - メッセージの前に付けるプレフィックス
+   * @returns プレフィックス付きフォーマットのMockFormatterクラス
    */
-  errorThrow: (errorMessage: string): AgFormatFunction => {
-    return ((logMessage: AgLogMessage): never => {
-      recordUsage('errorThrow', logMessage);
-      throw new Error(errorMessage);
-    }) as AgFormatFunction;
-  },
-
-  /**
-   * Get usage statistics for a specific formatter.
-   * @param formatterName - Name of the formatter to get stats for
-   * @returns Statistics object containing call count and last message, or null if formatter not found
-   */
-  getStats: (formatterName: string): MockFormatterStats | null => {
-    return formatterStats[formatterName] ?? null;
-  },
-
-  /**
-   * Get usage statistics for all formatters.
-   * @returns Object containing statistics for all formatter methods
-   */
-  getAllStats: (): Record<string, MockFormatterStats> => {
-    return { ...formatterStats };
-  },
-
-  /**
-   * Get the last log message processed by a specific formatter.
-   * @param formatterName - Name of the formatter to get last message for
-   * @returns Last log message processed by the formatter, or null if none or formatter not found
-   */
-  getLastMessage: (formatterName: string): AgLogMessage | null => {
-    return formatterName in formatterStats ? formatterStats[formatterName].lastMessage : null;
-  },
-
-  /**
-   * Reset usage statistics for all formatters.
-   * Sets call counts to 0 and last messages to null.
-   */
-  resetStats: (): void => {
-    Object.keys(formatterStats).forEach((key) => {
-      formatterStats[key].callCount = 0;
-      formatterStats[key].lastMessage = null;
-    });
-  },
-
-  /**
-   * Reset usage statistics for a specific formatter.
-   * @param formatterName - Name of the formatter to reset stats for
-   */
-  resetFormatterStats: (formatterName: string): void => {
-    const stats = formatterStats[formatterName];
-    stats.callCount = 0;
-    stats.lastMessage = null;
-  },
+  prefixed: (prefix: string) => createMockFormatter((msg) => `${prefix}: ${msg.message}`),
 } as const;
-/**
- * Checks if the given value is the MockFormatter object.
- *
- * This function determines whether the provided value is specifically
- * the MockFormatter constant object, not a class constructor.
- *
- * @param value - The value to check
- * @returns true if the value is the MockFormatter object, false otherwise
- *
- * @example
- * ```typescript
- * import { MockFormatter, isMockFormatter } from './MockFormatter';
- *
- * isMockFormatter(MockFormatter);     // true
- * isMockFormatter({});               // false
- * isMockFormatter(null);             // false
- *
- * class SomeClass {}
- * isMockFormatter(SomeClass);        // false
- * ```
- */
-export const isMockFormatter = (value: unknown): value is typeof MockFormatter => {
-  // Check if value is an object and not null
-  if (typeof value !== 'object' || value === null) {
-    return false;
-  }
-
-  // Check if the object has the expected MockFormatter properties and methods
-  const formatter = value as Record<string, unknown>;
-
-  return (
-    typeof formatter.passthrough === 'function'
-    && typeof formatter.json === 'function'
-    && typeof formatter.messageOnly === 'function'
-    && typeof formatter.errorThrow === 'function'
-    && typeof formatter.getStats === 'function'
-    && typeof formatter.getAllStats === 'function'
-    && typeof formatter.getLastMessage === 'function'
-    && typeof formatter.resetStats === 'function'
-    && typeof formatter.resetFormatterStats === 'function'
-    && formatter === MockFormatter
-  );
-};
-
-export default MockFormatter;

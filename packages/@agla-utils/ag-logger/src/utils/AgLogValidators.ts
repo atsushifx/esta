@@ -15,6 +15,7 @@ import { AgLoggerError } from 'shared/types/AgLoggerError.types';
 import { AG_LOGGER_ERROR_MESSAGES, ERROR_TYPES } from '../../shared/constants/agErrorMessages';
 import { AG_LOGLEVEL } from '../../shared/types';
 import type { AgLogLevel } from '../../shared/types';
+import type { AgMockConstructor } from '../internal/types/AgMockConstructor.class';
 import { valueToString } from './AgLogHelpers';
 
 export const isValidLogLevel = (logLevel: unknown): boolean => {
@@ -115,4 +116,12 @@ export const isStandardLogLevel = (logLevel: AgLogLevel | undefined): boolean =>
   // Check integer constraint and range in one go
   return logLevel >= AG_LOGLEVEL.OFF // 0
     && logLevel <= AG_LOGLEVEL.TRACE; // 6
+};
+export const isAgMockConstructor = (value: unknown): value is AgMockConstructor => {
+  if (typeof value !== 'function') {
+    return false;
+  }
+  // 判定用の静的フラグを確認
+  const marker = (value as { __isMockConstructor?: unknown }).__isMockConstructor;
+  return marker === true;
 };

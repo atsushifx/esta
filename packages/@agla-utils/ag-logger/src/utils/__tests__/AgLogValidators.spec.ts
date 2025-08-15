@@ -8,8 +8,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { AG_LOGLEVEL } from '../../../shared/types';
+import type { AgLogMessage } from '../../../shared/types';
 import { AgLoggerError } from '../../../shared/types/AgLoggerError.types';
-import { isValidLogLevel, validateLogLevel } from '../AgLogValidators';
+import type { AgFormatRoutine } from '../../internal/types/AgMockConstructor.class';
+import { AgMockFormatter } from '../../plugins/formatter/AgMockFormatter';
+import { isAgMockConstructor, isValidLogLevel, validateLogLevel } from '../AgLogValidators';
 
 /**
  * AgLogValidators Consolidated Test Suite
@@ -183,6 +186,68 @@ describe('AgLogValidators', () => {
       it('should provide descriptive error for out-of-range numbers', () => {
         expect(() => validateLogLevel(999)).toThrow(/Invalid log level.*999/);
         expect(() => validateLogLevel(-999)).toThrow(/Invalid log level.*-999/);
+      });
+    });
+  });
+
+  /**
+   * AgMockConstructor 判定
+   * isAgMockConstructor(value: unknown): boolean の動作検証
+   * atsushifx式BDD: RED-GREEN-REFACTOR を it/expect 粒度で進める
+   */
+  describe('isAgMockConstructor: AgMockConstructor 判定', () => {
+    describe('真となるケース', () => {
+      it('AgMockFormatter クラスを渡すと true', () => {
+        expect(isAgMockConstructor(AgMockFormatter)).toBe(true);
+      });
+
+      it('モックシグネチャを満たす独自クラスで true', () => {
+        class TestMockConstructor {
+          static readonly __isMockConstructor = true as const;
+          constructor(_routine: AgFormatRoutine) {}
+          execute = (msg: AgLogMessage): string => msg.message;
+          getStats = (): { callCount: number; lastMessage: AgLogMessage | null } => ({
+            callCount: 0,
+            lastMessage: null as AgLogMessage | null,
+          });
+          reset = (): void => {};
+        }
+
+        expect(isAgMockConstructor(TestMockConstructor)).toBe(true);
+      });
+
+      it('関数に __isMockConstructor=true を付与すると true', () => {
+        // 通常の関数（クラスではない）にマーカーを付与
+        type MockCtorLike = ((...args: unknown[]) => void) & { __isMockConstructor?: boolean };
+        const fn: MockCtorLike = function() {/* noop */};
+        fn.__isMockConstructor = true;
+        expect(isAgMockConstructor(fn)).toBe(true);
+      });
+    });
+
+    describe('偽となるケース', () => {
+      it('通常の関数（マーカーなし）は false', () => {
+        const fn: () => void = () => {};
+        expect(isAgMockConstructor(fn)).toBe(false);
+      });
+
+      it('クラスでも __isMockConstructor が無い/false なら false', () => {
+        class NoMarker {}
+        class FalseMarker {
+          static readonly __isMockConstructor = false as unknown as true;
+        }
+        expect(isAgMockConstructor(NoMarker)).toBe(false);
+        expect(isAgMockConstructor(FalseMarker)).toBe(false);
+      });
+
+      it('オブジェクトに __isMockConstructor=true があっても関数でないので false', () => {
+        const obj = { __isMockConstructor: true };
+        expect(isAgMockConstructor(obj)).toBe(false);
+      });
+
+      it('プリミティブ値（null/undefined/数値/文字列/boolean）は false', () => {
+        const cases: unknown[] = [null, undefined, 0, 1, 'x', true, false];
+        cases.forEach((c) => expect(isAgMockConstructor(c)).toBe(false));
       });
     });
   });
