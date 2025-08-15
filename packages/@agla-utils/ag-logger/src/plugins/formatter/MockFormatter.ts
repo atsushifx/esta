@@ -141,7 +141,7 @@ export const MockFormatter = {
    * @returns Last log message processed by the formatter, or null if none or formatter not found
    */
   getLastMessage: (formatterName: string): AgLogMessage | null => {
-    return formatterStats[formatterName]?.lastMessage ?? null;
+    return formatterName in formatterStats ? formatterStats[formatterName].lastMessage : null;
   },
 
   /**
@@ -165,5 +165,48 @@ export const MockFormatter = {
     stats.lastMessage = null;
   },
 } as const;
+/**
+ * Checks if the given value is the MockFormatter object.
+ *
+ * This function determines whether the provided value is specifically
+ * the MockFormatter constant object, not a class constructor.
+ *
+ * @param value - The value to check
+ * @returns true if the value is the MockFormatter object, false otherwise
+ *
+ * @example
+ * ```typescript
+ * import { MockFormatter, isMockFormatter } from './MockFormatter';
+ *
+ * isMockFormatter(MockFormatter);     // true
+ * isMockFormatter({});               // false
+ * isMockFormatter(null);             // false
+ *
+ * class SomeClass {}
+ * isMockFormatter(SomeClass);        // false
+ * ```
+ */
+export const isMockFormatter = (value: unknown): value is typeof MockFormatter => {
+  // Check if value is an object and not null
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  // Check if the object has the expected MockFormatter properties and methods
+  const formatter = value as Record<string, unknown>;
+
+  return (
+    typeof formatter.passthrough === 'function'
+    && typeof formatter.json === 'function'
+    && typeof formatter.messageOnly === 'function'
+    && typeof formatter.errorThrow === 'function'
+    && typeof formatter.getStats === 'function'
+    && typeof formatter.getAllStats === 'function'
+    && typeof formatter.getLastMessage === 'function'
+    && typeof formatter.resetStats === 'function'
+    && typeof formatter.resetFormatterStats === 'function'
+    && formatter === MockFormatter
+  );
+};
 
 export default MockFormatter;

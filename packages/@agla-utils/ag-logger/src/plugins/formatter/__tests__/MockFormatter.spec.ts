@@ -15,7 +15,7 @@ import { AG_LOGLEVEL } from '../../../../shared/types';
 import type { AgLogMessage } from '../../../../shared/types/AgLogger.types';
 
 // subject under test
-import { MockFormatter } from '../MockFormatter';
+import { isMockFormatter, MockFormatter } from '../MockFormatter';
 
 /**
  * MockFormatterプラグインのユニットテストスイート
@@ -980,6 +980,229 @@ describe('MockFormatter', () => {
 
         // Assert
         expect(lastMessage).toBeNull();
+      });
+    });
+  });
+
+  /**
+   * isMockFormatter function utility tests
+   * Validates whether a given value is the MockFormatter object
+   */
+  describe('isMockFormatter function', () => {
+    describe('when checking the MockFormatter object', () => {
+      it('should return true for the actual MockFormatter object', () => {
+        // Arrange & Act
+        const result = isMockFormatter(MockFormatter);
+
+        // Assert
+        expect(result).toBe(true);
+      });
+
+      it('should return true using module import', () => {
+        // Arrange & Act
+        const result = isMockFormatter(MockFormatter);
+
+        // Assert
+        expect(result).toBe(true);
+      });
+    });
+
+    describe('when checking non-MockFormatter values', () => {
+      it('should return false for null', () => {
+        // Arrange & Act
+        const result = isMockFormatter(null);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+
+      it('should return false for undefined', () => {
+        // Arrange & Act
+        const result = isMockFormatter(undefined);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+
+      it('should return false for empty object', () => {
+        // Arrange
+        const emptyObject = {};
+
+        // Act
+        const result = isMockFormatter(emptyObject);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+
+      it('should return false for object with similar properties but different implementation', () => {
+        // Arrange
+        const similarObject = {
+          passthrough: () => {},
+          json: () => {},
+          messageOnly: () => {},
+          errorThrow: () => {},
+          getStats: () => {},
+          getAllStats: () => {},
+          getLastMessage: () => {},
+          resetStats: () => {},
+          resetFormatterStats: () => {},
+        };
+
+        // Act
+        const result = isMockFormatter(similarObject);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+
+      it('should return false for class constructor', () => {
+        // Arrange
+        class TestClass {
+          passthrough(): void {}
+          json(): void {}
+          messageOnly(): void {}
+          errorThrow(): void {}
+          getStats(): void {}
+          getAllStats(): void {}
+          getLastMessage(): void {}
+          resetStats(): void {}
+          resetFormatterStats(): void {}
+        }
+
+        // Act
+        const result = isMockFormatter(TestClass);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+
+      it('should return false for class instance', () => {
+        // Arrange
+        class TestClass {
+          passthrough(): void {}
+          json(): void {}
+          messageOnly(): void {}
+          errorThrow(): void {}
+          getStats(): void {}
+          getAllStats(): void {}
+          getLastMessage(): void {}
+          resetStats(): void {}
+          resetFormatterStats(): void {}
+        }
+        const instance = new TestClass();
+
+        // Act
+        const result = isMockFormatter(instance);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+
+      it('should return false for function', () => {
+        // Arrange
+        const testFunction = (): void => {};
+
+        // Act
+        const result = isMockFormatter(testFunction);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+
+      it('should return false for primitive values', () => {
+        // Arrange
+        const primitiveValues = ['string', 42, true, false];
+
+        primitiveValues.forEach((value) => {
+          // Act
+          const result = isMockFormatter(value);
+
+          // Assert
+          expect(result).toBe(false);
+        });
+      });
+
+      it('should return false for array', () => {
+        // Arrange
+        const array = [1, 2, 3];
+
+        // Act
+        const result = isMockFormatter(array);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+
+      it('should return false for object with missing properties', () => {
+        // Arrange
+        const incompleteObject = {
+          passthrough: () => {},
+          json: () => {},
+          // Missing other required properties
+        };
+
+        // Act
+        const result = isMockFormatter(incompleteObject);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+
+      it('should return false for object with non-function properties', () => {
+        // Arrange
+        const invalidObject = {
+          passthrough: 'not a function',
+          json: () => {},
+          messageOnly: () => {},
+          errorThrow: () => {},
+          getStats: () => {},
+          getAllStats: () => {},
+          getLastMessage: () => {},
+          resetStats: () => {},
+          resetFormatterStats: () => {},
+        };
+
+        // Act
+        const result = isMockFormatter(invalidObject);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+    });
+
+    describe('when checking edge cases', () => {
+      it('should return false for Symbol', () => {
+        // Arrange
+        const symbol = Symbol('test');
+
+        // Act
+        const result = isMockFormatter(symbol);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+
+      it('should return false for Date object', () => {
+        // Arrange
+        const date = new Date();
+
+        // Act
+        const result = isMockFormatter(date);
+
+        // Assert
+        expect(result).toBe(false);
+      });
+
+      it('should return false for RegExp object', () => {
+        // Arrange
+        const regex = /test/;
+
+        // Act
+        const result = isMockFormatter(regex);
+
+        // Assert
+        expect(result).toBe(false);
       });
     });
   });
