@@ -7,11 +7,18 @@
 // https://opensource.org/licenses/MIT
 
 // utilities
-import { isStandardLogLevel, isValidFormatter, isValidLogger, isValidLogLevel } from '../utils/AgLogValidators';
+import {
+  isAgMockConstructor,
+  isStandardLogLevel,
+  isValidFormatter,
+  isValidLogger,
+  isValidLogLevel,
+} from '../utils/AgLogValidators';
 
 // types
 import type { AgLoggerMap, AgLogLevel } from '../../shared/types';
 import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions } from '../../shared/types/AgLogger.interface';
+import type { AgFormatRoutine } from './types/AgMockConstructor.class';
 // constants
 import { AG_LOGLEVEL } from '../../shared/types';
 // plugins
@@ -321,8 +328,16 @@ export class AgLoggerConfig {
         return false;
       }
     }
+    // formatter: AgMockConstructor対応（自動インスタンス化して execute を設定）
+    let resolvedOptions: AgLoggerOptions = options;
     if ('formatter' in options) {
-      if (!isValidFormatter(options.formatter)) {
+      const input = options.formatter as unknown;
+      if (isAgMockConstructor(input)) {
+        // デフォルトルーチン: 透過（AgLogMessageをそのまま返す）
+        const passthrough: AgFormatRoutine = (msg) => msg;
+        const instance = new input(passthrough);
+        resolvedOptions = { ...options, formatter: instance.execute };
+      } else if (!isValidFormatter(options.formatter)) {
         return false;
       }
     }
@@ -334,11 +349,11 @@ export class AgLoggerConfig {
     }
 
     // After validation, safely update options
-    this._options = { ...this._options, ...options };
+    this._options = { ...this._options, ...resolvedOptions };
 
     // Apply loggerMap setting if provided (this overrides the defaultLogger initialization above)
-    if (options.loggerMap !== undefined) {
-      this.updateLoggerMap(options.loggerMap);
+    if (resolvedOptions.loggerMap !== undefined) {
+      this.updateLoggerMap(resolvedOptions.loggerMap);
     }
     return true;
   }
