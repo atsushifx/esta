@@ -18,7 +18,7 @@ import { AgLogger } from '@/AgLogger.class';
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 
 // プラグイン（フォーマッター/ロガー）: モック/プレーン実装
-import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { createMockFormatter } from '@/plugins/formatter/MockFormatter';
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
 import { MockLogger } from '@/plugins/logger/MockLogger';
 
@@ -74,9 +74,10 @@ describe('AgLogger Core Configuration Integration', () => {
         const defaultLogger = new MockLogger.buffer();
 
         // When: 部分的なロガーマップで設定
+        const PassthroughFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: defaultLogger.getLoggerFunction(),
-          formatter: MockFormatter.passthrough,
+          formatter: new PassthroughFormatter((msg) => msg).execute,
           loggerMap: {
             [AG_LOGLEVEL.ERROR]: errorLogger.getLoggerFunction(AG_LOGLEVEL.ERROR),
             [AG_LOGLEVEL.WARN]: warnLogger.getLoggerFunction(AG_LOGLEVEL.WARN),
@@ -124,7 +125,8 @@ describe('AgLogger Core Configuration Integration', () => {
         logger.setLoggerConfig({
           loggerMap: { [AG_LOGLEVEL.ERROR]: tempLogger2.getLoggerFunction(AG_LOGLEVEL.ERROR) },
         });
-        logger.setLoggerConfig({ formatter: MockFormatter.json });
+        const JsonFormatter = createMockFormatter((msg) => JSON.stringify(msg));
+        logger.setLoggerConfig({ formatter: new JsonFormatter((msg) => JSON.stringify(msg)).execute });
         logger.setLoggerConfig({ defaultLogger: finalLogger.getLoggerFunction() });
 
         // When: 最終設定でログ出力

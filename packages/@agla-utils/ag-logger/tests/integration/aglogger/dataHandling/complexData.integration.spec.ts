@@ -20,7 +20,7 @@ import { AgLogger } from '@/AgLogger.class';
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 
 // プラグイン（フォーマッター/ロガー）: モック実装
-import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { createMockFormatter } from '@/plugins/formatter/MockFormatter';
 import { MockLogger } from '@/plugins/logger/MockLogger';
 
 // type definitions
@@ -50,7 +50,8 @@ export type TCircularTestObject = {
  */
 const createMock = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFormatter: AgFormatFunction } => {
   const mockLogger = new MockLogger.buffer();
-  const mockFormatter = MockFormatter.passthrough;
+  const mockFormatterConstructor = createMockFormatter((msg) => msg);
+  const mockFormatter = new mockFormatterConstructor((msg) => msg).execute;
 
   ctx.onTestFinished(() => {
     AgLogger.resetSingleton();
@@ -283,7 +284,7 @@ describe('AgLogger Data Handling Complex Data Integration', () => {
         // Given: 特殊値対応ロガー
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.passthrough,
+          formatter: new (createMockFormatter((msg) => msg))((msg) => msg).execute,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 

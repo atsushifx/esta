@@ -23,7 +23,7 @@ import { AgLoggerManager } from '@/AgLoggerManager.class';
 
 // プラグイン（フォーマッター/ロガー）: JSON/Plain/モック
 import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
-import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { createMockFormatter } from '@/plugins/formatter/MockFormatter';
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
 import { MockLogger } from '@/plugins/logger/MockLogger';
 
@@ -34,7 +34,8 @@ import { MockLogger } from '@/plugins/logger/MockLogger';
  */
 const createMock = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFormatter: AgFormatFunction } => {
   const mockLogger = new MockLogger.buffer();
-  const mockFormatter = MockFormatter.passthrough;
+  const mockFormatterConstructor = createMockFormatter((msg) => msg);
+  const mockFormatter = new mockFormatterConstructor((msg) => msg).execute;
 
   ctx.onTestFinished(() => {
     AgLogger.resetSingleton();
@@ -132,9 +133,10 @@ describe('AgLogger Features Filtering Integration', () => {
         setupTestContext();
 
         // Given: DEBUG レベルで設定されたロガー
+        const PassthroughFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.passthrough,
+          formatter: new PassthroughFormatter((msg) => msg).execute,
         });
         logger.logLevel = AG_LOGLEVEL.DEBUG;
 
@@ -198,9 +200,10 @@ describe('AgLogger Features Filtering Integration', () => {
         setupTestContext();
 
         // Given: 初期はVerboseモード有効
+        const PassthroughFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.passthrough,
+          formatter: new PassthroughFormatter((msg) => msg).execute,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
         logger.setVerbose = ENABLE;
@@ -266,9 +269,10 @@ describe('AgLogger Features Filtering Integration', () => {
         setupTestContext();
 
         // Given: 標準ログレベル検証と統合
+        const PassthroughFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.passthrough,
+          formatter: new PassthroughFormatter((msg) => msg).execute,
         });
 
         // When: 標準レベルと非標準レベルをテスト

@@ -20,7 +20,7 @@ import type { AgFormatFunction } from '../../../../shared/types';
 import { AgLogger } from '@/AgLogger.class';
 
 // プラグイン（フォーマッター/ロガー）: モック実装
-import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { createMockFormatter } from '@/plugins/formatter/MockFormatter';
 import { MockLogger } from '@/plugins/logger/MockLogger';
 
 // Test utilities
@@ -29,7 +29,8 @@ import { MockLogger } from '@/plugins/logger/MockLogger';
  */
 const createMock = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFormatter: AgFormatFunction } => {
   const mockLogger = new MockLogger.buffer();
-  const mockFormatter = MockFormatter.passthrough;
+  const mockFormatterConstructor = createMockFormatter((msg) => msg);
+  const mockFormatter = new mockFormatterConstructor((msg) => msg).execute;
   AgLogger.resetSingleton();
 
   ctx.onTestFinished(() => {
@@ -63,9 +64,10 @@ describe('AgLogger Performance High Load Integration', () => {
         const { mockLogger } = createMock(ctx);
 
         // Given: パフォーマンス重視の設定
+        const LightweightFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.passthrough, // 軽量フォーマッター
+          formatter: new LightweightFormatter((msg) => msg).execute, // 軽量フォーマッター
         });
         logger.logLevel = AG_LOGLEVEL.DEBUG;
 
@@ -92,9 +94,10 @@ describe('AgLogger Performance High Load Integration', () => {
         const { mockLogger } = createMock(ctx);
 
         // Given: 大量データ対応の設定
+        const JsonFormatter = createMockFormatter((msg) => JSON.stringify(msg));
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.json, // JSON化によるオーバーヘッドを含む
+          formatter: new JsonFormatter((msg) => JSON.stringify(msg)).execute, // JSON化によるオーバーヘッドを含む
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
@@ -132,9 +135,10 @@ describe('AgLogger Performance High Load Integration', () => {
         const { mockLogger } = createMock(ctx);
 
         // Given: 厳格なフィルタリング設定（ERROR レベルのみ）
+        const JsonFormatter = createMockFormatter((msg) => JSON.stringify(msg));
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.json,
+          formatter: new JsonFormatter((msg) => JSON.stringify(msg)).execute,
         });
         logger.logLevel = AG_LOGLEVEL.ERROR;
 
@@ -161,9 +165,10 @@ describe('AgLogger Performance High Load Integration', () => {
         const { mockLogger } = createMock(ctx);
 
         // Given: Verboseモード + 厳格フィルタリング
+        const JsonFormatter = createMockFormatter((msg) => JSON.stringify(msg));
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.json,
+          formatter: new JsonFormatter((msg) => JSON.stringify(msg)).execute,
         });
         logger.logLevel = AG_LOGLEVEL.WARN;
         logger.setVerbose = ENABLE;
@@ -200,9 +205,10 @@ describe('AgLogger Performance High Load Integration', () => {
         const { mockLogger } = createMock(ctx);
 
         // Given: 同時実行対応の設定
+        const PassthroughFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.passthrough,
+          formatter: new PassthroughFormatter((msg) => msg).execute,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
@@ -241,9 +247,10 @@ describe('AgLogger Performance High Load Integration', () => {
         const { mockLogger } = createMock(ctx);
 
         // Given: 長時間動作対応の設定
+        const PassthroughFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.passthrough,
+          formatter: new PassthroughFormatter((msg) => msg).execute,
         });
         logger.logLevel = AG_LOGLEVEL.DEBUG;
 
@@ -290,9 +297,10 @@ describe('AgLogger Performance High Load Integration', () => {
 
         // Given: 全機能有効の複雑な設定
         const errorLogger = new MockLogger.buffer();
+        const HeavyFormatter = createMockFormatter((msg) => JSON.stringify(msg));
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.json, // 重いフォーマッター
+          formatter: new HeavyFormatter((msg) => JSON.stringify(msg)).execute, // 重いフォーマッター
           loggerMap: {
             [AG_LOGLEVEL.ERROR]: errorLogger.getLoggerFunction(AG_LOGLEVEL.ERROR),
             [AG_LOGLEVEL.WARN]: mockLogger.getLoggerFunction(AG_LOGLEVEL.WARN),

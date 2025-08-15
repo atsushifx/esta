@@ -33,6 +33,7 @@ export { NullLogger } from './plugins/logger/NullLogger';
 
 // plugins: formatter
 export { JsonFormatter } from './plugins/formatter/JsonFormatter';
+export { createMockFormatter, MockFormatter } from './plugins/formatter/MockFormatter';
 export { NullFormatter } from './plugins/formatter/NullFormatter';
 export { PlainFormatter } from './plugins/formatter/PlainFormatter';
 

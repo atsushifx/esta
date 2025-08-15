@@ -22,7 +22,7 @@ import { AgLoggerManager } from '@/AgLoggerManager.class';
 
 // プラグイン（フォーマッター/ロガー）: モックとJSON
 import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
-import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { createMockFormatter } from '@/plugins/formatter/MockFormatter';
 import { MockLogger } from '@/plugins/logger/MockLogger';
 
 // Test Utilities
@@ -32,7 +32,8 @@ import { MockLogger } from '@/plugins/logger/MockLogger';
  */
 const createMock = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFormatter: AgFormatFunction } => {
   const mockLogger = new MockLogger.buffer();
-  const mockFormatter = MockFormatter.passthrough;
+  const mockFormatterConstructor = createMockFormatter((msg) => msg);
+  const mockFormatter = new mockFormatterConstructor((msg) => msg).execute;
 
   ctx.onTestFinished(() => {
     AgLogger.resetSingleton();
