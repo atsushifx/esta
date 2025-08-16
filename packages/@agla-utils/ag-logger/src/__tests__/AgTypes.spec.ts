@@ -8,7 +8,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { AG_LOGLEVEL } from '../../shared/types';
-import type { AgLoggerOptions, AgLogLevel, AgLogMessage } from '../../shared/types';
+import type { AgFormatFunction, AgLoggerOptions, AgLogLevel, AgLogMessage } from '../../shared/types';
 import type { AglaError } from '../../shared/types';
 import { AgLoggerError } from '../../shared/types';
 
@@ -275,7 +275,7 @@ describe('AgLogger Type System', () => {
         };
 
         expect(message.logLevel).toBe(options.logLevel);
-        expect(options.formatter!(message)).toBe(`[${AG_LOGLEVEL.INFO}] Integration test message`);
+        expect((options.formatter as AgFormatFunction)(message)).toBe(`[${AG_LOGLEVEL.INFO}] Integration test message`);
       });
 
       it('should handle error scenarios with proper typing', () => {

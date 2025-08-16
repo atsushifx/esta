@@ -7,6 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // type
+import type { AgFormatterInput } from '../../src/internal/types/AgMockConstructor.class';
 import type { AgFormattedLogMessage, AgLogMessage } from './AgLogger.types';
 import type { AgLogLevel } from './AgLogLevel.types';
 
@@ -129,7 +130,7 @@ export type AgLoggerOptions = {
   /**
    * Formatter function to format log messages before passing to logger functions.
    */
-  formatter?: AgFormatFunction;
+  formatter?: AgFormatterInput;
 
   /**
    * Log level setting that controls which log messages are output.
