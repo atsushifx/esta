@@ -10,12 +10,12 @@
 import { describe, expect, it } from 'vitest';
 
 // constants
-import { AG_LOGLEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '../../../../../shared/types';
 // types
-import type { AgLogMessage } from '../../../../shared/types/AgLogger.types';
+import type { AgLogMessage } from '../../../../../shared/types/AgLogger.types';
 
 // subject under test
-import { PlainFormatter } from '../PlainFormatter';
+import { PlainFormatter } from '../../../../plugins/formatter/PlainFormatter';
 
 describe('PlainFormatter', () => {
   /**

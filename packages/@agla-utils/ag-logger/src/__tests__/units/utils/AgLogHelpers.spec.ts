@@ -7,16 +7,16 @@
 // https://opensource.org/licenses/MIT
 
 import { describe, expect, it, vi } from 'vitest';
-import { AG_LOGLEVEL } from '../../../shared/types';
-import type { AgLogLevel } from '../../../shared/types';
+import { AG_LOGLEVEL } from '../../../../shared/types';
+import type { AgLogLevel } from '../../../../shared/types';
 import {
   AgToLabel,
   AgToLogLevel,
   argsToString,
   createLoggerFunction,
   valueToString,
-} from '../AgLogHelpers';
-import { isValidLogLevel } from '../AgLogValidators';
+} from '../../../utils/AgLogHelpers';
+import { isValidLogLevel } from '../../../utils/AgLogValidators';
 
 /**
  * AgLogHelpers Consolidated Unit Test Suite

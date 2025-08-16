@@ -10,12 +10,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // テスト対象 - AgLoggerManagerクラスのシングルトン実装
-import { AgLoggerManager } from '../AgLoggerManager.class';
+import { AgLoggerManager } from '../../AgLoggerManager.class';
 // AgLoggerクラス - 参照比較のため
-import { AgLogger } from '../AgLogger.class';
+import { AgLogger } from '../../AgLogger.class';
 // 型定義 - 委譲テスト用
-import type { AgLoggerFunction, AgLoggerMap } from '../../shared/types/AgLogger.interface';
-import { AG_LOGLEVEL } from '../../shared/types/AgLogLevel.types';
+import type { AgLoggerFunction, AgLoggerMap } from '../../../shared/types/AgLogger.interface';
+import { AG_LOGLEVEL } from '../../../shared/types/AgLogLevel.types';
 
 /**
  * AgLoggerManager仕様準拠BDDテストスイート

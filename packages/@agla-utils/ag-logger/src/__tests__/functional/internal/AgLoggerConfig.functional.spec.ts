@@ -23,22 +23,22 @@ import { describe, expect, it } from 'vitest';
 // error
 
 // constants
-import { DISABLE, ENABLE } from '../../../shared/constants/common.constants';
-import { AG_LOGLEVEL } from '../../../shared/types';
+import { DISABLE, ENABLE } from '../../../../shared/constants/common.constants';
+import { AG_LOGLEVEL } from '../../../../shared/types';
 
 // types
-import type { AgLogLevel, AgLogMessage } from '../../../shared/types';
-import type { AgLoggerOptions } from '../../../shared/types/AgLogger.interface';
-import { AgLoggerError } from '../../../shared/types/AgLoggerError.types';
+import type { AgLogLevel, AgLogMessage } from '../../../../shared/types';
+import type { AgLoggerOptions } from '../../../../shared/types/AgLogger.interface';
+import { AgLoggerError } from '../../../../shared/types/AgLoggerError.types';
 
 // target
-import { AgLoggerConfig } from '../AgLoggerConfig.class';
+import { AgLoggerConfig } from '../../../internal/AgLoggerConfig.class';
 // plugins
-import { NullFormatter } from '../../plugins/formatter/NullFormatter';
-import { NullLogger } from '../../plugins/logger/NullLogger';
+import { NullFormatter } from '../../../plugins/formatter/NullFormatter';
+import { NullLogger } from '../../../plugins/logger/NullLogger';
 // utilities
 import { ERROR_TYPES } from 'shared/constants';
-import { validateLogLevel } from '../../utils/AgLogValidators';
+import { validateLogLevel } from '../../../utils/AgLogValidators';
 
 /**
  * Test suite for AgLoggerConfig internal class.

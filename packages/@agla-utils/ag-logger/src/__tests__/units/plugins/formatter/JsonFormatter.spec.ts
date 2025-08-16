@@ -10,12 +10,12 @@
 import { describe, expect, it } from 'vitest';
 
 // ログレベル定数 - テストで使用するログレベル定義
-import { AG_LOGLEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '../../../../../shared/types';
 // 型定義 - ログメッセージの構造を定義する型
-import type { AgLogMessage } from '../../../../shared/types/AgLogger.types';
+import type { AgLogMessage } from '../../../../../shared/types/AgLogger.types';
 
 // テスト対象 - JSON形式フォーマッタープラグインの実装
-import { JsonFormatter } from '../JsonFormatter';
+import { JsonFormatter } from '../../../../plugins/formatter/JsonFormatter';
 
 // test main
 

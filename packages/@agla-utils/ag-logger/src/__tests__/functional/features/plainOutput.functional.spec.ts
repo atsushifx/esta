@@ -1,10 +1,10 @@
 // tests/e2e/aglogger/plain/basic.e2e.spec.ts
-import { AgLogger } from '@/AgLogger.class';
-import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
-import { ConsoleLogger } from '@/plugins/logger/ConsoleLogger';
 import { describe, expect, it, vi } from 'vitest';
 import { AG_LOGLEVEL } from '../../../../shared/types';
-import { createConsoleMock } from '../../_helpers/consoleMock';
+import { createConsoleMock } from '../../../../tests/e2e/_helpers/consoleMock';
+import { AgLogger } from '../../../AgLogger.class';
+import { PlainFormatter } from '../../../plugins/formatter/PlainFormatter';
+import { ConsoleLogger } from '../../../plugins/logger/ConsoleLogger';
 
 describe('AgLogger Plain Basic Output', () => {
   const { mockConsole, setup } = createConsoleMock(vi);

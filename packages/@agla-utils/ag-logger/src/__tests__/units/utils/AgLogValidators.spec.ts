@@ -7,12 +7,12 @@
 // https://opensource.org/licenses/MIT
 
 import { describe, expect, it } from 'vitest';
-import { AG_LOGLEVEL } from '../../../shared/types';
-import type { AgLogMessage } from '../../../shared/types';
-import { AgLoggerError } from '../../../shared/types/AgLoggerError.types';
-import type { AgFormatRoutine } from '../../internal/types/AgMockConstructor.class';
-import { AgMockFormatter } from '../../plugins/formatter/AgMockFormatter';
-import { isAgMockConstructor, isValidLogLevel, validateLogLevel } from '../AgLogValidators';
+import { AG_LOGLEVEL } from '../../../../shared/types';
+import type { AgLogMessage } from '../../../../shared/types';
+import { AgLoggerError } from '../../../../shared/types/AgLoggerError.types';
+import type { AgFormatRoutine } from '../../../internal/types/AgMockConstructor.class';
+import { AgMockFormatter } from '../../../plugins/formatter/AgMockFormatter';
+import { isAgMockConstructor, isValidLogLevel, validateLogLevel } from '../../../utils/AgLogValidators';
 
 /**
  * AgLogValidators Consolidated Test Suite

@@ -10,10 +10,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ログレベル定数 - テストで使用するログレベル定義
-import { AG_LOGLEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '../../../../../shared/types';
 
 // テスト対象 - コンソール出力ロガープラグインの実装
-import { ConsoleLogger, ConsoleLoggerMap } from '../ConsoleLogger';
+import { ConsoleLogger, ConsoleLoggerMap } from '../../../../plugins/logger/ConsoleLogger';
 
 // mock console methods
 const mockConsole = {

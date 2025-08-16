@@ -9,12 +9,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Constants and Types
-import { DISABLE, ENABLE } from '../../shared/constants/common.constants';
-import { AG_LOGLEVEL } from '../../shared/types';
-import type { AgLogLevel } from '../../shared/types';
+import { DISABLE, ENABLE } from '../../../shared/constants/common.constants';
+import { AG_LOGLEVEL } from '../../../shared/types';
+import type { AgLogLevel } from '../../../shared/types';
 
 // Test target
-import { AgLogger } from '../AgLogger.class';
+import { AgLogger } from '../../AgLogger.class';
 
 // Test utilities
 const mockLogger = vi.fn();
