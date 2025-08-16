@@ -132,6 +132,15 @@ export class E2eMockLogger implements AgLoggerInterface {
   }
 
   /**
+   * Default level logger method for special DEFAULT level (-99).
+   * Provided for API parity and completeness.
+   */
+  default(message: AgFormattedLogMessage): void {
+    const mockLogger = this.getCurrentMockLogger();
+    mockLogger.executeLog(AG_LOGLEVEL.DEFAULT, message);
+  }
+
+  /**
    * Get the MockLogger instance for the current test.
    * Validates that there is an active test before returning.
    */
@@ -207,6 +216,7 @@ export class E2eMockLogger implements AgLoggerInterface {
       // logger for special log level
       [AG_LOGLEVEL.VERBOSE]: (message: AgFormattedLogMessage) => this.verbose(message),
       [AG_LOGLEVEL.LOG]: (message: AgFormattedLogMessage) => this.log(message),
+      [AG_LOGLEVEL.DEFAULT]: (message: AgFormattedLogMessage) => this.default(message),
     };
   }
 }

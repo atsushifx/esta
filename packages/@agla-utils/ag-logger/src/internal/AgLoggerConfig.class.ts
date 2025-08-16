@@ -7,11 +7,18 @@
 // https://opensource.org/licenses/MIT
 
 // utilities
-import { isStandardLogLevel, isValidFormatter, isValidLogger, isValidLogLevel } from '../utils/AgLogValidators';
+import {
+  isAgMockConstructor,
+  isStandardLogLevel,
+  isValidFormatter,
+  isValidLogger,
+  isValidLogLevel,
+} from '../utils/AgLogValidators';
 
 // types
-import type { AgLoggerMap, AgLogLevel } from '../../shared/types';
+import type { AgLoggerMap, AgLogLevel, AgLogMessage } from '../../shared/types';
 import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions } from '../../shared/types/AgLogger.interface';
+
 // constants
 import { AG_LOGLEVEL } from '../../shared/types';
 // plugins
@@ -62,6 +69,15 @@ export class AgLoggerConfig {
    * Initialized with all levels mapped to NullLogger.
    */
   private readonly _loggerMap: Map<AgLogLevel, AgLoggerFunction>;
+
+  /**
+   * Formatter instance storage for statistics access and control.
+   * Contains the actual formatter instance when AgMockConstructor is used.
+   * Provides access to getStats() and reset() methods for testing and monitoring.
+   */
+  private _formatterInstance:
+    | { getStats(): { callCount: number; lastMessage: AgLogMessage | null }; reset(): void }
+    | null = null;
 
   /**
    * Creates a new AgLoggerConfig instance with default settings.
@@ -147,7 +163,7 @@ export class AgLoggerConfig {
    * @returns The configured formatter function
    */
   public get formatter(): AgFormatFunction {
-    return this._options.formatter;
+    return this._options.formatter as AgFormatFunction;
   }
 
   /**
@@ -321,9 +337,21 @@ export class AgLoggerConfig {
         return false;
       }
     }
+    // formatter: AgMockConstructor対応（自動インスタンス化して execute を設定）
+    let resolvedOptions: AgLoggerOptions = options;
     if ('formatter' in options) {
-      if (!isValidFormatter(options.formatter)) {
-        return false;
+      const input = options.formatter as unknown;
+      if (isAgMockConstructor(input)) {
+        // AgMockConstructor自体がデフォルトルーチンを提供
+        const instance = new input();
+        this._formatterInstance = instance;
+        resolvedOptions = { ...options, formatter: instance.execute };
+      } else {
+        // 通常のフォーマッタの場合はインスタンスをクリア
+        this._formatterInstance = null;
+        if (!isValidFormatter(options.formatter)) {
+          return false;
+        }
       }
     }
     // Validate logLevel if provided - special levels cannot be set as default log level
@@ -334,11 +362,11 @@ export class AgLoggerConfig {
     }
 
     // After validation, safely update options
-    this._options = { ...this._options, ...options };
+    this._options = { ...this._options, ...resolvedOptions };
 
     // Apply loggerMap setting if provided (this overrides the defaultLogger initialization above)
-    if (options.loggerMap !== undefined) {
-      this.updateLoggerMap(options.loggerMap);
+    if (resolvedOptions.loggerMap !== undefined) {
+      this.updateLoggerMap(resolvedOptions.loggerMap);
     }
     return true;
   }
@@ -388,5 +416,37 @@ export class AgLoggerConfig {
     // Track explicit overrides in options to distinguish from initial defaults
     this._options.loggerMap = { ...this._options.loggerMap, [level]: logger };
     return true;
+  }
+
+  /**
+   * Gets formatter statistics if a mock formatter instance is available.
+   * Returns null if no formatter instance is stored or if the formatter is not a mock formatter.
+   *
+   * @returns Formatter statistics object with callCount and lastMessage, or null if not available
+   * @since 0.2.0
+   */
+  public getFormatterStats(): { callCount: number; lastMessage: AgLogMessage | null } | null {
+    return this._formatterInstance?.getStats() ?? null;
+  }
+
+  /**
+   * Resets formatter statistics if a mock formatter instance is available.
+   * Does nothing if no formatter instance is stored or if the formatter is not a mock formatter.
+   *
+   * @since 0.2.0
+   */
+  public resetFormatterStats(): void {
+    this._formatterInstance?.reset();
+  }
+
+  /**
+   * Checks if a formatter instance is available for statistics access.
+   * Returns true if a mock formatter instance is currently stored.
+   *
+   * @returns True if formatter instance is available, false otherwise
+   * @since 0.2.0
+   */
+  public hasFormatterInstance(): boolean {
+    return this._formatterInstance !== null;
   }
 }

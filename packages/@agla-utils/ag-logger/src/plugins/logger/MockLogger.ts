@@ -50,7 +50,7 @@ export class AgMockBufferLogger {
    */
   private validateLogLevel(logLevel: AgLogLevel): void {
     if (!isValidLogLevel(logLevel)) {
-      throw new Error(`MockLogger: Invalid log level: ${logLevel}`);
+      throw new Error(`MockLogger: Invalid log level: ${String(logLevel)}`);
     }
   }
 
