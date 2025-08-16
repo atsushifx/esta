@@ -1,5 +1,5 @@
-// src: shared/common/configs/vitest.config.unit.ts
-// @(#) : vitest config for unit test
+// src: shared/common/configs/vitest.config.functional.ts
+// @(#) : vitest config for functional test
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -22,16 +22,16 @@ import baseConfig from '../../../../base/configs/vitest.config.base';
 export default mergeConfig(baseConfig, {
   test: {
     include: [
-      // Unit Test - pure unit tests for individual functions/methods
-      'src/**/__tests__/units/**/*.spec.ts',
-      'src/**/__tests__/units/**/*.test.ts',
+      // Functional Test - single feature complete behavior verification
+      'src/**/__tests__/functional/**/*.functional.spec.ts',
+      'src/**/__tests__/functional/**/*.functional.test.ts',
     ],
     exclude: [
-      'src/**/__tests__/functional/**/*',
+      'src/**/__tests__/units/**/*',
       'tests/**/*',
     ],
-    cacheDir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),
-    // sequential test execution to avoid singleton state conflicts
+    cacheDir: path.resolve(__dirname, '../../../.cache/vitest-cache/functional/'),
+    // sequential test execution to avoid singleton state conflicts in functional tests
     sequence: {
       concurrent: false,
     },
