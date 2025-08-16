@@ -1,5 +1,5 @@
-// tests/integration/plugins/loggers/loggerTypes.integration.spec.ts
-// @(#) : Plugin Loggers Integration Tests - Different logger type behavior
+// tests/integration/console-output/loggers/console-logger-behavior.integration.spec.ts
+// @(#) : Console Logger Behavior Integration Tests - Console output behavior verification
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -10,7 +10,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 // 共有定数: ログレベル定義
-import { AG_LOGLEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '@/shared/types';
 
 // テスト対象: AgLoggerとエントリーポイント
 import { AgLogger } from '@/AgLogger.class';
@@ -24,12 +24,12 @@ import { ConsoleLogger, ConsoleLoggerMap } from '@/plugins/logger/ConsoleLogger'
 import { NullLogger } from '@/plugins/logger/NullLogger';
 
 /**
- * Plugin Loggers Integration Tests
+ * Console Logger Behavior Integration Tests
  *
- * @description 各種ロガープラグインの統合動作を保証するテスト
+ * @description Console出力での各種ロガーの振る舞いを保証するテスト
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
-describe('Plugin Loggers Integration', () => {
+describe('Console Logger Behavior Integration', () => {
   const setupTestContext = (): void => {
     vi.clearAllMocks();
     AgLogger.resetSingleton();

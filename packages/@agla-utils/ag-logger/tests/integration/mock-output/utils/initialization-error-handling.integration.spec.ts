@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // テストフレームワーク
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { TestContext } from 'vitest';
 
 // 共有定数: エラーメッセージ
@@ -18,11 +18,30 @@ import { AgLoggerManager } from '@/AgLoggerManager.class';
 import { AgManager, createManager, getLogger, setupManager } from '@/AgManagerUtils';
 
 // テストユーティリティ: テスト終了時クリーンアップ
-const setupTestContext = (ctx: TestContext): void => {
-  ctx.onTestFinished(() => {
+import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { MockLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockConstructor } from '@/shared/types/AgMockConstructor.class';
+
+const setupTestContext = (_ctx?: TestContext): {
+  mockLogger: AgMockBufferLogger;
+  mockFormatter: AgMockConstructor;
+} => {
+  const _mockLogger = new MockLogger.buffer();
+  const _mockFormatter = MockFormatter.passthrough;
+
+  // 初期設定
+  AgLoggerManager.resetSingleton();
+
+  // 終了設定
+  _ctx?.onTestFinished(() => {
     AgLoggerManager.resetSingleton();
-    vi.clearAllMocks();
   });
+
+  return {
+    mockLogger: _mockLogger,
+    mockFormatter: _mockFormatter,
+  };
 };
 
 /**

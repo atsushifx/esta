@@ -10,9 +10,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
 // 共有型・定数: ログレベル定義と型
-import { AG_LOGLEVEL } from '../../../../shared/types';
-import type { AgLoggerFunction, AgLogLevel } from '../../../../shared/types';
-import type { AgLoggerMap } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '@/shared/types';
+import type { AgLoggerFunction, AgLogLevel } from '@/shared/types';
+import type { AgLoggerMap } from '@/shared/types';
 
 // テスト対象: マネージャ本体
 import { AgLoggerManager } from '@/AgLoggerManager.class';
@@ -21,6 +21,9 @@ import { AgLoggerManager } from '@/AgLoggerManager.class';
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
 
 // プラグイン（ロガー）: 出力先実装とダミー
+import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { MockLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
 import { NullLogger } from '@/plugins/logger/NullLogger';
 
 /**
@@ -30,10 +33,15 @@ import { NullLogger } from '@/plugins/logger/NullLogger';
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
 describe('AgLoggerManager Management Logger Map Integration', () => {
-  const setupTestContext = (): void => {
+  const setupTestContext = (): { mockLogger: AgMockBufferLogger; mockFormatter: typeof MockFormatter.passthrough } => {
     vi.clearAllMocks();
     // Reset singleton instance for clean test state
     AgLoggerManager.resetSingleton();
+
+    return {
+      mockLogger: new MockLogger.buffer(),
+      mockFormatter: MockFormatter.passthrough,
+    };
   };
 
   /**
@@ -48,9 +56,12 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
         setupTestContext();
 
         // Given: レベル別の専用ロガー
-        const defaultLogger = vi.fn() as AgLoggerFunction;
-        const errorLogger = vi.fn() as AgLoggerFunction;
-        const debugLogger = vi.fn() as AgLoggerFunction;
+        const defaultLoggerInstance = new MockLogger.buffer();
+        const defaultLogger = defaultLoggerInstance.info.bind(defaultLoggerInstance) as AgLoggerFunction;
+        const errorLoggerInstance = new MockLogger.buffer();
+        const errorLogger = errorLoggerInstance.error.bind(errorLoggerInstance) as AgLoggerFunction;
+        const debugLoggerInstance = new MockLogger.buffer();
+        const debugLogger = debugLoggerInstance.debug.bind(debugLoggerInstance) as AgLoggerFunction;
 
         const loggerMap: Partial<AgLoggerMap> = {
           [AG_LOGLEVEL.OFF]: NullLogger,
@@ -87,9 +98,12 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
         setupTestContext();
 
         // Given: 部分的なロガーマップ設定
-        const defaultLogger = vi.fn();
-        const errorLogger = vi.fn();
-        const debugLogger = vi.fn();
+        const defaultLoggerInstance = new MockLogger.buffer();
+        const defaultLogger = defaultLoggerInstance.info.bind(defaultLoggerInstance);
+        const errorLoggerInstance = new MockLogger.buffer();
+        const errorLogger = errorLoggerInstance.error.bind(errorLoggerInstance);
+        const debugLoggerInstance = new MockLogger.buffer();
+        const debugLogger = debugLoggerInstance.debug.bind(debugLoggerInstance);
 
         const partialLoggerMap = {
           [AG_LOGLEVEL.ERROR]: errorLogger,
@@ -130,7 +144,8 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
         setupTestContext();
 
         // Given: マップ未設定の環境
-        const defaultLogger = vi.fn();
+        const defaultLoggerInstance = new MockLogger.buffer();
+        const defaultLogger = defaultLoggerInstance.info.bind(defaultLoggerInstance);
         AgLoggerManager.createManager({ defaultLogger: defaultLogger, formatter: PlainFormatter });
         const manager = AgLoggerManager.getManager();
         const logger = manager.getLogger();
@@ -152,7 +167,8 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
         setupTestContext();
 
         // Given: 空のロガーマップ設定
-        const defaultLogger = vi.fn();
+        const defaultLoggerInstance = new MockLogger.buffer();
+        const defaultLogger = defaultLoggerInstance.info.bind(defaultLoggerInstance);
         AgLoggerManager.createManager({
           defaultLogger: defaultLogger,
           formatter: PlainFormatter,
@@ -185,7 +201,8 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
         setupTestContext();
 
         // Given: undefined値を含むマップ設定
-        const defaultLogger = vi.fn();
+        const defaultLoggerInstance = new MockLogger.buffer();
+        const defaultLogger = defaultLoggerInstance.info.bind(defaultLoggerInstance);
         AgLoggerManager.createManager({ defaultLogger, formatter: PlainFormatter });
         const manager = AgLoggerManager.getManager();
         const logger = manager.getLogger();
@@ -216,7 +233,8 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
         setupTestContext();
 
         // Given: 初期設定のマネージャー
-        const initialDefaultLogger = vi.fn();
+        const initialDefaultLoggerInstance = new MockLogger.buffer();
+        const initialDefaultLogger = initialDefaultLoggerInstance.info.bind(initialDefaultLoggerInstance);
         const manager = AgLoggerManager.createManager({
           defaultLogger: initialDefaultLogger,
           formatter: PlainFormatter,
@@ -224,8 +242,10 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
         const logger = manager.getLogger();
 
         // When: ロガーマップの動的更新
-        const errorLogger = vi.fn();
-        const debugLogger = vi.fn();
+        const errorLoggerInstance = new MockLogger.buffer();
+        const errorLogger = errorLoggerInstance.error.bind(errorLoggerInstance);
+        const debugLoggerInstance = new MockLogger.buffer();
+        const debugLogger = debugLoggerInstance.debug.bind(debugLoggerInstance);
         manager.setLoggerConfig({
           loggerMap: {
             [AG_LOGLEVEL.ERROR]: errorLogger,
@@ -246,7 +266,8 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
         setupTestContext();
 
         // Given: 基本設定のマネージャー
-        const defaultLogger = vi.fn();
+        const defaultLoggerInstance = new MockLogger.buffer();
+        const defaultLogger = defaultLoggerInstance.info.bind(defaultLoggerInstance);
         const manager = AgLoggerManager.createManager({
           defaultLogger: defaultLogger,
           formatter: PlainFormatter,
@@ -254,12 +275,14 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
         const logger = manager.getLogger();
 
         // When: 段階的なマップ更新（各回で全マップを設定）
-        const errorLogger = vi.fn();
+        const errorLoggerInstance = new MockLogger.buffer();
+        const errorLogger = errorLoggerInstance.error.bind(errorLoggerInstance);
         manager.setLoggerConfig({
           loggerMap: { [AG_LOGLEVEL.ERROR]: errorLogger },
         });
 
-        const warnLogger = vi.fn();
+        const warnLoggerInstance = new MockLogger.buffer();
+        const warnLogger = warnLoggerInstance.warn.bind(warnLoggerInstance);
         manager.setLoggerConfig({
           loggerMap: {
             [AG_LOGLEVEL.ERROR]: errorLogger, // 既存設定を保持
@@ -267,7 +290,8 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
           },
         });
 
-        const debugLogger = vi.fn();
+        const debugLoggerInstance = new MockLogger.buffer();
+        const debugLogger = debugLoggerInstance.debug.bind(debugLoggerInstance);
         manager.setLoggerConfig({
           loggerMap: {
             [AG_LOGLEVEL.ERROR]: errorLogger, // 既存設定を保持

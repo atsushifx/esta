@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // テストフレームワーク: テスト実行・アサーション・モック
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { TestContext } from 'vitest';
 
 // 共有定数/型: エラーメッセージ
@@ -20,11 +20,29 @@ import { AgManager, createManager, getLogger, setupManager } from '@/AgManagerUt
 /**
  * テストユーティリティ: 各テスト終了時にシングルトンとモックを初期化
  */
-const setupTestContext = (ctx: TestContext): void => {
-  ctx.onTestFinished(() => {
+import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { MockLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+
+const setupTestContext = (_ctx?: TestContext): {
+  mockLogger: AgMockBufferLogger;
+  mockFormatter: typeof MockFormatter.passthrough;
+} => {
+  const _mockLogger = new MockLogger.buffer();
+  const _mockFormatter = MockFormatter.passthrough;
+
+  // 初期設定
+  AgLoggerManager.resetSingleton();
+
+  // 終了設定
+  _ctx?.onTestFinished(() => {
     AgLoggerManager.resetSingleton();
-    vi.clearAllMocks();
   });
+
+  return {
+    mockLogger: _mockLogger,
+    mockFormatter: _mockFormatter,
+  };
 };
 
 /**

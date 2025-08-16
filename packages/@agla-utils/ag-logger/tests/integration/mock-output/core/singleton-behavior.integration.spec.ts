@@ -11,40 +11,42 @@ import { describe, expect, it, vi } from 'vitest';
 import type { TestContext } from 'vitest';
 
 // 共有型・定数: ログレベルと共通ユーティリティ
-import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import { AG_LOGLEVEL } from '@/shared/types';
+import type { AgLogMessage } from '@/shared/types';
 import { ENABLE } from '../../../../shared/constants';
-import { AG_LOGLEVEL } from '../../../../shared/types';
-import type { AgFormatFunction } from '../../../../shared/types';
 
 // テスト対象: AgLoggerとマネージャ
 import { AgLogger } from '@/AgLogger.class';
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 
 // プラグイン（フォーマッター/ロガー）: モックとJSON
-import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
-import { createMockFormatter } from '@/plugins/formatter/MockFormatter';
+import MockFormatter from '@/plugins/formatter/MockFormatter';
 import { MockLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockConstructor } from '@/shared/types/AgMockConstructor.class';
 
 // Test Utilities
 
 /**
- * テストモック（MockLogger.buffer + 軽量フォーマッタ）を作成
+ * テストセットアップ
  */
-const createMock = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFormatter: AgFormatFunction } => {
-  const mockLogger = new MockLogger.buffer();
-  const mockFormatterConstructor = createMockFormatter((msg) => msg);
-  const mockFormatter = new mockFormatterConstructor((msg) => msg).execute;
+const setupTestContext = (_ctx?: TestContext): { mockLogger: AgMockBufferLogger; mockFormatter: AgMockConstructor } => {
+  const _mockLogger = new MockLogger.buffer();
+  const _mockFormatter = MockFormatter.passthrough;
 
-  ctx.onTestFinished(() => {
+  vi.clearAllMocks();
+  AgLogger.resetSingleton();
+  AgLoggerManager.resetSingleton();
+
+  _ctx?.onTestFinished(() => {
     AgLogger.resetSingleton();
     AgLoggerManager.resetSingleton();
-    mockLogger.clearAllMessages();
     vi.clearAllMocks();
   });
 
   return {
-    mockLogger,
-    mockFormatter,
+    mockLogger: _mockLogger,
+    mockFormatter: _mockFormatter,
   };
 };
 
@@ -55,12 +57,6 @@ const createMock = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFor
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
 describe('AgLogger Core Singleton Integration', () => {
-  const setupTestContext = (): void => {
-    vi.clearAllMocks();
-    AgLogger.resetSingleton();
-    AgLoggerManager.resetSingleton();
-  };
-
   /**
    * Given: 複数のAgLoggerアクセスパターンが存在する場合
    * When: 異なるエントリポイントからアクセスした時
@@ -69,9 +65,8 @@ describe('AgLogger Core Singleton Integration', () => {
   describe('Given multiple AgLogger access patterns', () => {
     describe('When accessing through different entry points', () => {
       // 目的: 全てのエントリポイントでシングルトン一貫性を確認
-      it('Then should return the same instance consistently', (ctx) => {
-        createMock(ctx);
-        setupTestContext();
+      it('Then should return the same instance consistently', (_ctx) => {
+        setupTestContext(_ctx);
 
         // When: 様々なエントリポイントからアクセス
         AgLogger.createLogger();
@@ -87,9 +82,8 @@ describe('AgLogger Core Singleton Integration', () => {
 
     describe('When configuring shared state and properties', () => {
       // 目的: インスタンス間で設定/状態が共有される
-      it('Then should share state and configuration across instances', (ctx) => {
-        const { mockLogger } = createMock(ctx);
-        setupTestContext();
+      it('Then should share state and configuration across instances', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext(_ctx);
 
         // Given: 複数のロガーインスタンス
         AgLogger.createLogger();
@@ -100,8 +94,9 @@ describe('AgLogger Core Singleton Integration', () => {
         logger1.logLevel = AG_LOGLEVEL.DEBUG;
         logger1.setVerbose = ENABLE;
         logger1.setLoggerConfig({
-          defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: JsonFormatter,
+          defaultLogger: mockLogger.default,
+          formatter: mockFormatter,
+          loggerMap: mockLogger.defaultLoggerMap,
         });
 
         // Then: 設定が他のインスタンスと共有される
@@ -113,10 +108,9 @@ describe('AgLogger Core Singleton Integration', () => {
         logger2.info('test message');
 
         expect(mockLogger.getTotalMessageCount()).toBe(1);
-        const message = mockLogger.getLastMessage(AG_LOGLEVEL.DEFAULT) as string;
-        expect(() => JSON.parse(message)).not.toThrow();
-        const parsed = JSON.parse(message);
-        expect(parsed.message).toBe('test message');
+        const log = mockLogger.getLastMessage(AG_LOGLEVEL.INFO) as AgLogMessage;
+
+        expect(log.message).toBe('test message');
       });
     });
   });
@@ -129,20 +123,20 @@ describe('AgLogger Core Singleton Integration', () => {
   describe('Given error scenarios exist', () => {
     describe('When plugin errors occur', () => {
       // 目的: エラー発生時もシングルトン整合性を維持
-      it('Then should maintain singleton integrity during errors', (ctx) => {
-        createMock(ctx);
-        setupTestContext();
+      it('Then should maintain singleton integrity during errors', (_ctx) => {
+        const { mockLogger } = setupTestContext(_ctx);
 
         // Given: 正常なロガーインスタンス
         const logger1 = AgLogger.createLogger();
 
         // When: エラーを引き起こす設定を適用
-        const throwingFormatter = vi.fn(() => {
-          throw new Error('Formatter error');
-        });
-
         // Formatterを呼び出していないのでエラーを投げない
-        expect(() => logger1.setLoggerConfig({ formatter: throwingFormatter })).not.toThrow();
+        expect(() =>
+          logger1.setLoggerConfig({
+            defaultLogger: mockLogger.default,
+            formatter: MockFormatter.errorThrow,
+          })
+        ).not.toThrow();
 
         // Then: 新しいインスタンス取得時も同一性が保たれる
         const logger2 = AgLogger.createLogger();
@@ -152,9 +146,8 @@ describe('AgLogger Core Singleton Integration', () => {
 
     describe('When accessing rapidly and concurrently', () => {
       // 目的: 急速なシングルトンアクセス時の一貫性
-      it('Then should handle rapid access patterns consistently', (ctx) => {
-        createMock(ctx);
-        setupTestContext();
+      it('Then should handle rapid access patterns consistently', (_ctx) => {
+        setupTestContext(_ctx);
 
         // When: 大量の並行アクセス
         const loggers = Array.from({ length: 100 }, () => AgLogger.createLogger());

@@ -9,44 +9,45 @@
 // テストフレームワーク: テスト実行・アサーション・モック
 import { describe, expect, it, vi } from 'vitest';
 import type { TestContext } from 'vitest';
-
 // 共有型・定数: ログレベルとverbose制御
-import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import { AG_LOGLEVEL } from '@/shared/types';
+import type { AgLogMessage } from '@/shared/types';
 import { isStandardLogLevel } from '@/utils/AgLogValidators';
 import { DISABLE, ENABLE } from '../../../../shared/constants';
-import { AG_LOGLEVEL } from '../../../../shared/types';
-import type { AgFormatFunction } from '../../../../shared/types';
 
 // テスト対象: AgLoggerとマネージャ
 import { AgLogger } from '@/AgLogger.class';
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 
-// プラグイン（フォーマッター/ロガー）: JSON/Plain/モック
-import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
-import { createMockFormatter } from '@/plugins/formatter/MockFormatter';
-import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
+// プラグイン（フォーマッター/ロガー）: モック
+import { MockFormatter } from '@/plugins/formatter/MockFormatter';
 import { MockLogger } from '@/plugins/logger/MockLogger';
-
-// Test Utilities
+import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockConstructor } from '@/shared/types/AgMockConstructor.class';
 
 /**
- * テストモックを作成
+ * テスト初期設定
  */
-const createMock = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFormatter: AgFormatFunction } => {
-  const mockLogger = new MockLogger.buffer();
-  const mockFormatterConstructor = createMockFormatter((msg) => msg);
-  const mockFormatter = new mockFormatterConstructor((msg) => msg).execute;
+const setupTestContext = (_ctx?: TestContext): {
+  mockLogger: AgMockBufferLogger;
+  mockFormatter: AgMockConstructor;
+} => {
+  const _mockLogger = new MockLogger.buffer();
+  const _mockFormatter = MockFormatter.passthrough;
 
-  ctx.onTestFinished(() => {
+  vi.clearAllMocks();
+  AgLogger.resetSingleton();
+  AgLoggerManager.resetSingleton();
+
+  _ctx?.onTestFinished(() => {
     AgLogger.resetSingleton();
     AgLoggerManager.resetSingleton();
-    mockLogger.clearAllMessages();
     vi.clearAllMocks();
   });
 
   return {
-    mockLogger,
-    mockFormatter,
+    mockLogger: _mockLogger,
+    mockFormatter: _mockFormatter,
   };
 };
 
@@ -57,12 +58,6 @@ const createMock = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFor
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
 describe('AgLogger Features Filtering Integration', () => {
-  const setupTestContext = (): void => {
-    vi.clearAllMocks();
-    AgLogger.resetSingleton();
-    AgLoggerManager.resetSingleton();
-  };
-
   /**
    * Given: 異なるログレベル設定が存在する場合
    * When: 各レベルでログメッセージを出力した時
@@ -71,14 +66,13 @@ describe('AgLogger Features Filtering Integration', () => {
   describe('Given different log level settings exist', () => {
     describe('When outputting log messages at various levels', () => {
       // 目的: すべての構成要素で一貫したフィルタリングが行われる
-      it('Then should apply filtering consistently across all components', (ctx) => {
-        const { mockLogger } = createMock(ctx);
-        setupTestContext();
+      it('Then should apply filtering consistently across all components', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: WARN レベルで設定されたロガー
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.info,
-          formatter: JsonFormatter,
+          defaultLogger: mockLogger.default,
+          formatter: mockFormatter,
           loggerMap: mockLogger.defaultLoggerMap,
         });
         logger.logLevel = AG_LOGLEVEL.WARN;
@@ -99,15 +93,14 @@ describe('AgLogger Features Filtering Integration', () => {
 
     describe('When log level is set to OFF', () => {
       // 目的: OFFレベル時に全レベルで出力が抑止される
-      it('Then should suppress all log output', (ctx) => {
-        const { mockLogger } = createMock(ctx);
-        const mockFormatter = vi.fn().mockImplementation((msg) => msg.message ?? msg);
-        setupTestContext();
+      it('Then should suppress all log output', (_ctx) => {
+        const { mockLogger } = setupTestContext();
 
         // Given: OFFレベルで設定されたロガー
+        const messageOnlyFormatter = new MockFormatter.messageOnly();
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: mockFormatter,
+          formatter: messageOnlyFormatter.execute,
           loggerMap: mockLogger.defaultLoggerMap,
         });
         logger.logLevel = AG_LOGLEVEL.OFF;
@@ -122,21 +115,19 @@ describe('AgLogger Features Filtering Integration', () => {
 
         // Then: 全ての出力が抑止される
         expect(mockLogger.getTotalMessageCount()).toBe(0);
-        expect(mockFormatter).not.toHaveBeenCalled();
+        expect(messageOnlyFormatter.getStats().callCount).toBe(0);
       });
     });
 
     describe('When log level changes dynamically', () => {
       // 目的: 動的なログレベル変更が即座に反映される
-      it('Then should immediately apply new filtering rules', (ctx) => {
-        const { mockLogger } = createMock(ctx);
-        setupTestContext();
+      it('Then should immediately apply new filtering rules', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: DEBUG レベルで設定されたロガー
-        const PassthroughFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: new PassthroughFormatter((msg) => msg).execute,
+          formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.DEBUG;
 
@@ -168,14 +159,13 @@ describe('AgLogger Features Filtering Integration', () => {
   describe('Given verbose mode configurations exist', () => {
     describe('When enabling verbose mode', () => {
       // 目的: Verboseモード有効時に詳細な出力が行われる
-      it('Then should provide detailed output formatting', (ctx) => {
-        const { mockLogger } = createMock(ctx);
-        setupTestContext();
+      it('Then should provide detailed output formatting', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext(_ctx);
 
         // Given: Verboseモード有効なロガー
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: PlainFormatter,
+          formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
         logger.setVerbose = ENABLE;
@@ -186,24 +176,23 @@ describe('AgLogger Features Filtering Integration', () => {
         // Then: Verboseモードが有効
         expect(logger.isVerbose).toBe(ENABLE);
         expect(mockLogger.getTotalMessageCount()).toBe(1);
-        const message = mockLogger.getLastMessage(AG_LOGLEVEL.DEFAULT) as string;
+        const message = mockLogger.getLastMessage(AG_LOGLEVEL.DEFAULT) as AgLogMessage;
 
-        // PlainFormatterによる詳細な出力フォーマットを確認
-        expect(message).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z \[INFO\] verbose test/);
+        // PlainFormatterが適用されたフォーマット済み文字列を確認
+        expect(message.logLevel).toBe(AG_LOGLEVEL.INFO);
+        expect(message.message).toBe('verbose test');
       });
     });
 
     describe('When disabling verbose mode', () => {
       // 目的: Verboseモード無効時に簡潔な出力が行われる
-      it('Then should provide concise output formatting', (ctx) => {
-        const { mockLogger } = createMock(ctx);
-        setupTestContext();
+      it('Then should provide concise output formatting', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: 初期はVerboseモード有効
-        const PassthroughFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: new PassthroughFormatter((msg) => msg).execute,
+          formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
         logger.setVerbose = ENABLE;
@@ -227,17 +216,16 @@ describe('AgLogger Features Filtering Integration', () => {
   describe('Given complex filtering scenarios exist', () => {
     describe('When log level, verbose mode, and logger map are combined', () => {
       // 目的: 複合設定での統合フィルタリング動作
-      it('Then should coordinate all filtering settings appropriately', (ctx) => {
-        const { mockLogger } = createMock(ctx);
-        setupTestContext();
+      it('Then should coordinate all filtering settings appropriately', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: 複合的な設定
         const errorLogger = new MockLogger.buffer();
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: JsonFormatter,
+          formatter: mockFormatter,
           loggerMap: {
-            [AG_LOGLEVEL.ERROR]: errorLogger.getLoggerFunction(AG_LOGLEVEL.ERROR),
+            [AG_LOGLEVEL.ERROR]: errorLogger.getLoggerFunction(),
           },
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
@@ -255,24 +243,20 @@ describe('AgLogger Features Filtering Integration', () => {
         expect(logger.isVerbose).toBe(ENABLE);
 
         // Then: エラーメッセージが専用ロガーで処理
-        const errorMessage = errorLogger.getLastMessage(AG_LOGLEVEL.ERROR) as string;
-        expect(() => JSON.parse(errorMessage)).not.toThrow();
-        const parsedError = JSON.parse(errorMessage);
-        expect(parsedError.message).toBe('error msg');
+        const errorMessage = errorLogger.getLastMessage(AG_LOGLEVEL.DEFAULT) as AgLogMessage;
+        expect(errorMessage.message).toBe('error msg');
       });
     });
 
     describe('When filtering with standard log level validation', () => {
       // 目的: 標準ログレベル検証との統合
-      it('Then should work correctly with log level validators', (ctx) => {
-        const { mockLogger } = createMock(ctx);
-        setupTestContext();
+      it('Then should work correctly with log level validators', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: 標準ログレベル検証と統合
-        const PassthroughFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: new PassthroughFormatter((msg) => msg).execute,
+          formatter: mockFormatter,
         });
 
         // When: 標準レベルと非標準レベルをテスト

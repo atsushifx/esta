@@ -1,5 +1,5 @@
-// tests/integration/plugins/combinations/pluginCombinations.integration.spec.ts
-// @(#) : Plugin Combinations Integration Tests - Formatter and logger combinations
+// tests/integration/mock-output/plugins/combinations/mock-plugin-combinations.integration.spec.ts
+// @(#) : Mock Plugin Combinations Integration Tests - Mock logger and formatter combinations
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
@@ -8,30 +8,50 @@
 
 // テストフレームワーク: テスト実行・アサーション・モック
 import { describe, expect, it, vi } from 'vitest';
+import type { TestContext } from 'vitest';
 
 // 共有定数: ログレベル定義
-import { AG_LOGLEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '@/shared/types';
+import type { AgLogMessage } from '@/shared/types';
 
 // テスト対象: AgLoggerとエントリーポイント
 import { AgLogger } from '@/AgLogger.class';
 
 // プラグイン（フォーマッター）: 出力フォーマット実装
-import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
 
-// プラグイン（ロガー）: 出力先実装とマップ
-import { ConsoleLogger, ConsoleLoggerMap } from '@/plugins/logger/ConsoleLogger';
+// プラグイン（ロガー）: モック実装
+import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { MockLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockConstructor } from '../../../../../shared/types/AgMockConstructor.class';
 
 /**
- * Plugin Combinations Integration Tests
+ * Mock Plugin Combinations Integration Tests
  *
- * @description フォーマッターとロガーの組み合わせ統合動作を保証するテスト
+ * @description Mock出力でのフォーマッターとロガーの組み合わせ統合動作を保証するテスト
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
-describe('Plugin Combinations Integration', () => {
-  const setupTestContext = (): void => {
+describe('Mock Plugin Combinations Integration', () => {
+  const setupTestContext = (_ctx?: TestContext): {
+    mockLogger: AgMockBufferLogger;
+    mockFormatter: AgMockConstructor;
+  } => {
+    const _mockLogger = new MockLogger.buffer();
+    const _mockFormatter = MockFormatter.passthrough;
+
     vi.clearAllMocks();
     AgLogger.resetSingleton();
+
+    _ctx?.onTestFinished(() => {
+      AgLogger.resetSingleton();
+      vi.clearAllMocks();
+    });
+
+    return {
+      mockLogger: _mockLogger,
+      mockFormatter: _mockFormatter,
+    };
   };
 
   /**
@@ -43,13 +63,13 @@ describe('Plugin Combinations Integration', () => {
     describe('When processing large volumes of log messages', () => {
       // 目的: 高頻度ログ出力時の組み合わせ処理性能
       it('Then should maintain performance with plugin combinations under high frequency', () => {
-        setupTestContext();
+        const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: 高負荷対応の組み合わせ設定
-        const mockLogger = vi.fn();
+
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
-          formatter: JsonFormatter,
+          defaultLogger: mockLogger.getLoggerFunction(),
+          formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.DEBUG;
 
@@ -66,20 +86,20 @@ describe('Plugin Combinations Integration', () => {
 
         // Then: 組み合わせでも合理的な処理時間（1000回で1秒以内）
         expect(totalTime).toBeLessThan(1000);
-        expect(mockLogger).toHaveBeenCalledTimes(iterations);
+        expect(mockLogger.getMessageCount()).toBe(iterations);
       });
     });
 
     describe('When filtering suppresses many messages in combinations', () => {
       // 目的: フィルタリングによる出力抑制時の組み合わせ低オーバーヘッド
       it('Then should minimize overhead when combinations filter out messages', () => {
-        setupTestContext();
+        const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: 厳格フィルタリング + 組み合わせ設定
-        const mockLogger = vi.fn();
+
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
-          formatter: JsonFormatter,
+          defaultLogger: mockLogger.getLoggerFunction(),
+          formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.ERROR;
 
@@ -96,7 +116,7 @@ describe('Plugin Combinations Integration', () => {
 
         // Then: 組み合わせでもフィルタリングによる高速処理（100ms以内）
         expect(totalTime).toBeLessThan(100);
-        expect(mockLogger).not.toHaveBeenCalled();
+        expect(mockLogger.getMessageCount()).toBe(0);
       });
     });
   });
@@ -110,7 +130,7 @@ describe('Plugin Combinations Integration', () => {
     describe('When processing complex data structures across combinations', () => {
       // 目的: 複雑オブジェクトを各プラグイン組合せで安定処理
       it('Then should handle complex objects correctly across all combinations', () => {
-        setupTestContext();
+        const { mockLogger } = setupTestContext();
 
         // Given: 複雑データ構造
         const complexData = {
@@ -128,34 +148,34 @@ describe('Plugin Combinations Integration', () => {
         };
 
         // When: JsonFormatter + MockLogger 組み合わせでテスト
-        const jsonMockLogger = vi.fn();
+
         const jsonLogger = AgLogger.createLogger({
-          defaultLogger: jsonMockLogger,
-          formatter: JsonFormatter,
+          defaultLogger: mockLogger.getLoggerFunction(),
+          formatter: MockFormatter.json,
         });
         jsonLogger.logLevel = AG_LOGLEVEL.INFO;
         jsonLogger.info('Complex data', complexData);
 
         // Then: JSON組み合わせで適切に処理
-        expect(jsonMockLogger).toHaveBeenCalledTimes(1);
-        const [jsonOutput] = jsonMockLogger.mock.calls[0];
+        expect(mockLogger.getMessageCount()).toBe(1); // MockLoggerの呼び出し回数が1回になる
+        const jsonOutput = mockLogger.getMessages()[0] as string;
 
         expect(() => JSON.parse(jsonOutput)).not.toThrow();
         const parsedJson = JSON.parse(jsonOutput);
         expect(parsedJson.args[0]).toEqual(complexData);
 
         // When: PlainFormatter + MockLogger 組み合わせでテスト
-        const plainMockLogger = vi.fn();
+        mockLogger.reset();
         const plainLogger = AgLogger.createLogger({
-          defaultLogger: plainMockLogger,
+          defaultLogger: mockLogger.getLoggerFunction(),
           formatter: PlainFormatter,
         });
         plainLogger.logLevel = AG_LOGLEVEL.INFO;
         plainLogger.info('Complex data', complexData);
 
         // Then: Plain組み合わせで適切に処理
-        expect(plainMockLogger).toHaveBeenCalledTimes(1);
-        const [plainOutput] = plainMockLogger.mock.calls[0];
+        expect(mockLogger.getMessageCount()).toBe(1);
+        const plainOutput = mockLogger.getMessages()[0] as string;
 
         expect(plainOutput).toContain('Complex data');
         expect(plainOutput).toContain('{"nested"'); // JSON.stringify representation
@@ -165,16 +185,15 @@ describe('Plugin Combinations Integration', () => {
     describe('When handling large data sets efficiently in combinations', () => {
       // 目的: 大規模データ引数での組み合わせ性能検証
       it('Then should handle large data sets efficiently across combinations', () => {
-        setupTestContext();
+        const { mockLogger } = setupTestContext();
 
         // Given: 大規模データセット
         const largeArray = Array.from({ length: 1000 }, (_, i) => ({ id: i, data: `item${i}` }));
 
         // When: 組み合わせでの大規模データ処理
-        const mockLogger = vi.fn();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
-          formatter: JsonFormatter,
+          defaultLogger: mockLogger.getLoggerFunction(),
+          formatter: MockFormatter.json,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
@@ -184,9 +203,9 @@ describe('Plugin Combinations Integration', () => {
 
         // Then: 組み合わせでも合理的な処理時間（100ms以内）
         expect(endTime - startTime).toBeLessThan(100);
-        expect(mockLogger).toHaveBeenCalledTimes(1);
+        expect(mockLogger.getMessageCount()).toBe(1);
 
-        const [output] = mockLogger.mock.calls[0];
+        const output = mockLogger.getMessages()[0] as string;
         expect(() => JSON.parse(output)).not.toThrow();
       });
     });
@@ -204,14 +223,9 @@ describe('Plugin Combinations Integration', () => {
         setupTestContext();
 
         // Given: エラーロガー + 正常フォーマッター組み合わせ
-        const throwingLogger = vi.fn().mockImplementation(() => {
-          throw new Error('Logger error');
-        });
-        const formatterSpy = vi.fn().mockReturnValue('formatted message');
-
         const logger = AgLogger.createLogger({
-          defaultLogger: throwingLogger,
-          formatter: formatterSpy,
+          defaultLogger: MockLogger.throwError('Logger error'),
+          formatter: MockFormatter.returnValue('formatted message'),
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
@@ -221,23 +235,21 @@ describe('Plugin Combinations Integration', () => {
         }).toThrow('Logger error');
 
         // Then: フォーマッターは組み合わせ内で正常実行される
-        expect(formatterSpy).toHaveBeenCalled();
+        const stats = logger.getStatsFormatter()?.getStats();
+        expect(stats?.callCount).toBe(1);
+        expect(stats?.lastMessage?.message).toBe('test message'); // format前のメッセージが返る
       });
     });
 
     describe('When combinations recover from errors', () => {
       // 目的: プラグインエラー発生後もシステム安定性を維持
       it('Then should maintain system stability after combination errors', () => {
-        setupTestContext();
+        const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: 初期エラー組み合わせ
-        const throwingLogger = vi.fn().mockImplementation(() => {
-          throw new Error('Temporary error');
-        });
-
         const logger = AgLogger.createLogger({
-          defaultLogger: throwingLogger,
-          formatter: PlainFormatter,
+          defaultLogger: MockLogger.throwError('Temporary error'),
+          formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
@@ -247,65 +259,18 @@ describe('Plugin Combinations Integration', () => {
         }).toThrow('Temporary error');
 
         // When: 正常な組み合わせに置換
-        const workingLogger = vi.fn();
-        logger.setLoggerConfig({ defaultLogger: workingLogger });
+        logger.setLoggerConfig({
+          defaultLogger: mockLogger.getLoggerFunction(),
+        });
 
         // Then: 組み合わせ回復後は正常動作
         expect(() => {
           logger.info('second message');
         }).not.toThrow();
 
-        expect(workingLogger).toHaveBeenCalled();
-      });
-    });
-  });
-
-  /**
-   * Given: 実際のシステム統合環境でプラグイン組み合わせが使用される場合
-   * When: ConsoleLoggerMapとフォーマッターの実際の組み合わせを使用した時
-   * Then: 実環境での統合動作が適切に実行される
-   */
-  describe('Given real system integration uses plugin combinations', () => {
-    describe('When using actual ConsoleLoggerMap with formatter combinations', () => {
-      // 目的: ConsoleLoggerMap×各フォーマッターの実システム統合
-      it('Then should integrate correctly in real system scenarios', () => {
-        setupTestContext();
-
-        // Given: 実システム相当の組み合わせ設定
-        const consoleSpies = {
-          error: vi.spyOn(console, 'error').mockImplementation(() => {}),
-          warn: vi.spyOn(console, 'warn').mockImplementation(() => {}),
-          info: vi.spyOn(console, 'info').mockImplementation(() => {}),
-          debug: vi.spyOn(console, 'debug').mockImplementation(() => {}),
-        };
-
-        const logger = AgLogger.createLogger({
-          defaultLogger: ConsoleLogger,
-          formatter: JsonFormatter,
-          loggerMap: ConsoleLoggerMap,
-        });
-        logger.logLevel = AG_LOGLEVEL.DEBUG;
-
-        // When: 実システム相当の組み合わせ使用
-        logger.error('System error occurred', { code: 500, stack: 'error stack' });
-        logger.warn('System warning', { resource: 'memory', usage: '90%' });
-        logger.info('System info', { status: 'running', uptime: 12345 });
-        logger.debug('System debug', { query: 'SELECT * FROM table', time: 45 });
-
-        // Then: 実システム統合での適切な出力先振り分け
-        expect(consoleSpies.error).toHaveBeenCalledTimes(1);
-        expect(consoleSpies.warn).toHaveBeenCalledTimes(1);
-        expect(consoleSpies.info).toHaveBeenCalledTimes(1);
-        expect(consoleSpies.debug).toHaveBeenCalledTimes(1);
-
-        // Then: 実システム統合での適切なフォーマット
-        consoleSpies.error.mock.calls.forEach(([output]) => {
-          expect(() => JSON.parse(output)).not.toThrow();
-          const parsed = JSON.parse(output);
-          expect(parsed.level).toBe('ERROR');
-        });
-
-        Object.values(consoleSpies).forEach((spy) => spy.mockRestore());
+        const lastMessage = mockLogger.getLastMessage() as AgLogMessage;
+        expect(mockLogger.getMessageCount()).toBe(1);
+        expect(lastMessage.message).toBe('second message');
       });
     });
   });

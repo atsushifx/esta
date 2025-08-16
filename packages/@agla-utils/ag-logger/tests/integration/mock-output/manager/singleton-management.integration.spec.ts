@@ -10,13 +10,18 @@
 import { describe, expect, it, vi } from 'vitest';
 
 // 共有型・定数: ログレベル定義と型
-import { AG_LOGLEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '@/shared/types';
 
 // テスト対象: マネージャ本体
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 
 // プラグイン（フォーマッター）: 出力フォーマット実装
 import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
+
+// プラグイン（ロガー）: 出力先実装とダミー
+import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { MockLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
 
 /**
  * AgLoggerManager Management Singleton Integration Tests
@@ -25,10 +30,15 @@ import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
 describe('AgLoggerManager Management Singleton Integration', () => {
-  const setupTestContext = (): void => {
+  const setupTestContext = (): { mockLogger: AgMockBufferLogger; mockFormatter: typeof MockFormatter.passthrough } => {
     vi.clearAllMocks();
     // Reset singleton instance for clean test state
     AgLoggerManager.resetSingleton();
+
+    return {
+      mockLogger: new MockLogger.buffer(),
+      mockFormatter: MockFormatter.passthrough,
+    };
   };
 
   /**
@@ -43,7 +53,9 @@ describe('AgLoggerManager Management Singleton Integration', () => {
         setupTestContext();
 
         // When: マネージャーを作成し、複数回取得
-        AgLoggerManager.createManager({ defaultLogger: vi.fn(), formatter: JsonFormatter });
+        const tempLoggerInstance = new MockLogger.buffer();
+        const tempLogger = tempLoggerInstance.info.bind(tempLoggerInstance);
+        AgLoggerManager.createManager({ defaultLogger: tempLogger, formatter: JsonFormatter });
         const manager1 = AgLoggerManager.getManager();
         const manager2 = AgLoggerManager.getManager();
 
@@ -58,7 +70,8 @@ describe('AgLoggerManager Management Singleton Integration', () => {
         setupTestContext();
 
         // Given: 設定済みマネージャー
-        const mockLogger = vi.fn();
+        const mockLoggerInstance = new MockLogger.buffer();
+        const mockLogger = mockLoggerInstance.info.bind(mockLoggerInstance);
         const mockFormatter = vi.fn().mockReturnValue('test output');
 
         AgLoggerManager.createManager({ defaultLogger: mockLogger, formatter: mockFormatter });
@@ -87,8 +100,10 @@ describe('AgLoggerManager Management Singleton Integration', () => {
         setupTestContext();
 
         // Given: 異なる設定パラメータ
-        const firstLogger = vi.fn();
-        const secondLogger = vi.fn();
+        const firstLoggerInstance = new MockLogger.buffer();
+        const firstLogger = firstLoggerInstance.info.bind(firstLoggerInstance);
+        const secondLoggerInstance = new MockLogger.buffer();
+        const secondLogger = secondLoggerInstance.info.bind(secondLoggerInstance);
         const firstFormatter = vi.fn().mockReturnValue('first');
 
         // When: 最初の初期化
@@ -111,13 +126,15 @@ describe('AgLoggerManager Management Singleton Integration', () => {
         setupTestContext();
 
         // Given: 初期のマネージャー設定
-        const firstLogger = vi.fn();
+        const firstLoggerInstance = new MockLogger.buffer();
+        const firstLogger = firstLoggerInstance.info.bind(firstLoggerInstance);
         AgLoggerManager.createManager({ defaultLogger: firstLogger, formatter: JsonFormatter });
         const firstManager = AgLoggerManager.getManager();
 
         // When: シングルトンリセット後の再初期化
         AgLoggerManager.resetSingleton();
-        const secondLogger = vi.fn();
+        const secondLoggerInstance = new MockLogger.buffer();
+        const secondLogger = secondLoggerInstance.info.bind(secondLoggerInstance);
         AgLoggerManager.createManager({ defaultLogger: secondLogger, formatter: JsonFormatter });
         const secondManager = AgLoggerManager.getManager();
 
@@ -140,12 +157,14 @@ describe('AgLoggerManager Management Singleton Integration', () => {
         setupTestContext();
 
         // Given: 初期マネージャー
-        const initialLogger = vi.fn();
+        const initialLoggerInstance = new MockLogger.buffer();
+        const initialLogger = initialLoggerInstance.info.bind(initialLoggerInstance);
         AgLoggerManager.createManager({ defaultLogger: initialLogger, formatter: JsonFormatter });
         const manager = AgLoggerManager.getManager();
 
         // When: 状態変更と参照取得を並行実行
-        const updatedLogger = vi.fn();
+        const updatedLoggerInstance = new MockLogger.buffer();
+        const updatedLogger = updatedLoggerInstance.info.bind(updatedLoggerInstance);
         manager.setLoggerConfig({ defaultLogger: updatedLogger });
 
         // 複数の並行アクセス

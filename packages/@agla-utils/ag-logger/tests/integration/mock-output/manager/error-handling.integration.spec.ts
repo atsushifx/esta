@@ -8,18 +8,47 @@
 
 // テストフレームワーク: テスト実行・アサーション・モック
 import { describe, expect, it, vi } from 'vitest';
+import type { TestContext } from 'vitest';
 
 // types
-import type { AgLoggerFunction } from '../../../../shared/types';
+import type { AgLoggerFunction } from '@/shared/types';
 
 // ログレベル定数
-import { AG_LOGLEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '@/shared/types';
+import type { AgLogLevel } from '@/shared/types';
 
 // テスト対象: マネージャ本体
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 
 // プラグイン（フォーマッター）: 出力フォーマット実装
-import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
+
+// プラグイン（ロガー）: 出力先実装とダミー
+import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { MockLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockConstructor } from '@/shared/types/AgMockConstructor.class';
+
+const setupTestContext = (_ctx?: TestContext): {
+  mockLogger: AgMockBufferLogger;
+  mockFormatter: AgMockConstructor;
+} => {
+  const _mockLogger = new MockLogger.buffer();
+  const _mockFormatter = MockFormatter.passthrough;
+
+  _ctx?.onTestFinished(() => {
+    AgLoggerManager.resetSingleton();
+    vi.clearAllMocks();
+  });
+
+  // initialize
+  vi.clearAllMocks();
+  AgLoggerManager.resetSingleton();
+
+  return {
+    mockLogger: _mockLogger,
+    mockFormatter: _mockFormatter,
+  };
+};
 
 /**
  * AgLoggerManager Error Handling Integration Tests
@@ -28,12 +57,6 @@ import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
 describe('AgLoggerManager Error Handling Integration', () => {
-  const setupTestContext = (): void => {
-    vi.clearAllMocks();
-    // Reset singleton instance for clean test state
-    AgLoggerManager.resetSingleton();
-  };
-
   /**
    * Given: 無効なログレベルアクセスが発生する環境が存在する場合
    * When: 存在しないまたは無効なログレベルにアクセスした時
@@ -42,20 +65,20 @@ describe('AgLoggerManager Error Handling Integration', () => {
   describe('Given invalid log level access scenarios exist', () => {
     describe('When accessing non-existent or invalid log levels', () => {
       // 目的: 無効ログレベル時に例外が投げられることを確認
-      it('Then should throw appropriate error for invalid log level', () => {
-        setupTestContext();
+      it('Then should throw appropriate error for invalid log level', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: 正常なマネージャー設定
-        const defaultLogger = vi.fn();
-        AgLoggerManager.createManager({ defaultLogger, formatter: PlainFormatter });
+        const defaultLogger = mockLogger.default;
+        AgLoggerManager.createManager({ defaultLogger, formatter: mockFormatter });
         const manager = AgLoggerManager.getManager();
         const logger = manager.getLogger();
 
         // When: 無効なログレベルにアクセス
-        const invalidLevel = 999 as unknown as typeof AG_LOGLEVEL.INFO;
+        const invalidLevel = 999 as unknown as AgLogLevel;
 
         // Then: エラーが投げられる
-        expect(() => logger.getLoggerFunction(invalidLevel)).toThrow();
+        expect(() => logger.getLoggerFunction(invalidLevel)).toThrow('Invalid log level (999 - out of valid range)');
       });
     });
   });
@@ -68,14 +91,14 @@ describe('AgLoggerManager Error Handling Integration', () => {
   describe('Given empty or invalid logger maps exist', () => {
     describe('When accessing with invalid map configurations', () => {
       // 目的: 空のロガーマップ指定時の挙動確認
-      it('Then should handle empty logger map gracefully', () => {
-        setupTestContext();
+      it('Then should handle empty logger map gracefully', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext(_ctx);
 
         // Given: 空のロガーマップ設定
-        const defaultLogger = vi.fn();
+        const defaultLogger = mockLogger.default;
         AgLoggerManager.createManager({
           defaultLogger: defaultLogger,
-          formatter: PlainFormatter,
+          formatter: mockFormatter,
           loggerMap: {},
         });
         const manager = AgLoggerManager.getManager();
@@ -88,7 +111,7 @@ describe('AgLoggerManager Error Handling Integration', () => {
           .filter((level) => typeof level === 'number')
           .forEach((level) => {
             expect(() => {
-              const loggerFn = logger.getLoggerFunction(level as typeof AG_LOGLEVEL.INFO);
+              const loggerFn = logger.getLoggerFunction(level as AgLogLevel);
               expect(typeof loggerFn).toBe('function');
             }).not.toThrow();
           });
@@ -97,12 +120,13 @@ describe('AgLoggerManager Error Handling Integration', () => {
 
     describe('When handling null or undefined logger map values', () => {
       // 目的: null/undefined値を含むマップの安定性
-      it('Then should maintain stability with null/undefined map values', () => {
-        setupTestContext();
+      it('Then should maintain stability with null/undefined map values', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext(_ctx);
 
         // Given: undefined値を含むマップ設定
-        const defaultLogger = vi.fn();
-        AgLoggerManager.createManager({ defaultLogger, formatter: PlainFormatter });
+
+        const defaultLogger = mockLogger.default;
+        AgLoggerManager.createManager({ defaultLogger, formatter: mockFormatter });
         const manager = AgLoggerManager.getManager();
         const logger = manager.getLogger();
 
@@ -132,14 +156,12 @@ describe('AgLoggerManager Error Handling Integration', () => {
   describe('Given plugin errors occur in the environment', () => {
     describe('When formatter or logger errors are encountered', () => {
       // 目的: プラグインエラー発生時のマネージャー安定性
-      it('Then should maintain manager stability during plugin errors', () => {
-        setupTestContext();
+      it('Then should maintain manager stability during plugin errors', (_ctx) => {
+        const { mockLogger } = setupTestContext(_ctx);
 
+        const workingLogger = mockLogger.default;
         // Given: エラーを投げるフォーマッター
-        const throwingFormatter = vi.fn(() => {
-          throw new Error('Formatter error');
-        });
-        const workingLogger = vi.fn();
+        const throwingFormatter = MockFormatter.errorThrow;
 
         // When: エラープラグインで設定
         expect(() => {
@@ -158,22 +180,21 @@ describe('AgLoggerManager Error Handling Integration', () => {
 
     describe('When recovering from plugin errors', () => {
       // 目的: プラグインエラー後の回復能力
-      it('Then should recover gracefully after plugin error resolution', () => {
-        setupTestContext();
+      it('Then should recover gracefully after plugin error resolution', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: 初期の問題のある設定
-        const problemLogger = vi.fn().mockImplementation(() => {
-          throw new Error('Logger error');
-        });
+        const problemLoggerInstance = new MockLogger.buffer();
+        const problemLogger = problemLoggerInstance.info.bind(problemLoggerInstance);
 
         AgLoggerManager.createManager({
           defaultLogger: problemLogger,
-          formatter: PlainFormatter,
+          formatter: mockFormatter,
         });
         const manager = AgLoggerManager.getManager();
 
         // When: 正常なロガーに置き換え
-        const workingLogger = vi.fn();
+        const workingLogger = mockLogger.default;
         manager.setLoggerConfig({ defaultLogger: workingLogger });
 
         // Then: 正常に回復
@@ -192,16 +213,18 @@ describe('AgLoggerManager Error Handling Integration', () => {
   describe('Given concurrent access conflicts occur', () => {
     describe('When configuration changes and access occur simultaneously', () => {
       // 目的: 同時アクセス時のマネージャー安定性
-      it('Then should handle concurrent operations without deadlock or inconsistency', () => {
-        setupTestContext();
+      it('Then should handle concurrent operations without deadlock or inconsistency', (_ctx) => {
+        const { mockFormatter } = setupTestContext();
 
         // Given: 同時アクセス対応の設定
-        const initialLogger = vi.fn();
-        AgLoggerManager.createManager({ defaultLogger: initialLogger, formatter: PlainFormatter });
+        const initialLoggerInstance = new MockLogger.buffer();
+        const initialLogger = initialLoggerInstance.info.bind(initialLoggerInstance);
+        AgLoggerManager.createManager({ defaultLogger: initialLogger, formatter: mockFormatter });
         const manager = AgLoggerManager.getManager();
 
         // When: 同時設定変更と参照
-        const loggers = Array.from({ length: 10 }, () => vi.fn());
+        const loggerInstances = Array.from({ length: 10 }, () => new MockLogger.buffer());
+        const loggers = loggerInstances.map((instance) => instance.info.bind(instance));
 
         // 設定変更と参照を交互に実行
         for (let i = 0; i < loggers.length; i++) {
@@ -227,18 +250,20 @@ describe('AgLoggerManager Error Handling Integration', () => {
   describe('Given memory leak risks exist in the environment', () => {
     describe('When frequent configuration changes occur', () => {
       // 目的: 頻繁な設定変更時のメモリリーク防止
-      it('Then should operate without memory leaks during frequent changes', () => {
-        setupTestContext();
+      it('Then should operate without memory leaks during frequent changes', (_ctx) => {
+        const { mockFormatter } = setupTestContext(_ctx);
 
         // Given: 頻繁変更対応の設定
-        const initialLogger = vi.fn();
-        AgLoggerManager.createManager({ defaultLogger: initialLogger, formatter: PlainFormatter });
+        const initialLoggerInstance = new MockLogger.buffer();
+        const initialLogger = initialLoggerInstance.info.bind(initialLoggerInstance);
+        AgLoggerManager.createManager({ defaultLogger: initialLogger, formatter: mockFormatter });
         const manager = AgLoggerManager.getManager();
 
         // When: 大量の設定変更を実行
         const iterations = 100;
         for (let i = 0; i < iterations; i++) {
-          const tempLogger = vi.fn();
+          const tempLoggerInstance = new MockLogger.buffer();
+          const tempLogger = tempLoggerInstance.info.bind(tempLoggerInstance);
           manager.setLoggerConfig({ defaultLogger: tempLogger });
 
           // 一時的な参照作成と解放

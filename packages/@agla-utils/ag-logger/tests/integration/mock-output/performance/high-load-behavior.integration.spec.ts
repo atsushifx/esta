@@ -7,41 +7,40 @@
 // https://opensource.org/licenses/MIT
 
 // テストフレームワーク: テスト実行・アサーション・モック
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { TestContext } from 'vitest';
 
 // 共有型・定数: ログレベルとverbose制御
+import { MockLogger } from '@/plugins/logger/MockLogger';
 import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import { AG_LOGLEVEL } from '@/shared/types';
+import type { AgMockConstructor } from '@/shared/types/AgMockConstructor.class';
 import { ENABLE } from '../../../../shared/constants';
-import { AG_LOGLEVEL } from '../../../../shared/types';
-import type { AgFormatFunction } from '../../../../shared/types';
 
 // テスト対象: AgLogger本体
 import { AgLogger } from '@/AgLogger.class';
 
 // プラグイン（フォーマッター/ロガー）: モック実装
-import { createMockFormatter } from '@/plugins/formatter/MockFormatter';
-import { MockLogger } from '@/plugins/logger/MockLogger';
+import { MockFormatter } from '@/plugins/formatter/MockFormatter';
 
 // Test utilities
 /**
  * テストモックを作成
  */
-const createMock = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFormatter: AgFormatFunction } => {
-  const mockLogger = new MockLogger.buffer();
-  const mockFormatterConstructor = createMockFormatter((msg) => msg);
-  const mockFormatter = new mockFormatterConstructor((msg) => msg).execute;
+const setupTest = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFormatter: AgMockConstructor } => {
+  const _mockLogger = new MockLogger.buffer();
+  const _mockFormatter = MockFormatter.passthrough;
+
   AgLogger.resetSingleton();
 
   ctx.onTestFinished(() => {
     AgLogger.resetSingleton();
-    mockLogger.clearAllMessages();
-    vi.clearAllMocks();
+    _mockLogger.clearAllMessages();
   });
 
   return {
-    mockLogger,
-    mockFormatter,
+    mockLogger: _mockLogger,
+    mockFormatter: _mockFormatter,
   };
 };
 
@@ -60,14 +59,13 @@ describe('AgLogger Performance High Load Integration', () => {
   describe('Given high-frequency logging scenarios exist', () => {
     describe('When outputting large volumes of log messages continuously', () => {
       // 目的: 高頻度ログ出力時の処理性能維持
-      it('Then should maintain performance with high-frequency logging', (ctx) => {
-        const { mockLogger } = createMock(ctx);
+      it('Then should maintain performance with high-frequency logging', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTest(_ctx);
 
         // Given: パフォーマンス重視の設定
-        const LightweightFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: new LightweightFormatter((msg) => msg).execute, // 軽量フォーマッター
+          defaultLogger: mockLogger.default,
+          formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.DEBUG;
 
@@ -83,21 +81,21 @@ describe('AgLogger Performance High Load Integration', () => {
         const totalTime = endTime - startTime;
 
         // Then: 合理的な処理時間（1000回で1秒以内）
-        expect(totalTime).toBeLessThan(1000);
+        expect(totalTime).toBeLessThan(1_000);
         expect(mockLogger.getTotalMessageCount()).toBe(iterations);
       });
     });
 
     describe('When processing large data payloads at high frequency', () => {
       // 目的: 大量データを含む高頻度ログの性能
-      it('Then should handle large payloads efficiently at high frequency', (ctx) => {
-        const { mockLogger } = createMock(ctx);
+      it('Then should handle large payloads efficiently at high frequency', (_ctx) => {
+        const { mockLogger } = setupTest(_ctx);
 
         // Given: 大量データ対応の設定
-        const JsonFormatter = createMockFormatter((msg) => JSON.stringify(msg));
+        const JsonFormatter = MockFormatter.json; // JSON化によるオーバーヘッドを含む>
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: new JsonFormatter((msg) => JSON.stringify(msg)).execute, // JSON化によるオーバーヘッドを含む
+          formatter: JsonFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
@@ -117,7 +115,7 @@ describe('AgLogger Performance High Load Integration', () => {
         const totalTime = endTime - startTime;
 
         // Then: 大量データでも合理的な処理時間（500回で2秒以内）
-        expect(totalTime).toBeLessThan(2000);
+        expect(totalTime).toBeLessThan(2_000);
         expect(mockLogger.getTotalMessageCount()).toBe(iterations);
       });
     });
@@ -131,14 +129,14 @@ describe('AgLogger Performance High Load Integration', () => {
   describe('Given log level filtering environments exist', () => {
     describe('When many messages are suppressed by filtering', () => {
       // 目的: フィルタリングによる出力抑制時の低オーバーヘッド
-      it('Then should minimize overhead when messages are filtered out', (ctx) => {
-        const { mockLogger } = createMock(ctx);
+      it('Then should minimize overhead when messages are filtered out', (_ctx) => {
+        const { mockLogger } = setupTest(_ctx);
 
         // Given: 厳格なフィルタリング設定（ERROR レベルのみ）
-        const JsonFormatter = createMockFormatter((msg) => JSON.stringify(msg));
+        const JsonFormatter = MockFormatter.json;
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: new JsonFormatter((msg) => JSON.stringify(msg)).execute,
+          formatter: JsonFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.ERROR;
 
@@ -161,14 +159,14 @@ describe('AgLogger Performance High Load Integration', () => {
 
     describe('When verbose mode affects filtering performance', () => {
       // 目的: Verboseモード有効時でもフィルタリング性能を維持
-      it('Then should maintain filtering performance even with verbose mode', (ctx) => {
-        const { mockLogger } = createMock(ctx);
+      it('Then should maintain filtering performance even with verbose mode', (_ctx) => {
+        const { mockLogger } = setupTest(_ctx);
 
         // Given: Verboseモード + 厳格フィルタリング
-        const JsonFormatter = createMockFormatter((msg) => JSON.stringify(msg));
+
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: new JsonFormatter((msg) => JSON.stringify(msg)).execute,
+          formatter: MockFormatter.json,
         });
         logger.logLevel = AG_LOGLEVEL.WARN;
         logger.setVerbose = ENABLE;
@@ -201,14 +199,13 @@ describe('AgLogger Performance High Load Integration', () => {
   describe('Given concurrent execution environments exist', () => {
     describe('When multiple async processes log simultaneously', () => {
       // 目的: 同時実行時の安全性とパフォーマンス
-      it('Then should handle concurrent logging safely and efficiently', async (ctx) => {
-        const { mockLogger } = createMock(ctx);
+      it('Then should handle concurrent logging safely and efficiently', async (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTest(_ctx);
 
         // Given: 同時実行対応の設定
-        const PassthroughFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: new PassthroughFormatter((msg) => msg).execute,
+          formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
@@ -229,7 +226,7 @@ describe('AgLogger Performance High Load Integration', () => {
         const totalTime = endTime - startTime;
 
         // Then: 同時実行でも合理的な処理時間（1秒以内）
-        expect(totalTime).toBeLessThan(1000);
+        expect(totalTime).toBeLessThan(1_000);
         expect(mockLogger.getTotalMessageCount()).toBe(concurrentTasks * messagesPerTask);
       });
     });
@@ -243,14 +240,13 @@ describe('AgLogger Performance High Load Integration', () => {
   describe('Given memory-constrained environments exist', () => {
     describe('When performing extended continuous logging', () => {
       // 目的: 長時間動作時のメモリ使用量安定性
-      it('Then should maintain stable memory usage during extended operation', (ctx) => {
-        const { mockLogger } = createMock(ctx);
+      it('Then should maintain stable memory usage during extended operation', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTest(_ctx);
 
         // Given: 長時間動作対応の設定
-        const PassthroughFormatter = createMockFormatter((msg) => msg);
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: new PassthroughFormatter((msg) => msg).execute,
+          formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.DEBUG;
 
@@ -292,18 +288,18 @@ describe('AgLogger Performance High Load Integration', () => {
   describe('Given complex configuration combinations exist', () => {
     describe('When executing high-load processing with all features enabled', () => {
       // 目的: フル機能有効時の統合パフォーマンス
-      it('Then should maintain stable performance with full feature interaction', (ctx) => {
-        const { mockLogger } = createMock(ctx);
+      it('Then should maintain stable performance with full feature interaction', (_ctx) => {
+        const { mockLogger } = setupTest(_ctx);
 
         // Given: 全機能有効の複雑な設定
         const errorLogger = new MockLogger.buffer();
-        const HeavyFormatter = createMockFormatter((msg) => JSON.stringify(msg));
+        const HeavyFormatter = MockFormatter.json;
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: new HeavyFormatter((msg) => JSON.stringify(msg)).execute, // 重いフォーマッター
+          formatter: HeavyFormatter,
           loggerMap: {
-            [AG_LOGLEVEL.ERROR]: errorLogger.getLoggerFunction(AG_LOGLEVEL.ERROR),
-            [AG_LOGLEVEL.WARN]: mockLogger.getLoggerFunction(AG_LOGLEVEL.WARN),
+            [AG_LOGLEVEL.ERROR]: errorLogger.getLoggerFunction(),
+            [AG_LOGLEVEL.WARN]: mockLogger.getLoggerFunction(),
           },
         });
         logger.logLevel = AG_LOGLEVEL.TRACE; // 最も詳細なレベル
@@ -335,7 +331,7 @@ describe('AgLogger Performance High Load Integration', () => {
         const totalTime = endTime - startTime;
 
         // Then: 複雑設定でも合理的な処理時間（2秒以内）
-        expect(totalTime).toBeLessThan(2000);
+        expect(totalTime).toBeLessThan(2_000);
         expect(mockLogger.getTotalMessageCount() + errorLogger.getTotalMessageCount()).toBe(iterations);
         expect(logger.isVerbose).toBe(ENABLE);
       });

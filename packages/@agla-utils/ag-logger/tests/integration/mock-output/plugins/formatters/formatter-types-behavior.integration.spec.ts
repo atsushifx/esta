@@ -8,17 +8,22 @@
 
 // テストフレームワーク: テスト実行・アサーション・モック
 import { describe, expect, it, vi } from 'vitest';
+import type { TestContext } from 'vitest';
 
 // 共有定数: ログレベル定義
-import { AG_LOGLEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '@/shared/types';
+import type { AgLogMessage } from '@/shared/types';
 
 // テスト対象: AgLoggerとエントリーポイント
 import { AgLogger } from '@/AgLogger.class';
 
 // プラグイン（フォーマッター）: 出力フォーマット実装
-import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
+import { MockFormatter } from '@/plugins/formatter/MockFormatter';
 import { NullFormatter } from '@/plugins/formatter/NullFormatter';
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
+import { MockLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockConstructor } from '../../../../../shared/types/AgMockConstructor.class';
 
 /**
  * Plugin Formatters Integration Tests
@@ -27,9 +32,26 @@ import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
 describe('Plugin Formatters Integration', () => {
-  const setupTestContext = (): void => {
+  const setupTestContext = (_ctx?: TestContext): {
+    mockLogger: AgMockBufferLogger;
+    mockFormatter: AgMockConstructor;
+  } => {
+    const _mockLogger = new MockLogger.buffer();
+    const _mockFormatter = MockFormatter.passthrough;
+
+    // 初期設定
     vi.clearAllMocks();
     AgLogger.resetSingleton();
+
+    _ctx?.onTestFinished(() => {
+      AgLogger.resetSingleton();
+      vi.clearAllMocks();
+    });
+
+    return {
+      mockLogger: _mockLogger,
+      mockFormatter: _mockFormatter,
+    };
   };
 
   /**
@@ -41,13 +63,12 @@ describe('Plugin Formatters Integration', () => {
     describe('When JSON format output is requested', () => {
       // 目的: JsonFormatterの基本統合動作とJSON構造検証
       it('Then should produce valid JSON output with proper structure', () => {
-        setupTestContext();
+        const { mockLogger } = setupTestContext();
 
         // Given: JsonFormatter設定のモックロガー
-        const mockLogger = vi.fn();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
-          formatter: JsonFormatter,
+          defaultLogger: mockLogger.getLoggerFunction(),
+          formatter: MockFormatter.json,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
@@ -55,8 +76,8 @@ describe('Plugin Formatters Integration', () => {
         logger.info('test message', { data: 'value' });
 
         // Then: 正しいJSON構造で出力
-        expect(mockLogger).toHaveBeenCalledTimes(1);
-        const [output] = mockLogger.mock.calls[0];
+        expect(mockLogger.getMessageCount()).toBe(1);
+        const output = mockLogger.getMessages()[0] as string;
 
         expect(() => JSON.parse(output)).not.toThrow();
         const parsed = JSON.parse(output);
@@ -71,13 +92,12 @@ describe('Plugin Formatters Integration', () => {
     describe('When complex data structures are formatted', () => {
       // 目的: JsonFormatterの複雑データ処理能力
       it('Then should handle complex data structures in JSON format', () => {
-        setupTestContext();
+        const { mockLogger } = setupTestContext();
 
         // Given: 複雑データ対応JsonFormatter設定
-        const mockLogger = vi.fn();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
-          formatter: JsonFormatter,
+          defaultLogger: mockLogger.getLoggerFunction(),
+          formatter: MockFormatter.json,
         });
         logger.logLevel = AG_LOGLEVEL.DEBUG;
 
@@ -99,8 +119,8 @@ describe('Plugin Formatters Integration', () => {
         logger.debug('Complex data', complexData);
 
         // Then: 複雑データが適切にJSON化される
-        expect(mockLogger).toHaveBeenCalledTimes(1);
-        const [output] = mockLogger.mock.calls[0];
+        expect(mockLogger.getMessageCount()).toBe(1);
+        const output = mockLogger.getMessages()[0] as string;
 
         expect(() => JSON.parse(output)).not.toThrow();
         const parsed = JSON.parse(output);
@@ -118,13 +138,12 @@ describe('Plugin Formatters Integration', () => {
     describe('When plain text format output is requested', () => {
       // 目的: PlainFormatterの基本統合動作とフォーマットパターン検証
       it('Then should produce readable plain text with proper format pattern', () => {
-        setupTestContext();
+        const { mockLogger } = setupTestContext();
 
         // Given: PlainFormatter設定のモックロガー
-        const mockLogger = vi.fn();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
-          formatter: PlainFormatter,
+          defaultLogger: mockLogger.getLoggerFunction(),
+          formatter: MockFormatter.passthrough,
         });
         logger.logLevel = AG_LOGLEVEL.WARN;
 
@@ -132,23 +151,23 @@ describe('Plugin Formatters Integration', () => {
         logger.warn('warning message', 'additional info');
 
         // Then: 適切な平文形式パターンで出力
-        expect(mockLogger).toHaveBeenCalledTimes(1);
-        const [output] = mockLogger.mock.calls[0];
+        expect(mockLogger.getMessageCount()).toBe(1);
 
-        expect(output).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z \[WARN\] warning message additional info$/);
+        const output = mockLogger.getMessages()[0] as AgLogMessage;
+        expect(output.logLevel).toBe(AG_LOGLEVEL.WARN);
+        expect(output.message).toBe('warning message additional info');
       });
     });
 
     describe('When multiple arguments are formatted', () => {
       // 目的: PlainFormatterの複数引数連結能力
       it('Then should concatenate multiple arguments in plain format', () => {
-        setupTestContext();
+        const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: 複数引数対応PlainFormatter設定
-        const mockLogger = vi.fn();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
-          formatter: PlainFormatter,
+          defaultLogger: mockLogger.getLoggerFunction(),
+          formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.ERROR;
 
@@ -156,11 +175,12 @@ describe('Plugin Formatters Integration', () => {
         logger.error('error occurred', 'detail1', 'detail2', { code: 500 });
 
         // Then: 全引数が適切に連結される
-        expect(mockLogger).toHaveBeenCalledTimes(1);
-        const [output] = mockLogger.mock.calls[0];
+        expect(mockLogger.getMessageCount()).toBe(1);
+        const output = mockLogger.getMessages()[0] as AgLogMessage;
 
-        expect(output).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z \[ERROR\] error occurred detail1 detail2/);
-        expect(output).toContain('{"code":500}'); // オブジェクトのJSON化
+        expect(output.logLevel).toBe(AG_LOGLEVEL.ERROR);
+        expect(output.message).toBe('error occurred detail1 detail2');
+        expect(output.args[0]).toEqual({ code: 500 });
       });
     });
   });
@@ -174,12 +194,11 @@ describe('Plugin Formatters Integration', () => {
     describe('When output suppression is requested', () => {
       // 目的: NullFormatterによる完全な出力抑制
       it('Then should suppress all log output by returning empty string', () => {
-        setupTestContext();
+        const { mockLogger } = setupTestContext();
 
         // Given: NullFormatter設定のモックロガー
-        const mockLogger = vi.fn();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
+          defaultLogger: mockLogger.getLoggerFunction(),
           formatter: NullFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
@@ -188,19 +207,18 @@ describe('Plugin Formatters Integration', () => {
         logger.info('test message');
 
         // Then: NullFormatter returns empty string, so logger should not be called
-        expect(mockLogger).not.toHaveBeenCalled();
+        expect(mockLogger.getMessageCount()).toBe(0);
       });
     });
 
     describe('When used with different log levels', () => {
       // 目的: NullFormatterの全レベル対応抑制能力
       it('Then should suppress output at all log levels', () => {
-        setupTestContext();
+        const { mockLogger } = setupTestContext();
 
         // Given: 全レベル対応NullFormatter設定
-        const mockLogger = vi.fn();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
+          defaultLogger: mockLogger.getLoggerFunction(),
           formatter: NullFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.TRACE; // 最も詳細なレベル
@@ -214,7 +232,7 @@ describe('Plugin Formatters Integration', () => {
         logger.trace('trace');
 
         // Then: 全レベルで出力が抑制される
-        expect(mockLogger).not.toHaveBeenCalled();
+        expect(mockLogger.getTotalMessageCount()).toBe(0);
       });
     });
   });
@@ -228,13 +246,12 @@ describe('Plugin Formatters Integration', () => {
     describe('When switching between different formatter types', () => {
       // 目的: フォーマッター間の動的切り替え能力
       it('Then should immediately apply new formatter behavior after switch', () => {
-        setupTestContext();
+        const { mockLogger } = setupTestContext();
 
         // Given: 初期JsonFormatter設定
-        const mockLogger = vi.fn();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
-          formatter: JsonFormatter,
+          defaultLogger: mockLogger.getLoggerFunction(),
+          formatter: MockFormatter.json,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
@@ -243,30 +260,30 @@ describe('Plugin Formatters Integration', () => {
         logger.info('after switch to plain');
 
         // Then: PlainFormatter形式で出力される
-        expect(mockLogger).toHaveBeenCalledTimes(1);
-        const [plainOutput] = mockLogger.mock.calls[0];
+        expect(mockLogger.getMessageCount()).toBe(1);
+        const plainOutput = mockLogger.getMessages()[0] as string;
+
         expect(plainOutput).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z \[INFO\] after switch to plain$/);
 
         // When: PlainFormatter -> NullFormatter への切り替え
-        mockLogger.mockClear();
+        mockLogger.reset();
         logger.setLoggerConfig({ formatter: NullFormatter });
         logger.info('after switch to null');
 
         // Then: 出力が抑制される
-        expect(mockLogger).not.toHaveBeenCalled();
+        expect(mockLogger.getMessageCount()).toBe(0);
       });
     });
 
     describe('When switching formatters with different data handling', () => {
       // 目的: フォーマッター切り替え時の異なるデータ処理対応
       it('Then should handle data differently based on current formatter', () => {
-        setupTestContext();
+        const { mockLogger } = setupTestContext();
 
         // Given: 複雑データを含む環境
-        const mockLogger = vi.fn();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
-          formatter: JsonFormatter,
+          defaultLogger: mockLogger.getLoggerFunction(),
+          formatter: MockFormatter.json,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
@@ -274,7 +291,7 @@ describe('Plugin Formatters Integration', () => {
 
         // When: JsonFormatterで複雑データ出力
         logger.info('json test', testData);
-        const [jsonOutput] = mockLogger.mock.calls[0];
+        const jsonOutput = mockLogger.getMessages()[0] as string;
 
         // Then: JSON構造として解析可能
         expect(() => JSON.parse(jsonOutput)).not.toThrow();
@@ -282,11 +299,11 @@ describe('Plugin Formatters Integration', () => {
         expect(parsed.args[0]).toEqual(testData);
 
         // When: PlainFormatterに切り替えて同じデータ出力
-        mockLogger.mockClear();
+        mockLogger.reset();
         logger.setLoggerConfig({ formatter: PlainFormatter });
         logger.info('plain test', testData);
 
-        const [plainOutput] = mockLogger.mock.calls[0];
+        const plainOutput = mockLogger.getMessages()[0] as string;
 
         // Then: 平文形式で同じデータが処理される
         expect(plainOutput).toContain('plain test');

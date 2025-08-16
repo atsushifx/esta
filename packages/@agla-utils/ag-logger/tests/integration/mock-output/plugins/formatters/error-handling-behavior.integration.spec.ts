@@ -7,9 +7,9 @@
 import { describe, expect, it } from 'vitest';
 
 // types
-import type { AgFormatRoutine } from '@/internal/types/AgMockConstructor.class';
 import { AG_LOGLEVEL } from '@/shared/types';
-import type { AgFormatFunction, AgLogMessage } from '@/shared/types';
+import type { AgLogMessage } from '@/shared/types';
+import type { AgFormatRoutine } from '../../../../../shared/types/AgMockConstructor.class';
 
 // target
 import { MockFormatter } from '@/plugins/formatter/MockFormatter';
@@ -38,11 +38,12 @@ describe('MockFormatter.errorThrow - 統合テスト', () => {
     it('AgLoggerConfigでErrorThrowFormatterを自動インスタンス化できる', () => {
       // Arrange
       const config = new AgLoggerConfig();
-      const FormatterClass = MockFormatter.errorThrow;
+      const FormatterClass = new MockFormatter.errorThrow();
+      FormatterClass.setErrorMessage('Default mock error');
 
       // Act - AgLoggerConfigにerrorThrowフォーマッタを設定
       const result = config.setLoggerConfig({
-        formatter: FormatterClass as unknown as AgFormatFunction,
+        formatter: FormatterClass.execute,
       });
 
       // Assert - 設定が成功
@@ -60,21 +61,23 @@ describe('MockFormatter.errorThrow - 統合テスト', () => {
     it('AgLoggerConfig経由でもsetErrorMessageが動作する', () => {
       // Arrange
       const config = new AgLoggerConfig();
-      const FormatterClass = MockFormatter.errorThrow;
+      const errorThrowFormatter = new MockFormatter.errorThrow();
 
       // インスタンスを直接作成してAgLoggerConfigに設定
-      const instance = new FormatterClass(dummyRoutine, 'Config integration test');
+      errorThrowFormatter.setErrorMessage('Config integration test');
       config.setLoggerConfig({
-        formatter: instance.execute,
+        formatter: errorThrowFormatter.execute,
       });
 
       const testMessage = createTestMessage();
 
       // Act & Assert - 初期メッセージでエラーを投げる
-      expect(() => config.formatter(testMessage)).toThrow('Config integration test');
+      expect(
+        () => config.formatter(testMessage),
+      ).toThrow('Config integration test');
 
       // Act - エラーメッセージを変更
-      instance.setErrorMessage('Runtime changed via config');
+      errorThrowFormatter.setErrorMessage('Runtime changed via config');
 
       // Assert - 変更されたメッセージでエラーを投げる
       expect(() => config.formatter(testMessage)).toThrow('Runtime changed via config');
@@ -95,7 +98,7 @@ describe('MockFormatter.errorThrow - 統合テスト', () => {
 
       // Act - カスタムクラスをAgLoggerConfigに設定
       const result = config.setLoggerConfig({
-        formatter: CustomErrorThrow as unknown as AgFormatFunction,
+        formatter: CustomErrorThrow,
       });
 
       // Assert - 設定が成功

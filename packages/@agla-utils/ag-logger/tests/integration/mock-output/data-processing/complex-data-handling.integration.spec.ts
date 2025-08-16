@@ -11,17 +11,17 @@ import { describe, expect, it, vi } from 'vitest';
 import type { TestContext } from 'vitest';
 
 // 共有型・定数: ログレベルとモック型
-import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
 import { AG_LOGLEVEL } from '@/shared/types';
-import type { AgFormatFunction } from '@/shared/types';
+import type { AgFormattedLogMessage } from '@/shared/types';
 
 // テスト対象: AgLoggerとマネージャ
 import { AgLogger } from '@/AgLogger.class';
-import { AgLoggerManager } from '@/AgLoggerManager.class';
 
 // プラグイン（フォーマッター/ロガー）: モック実装
-import { createMockFormatter } from '@/plugins/formatter/MockFormatter';
+import { createMockFormatter, MockFormatter } from '@/plugins/formatter/MockFormatter';
 import { MockLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockConstructor } from '@/shared/types/AgMockConstructor.class';
 
 // type definitions
 /**
@@ -46,23 +46,18 @@ export type TCircularTestObject = {
 // Test Utilities
 
 /**
- * テストモックを作成
+ * テスト初期設定
  */
-const createMock = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFormatter: AgFormatFunction } => {
-  const mockLogger = new MockLogger.buffer();
-  const mockFormatterConstructor = createMockFormatter((msg) => msg);
-  const mockFormatter = new mockFormatterConstructor((msg) => msg).execute;
-
-  ctx.onTestFinished(() => {
-    AgLogger.resetSingleton();
-    AgLoggerManager.resetSingleton();
-    mockLogger.clearAllMessages();
-    vi.clearAllMocks();
-  });
+const setupTestContext = (_ctx?: TestContext): {
+  mockLogger: AgMockBufferLogger;
+  mockFormatter: AgMockConstructor;
+} => {
+  vi.clearAllMocks();
+  AgLogger.resetSingleton();
 
   return {
-    mockLogger,
-    mockFormatter,
+    mockLogger: new MockLogger.buffer(),
+    mockFormatter: MockFormatter.passthrough,
   };
 };
 
@@ -73,11 +68,6 @@ const createMock = (ctx: TestContext): { mockLogger: AgMockBufferLogger; mockFor
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
 describe('AgLogger Data Handling Complex Data Integration', () => {
-  const setupTestContext = (): void => {
-    vi.clearAllMocks();
-    AgLogger.resetSingleton();
-  };
-
   /**
    * Given: 循環参照オブジェクトが存在する場合
    * When: 循環参照を含むデータをログ出力した時
@@ -86,21 +76,20 @@ describe('AgLogger Data Handling Complex Data Integration', () => {
   describe('Given circular reference objects exist', () => {
     describe('When logging data with circular references', () => {
       // 目的: 循環参照を含むデータでも安全に処理継続
-      it('Then should handle circular references with graceful degradation', (ctx) => {
-        const { mockLogger } = createMock(ctx);
-        setupTestContext();
+      it('Then should handle circular references with graceful degradation', (_ctx) => {
+        const { mockLogger } = setupTestContext();
+        const circularFormatter = (logMessage: AgFormattedLogMessage): string => {
+          try {
+            return JSON.stringify(logMessage);
+          } catch (error) {
+            return `[Circular Reference Error: ${error instanceof Error ? error.message : String(error)}]`;
+          }
+        };
 
         // Given: 循環参照処理可能なロガー設定
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: vi.fn().mockImplementation((logMessage) => {
-            // フォーマッターで循環参照を処理するシナリオ
-            try {
-              return JSON.stringify(logMessage);
-            } catch (error) {
-              return `[Circular Reference Error: ${error instanceof Error ? error.message : String(error)}]`;
-            }
-          }),
+          formatter: MockFormatter.withRoutine(circularFormatter),
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
 
@@ -127,31 +116,32 @@ describe('AgLogger Data Handling Complex Data Integration', () => {
 
     describe('When processing nested circular structures', () => {
       // 目的: 複雑にネストした循環参照の安全な処理
-      it('Then should safely handle deeply nested circular structures', (ctx) => {
-        const { mockLogger } = createMock(ctx);
-        setupTestContext();
+      it('Then should safely handle deeply nested circular structures', (_ctx) => {
+        const { mockLogger } = setupTestContext(_ctx);
+
+        const circularCheckFormatter = (logMessage: AgFormattedLogMessage): string => {
+          // 循環参照安全なJSONフォーマッター
+          try {
+            return JSON.stringify(logMessage, (key, value) => {
+              // 循環参照を検出・回避
+              if (typeof value === 'object' && value !== null) {
+                if (seen.has(value)) {
+                  return '[Circular]';
+                }
+                seen.add(value);
+              }
+              return value;
+            });
+          } catch (error) {
+            return `[Format Error: ${error instanceof Error ? error.message : String(error)}]`;
+          }
+        };
 
         // Given: ネスト循環参照処理可能なロガー
         const seen = new WeakSet(); // 循環参照検出用
         const logger = AgLogger.createLogger({
           defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: vi.fn().mockImplementation((logMessage) => {
-            // 循環参照安全なJSONフォーマッター
-            try {
-              return JSON.stringify(logMessage, (key, value) => {
-                // 循環参照を検出・回避
-                if (typeof value === 'object' && value !== null) {
-                  if (seen.has(value)) {
-                    return '[Circular]';
-                  }
-                  seen.add(value);
-                }
-                return value;
-              });
-            } catch (error) {
-              return `[Format Error: ${error instanceof Error ? error.message : String(error)}]`;
-            }
-          }),
+          formatter: MockFormatter.withRoutine(circularCheckFormatter),
         });
         logger.logLevel = AG_LOGLEVEL.DEBUG;
 
@@ -185,9 +175,8 @@ describe('AgLogger Data Handling Complex Data Integration', () => {
   describe('Given deeply nested object structures exist', () => {
     describe('When logging deeply nested data structures', () => {
       // 目的: 深くネストしたオブジェクトの安全な処理
-      it('Then should handle deeply nested objects without stack overflow', (ctx) => {
-        const { mockLogger, mockFormatter } = createMock(ctx);
-        setupTestContext();
+      it('Then should handle deeply nested objects without stack overflow', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext(_ctx);
 
         // Given: 深いネスト対応ロガー
         const logger = AgLogger.createLogger({
@@ -224,9 +213,8 @@ describe('AgLogger Data Handling Complex Data Integration', () => {
   describe('Given custom Error objects with additional properties exist', () => {
     describe('When logging complex Error objects', () => {
       // 目的: カスタムプロパティ付きErrorの取り扱い
-      it('Then should handle errors with custom properties appropriately', (ctx) => {
-        const { mockLogger, mockFormatter } = createMock(ctx);
-        setupTestContext();
+      it('Then should handle errors with custom properties appropriately', (_ctx) => {
+        const { mockLogger, mockFormatter } = setupTestContext(_ctx);
 
         // Given: Errorオブジェクト対応ロガー
         const logger = AgLogger.createLogger({
@@ -277,9 +265,8 @@ describe('AgLogger Data Handling Complex Data Integration', () => {
   describe('Given special JavaScript objects exist', () => {
     describe('When logging special object types', () => {
       // 目的: 特殊JavaScript値の安全な処理
-      it('Then should handle special JavaScript values safely', (ctx) => {
-        const { mockLogger } = createMock(ctx);
-        setupTestContext();
+      it('Then should handle special JavaScript values safely', (_ctx) => {
+        const { mockLogger } = setupTestContext();
 
         // Given: 特殊値対応ロガー
         const logger = AgLogger.createLogger({
