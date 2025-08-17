@@ -7,7 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 // libs
+import { type AgLoggerMethodsInterface, bindLoggerMethods } from '@/utils/AgLoggerMethod';
 import { isValidLogLevel } from '../../utils/AgLogValidators';
+
 import { NullLogger } from './NullLogger';
 
 // constants
@@ -33,10 +35,13 @@ import type {
  * - Thread-safe for single-threaded test scenarios
  * - Deep immutability for message objects
  */
-export class AgMockBufferLogger {
+export class AgMockBufferLogger implements AgLoggerMethodsInterface {
   public defaultLoggerMap: AgLoggerMap;
+  [key: string]: unknown;
+
   constructor() {
     this.defaultLoggerMap = this.createLoggerMap();
+    bindLoggerMethods(this);
   }
 
   private messages: Map<AgLogLevel, AgFormattedLogMessage[]> = new Map(
@@ -97,12 +102,12 @@ export class AgMockBufferLogger {
   }
 
   // Query methods
-  getMessages(logLevel: AgLogLevel): AgFormattedLogMessage[] {
+  getMessages(logLevel: AgLogLevel = AG_LOGLEVEL.DEFAULT): AgFormattedLogMessage[] {
     this.validateLogLevel(logLevel);
     return this.messages.get(logLevel)?.slice() ?? [];
   }
 
-  getLastMessage(logLevel: AgLogLevel): AgLogMessage | string | null {
+  getLastMessage(logLevel: AgLogLevel = AG_LOGLEVEL.DEFAULT): AgLogMessage | string | null {
     this.validateLogLevel(logLevel);
     return this.messages.get(logLevel)?.slice(-1)[0] ?? null;
   }
@@ -126,7 +131,11 @@ export class AgMockBufferLogger {
     });
   }
 
-  getMessageCount(logLevel: AgLogLevel): number {
+  reset(): void {
+    this.clearAllMessages();
+  }
+
+  getMessageCount(logLevel: AgLogLevel = AG_LOGLEVEL.DEFAULT): number {
     this.validateLogLevel(logLevel);
     return this.messages.get(logLevel)!.length;
   }
@@ -139,7 +148,7 @@ export class AgMockBufferLogger {
     return total;
   }
 
-  hasMessages(logLevel: AgLogLevel): boolean {
+  hasMessages(logLevel: AgLogLevel = AG_LOGLEVEL.DEFAULT): boolean {
     this.validateLogLevel(logLevel);
     return this.messages.get(logLevel)!.length > 0;
   }
@@ -178,8 +187,14 @@ export class AgMockBufferLogger {
     return _loggerMap;
   }
 }
+// other functions
 
 // Export for backward compatibility
 export const MockLogger = {
   buffer: AgMockBufferLogger,
+  throwError: (errorMessage: string): AgLoggerFunction => {
+    return () => {
+      throw new Error(errorMessage);
+    };
+  },
 } as const;

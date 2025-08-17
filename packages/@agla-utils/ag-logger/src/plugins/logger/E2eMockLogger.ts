@@ -29,29 +29,47 @@ import type { AgMockBufferLogger } from './MockLogger';
  * Each test gets its own MockLogger instance for thread-safe parallel execution.
  */
 export class E2eMockLogger implements AgLoggerInterface {
-  private testIdentifier: string;
-  private currentTestId: string | null;
-  private mockLoggers: Map<string, AgMockBufferLogger>;
+  private _testIdentifier: string;
+  private _currentTestId: string | null;
+  private _mockLoggers: Map<string, AgMockBufferLogger>;
+  private _defaultLoggerMap: AgLoggerMap | undefined;
 
   constructor(identifier?: string) {
     const trimmedIdentifier = typeof identifier === 'string' ? identifier.trim() : '';
-    this.testIdentifier = trimmedIdentifier ? getNormalizedBasename(trimmedIdentifier) : 'e2e-default';
-    this.currentTestId = null;
-    this.mockLoggers = new Map<string, AgMockBufferLogger>();
+    this._testIdentifier = trimmedIdentifier ? getNormalizedBasename(trimmedIdentifier) : 'e2e-default';
+    this._currentTestId = null;
+    this._mockLoggers = new Map<string, AgMockBufferLogger>();
   }
 
   /**
-   * Get the test identifier for this logger instance.
+   * Get the default logger map.
    */
-  getTestIdentifier(): string {
-    return this.testIdentifier;
+  get defaultLoggerMap(): AgLoggerMap {
+    if (!this._defaultLoggerMap) {
+      const _mockLogger = this.getCurrentMockLogger();
+      this._defaultLoggerMap = _mockLogger.defaultLoggerMap;
+    }
+    return this._defaultLoggerMap;
+  }
+  /**
+   * Set the default logger map.
+   */
+  set defaultLoggerMap(value: AgLoggerMap | undefined) {
+    this._defaultLoggerMap = value;
   }
 
   /**
    * Get the current test ID for this logger instance.
    */
   getCurrentTestId(): string | AgLogMessage | null {
-    return this.currentTestId;
+    return this._currentTestId;
+  }
+
+  /**
+   * Get the test identifier for this logger instance.
+   */
+  getTestIdentifier(): string {
+    return this._testIdentifier;
   }
 
   /**
@@ -61,12 +79,12 @@ export class E2eMockLogger implements AgLoggerInterface {
   startTest(testId: string = ''): void {
     const trimmedTestId = testId.trim();
     const finalTestId = trimmedTestId === ''
-      ? createTestId(this.testIdentifier)
+      ? createTestId(this._testIdentifier)
       : trimmedTestId;
 
     // Create new MockLogger instance for this test
-    this.mockLoggers.set(finalTestId, new MockLogger.buffer());
-    this.currentTestId = finalTestId;
+    this._mockLoggers.set(finalTestId, new MockLogger.buffer());
+    this._currentTestId = finalTestId;
   }
 
   /**
@@ -75,17 +93,17 @@ export class E2eMockLogger implements AgLoggerInterface {
    */
   endTest(testId?: string): void {
     if (testId) {
-      if (testId !== this.currentTestId) {
-        throw new Error(`Cannot end test '${testId}': current test is '${this.currentTestId}'`);
+      if (testId !== this._currentTestId) {
+        throw new Error(`Cannot end test '${testId}': current test is '${this._currentTestId}'`);
       }
       // Remove MockLogger instance from map
-      this.mockLoggers.delete(testId);
-      this.currentTestId = null;
+      this._mockLoggers.delete(testId);
+      this._currentTestId = null;
     } else {
       // End current test if no specific testId provided
-      if (this.currentTestId) {
-        this.mockLoggers.delete(this.currentTestId);
-        this.currentTestId = null;
+      if (this._currentTestId) {
+        this._mockLoggers.delete(this._currentTestId);
+        this._currentTestId = null;
       }
     }
   }
@@ -140,23 +158,6 @@ export class E2eMockLogger implements AgLoggerInterface {
     mockLogger.executeLog(AG_LOGLEVEL.DEFAULT, message);
   }
 
-  /**
-   * Get the MockLogger instance for the current test.
-   * Validates that there is an active test before returning.
-   */
-  private getCurrentMockLogger(): AgMockBufferLogger {
-    if (!this.currentTestId) {
-      throw new Error('No active test. Call startTest() before logging.');
-    }
-
-    const mockLogger = this.mockLoggers.get(this.currentTestId);
-    if (!mockLogger) {
-      throw new Error(`MockLogger not found for test ID: ${this.currentTestId}`);
-    }
-
-    return mockLogger;
-  }
-
   // Query methods
   getMessages(logLevel: AgLogLevel): AgLogMessageCollection {
     const mockLogger = this.getCurrentMockLogger();
@@ -190,13 +191,108 @@ export class E2eMockLogger implements AgLoggerInterface {
   }
 
   /**
+   * Get the total message count for the current test.
+   */
+  getTotalMessageCount(): number {
+    const mockLogger = this.getCurrentMockLogger();
+    return mockLogger.getTotalMessageCount();
+  }
+
+  /**
+   * Get the message count for a specific log level.
+   */
+  getMessageCount(logLevel: AgLogLevel): number {
+    const mockLogger = this.getCurrentMockLogger();
+    return mockLogger.getMessageCount(logLevel);
+  }
+
+  /**
+   * Check if there are any messages for a specific log level.
+   */
+  hasMessages(logLevel: AgLogLevel): boolean {
+    const mockLogger = this.getCurrentMockLogger();
+    return mockLogger.hasMessages(logLevel);
+  }
+
+  /**
+   * Check if there are any messages for any log level.
+   */
+  hasAnyMessages(): boolean {
+    const mockLogger = this.getCurrentMockLogger();
+    return mockLogger.hasAnyMessages();
+  }
+
+  /**
+   * Clear all messages for the current test.
+   */
+  clearAllMessages(): void {
+    const mockLogger = this.getCurrentMockLogger();
+    mockLogger.clearAllMessages();
+  }
+
+  /**
+   * Get the logger function for a specific log level.
+   */
+  getLoggerFunction(logLevel: AgLogLevel = AG_LOGLEVEL.DEFAULT): AgLoggerFunction {
+    const mockLogger = this.getCurrentMockLogger();
+    return mockLogger.getLoggerFunction(logLevel);
+  }
+
+  /**
+   * Get the MockLogger instance for the current test.
+   * Validates that there is an active test before returning.
+   */
+  private getCurrentMockLogger(): AgMockBufferLogger {
+    if (!this._currentTestId) {
+      throw new Error('No active test. Call startTest() before logging.');
+    }
+
+    const mockLogger = this._mockLoggers.get(this._currentTestId);
+    if (!mockLogger) {
+      throw new Error(`MockLogger not found for test ID: ${this._currentTestId}`);
+    }
+
+    return mockLogger;
+  }
+
+  /**
+   * Parse log level from formatted message.
+   * Extracts the log level from the formatted message by looking for [LABEL] pattern.
+   * Falls back to DEFAULT level if no label is found or if label is not recognized.
+   */
+  private parseLogLevelFromFormattedMessage(formattedMessage: AgFormattedLogMessage): AgLogLevel {
+    // Convert to string if it's not already a string
+    const messageStr = typeof formattedMessage === 'string' ? formattedMessage : String(formattedMessage);
+
+    // Extract label from format: "timestamp [LABEL] message"
+    const labelMatch = messageStr.match(/\[([A-Z]+)\]/);
+    if (!labelMatch) {
+      return AG_LOGLEVEL.DEFAULT;
+    }
+
+    const label = labelMatch[1] as keyof typeof AG_LOGLEVEL;
+
+    // Check if the label exists in AG_LOGLEVEL enum
+    if (label in AG_LOGLEVEL) {
+      return AG_LOGLEVEL[label];
+    }
+
+    return AG_LOGLEVEL.DEFAULT;
+  }
+
+  /**
    * Create AgLoggerFunction for the current test.
    * This can be used as a plugin for ag-logger.
    */
   createLoggerFunction(): AgLoggerFunction {
     return (formattedLogMessage: AgFormattedLogMessage): void => {
       const mockLogger = this.getCurrentMockLogger();
-      mockLogger.info(formattedLogMessage);
+
+      // Parse log level from formatted message
+      // Format: "timestamp [LABEL] message" where LABEL is the log level
+      const logLevel = this.parseLogLevelFromFormattedMessage(formattedLogMessage);
+
+      mockLogger.executeLog(logLevel, formattedLogMessage);
     };
   }
 
