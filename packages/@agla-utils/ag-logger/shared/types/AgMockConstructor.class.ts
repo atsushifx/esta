@@ -5,7 +5,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import type { AgFormatFunction, AgFormattedLogMessage, AgLogMessage } from '../../../shared/types';
+import type { AgFormatFunction, AgFormattedLogMessage, AgLogMessage } from '../../shared/types';
 
 /**
  * Format routine function type that processes AgLogMessage and returns formatted output.
