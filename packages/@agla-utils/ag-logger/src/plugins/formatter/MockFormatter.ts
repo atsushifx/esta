@@ -5,19 +5,12 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import type { AgFormatRoutine, AgMockConstructor } from '../../internal/types/AgMockConstructor.class';
+import type { AgFormatRoutine, AgMockConstructor } from '../../../shared/types/AgMockConstructor.class';
 
 // plugins
 import { AgMockFormatter } from './AgMockFormatter';
 // utilities
 import { AgToLabel } from '../../utils/AgLogHelpers';
-
-/**
- * MockFormatter.ts
- *
- * カリー化されたファクトリ関数を提供し、カスタムルーチンをbindした
- * MockFormatterクラスを生成する機能を実装
- */
 
 /**
  * ErrorThrowFormatter - 実行時にエラーメッセージを変更可能なフォーマッタ
@@ -136,6 +129,15 @@ export const MockFormatter = {
   prefixed: (prefix: string) => createMockFormatter((msg) => `${prefix}: ${msg.message}`),
 
   /**
+   * 固定値を返すフォーマッタファクトリ関数
+   * 指定した値を常に返すMockFormatterを作成
+   *
+   * @param value - 常に返す固定値
+   * @returns 固定値を返すMockFormatterクラス
+   */
+  returnValue: (value: string) => createMockFormatter(() => value),
+
+  /**
    * 動的エラーメッセージ対応フォーマッタ
    * 実行時にsetErrorMessageでエラーメッセージを変更可能
    *
@@ -144,3 +146,5 @@ export const MockFormatter = {
    */
   errorThrow: ErrorThrowFormatter,
 } as const;
+
+export default MockFormatter;
