@@ -22,6 +22,7 @@ import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions } from '../../
 // constants
 import { AG_LOGLEVEL } from '../../shared/types';
 // plugins
+import type { AgMockFormatter } from '../plugins/formatter/AgMockFormatter';
 import { NullFormatter } from '../plugins/formatter/NullFormatter';
 import { NullLogger } from '../plugins/logger/NullLogger';
 
@@ -75,9 +76,7 @@ export class AgLoggerConfig {
    * Contains the actual formatter instance when AgMockConstructor is used.
    * Provides access to getStats() and reset() methods for testing and monitoring.
    */
-  private _formatterInstance:
-    | { getStats(): { callCount: number; lastMessage: AgLogMessage | null }; reset(): void }
-    | null = null;
+  private _formatterInstance: AgMockFormatter | null = null;
 
   /**
    * Creates a new AgLoggerConfig instance with default settings.
@@ -344,7 +343,7 @@ export class AgLoggerConfig {
       if (isAgMockConstructor(input)) {
         // AgMockConstructor自体がデフォルトルーチンを提供
         const instance = new input();
-        this._formatterInstance = instance;
+        this._formatterInstance = instance as AgMockFormatter;
         resolvedOptions = { ...options, formatter: instance.execute };
       } else {
         // 通常のフォーマッタの場合はインスタンスをクリア
@@ -440,13 +439,24 @@ export class AgLoggerConfig {
   }
 
   /**
-   * Checks if a formatter instance is available for statistics access.
-   * Returns true if a mock formatter instance is currently stored.
+   * Gets the statistics formatter instance if available.
+   * Returns the AgMockFormatter instance that provides statistics tracking capabilities.
    *
-   * @returns True if formatter instance is available, false otherwise
+   * @returns AgMockFormatter instance if available, null otherwise
    * @since 0.2.0
    */
-  public hasFormatterInstance(): boolean {
+  public getStatsFormatter(): AgMockFormatter | null {
+    return this._formatterInstance;
+  }
+
+  /**
+   * Checks if a statistics formatter instance is available for statistics access.
+   * Returns true if a mock formatter instance is currently stored.
+   *
+   * @returns True if statistics formatter instance is available, false otherwise
+   * @since 0.2.0
+   */
+  public hasStatsFormatter(): boolean {
     return this._formatterInstance !== null;
   }
 }

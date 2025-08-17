@@ -7,9 +7,9 @@
 // https://opensource.org/licenses/MIT
 
 // type
-import type { AgFormatterInput } from '../../src/internal/types/AgMockConstructor.class';
 import type { AgFormattedLogMessage, AgLogMessage } from './AgLogger.types';
 import type { AgLogLevel } from './AgLogLevel.types';
+import type { AgFormatterInput } from './AgMockConstructor.class';
 
 // --- interfaces ---
 /**
