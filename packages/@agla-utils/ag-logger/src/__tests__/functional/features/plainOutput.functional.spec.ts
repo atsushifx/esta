@@ -1,82 +1,105 @@
 // tests/e2e/aglogger/plain/basic.e2e.spec.ts
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import type { TestContext } from 'vitest';
+
 import { AG_LOGLEVEL } from '../../../../shared/types';
-// Console mock utilities removed - using vi.spyOn directly
+import type { AgFormatFunction } from '../../../../shared/types';
 import { AgLogger } from '../../../AgLogger.class';
+
+import type { AgMockBufferLogger } from '../../../plugins/logger/MockLogger';
+
+// logger & formatter
 import { PlainFormatter } from '../../../plugins/formatter/PlainFormatter';
-import { ConsoleLogger } from '../../../plugins/logger/ConsoleLogger';
+import { MockLogger } from '../../../plugins/logger/MockLogger';
+
+/**
+ * テストセットアップ
+ */
+const setupTestContext = (_ctx?: TestContext): {
+  mockLogger: AgMockBufferLogger;
+  mockFormatter: AgFormatFunction;
+} => {
+  const _mockLogger = new MockLogger.buffer();
+  const _mockFormatter = PlainFormatter;
+
+  AgLogger.resetSingleton();
+
+  _ctx?.onTestFinished(() => {
+    AgLogger.resetSingleton();
+  });
+
+  return {
+    mockLogger: _mockLogger,
+    mockFormatter: _mockFormatter,
+  };
+};
 
 describe('AgLogger Plain Basic Output', () => {
-  const setupTestContext = (): void => {
-    vi.clearAllMocks();
-    AgLogger.resetSingleton();
-  };
-
   it('INFO/ERROR/WARN/DEBUG の基本出力', () => {
-    setupTestContext();
+    const { mockLogger, mockFormatter } = setupTestContext();
 
-    // Setup console spies
-    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const debugSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
-    const logger = AgLogger.createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
+    const logger = AgLogger.createLogger({
+      defaultLogger: mockLogger.getLoggerFunction(),
+      formatter: mockFormatter,
+      loggerMap: {
+        [AG_LOGLEVEL.INFO]: mockLogger.info.bind(mockLogger),
+        [AG_LOGLEVEL.ERROR]: mockLogger.error.bind(mockLogger),
+        [AG_LOGLEVEL.WARN]: mockLogger.warn.bind(mockLogger),
+        [AG_LOGLEVEL.DEBUG]: mockLogger.debug.bind(mockLogger),
+      },
+    });
 
     logger.logLevel = AG_LOGLEVEL.INFO;
     logger.info('Test message');
-    expect(infoSpy).toHaveBeenCalledTimes(1);
-    expect(infoSpy.mock.calls[0][0]).toMatch(/\[INFO\] Test message$/);
+    expect(mockLogger.getMessageCount(AG_LOGLEVEL.INFO)).toBe(1);
+    expect(mockLogger.getLastMessage(AG_LOGLEVEL.INFO)).toMatch(/\[INFO\] Test message$/);
 
-    vi.clearAllMocks();
+    mockLogger.clearAllMessages();
     logger.logLevel = AG_LOGLEVEL.ERROR;
     logger.error('Error message');
-    expect(errorSpy).toHaveBeenCalledTimes(1);
-    expect(errorSpy.mock.calls[0][0]).toMatch(/\[ERROR\] Error message$/);
+    expect(mockLogger.getMessageCount(AG_LOGLEVEL.ERROR)).toBe(1);
+    expect(mockLogger.getLastMessage(AG_LOGLEVEL.ERROR)).toMatch(/\[ERROR\] Error message$/);
 
-    vi.clearAllMocks();
+    mockLogger.clearAllMessages();
     logger.logLevel = AG_LOGLEVEL.WARN;
     logger.warn('Warning message');
-    expect(warnSpy).toHaveBeenCalledTimes(1);
-    expect(warnSpy.mock.calls[0][0]).toMatch(/\[WARN\] Warning message$/);
+    expect(mockLogger.getMessageCount(AG_LOGLEVEL.WARN)).toBe(1);
+    expect(mockLogger.getLastMessage(AG_LOGLEVEL.WARN)).toMatch(/\[WARN\] Warning message$/);
 
-    vi.clearAllMocks();
+    mockLogger.clearAllMessages();
     logger.logLevel = AG_LOGLEVEL.DEBUG;
     logger.debug('Debug message');
-    expect(debugSpy).toHaveBeenCalledTimes(1);
-    expect(debugSpy.mock.calls[0][0]).toMatch(/\[DEBUG\] Debug message$/);
-
-    // Cleanup spies
-    infoSpy.mockRestore();
-    errorSpy.mockRestore();
-    warnSpy.mockRestore();
-    debugSpy.mockRestore();
+    expect(mockLogger.getMessageCount(AG_LOGLEVEL.DEBUG)).toBe(1);
+    expect(mockLogger.getLastMessage(AG_LOGLEVEL.DEBUG)).toMatch(/\[DEBUG\] Debug message$/);
   });
 
   it('複数引数: オブジェクト/配列を整形して末尾に付加', () => {
-    setupTestContext();
+    const { mockLogger, mockFormatter } = setupTestContext();
 
-    // Setup console spies
-    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
-    const debugSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
+    const logger = AgLogger.createLogger({
+      defaultLogger: mockLogger.info.bind(mockLogger),
+      formatter: mockFormatter,
+      loggerMap: {
+        [AG_LOGLEVEL.INFO]: mockLogger.info.bind(mockLogger),
+        [AG_LOGLEVEL.DEBUG]: mockLogger.debug.bind(mockLogger),
+      },
+    });
 
-    const logger = AgLogger.createLogger({ defaultLogger: ConsoleLogger, formatter: PlainFormatter });
     logger.logLevel = AG_LOGLEVEL.INFO;
     const obj = { userId: 123, userName: 'testUser' };
     logger.info('User data', obj, 'additional info');
-    expect(infoSpy).toHaveBeenCalledTimes(1);
-    expect(infoSpy.mock.calls[0][0]).toMatch(
+    expect(mockLogger.getMessageCount(AG_LOGLEVEL.INFO)).toBe(1);
+    expect(mockLogger.getLastMessage(AG_LOGLEVEL.INFO)).toMatch(
       /\[INFO\] User data additional info \{"userId":123,"userName":"testUser"\}$/,
     );
 
-    vi.clearAllMocks();
+    mockLogger.clearAllMessages();
     logger.logLevel = AG_LOGLEVEL.DEBUG;
     const items = ['item1', 'item2', 'item3'];
     logger.debug('Items to process', items);
-    expect(debugSpy).toHaveBeenCalledTimes(1);
-    expect(debugSpy.mock.calls[0][0]).toMatch(/\[DEBUG\] Items to process \["item1","item2","item3"\]$/);
-
-    // Cleanup spies
-    infoSpy.mockRestore();
-    debugSpy.mockRestore();
+    expect(mockLogger.getMessageCount(AG_LOGLEVEL.DEBUG)).toBe(1);
+    expect(mockLogger.getLastMessage(AG_LOGLEVEL.DEBUG)).toMatch(
+      /\[DEBUG\] Items to process \["item1","item2","item3"\]$/,
+    );
   });
 });

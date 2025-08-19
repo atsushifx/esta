@@ -17,8 +17,10 @@ import type { AgLogLevel } from '../../../shared/types';
 import { AgLogger } from '../../AgLogger.class';
 
 // Test utilities
-const mockLogger = vi.fn();
-const mockFormatter = vi.fn().mockImplementation((msg) => msg.message ?? msg);
+import { MockFormatter } from '../../plugins/formatter/MockFormatter';
+import { MockLogger } from '../../plugins/logger/MockLogger';
+
+const mockFormatter = MockFormatter.passthrough;
 
 // Type for testing protected methods
 type TestableAgLogger = AgLogger & {
@@ -120,8 +122,9 @@ describe('AgLogger', () => {
 
     describe('特殊ログレベル処理', () => {
       it('LOGレベルは常に出力される', () => {
+        const mockLogger = new MockLogger.buffer();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
+          defaultLogger: mockLogger.log,
           formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.OFF;
@@ -129,7 +132,7 @@ describe('AgLogger', () => {
 
         logger.log('force output message');
 
-        expect(mockLogger).toHaveBeenCalledTimes(1);
+        expect(mockLogger.getMessageCount(AG_LOGLEVEL.LOG)).toBe(1);
       });
 
       it('VERBOSEレベルのsetLoggerConfigでAgLoggerErrorを投げる', () => {
@@ -145,8 +148,9 @@ describe('AgLogger', () => {
 
     describe('異常系ログレベル処理', () => {
       it('undefinedログレベルでエラーを投げる', () => {
+        const mockLogger = new MockLogger.buffer();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
+          defaultLogger: mockLogger.info.bind(mockLogger),
           formatter: mockFormatter,
         });
         const testableLogger = logger as TestableAgLogger;
@@ -184,26 +188,28 @@ describe('AgLogger', () => {
       });
 
       it('verboseメソッドがverbose設定を尊重する', () => {
+        const mockLogger = new MockLogger.buffer();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
+          defaultLogger: mockLogger.verbose.bind(mockLogger),
           formatter: mockFormatter,
         });
 
         // Verbose disabled - no output
         logger.verbose('test message');
-        expect(mockLogger).not.toHaveBeenCalled();
+        expect(mockLogger.getMessageCount(AG_LOGLEVEL.VERBOSE)).toBe(0);
 
         // Verbose enabled - output expected
         logger.setVerbose = ENABLE;
         logger.verbose('test message');
-        expect(mockLogger).toHaveBeenCalledWith('test message');
+        expect(mockLogger.getMessageCount(AG_LOGLEVEL.VERBOSE)).toBe(1);
       });
     });
 
     describe('verbose機能のエッジケース', () => {
       it('様々な引数タイプでverboseメソッドを処理する', () => {
+        const mockLogger = new MockLogger.buffer();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
+          defaultLogger: mockLogger.verbose.bind(mockLogger),
           formatter: mockFormatter,
         });
         logger.setVerbose = true;
@@ -221,13 +227,14 @@ describe('AgLogger', () => {
         });
 
         // Expect at least some calls to have been made
-        expect(mockLogger).toHaveBeenCalled();
-        expect(mockLogger.mock.calls.length).toBeGreaterThan(0);
+
+        expect(mockLogger.getMessageCount(AG_LOGLEVEL.VERBOSE)).toBe(4); // count testArgs
       });
 
       it('高速なverbose状態変更を処理する', () => {
+        const mockLogger = new MockLogger.buffer();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
+          defaultLogger: mockLogger.verbose.bind(mockLogger),
           formatter: mockFormatter,
         });
         logger.logLevel = AG_LOGLEVEL.INFO;
@@ -237,7 +244,7 @@ describe('AgLogger', () => {
           logger.verbose(`verbose ${i}`);
         });
 
-        expect(mockLogger).toHaveBeenCalledTimes(50);
+        expect(mockLogger.getMessageCount(AG_LOGLEVEL.VERBOSE)).toBe(50);
       });
     });
   });
@@ -248,9 +255,18 @@ describe('AgLogger', () => {
    */
   describe('標準ログメソッド', () => {
     describe('基本的なログ出力', () => {
+      const mockLogger = new MockLogger.buffer();
       const logger = AgLogger.createLogger({
-        defaultLogger: mockLogger,
+        defaultLogger: mockLogger.info.bind(mockLogger),
         formatter: mockFormatter,
+        loggerMap: {
+          [AG_LOGLEVEL.FATAL]: mockLogger.fatal.bind(mockLogger),
+          [AG_LOGLEVEL.ERROR]: mockLogger.error.bind(mockLogger),
+          [AG_LOGLEVEL.WARN]: mockLogger.warn.bind(mockLogger),
+          [AG_LOGLEVEL.INFO]: mockLogger.info.bind(mockLogger),
+          [AG_LOGLEVEL.DEBUG]: mockLogger.debug.bind(mockLogger),
+          [AG_LOGLEVEL.TRACE]: mockLogger.trace.bind(mockLogger),
+        },
       });
 
       const logMethods = [
@@ -265,51 +281,62 @@ describe('AgLogger', () => {
       logMethods.forEach(({ name, level, method }) => {
         it(`${name}メソッドが正常に動作する`, () => {
           logger.logLevel = level;
+          mockLogger.clearAllMessages();
 
           method('test message');
 
-          expect(mockLogger).toHaveBeenCalledTimes(1);
+          expect(mockLogger.getMessageCount(level)).toBe(1);
         });
       });
     });
 
     describe('ログレベルフィルタリング', () => {
       it('設定レベルより低い優先度のログは出力されない', () => {
+        const mockLogger = new MockLogger.buffer();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
+          defaultLogger: mockLogger.info.bind(mockLogger),
           formatter: mockFormatter,
+          loggerMap: {
+            [AG_LOGLEVEL.INFO]: mockLogger.info.bind(mockLogger),
+            [AG_LOGLEVEL.DEBUG]: mockLogger.debug.bind(mockLogger),
+          },
         });
         logger.logLevel = AG_LOGLEVEL.WARN;
 
         const lowerPriorityMethods = [
-          { method: logger.info.bind(logger), message: 'info message' },
-          { method: logger.debug.bind(logger), message: 'debug message' },
+          { method: logger.info.bind(logger), message: 'info message', level: AG_LOGLEVEL.INFO },
+          { method: logger.debug.bind(logger), message: 'debug message', level: AG_LOGLEVEL.DEBUG },
         ] as const;
 
         lowerPriorityMethods.forEach(({ method, message }) => {
           method(message);
         });
 
-        expect(mockLogger).not.toHaveBeenCalled();
+        expect(mockLogger.getTotalMessageCount()).toBe(0);
       });
 
       it('設定レベル以上の優先度のログは出力される', () => {
+        const mockLogger = new MockLogger.buffer();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
+          defaultLogger: mockLogger.warn.bind(mockLogger),
           formatter: mockFormatter,
+          loggerMap: {
+            [AG_LOGLEVEL.ERROR]: mockLogger.error.bind(mockLogger),
+            [AG_LOGLEVEL.WARN]: mockLogger.warn.bind(mockLogger),
+          },
         });
         logger.logLevel = AG_LOGLEVEL.WARN;
 
         const higherPriorityMethods = [
-          { method: logger.error.bind(logger), message: 'error message' },
-          { method: logger.warn.bind(logger), message: 'warn message' },
+          { method: logger.error.bind(logger), message: 'error message', level: AG_LOGLEVEL.ERROR },
+          { method: logger.warn.bind(logger), message: 'warn message', level: AG_LOGLEVEL.WARN },
         ] as const;
 
         higherPriorityMethods.forEach(({ method, message }) => {
           method(message);
         });
 
-        expect(mockLogger).toHaveBeenCalledTimes(2);
+        expect(mockLogger.getTotalMessageCount()).toBe(2);
       });
     });
   });
@@ -335,6 +362,7 @@ describe('AgLogger', () => {
         const result = logger.setLoggerFunction(AG_LOGLEVEL.INFO, customLogger);
 
         expect(result).toBe(true);
+        expect(logger.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe(customLogger);
       });
 
       it('should throw error when setting logger function with invalid log level', () => {
@@ -347,8 +375,9 @@ describe('AgLogger', () => {
       });
 
       it('should update logger map when setLoggerFunction is called', () => {
+        const mockLogger = new MockLogger.buffer();
         const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger,
+          defaultLogger: mockLogger.error.bind(mockLogger),
           formatter: mockFormatter,
         });
         const customLogger = vi.fn();
