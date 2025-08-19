@@ -18,6 +18,7 @@ import { AG_LOGGER_ERROR_MESSAGES, ERROR_TYPES } from '../shared/constants/agErr
 // internal
 import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 // plugins
+import type { AgMockFormatter } from './plugins/formatter/AgMockFormatter';
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
 import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
@@ -165,6 +166,28 @@ export class AgLogger {
    */
   getFormatter(): AgFormatFunction {
     return this._config.formatter;
+  }
+
+  /**
+   * Gets the statistics formatter instance if available.
+   * Returns the AgMockFormatter instance that provides statistics tracking capabilities.
+   *
+   * @returns AgMockFormatter instance if available, null otherwise
+   * @since 0.2.0
+   */
+  getStatsFormatter(): AgMockFormatter | null {
+    return this._config.getStatsFormatter();
+  }
+
+  /**
+   * Checks if a statistics formatter instance is available for statistics access.
+   * Returns true if a mock formatter instance is currently stored.
+   *
+   * @returns True if statistics formatter instance is available, false otherwise
+   * @since 0.2.0
+   */
+  hasStatsFormatter(): boolean {
+    return this._config.hasStatsFormatter();
   }
 
   /**

@@ -9,7 +9,11 @@ import { describe, expect, it } from 'vitest';
 
 // Import types for testing
 import type { AgFormattedLogMessage, AgLogLevel, AgLogMessage } from '../../../../shared/types';
-import type { AgFormatRoutine, AgFormatterInput, AgMockConstructor } from '../AgMockConstructor.class';
+import type {
+  AgFormatRoutine,
+  AgFormatterInput,
+  AgMockConstructor,
+} from '../../../../shared/types/AgMockConstructor.class';
 
 /**
  * BDD Tests for AgMockConstructor type system

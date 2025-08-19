@@ -7,7 +7,7 @@
 
 // types
 import type { AgFormatFunction, AgFormattedLogMessage, AgLogMessage } from '../../../shared/types';
-import type { AgFormatRoutine } from '../../internal/types/AgMockConstructor.class';
+import type { AgFormatRoutine } from '../../../shared/types/AgMockConstructor.class';
 
 /**
  * AgMockFormatter - Base class implementing AgMockConstructor interface

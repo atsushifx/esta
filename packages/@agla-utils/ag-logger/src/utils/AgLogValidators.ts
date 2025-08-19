@@ -15,7 +15,7 @@ import { AgLoggerError } from 'shared/types/AgLoggerError.types';
 import { AG_LOGGER_ERROR_MESSAGES, ERROR_TYPES } from '../../shared/constants/agErrorMessages';
 import { AG_LOGLEVEL } from '../../shared/types';
 import type { AgLogLevel } from '../../shared/types';
-import type { AgMockConstructor } from '../internal/types/AgMockConstructor.class';
+import type { AgMockConstructor } from '../../shared/types/AgMockConstructor.class';
 import { valueToString } from './AgLogHelpers';
 
 export const isValidLogLevel = (logLevel: unknown): logLevel is AgLogLevel => {

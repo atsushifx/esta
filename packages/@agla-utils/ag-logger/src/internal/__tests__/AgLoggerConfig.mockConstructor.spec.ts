@@ -46,7 +46,7 @@ describe('AgLoggerConfig: AgMockConstructor対応', () => {
     config.setLoggerConfig({ formatter: AgMockFormatter as unknown as AgFormatFunction });
 
     // formatterInstanceが設定されることを確認
-    expect(config.hasFormatterInstance()).toBe(true);
+    expect(config.hasStatsFormatter()).toBe(true);
   });
 
   it('自動生成されたインスタンスのexecuteがformatterに設定され、呼び出せる', () => {

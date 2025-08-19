@@ -8,7 +8,7 @@ import { AgLoggerConfig } from '../AgLoggerConfig.class';
 
 // types
 import type { AgLogMessage } from '../../../shared/types';
-import type { AgFormatRoutine, AgFormatterInput } from '../types/AgMockConstructor.class';
+import type { AgFormatRoutine, AgFormatterInput } from '../../../shared/types/AgMockConstructor.class';
 
 // plugins
 import { AgMockFormatter } from '../../plugins/formatter/AgMockFormatter';
@@ -55,7 +55,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
 
           // Assert: 設定成功とインスタンス保存
           expect(result).toBe(true);
-          expect(config.hasFormatterInstance()).toBe(true);
+          expect(config.hasStatsFormatter()).toBe(true);
           expect(config.getFormatterStats()).not.toBeNull();
         });
 
@@ -70,7 +70,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
 
           // Assert: 設定成功とインスタンス保存
           expect(result).toBe(true);
-          expect(config.hasFormatterInstance()).toBe(true);
+          expect(config.hasStatsFormatter()).toBe(true);
           expect(config.getFormatterStats()).not.toBeNull();
         });
 
@@ -85,7 +85,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
 
           // Assert: 設定成功とインスタンス保存
           expect(result).toBe(true);
-          expect(config.hasFormatterInstance()).toBe(true);
+          expect(config.hasStatsFormatter()).toBe(true);
           expect(config.getFormatterStats()).not.toBeNull();
         });
 
@@ -100,7 +100,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
 
           // Assert: 设定成功とインスタンス保存
           expect(result).toBe(true);
-          expect(config.hasFormatterInstance()).toBe(true);
+          expect(config.hasStatsFormatter()).toBe(true);
           expect(config.getFormatterStats()).not.toBeNull();
         });
       });
@@ -114,7 +114,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
           });
 
           // Pre-condition: インスタンスが保存されている
-          expect(config.hasFormatterInstance()).toBe(true);
+          expect(config.hasStatsFormatter()).toBe(true);
 
           // Act: 通常のフォーマッターに変更
           const result = config.setLoggerConfig({
@@ -123,7 +123,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
 
           // Assert: 設定成功とインスタンスクリア
           expect(result).toBe(true);
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
           expect(config.getFormatterStats()).toBeNull();
         });
       });
@@ -226,7 +226,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
 
           // Assert
           expect(stats).toBeNull();
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
         });
 
         it('Then should return null after setting standard formatter', () => {
@@ -239,7 +239,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
 
           // Assert
           expect(stats).toBeNull();
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
         });
       });
     });
@@ -313,7 +313,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
           expect(() => config.resetFormatterStats()).not.toThrow();
 
           // Assert: 状態は変わらない
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
           expect(config.getFormatterStats()).toBeNull();
         });
 
@@ -326,7 +326,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
           expect(() => config.resetFormatterStats()).not.toThrow();
 
           // Assert: 状態は変わらない
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
           expect(config.getFormatterStats()).toBeNull();
         });
       });
@@ -334,20 +334,20 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
   });
 
   /**
-   * Feature: hasFormatterInstance Method
+   * Feature: hasStatsFormatter Method
    * Given: 各種フォーマッター設定状態
-   * When: hasFormatterInstanceを呼び出した時
+   * When: hasStatsFormatterを呼び出した時
    * Then: 正しいブール値が返される
    */
-  describe('Feature: hasFormatterInstance Method', () => {
+  describe('Feature: hasStatsFormatter Method', () => {
     describe('Given various formatter configuration states', () => {
-      describe('When calling hasFormatterInstance', () => {
+      describe('When calling hasStatsFormatter', () => {
         it('Then should return false for uninitialized config', () => {
           // Arrange
           const config = new AgLoggerConfig();
 
           // Act & Assert
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
         });
 
         it('Then should return true for MockFormatter configurations', () => {
@@ -366,7 +366,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
               formatter: FormatterClass as AgFormatterInput,
             });
 
-            expect(config.hasFormatterInstance(), `Failed for formatter ${index}: ${FormatterClass.constructor.name}`)
+            expect(config.hasStatsFormatter(), `Failed for formatter ${index}: ${FormatterClass.constructor.name}`)
               .toBe(true);
           });
         });
@@ -377,7 +377,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
           config.setLoggerConfig({ formatter: JsonFormatter });
 
           // Act & Assert
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
         });
 
         it('Then should transition correctly between formatter types', () => {
@@ -387,23 +387,23 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
           // Act & Assert: MockFormatter -> Standard -> MockFormatter
 
           // 初期状態
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
 
           // MockFormatterに変更
           config.setLoggerConfig({
             formatter: MockFormatter.messageOnly as AgFormatterInput,
           });
-          expect(config.hasFormatterInstance()).toBe(true);
+          expect(config.hasStatsFormatter()).toBe(true);
 
           // 標準フォーマッターに変更
           config.setLoggerConfig({ formatter: JsonFormatter });
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
 
           // 再度MockFormatterに変更
           config.setLoggerConfig({
             formatter: MockFormatter.json as AgFormatterInput,
           });
-          expect(config.hasFormatterInstance()).toBe(true);
+          expect(config.hasStatsFormatter()).toBe(true);
         });
       });
     });
@@ -424,11 +424,11 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
           config.setLoggerConfig({ formatter: null as unknown as AgFormatterInput });
 
           // Act & Assert: エラーなく動作する
-          expect(() => config.hasFormatterInstance()).not.toThrow();
+          expect(() => config.hasStatsFormatter()).not.toThrow();
           expect(() => config.getFormatterStats()).not.toThrow();
           expect(() => config.resetFormatterStats()).not.toThrow();
 
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
           expect(config.getFormatterStats()).toBeNull();
         });
 
@@ -438,11 +438,11 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
           config.setLoggerConfig({ formatter: undefined as unknown as AgFormatterInput });
 
           // Act & Assert: エラーなく動作する
-          expect(() => config.hasFormatterInstance()).not.toThrow();
+          expect(() => config.hasStatsFormatter()).not.toThrow();
           expect(() => config.getFormatterStats()).not.toThrow();
           expect(() => config.resetFormatterStats()).not.toThrow();
 
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
           expect(config.getFormatterStats()).toBeNull();
         });
 
@@ -456,7 +456,7 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
 
           // Assert: 設定失敗とinstance状態のクリア
           expect(result).toBe(false);
-          expect(config.hasFormatterInstance()).toBe(false);
+          expect(config.hasStatsFormatter()).toBe(false);
           expect(config.getFormatterStats()).toBeNull();
         });
 
@@ -482,13 +482,13 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
 
             // MockFormatterかどうかで期待値を変える
             const isMockFormatter = formatter !== JsonFormatter;
-            expect(config.hasFormatterInstance(), `Instance check failed for configuration ${index}`).toBe(
+            expect(config.hasStatsFormatter(), `Instance check failed for configuration ${index}`).toBe(
               isMockFormatter,
             );
           });
 
           // Assert: 最終状態はMockFormatter
-          expect(config.hasFormatterInstance()).toBe(true);
+          expect(config.hasStatsFormatter()).toBe(true);
           expect(config.getFormatterStats()).not.toBeNull();
         });
 
@@ -506,9 +506,9 @@ describe('Feature: AgLoggerConfig FormatterStats機能', () => {
           });
 
           // Assert: 各configが独立している
-          expect(configs[0].hasFormatterInstance()).toBe(true);
-          expect(configs[1].hasFormatterInstance()).toBe(false);
-          expect(configs[2].hasFormatterInstance()).toBe(true);
+          expect(configs[0].hasStatsFormatter()).toBe(true);
+          expect(configs[1].hasStatsFormatter()).toBe(false);
+          expect(configs[2].hasStatsFormatter()).toBe(true);
 
           // 統計操作の独立性
           configs[0].formatter(createTestMessage('Config 0'));
