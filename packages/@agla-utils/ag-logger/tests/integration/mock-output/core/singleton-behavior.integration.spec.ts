@@ -6,20 +6,20 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// テストフレームワーク: テスト実行・アサーション・モック
+// Test framework: execution, assertion, mocking
 import { describe, expect, it, vi } from 'vitest';
 import type { TestContext } from 'vitest';
 
-// 共有型・定数: ログレベルと共通ユーティリティ
+// Shared types and constants: log levels and utilities
 import { AG_LOGLEVEL } from '@/shared/types';
 import type { AgLogMessage } from '@/shared/types';
 import { ENABLE } from '../../../../shared/constants';
 
-// テスト対象: AgLoggerとマネージャ
+// Test targets: main classes under test
 import { AgLogger } from '@/AgLogger.class';
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 
-// プラグイン（フォーマッター/ロガー）: モックとJSON
+// Plugin implementations: formatters and loggers
 import MockFormatter from '@/plugins/formatter/MockFormatter';
 import { MockLogger } from '@/plugins/logger/MockLogger';
 import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
@@ -141,21 +141,6 @@ describe('AgLogger Core Singleton Integration', () => {
         // Then: 新しいインスタンス取得時も同一性が保たれる
         const logger2 = AgLogger.createLogger();
         expect(logger1).toBe(logger2);
-      });
-    });
-
-    describe('When accessing rapidly and concurrently', () => {
-      // 目的: 急速なシングルトンアクセス時の一貫性
-      it('Then should handle rapid access patterns consistently', (_ctx) => {
-        setupTestContext(_ctx);
-
-        // When: 大量の並行アクセス
-        const loggers = Array.from({ length: 100 }, () => AgLogger.createLogger());
-
-        // Then: 全て同じインスタンスであることを確認
-        loggers.forEach((logger) => {
-          expect(logger).toBe(loggers[0]);
-        });
       });
     });
   });

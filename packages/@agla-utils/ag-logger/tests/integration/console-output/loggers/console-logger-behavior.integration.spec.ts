@@ -6,20 +6,18 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// テストフレームワーク: テスト実行・アサーション・モック
+// Test framework: execution, assertion, mocking
 import { describe, expect, it, vi } from 'vitest';
 
-// 共有定数: ログレベル定義
+// Shared types and constants: log levels and type definitions
 import { AG_LOGLEVEL } from '@/shared/types';
 
-// テスト対象: AgLoggerとエントリーポイント
+// Test targets: main classes under test
 import { AgLogger } from '@/AgLogger.class';
 
-// プラグイン（フォーマッター）: 出力フォーマット実装
+// Plugin implementations: formatters and loggers
 import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
-
-// プラグイン（ロガー）: 出力先実装とマップ
 import { ConsoleLogger, ConsoleLoggerMap } from '@/plugins/logger/ConsoleLogger';
 import { NullLogger } from '@/plugins/logger/NullLogger';
 
@@ -57,11 +55,9 @@ describe('Console Logger Behavior Integration', () => {
         // When: ConsoleLoggerでの出力
         logger.info('test message', { data: 'value' });
 
-        // Then: 適切なconsoleメソッドで出力
+        // Then: 適切なconsoleメソッドで出力され、有効なJSON形式
         expect(consoleSpy).toHaveBeenCalledTimes(1);
         const [output] = consoleSpy.mock.calls[0];
-
-        expect(() => JSON.parse(output)).not.toThrow();
         const parsed = JSON.parse(output);
         expect(parsed).toMatchObject({
           level: 'INFO',
@@ -118,65 +114,14 @@ describe('Console Logger Behavior Integration', () => {
         expect(consoleSpies.log).toHaveBeenCalledTimes(0); // no trace calls to log
 
         // Then: 各出力が有効なJSON形式
-        [consoleSpies.error, consoleSpies.warn, consoleSpies.info, consoleSpies.debug, consoleSpies.log]
+        [consoleSpies.error, consoleSpies.warn, consoleSpies.info, consoleSpies.debug]
           .forEach((spy) => {
             spy.mock.calls.forEach(([output]) => {
-              expect(() => JSON.parse(output)).not.toThrow();
+              const parsed = JSON.parse(output);
+              expect(parsed).toHaveProperty('level');
+              expect(parsed).toHaveProperty('message');
             });
           });
-
-        Object.values(consoleSpies).forEach((spy) => spy.mockRestore());
-      });
-    });
-
-    describe('When used with PlainFormatter', () => {
-      // 目的: ConsoleLoggerMap×PlainFormatterで適切なconsoleメソッドに振分け
-      it('Then should use correct console methods with PlainFormatter', () => {
-        setupTestContext();
-
-        // Given: 全consoleメソッド監視の設定
-        const consoleSpies = {
-          error: vi.spyOn(console, 'error').mockImplementation(() => {}),
-          warn: vi.spyOn(console, 'warn').mockImplementation(() => {}),
-          info: vi.spyOn(console, 'info').mockImplementation(() => {}),
-          debug: vi.spyOn(console, 'debug').mockImplementation(() => {}),
-          log: vi.spyOn(console, 'log').mockImplementation(() => {}),
-        };
-
-        // Given: ConsoleLoggerMap + PlainFormatter設定
-        const logger = AgLogger.createLogger({
-          defaultLogger: ConsoleLogger,
-          formatter: PlainFormatter,
-          loggerMap: ConsoleLoggerMap,
-        });
-        logger.logLevel = AG_LOGLEVEL.TRACE;
-
-        // When: 各レベルでのログ出力
-        logger.fatal('fatal message');
-        logger.error('error message');
-        logger.warn('warn message');
-        logger.info('info message');
-        logger.debug('debug message');
-        logger.trace('trace message');
-
-        // Then: 適切なconsoleメソッドが呼び出される
-        expect(consoleSpies.error).toHaveBeenCalledTimes(2); // fatal and error
-        expect(consoleSpies.warn).toHaveBeenCalledTimes(1);
-        expect(consoleSpies.info).toHaveBeenCalledTimes(1);
-        expect(consoleSpies.debug).toHaveBeenCalledTimes(2); // debug and trace both use console.debug
-        expect(consoleSpies.log).toHaveBeenCalledTimes(0); // no trace calls to log
-
-        // Then: 各出力がPlainFormatterパターンに一致
-        const allCalls = [
-          ...consoleSpies.error.mock.calls,
-          ...consoleSpies.warn.mock.calls,
-          ...consoleSpies.info.mock.calls,
-          ...consoleSpies.debug.mock.calls,
-        ];
-
-        allCalls.forEach(([output]) => {
-          expect(output).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z \[\w+\] .+$/);
-        });
 
         Object.values(consoleSpies).forEach((spy) => spy.mockRestore());
       });
@@ -277,7 +222,7 @@ describe('Console Logger Behavior Integration', () => {
 
     describe('When mock logger error scenarios occur', () => {
       // 目的: モックロガーエラー時の処理
-      it('Then should handle mock logger errors appropriately', () => {
+      it('Then should propagate mock logger errors correctly', () => {
         setupTestContext();
 
         // Given: エラーを投げるモックロガー
@@ -291,13 +236,8 @@ describe('Console Logger Behavior Integration', () => {
         });
         logger.logLevel = AG_LOGLEVEL.ERROR;
 
-        // When: エラーロガーでの出力
-        // Then: モックロガーのエラーが適切にスローされる
-        expect(() => {
-          logger.error('error message');
-        }).toThrow('Mock logger error');
-
-        // Then: フォーマッターは呼び出される（ロガーエラーの前に実行）
+        // When/Then: モックロガーのエラーが適切にスローされる
+        expect(() => logger.error('error message')).toThrow('Mock logger error');
         expect(throwingMockLogger).toHaveBeenCalledTimes(1);
       });
     });

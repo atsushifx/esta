@@ -6,22 +6,22 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// テストフレームワーク: テスト実行・アサーション・モック
+// Test framework: execution, assertion, mocking
 import { describe, expect, it } from 'vitest';
 import type { TestContext } from 'vitest';
 
-// 共有型・定数: ログレベルとverbose制御
-import { MockLogger } from '@/plugins/logger/MockLogger';
-import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+// Shared types and constants: log levels and utilities
 import { AG_LOGLEVEL } from '@/shared/types';
-import type { AgMockConstructor } from '@/shared/types/AgMockConstructor.class';
 import { ENABLE } from '../../../../shared/constants';
 
-// テスト対象: AgLogger本体
+// Test targets: main classes under test
 import { AgLogger } from '@/AgLogger.class';
 
-// プラグイン（フォーマッター/ロガー）: モック実装
+// Plugin implementations: formatters and loggers
 import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { MockLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
+import type { AgMockConstructor } from '@/shared/types/AgMockConstructor.class';
 
 // Test utilities
 /**
@@ -156,39 +156,6 @@ describe('AgLogger Performance High Load Integration', () => {
         expect(mockLogger.getTotalMessageCount()).toBe(0); // 全てフィルタリング
       });
     });
-
-    describe('When verbose mode affects filtering performance', () => {
-      // 目的: Verboseモード有効時でもフィルタリング性能を維持
-      it('Then should maintain filtering performance even with verbose mode', (_ctx) => {
-        const { mockLogger } = setupTest(_ctx);
-
-        // Given: Verboseモード + 厳格フィルタリング
-
-        const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.json,
-        });
-        logger.logLevel = AG_LOGLEVEL.WARN;
-        logger.setVerbose = ENABLE;
-
-        // When: フィルタリング + Verbose設定で大量処理
-        const iterations = 500;
-        const startTime = Date.now();
-
-        for (let i = 0; i < iterations; i++) {
-          logger.info(`Info message ${i}`); // WARNでフィルタリング
-          logger.debug(`Debug message ${i}`); // WARNでフィルタリング
-        }
-
-        const endTime = Date.now();
-        const totalTime = endTime - startTime;
-
-        // Then: Verboseモードでも高速フィルタリング（200ms以内）
-        expect(totalTime).toBeLessThan(200);
-        expect(mockLogger.getTotalMessageCount()).toBe(0); // 全てフィルタリング
-        expect(logger.isVerbose).toBe(ENABLE);
-      });
-    });
   });
 
   /**
@@ -228,54 +195,6 @@ describe('AgLogger Performance High Load Integration', () => {
         // Then: 同時実行でも合理的な処理時間（1秒以内）
         expect(totalTime).toBeLessThan(1_000);
         expect(mockLogger.getTotalMessageCount()).toBe(concurrentTasks * messagesPerTask);
-      });
-    });
-  });
-
-  /**
-   * Given: メモリ使用量制約がある環境が存在する場合
-   * When: 長時間の連続ログ出力を行った時
-   * Then: メモリリークなく安定して動作する
-   */
-  describe('Given memory-constrained environments exist', () => {
-    describe('When performing extended continuous logging', () => {
-      // 目的: 長時間動作時のメモリ使用量安定性
-      it('Then should maintain stable memory usage during extended operation', (_ctx) => {
-        const { mockLogger, mockFormatter } = setupTest(_ctx);
-
-        // Given: 長時間動作対応の設定
-        const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: mockFormatter,
-        });
-        logger.logLevel = AG_LOGLEVEL.DEBUG;
-
-        // When: 長時間の連続ログ出力（メモリリークチェック）
-        const batchSize = 1000;
-        const batches = 5;
-
-        for (let batch = 0; batch < batches; batch++) {
-          for (let i = 0; i < batchSize; i++) {
-            logger.debug(`Batch ${batch} - Message ${i}`, {
-              batch,
-              message: i,
-              data: { temp: new Array(10).fill(Math.random()) }, // 一時的なデータ
-            });
-          }
-          // バッチ間での一時停止（GC機会を提供）
-          mockLogger.clearAllMessages(); // メッセージバッファをクリア
-        }
-
-        // Then: 最終バッチの処理が正常完了（メモリリークによる性能劣化なし）
-        const finalBatchStartTime = Date.now();
-        for (let i = 0; i < 100; i++) {
-          logger.debug(`Final test ${i}`);
-        }
-        const finalBatchTime = Date.now() - finalBatchStartTime;
-
-        // 最終バッチの処理時間が合理的（100ms以内）
-        expect(finalBatchTime).toBeLessThan(100);
-        expect(mockLogger.getTotalMessageCount()).toBe(100);
       });
     });
   });

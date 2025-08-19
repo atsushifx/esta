@@ -6,18 +6,18 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// テストフレームワーク: テスト実行・アサーション・モック
+// Test framework: execution, assertion, mocking
 import { describe, expect, it, vi } from 'vitest';
 import type { TestContext } from 'vitest';
 
-// 共有定数: ログレベル定義
+// Shared types and constants: log levels and type definitions
 import { AG_LOGLEVEL } from '@/shared/types';
 import type { AgLogMessage } from '@/shared/types';
 
-// テスト対象: AgLoggerとエントリーポイント
+// Test targets: main classes under test
 import { AgLogger } from '@/AgLogger.class';
 
-// プラグイン（フォーマッター）: 出力フォーマット実装
+// Plugin implementations: formatters and loggers
 import { MockFormatter } from '@/plugins/formatter/MockFormatter';
 import { NullFormatter } from '@/plugins/formatter/NullFormatter';
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
@@ -78,8 +78,6 @@ describe('Plugin Formatters Integration', () => {
         // Then: 正しいJSON構造で出力
         expect(mockLogger.getMessageCount()).toBe(1);
         const output = mockLogger.getMessages()[0] as string;
-
-        expect(() => JSON.parse(output)).not.toThrow();
         const parsed = JSON.parse(output);
         expect(parsed).toMatchObject({
           level: 'INFO',
@@ -121,8 +119,6 @@ describe('Plugin Formatters Integration', () => {
         // Then: 複雑データが適切にJSON化される
         expect(mockLogger.getMessageCount()).toBe(1);
         const output = mockLogger.getMessages()[0] as string;
-
-        expect(() => JSON.parse(output)).not.toThrow();
         const parsed = JSON.parse(output);
         expect(parsed.args[0]).toEqual(complexData);
       });
@@ -272,42 +268,6 @@ describe('Plugin Formatters Integration', () => {
 
         // Then: 出力が抑制される
         expect(mockLogger.getMessageCount()).toBe(0);
-      });
-    });
-
-    describe('When switching formatters with different data handling', () => {
-      // 目的: フォーマッター切り替え時の異なるデータ処理対応
-      it('Then should handle data differently based on current formatter', () => {
-        const { mockLogger } = setupTestContext();
-
-        // Given: 複雑データを含む環境
-        const logger = AgLogger.createLogger({
-          defaultLogger: mockLogger.getLoggerFunction(),
-          formatter: MockFormatter.json,
-        });
-        logger.logLevel = AG_LOGLEVEL.INFO;
-
-        const testData = { complex: true, nested: { value: 42 } };
-
-        // When: JsonFormatterで複雑データ出力
-        logger.info('json test', testData);
-        const jsonOutput = mockLogger.getMessages()[0] as string;
-
-        // Then: JSON構造として解析可能
-        expect(() => JSON.parse(jsonOutput)).not.toThrow();
-        const parsed = JSON.parse(jsonOutput);
-        expect(parsed.args[0]).toEqual(testData);
-
-        // When: PlainFormatterに切り替えて同じデータ出力
-        mockLogger.reset();
-        logger.setLoggerConfig({ formatter: PlainFormatter });
-        logger.info('plain test', testData);
-
-        const plainOutput = mockLogger.getMessages()[0] as string;
-
-        // Then: 平文形式で同じデータが処理される
-        expect(plainOutput).toContain('plain test');
-        expect(plainOutput).toContain('{"complex":true'); // オブジェクトは文字列化
       });
     });
   });

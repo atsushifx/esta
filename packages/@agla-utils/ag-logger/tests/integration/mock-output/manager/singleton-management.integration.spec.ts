@@ -6,19 +6,17 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// テストフレームワーク: テスト実行・アサーション・モック
+// Test framework: execution, assertion, mocking
 import { describe, expect, it, vi } from 'vitest';
 
-// 共有型・定数: ログレベル定義と型
+// Shared types and constants: log levels and type definitions
 import { AG_LOGLEVEL } from '@/shared/types';
 
-// テスト対象: マネージャ本体
+// Test targets: main classes under test
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 
-// プラグイン（フォーマッター）: 出力フォーマット実装
+// Plugin implementations: formatters and loggers
 import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
-
-// プラグイン（ロガー）: 出力先実装とダミー
 import { MockFormatter } from '@/plugins/formatter/MockFormatter';
 import { MockLogger } from '@/plugins/logger/MockLogger';
 import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';

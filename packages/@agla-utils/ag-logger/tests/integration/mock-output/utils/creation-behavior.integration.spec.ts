@@ -6,18 +6,16 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// テストフレームワーク: テスト実行・アサーション・モック
+// Test framework: execution, assertion, mocking
 import { describe, expect, it } from 'vitest';
 import type { TestContext } from 'vitest';
 
-// テスト対象: AgManagerUtils（ユーティリティ）と依存（AgLogger, Manager）
+// Test targets: main classes under test
 import { AgLogger } from '@/AgLogger.class';
 import { AgLoggerManager } from '@/AgLoggerManager.class';
 import { AgManager, createManager, getLogger } from '@/AgManagerUtils';
 
-/**
- * テストユーティリティ: 各テスト終了時にシングルトンとモックを初期化
- */
+// Plugin implementations: formatters and loggers
 import { MockFormatter } from '@/plugins/formatter/MockFormatter';
 import { MockLogger } from '@/plugins/logger/MockLogger';
 import type { AgMockConstructor } from '@/shared/types/AgMockConstructor.class';
