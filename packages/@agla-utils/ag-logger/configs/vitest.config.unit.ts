@@ -23,8 +23,8 @@ export default mergeConfig(baseConfig, {
   test: {
     include: [
       // Unit Test - pure unit tests for individual functions/methods
-      'src/**/__tests__/units/**/*.spec.ts',
-      'src/**/__tests__/units/**/*.test.ts',
+      'src/**/__tests__/**/*.spec.ts',
+      'src/**/__tests__/**/*.test.ts',
     ],
     exclude: [
       'src/**/__tests__/functional/**/*',
