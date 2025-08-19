@@ -50,10 +50,17 @@ describe('Core Configuration Behavior Integration', () => {
    * Given: 複雑な設定組み合わせが存在する場合
    * When: 部分的なロガーマップ設定を適用した時
    * Then: 適切なフォールバック動作が発生する
+   *
+   * @description 複雑な設定組み合わせでの動作統合テスト
+   * 部分的なロガーマップ設定と適切なフォールバック動作を検証
    */
   describe('Given complex configuration combinations exist', () => {
+    /**
+     * @description 部分的ロガーマップ設定適用時のフォールバック動作テスト
+     * 部分的なロガーマップ設定での適切なフォールバック処理を検証
+     */
     describe('When applying partial logger map configurations', () => {
-      // 目的: 部分ロガーマップと混在設定の適用検証
+      // 部分ロガーマップと混在設定の適用を検証
       it('Then should handle partial logger maps with proper fallback', (_ctx) => {
         const { mockLogger, mockFormatter } = setupTest();
 
@@ -95,8 +102,12 @@ describe('Core Configuration Behavior Integration', () => {
       });
     });
 
+    /**
+     * @description 段階的設定更新時の設定維持テスト
+     * 複数回の設定更新を通じて最終構成が正しく維持されることを検証
+     */
     describe('When updating configurations incrementally', () => {
-      // 目的: 段階的な設定更新を通じて最終構成が反映される
+      // 段階的な設定更新を通じて最終構成の反映を確認
       it('Then should maintain final configuration through multiple updates', (_ctx) => {
         const { mockFormatter } = setupTest();
 
@@ -132,10 +143,17 @@ describe('Core Configuration Behavior Integration', () => {
    * Given: 設定競合とエラーシナリオが存在する場合
    * When: フォーマッター競合が発生した時
    * Then: 適切なエラー処理が行われる
+   *
+   * @description 設定競合とエラーシナリオでの処理統合テスト
+   * フォーマッター競合や各種エラーシナリオでの適切な処理を検証
    */
   describe('Given configuration conflicts and error scenarios exist', () => {
+    /**
+     * @description フォーマッター競合発生時のエラー処理テスト
+     * フォーマッター競合が発生した場合の適切なエラー処理を検証
+     */
     describe('When formatter conflicts occur', () => {
-      // 目的: フォーマッター競合発生時のエラー処理
+      // フォーマッター競合発生時のエラー処理を確認
       it('Then should handle configuration conflicts gracefully', (_ctx) => {
         setupTest();
 
@@ -161,8 +179,12 @@ describe('Core Configuration Behavior Integration', () => {
       });
     });
 
+    /**
+     * @description ログ出力中の急速設定変更時の処理テスト
+     * ログ出力中に急速な設定変更が発生した場合の適切な処理を検証
+     */
     describe('When rapid configuration changes occur during logging', () => {
-      // 目的: ログ出力中の急速な設定変更に耐える
+      // ログ出力中の急速な設定変更に対する耐性を確認
       it('Then should handle rapid configuration changes during active logging', (_ctx) => {
         const { mockLogger: mockLogger1 } = setupTest();
 
@@ -199,8 +221,12 @@ describe('Core Configuration Behavior Integration', () => {
       });
     });
 
+    /**
+     * @description 複雑設定での混在エラーシナリオ処理テスト
+     * 複雑な設定下での混在エラーパターンの適切な処理を検証
+     */
     describe('When mixed error scenarios occur in complex configurations', () => {
-      // 目的: 複雑設定下での混在エラーパターン処理
+      // 複雑設定下での混在エラーパターン処理を確認
       it('Then should handle mixed error scenarios appropriately', (_ctx) => {
         const { mockLogger } = setupTest();
 

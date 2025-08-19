@@ -37,10 +37,17 @@ describe('Console Plugin Combinations Integration', () => {
    * Given: 実際のシステム統合環境でプラグイン組み合わせが使用される場合
    * When: ConsoleLoggerMapとフォーマッターの実際の組み合わせを使用した時
    * Then: 実環境での統合動作が適切に実行される
+   *
+   * @description 実際のシステム統合環境におけるプラグイン組み合わせの動作テスト
+   * ConsoleLoggerMapとフォーマッターの組み合わせが実環境で適切に統合されることを検証
    */
   describe('Given real system integration uses plugin combinations', () => {
+    /**
+     * @description ConsoleLoggerMapとフォーマッター組み合わせの実システム統合テスト
+     * 実際の使用シナリオでの組み合わせ動作を検証
+     */
     describe('When using actual ConsoleLoggerMap with formatter combinations', () => {
-      // 目的: ConsoleLoggerMap×各フォーマッターの実システム統合
+      // ConsoleLoggerMap×各フォーマッターの実システム統合を検証
       it('Then should integrate correctly in real system scenarios', () => {
         setupTestContext();
 
