@@ -10,7 +10,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 // import test target
-import { NullLogger } from '../NullLogger';
+import { NullLogger } from '../../NullLogger';
 
 /**
  * NullLoggerプラグインの包括的ユニットテストスイート

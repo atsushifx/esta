@@ -10,14 +10,14 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 // Constants and enums - ログレベル定数とEnum定義
-import { AG_LOGLEVEL } from '../../../../shared/types';
+import { AG_LOGLEVEL } from '../../../../../shared/types';
 
 // Test target - テスト対象のMockLoggerクラス
-import { MockLogger } from '../MockLogger';
+import { MockLogger } from '../../MockLogger';
 
 // Type definitions - TypeScript型定義（実行時影響なし）
-import type { AgFormattedLogMessage, AgLogLevel, AgLogMessage } from '../../../../shared/types';
-import type { AgMockBufferLogger } from '../MockLogger';
+import type { AgFormattedLogMessage, AgLogLevel, AgLogMessage } from '../../../../../shared/types';
+import type { AgMockBufferLogger } from '../../MockLogger';
 
 /**
  * MockLoggerプラグインの包括的ユニットテストスイート
