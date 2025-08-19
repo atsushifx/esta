@@ -34,51 +34,50 @@ export const isValidLogLevel = (logLevel: unknown): logLevel is AgLogLevel => {
  */
 export const validateLogLevel = (input: unknown): AgLogLevel => {
   // Quick check with isValidLogLevel first
-  if (isValidLogLevel(input)) {
-    return input;
-  }
+  if (!isValidLogLevel(input)) {
+    // Detailed error reporting for specific failure cases
+    if (input === undefined) {
+      throw new AgLoggerError(
+        ERROR_TYPES.VALIDATION,
+        `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (undefined)`,
+      );
+    }
 
-  // Detailed error reporting for specific failure cases
-  if (input === undefined) {
+    if (input === null) {
+      throw new AgLoggerError(
+        ERROR_TYPES.VALIDATION,
+        `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (null)`,
+      );
+    }
+
+    if (typeof input !== 'number') {
+      throw new AgLoggerError(
+        ERROR_TYPES.VALIDATION,
+        `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (${valueToString(input)} - expected number)`,
+      );
+    }
+
+    if (!Number.isFinite(input)) {
+      throw new AgLoggerError(
+        ERROR_TYPES.VALIDATION,
+        `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (${input} - must be finite number)`,
+      );
+    }
+
+    if (!Number.isInteger(input)) {
+      throw new AgLoggerError(
+        ERROR_TYPES.VALIDATION,
+        `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (${input} - must be integer)`,
+      );
+    }
+
+    // If we reach here, it must be out of range
     throw new AgLoggerError(
       ERROR_TYPES.VALIDATION,
-      `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (undefined)`,
+      `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (${input} - out of valid range)`,
     );
   }
-
-  if (input === null) {
-    throw new AgLoggerError(
-      ERROR_TYPES.VALIDATION,
-      `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (null)`,
-    );
-  }
-
-  if (typeof input !== 'number') {
-    throw new AgLoggerError(
-      ERROR_TYPES.VALIDATION,
-      `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (${valueToString(input)} - expected number)`,
-    );
-  }
-
-  if (!Number.isFinite(input)) {
-    throw new AgLoggerError(
-      ERROR_TYPES.VALIDATION,
-      `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (${input} - must be finite number)`,
-    );
-  }
-
-  if (!Number.isInteger(input)) {
-    throw new AgLoggerError(
-      ERROR_TYPES.VALIDATION,
-      `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (${input} - must be integer)`,
-    );
-  }
-
-  // If we reach here, it must be out of range
-  throw new AgLoggerError(
-    ERROR_TYPES.VALIDATION,
-    `${AG_LOGGER_ERROR_MESSAGES.VALIDATION.INVALID_LOG_LEVEL} (${input} - out of valid range)`,
-  );
+  return input;
 };
 
 /**

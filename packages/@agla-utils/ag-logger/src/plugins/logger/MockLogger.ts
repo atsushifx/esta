@@ -102,14 +102,20 @@ export class AgMockBufferLogger implements AgLoggerMethodsInterface {
   }
 
   // Query methods
-  getMessages(logLevel: AgLogLevel = AG_LOGLEVEL.DEFAULT): AgFormattedLogMessage[] {
-    this.validateLogLevel(logLevel);
-    return this.messages.get(logLevel)?.slice() ?? [];
+  getMessages(logLevel?: AgLogLevel): AgFormattedLogMessage[] {
+    const levelToUse = (arguments.length === 0)
+      ? AG_LOGLEVEL.DEFAULT
+      : (logLevel as unknown as AgLogLevel);
+    this.validateLogLevel(levelToUse);
+    return this.messages.get(levelToUse)?.slice() ?? [];
   }
 
-  getLastMessage(logLevel: AgLogLevel = AG_LOGLEVEL.DEFAULT): AgLogMessage | string | null {
-    this.validateLogLevel(logLevel);
-    return this.messages.get(logLevel)?.slice(-1)[0] ?? null;
+  getLastMessage(logLevel?: AgLogLevel): AgLogMessage | string | null {
+    const levelToUse = (arguments.length === 0)
+      ? AG_LOGLEVEL.DEFAULT
+      : (logLevel as unknown as AgLogLevel);
+    this.validateLogLevel(levelToUse);
+    return this.messages.get(levelToUse)?.slice(-1)[0] ?? null;
   }
 
   getAllMessages(): { [K in AgLogLevelLabel]: AgFormattedLogMessage[] } {
@@ -135,9 +141,12 @@ export class AgMockBufferLogger implements AgLoggerMethodsInterface {
     this.clearAllMessages();
   }
 
-  getMessageCount(logLevel: AgLogLevel = AG_LOGLEVEL.DEFAULT): number {
-    this.validateLogLevel(logLevel);
-    return this.messages.get(logLevel)!.length;
+  getMessageCount(logLevel?: AgLogLevel): number {
+    const levelToUse = (arguments.length === 0)
+      ? AG_LOGLEVEL.DEFAULT
+      : (logLevel as unknown as AgLogLevel);
+    this.validateLogLevel(levelToUse);
+    return this.messages.get(levelToUse)!.length;
   }
 
   getTotalMessageCount(): number {
@@ -148,9 +157,12 @@ export class AgMockBufferLogger implements AgLoggerMethodsInterface {
     return total;
   }
 
-  hasMessages(logLevel: AgLogLevel = AG_LOGLEVEL.DEFAULT): boolean {
-    this.validateLogLevel(logLevel);
-    return this.messages.get(logLevel)!.length > 0;
+  hasMessages(logLevel?: AgLogLevel): boolean {
+    const levelToUse = (arguments.length === 0)
+      ? AG_LOGLEVEL.DEFAULT
+      : (logLevel as unknown as AgLogLevel);
+    this.validateLogLevel(levelToUse);
+    return this.messages.get(levelToUse)!.length > 0;
   }
 
   hasAnyMessages(): boolean {
@@ -165,9 +177,12 @@ export class AgMockBufferLogger implements AgLoggerMethodsInterface {
    * @param logLevel - The log level to get the logger function for
    * @returns The logger function for the specified level
    */
-  getLoggerFunction(logLevel: AgLogLevel = AG_LOGLEVEL.DEFAULT): AgLoggerFunction {
-    this.validateLogLevel(logLevel);
-    return this.defaultLoggerMap[logLevel] ?? NullLogger;
+  getLoggerFunction(logLevel?: AgLogLevel): AgLoggerFunction {
+    const levelToUse = (arguments.length === 0)
+      ? AG_LOGLEVEL.DEFAULT
+      : (logLevel as unknown as AgLogLevel);
+    this.validateLogLevel(levelToUse);
+    return this.defaultLoggerMap[levelToUse] ?? NullLogger;
   }
 
   /**
