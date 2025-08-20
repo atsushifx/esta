@@ -18,9 +18,11 @@ import type { AgLogMessage } from '@/shared/types';
 import { AgLogger } from '@/AgLogger.class';
 
 // Plugin implementations: formatters and loggers
+import { JsonFormatter } from '@/plugins/formatter/JsonFormatter';
 import { MockFormatter } from '@/plugins/formatter/MockFormatter';
 import { NullFormatter } from '@/plugins/formatter/NullFormatter';
 import { PlainFormatter } from '@/plugins/formatter/PlainFormatter';
+import { E2eMockLogger } from '@/plugins/logger/E2eMockLogger';
 import { MockLogger } from '@/plugins/logger/MockLogger';
 import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
 import type { AgMockConstructor } from '../../../../../shared/types/AgMockConstructor.class';
@@ -31,7 +33,7 @@ import type { AgMockConstructor } from '../../../../../shared/types/AgMockConstr
  * @description 各種フォーマッタープラグインの統合動作を保証するテスト
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
-describe('Plugin Formatters Integration', () => {
+describe('Mock Output Formatter Types Behavior Integration', () => {
   const setupTestContext = (_ctx?: TestContext): {
     mockLogger: AgMockBufferLogger;
     mockFormatter: AgMockConstructor;
@@ -59,10 +61,10 @@ describe('Plugin Formatters Integration', () => {
    * When: JSON形式での出力が要求された時
    * Then: 適切なJSON構造で出力される
    */
-  describe('Given JsonFormatter is used in the environment', () => {
-    describe('When JSON format output is requested', () => {
+  describe('Given different formatter types are configured', () => {
+    describe('When using JSON formatter for structured output', () => {
       // 目的: JsonFormatterの基本統合動作とJSON構造検証
-      it('Then should produce valid JSON output with proper structure', () => {
+      it('Then should produce valid JSON formatted log entries', () => {
         const { mockLogger } = setupTestContext();
 
         // Given: JsonFormatter設定のモックロガー
@@ -87,7 +89,7 @@ describe('Plugin Formatters Integration', () => {
       });
     });
 
-    describe('When complex data structures are formatted', () => {
+    describe('When using JSON formatter with complex data', () => {
       // 目的: JsonFormatterの複雑データ処理能力
       it('Then should handle complex data structures in JSON format', () => {
         const { mockLogger } = setupTestContext();
@@ -130,10 +132,10 @@ describe('Plugin Formatters Integration', () => {
    * When: 平文形式での出力が要求された時
    * Then: 可読性の高い平文形式で出力される
    */
-  describe('Given PlainFormatter is used in the environment', () => {
-    describe('When plain text format output is requested', () => {
+  describe('Given different formatter types are configured', () => {
+    describe('When using plain formatter for readable output', () => {
       // 目的: PlainFormatterの基本統合動作とフォーマットパターン検証
-      it('Then should produce readable plain text with proper format pattern', () => {
+      it('Then should produce human-readable plain text entries', () => {
         const { mockLogger } = setupTestContext();
 
         // Given: PlainFormatter設定のモックロガー
@@ -155,7 +157,7 @@ describe('Plugin Formatters Integration', () => {
       });
     });
 
-    describe('When multiple arguments are formatted', () => {
+    describe('When formatting multiple arguments', () => {
       // 目的: PlainFormatterの複数引数連結能力
       it('Then should concatenate multiple arguments in plain format', () => {
         const { mockLogger, mockFormatter } = setupTestContext();
@@ -186,10 +188,10 @@ describe('Plugin Formatters Integration', () => {
    * When: 出力抑制が要求された時
    * Then: 空文字列が返されログが出力されない
    */
-  describe('Given NullFormatter is used in the environment', () => {
-    describe('When output suppression is requested', () => {
+  describe('Given different formatter types are configured', () => {
+    describe('When using null formatter for minimal output', () => {
       // 目的: NullFormatterによる完全な出力抑制
-      it('Then should suppress all log output by returning empty string', () => {
+      it('Then should suppress detailed formatting while maintaining functionality', () => {
         const { mockLogger } = setupTestContext();
 
         // Given: NullFormatter設定のモックロガー
@@ -238,10 +240,10 @@ describe('Plugin Formatters Integration', () => {
    * When: 動的にフォーマッターを切り替えた時
    * Then: 切り替え後のフォーマットが即座に適用される
    */
-  describe('Given dynamic formatter switching is required', () => {
-    describe('When switching between different formatter types', () => {
+  describe('Given dynamic formatter switching requirements', () => {
+    describe('When switching formatters during execution', () => {
       // 目的: フォーマッター間の動的切り替え能力
-      it('Then should immediately apply new formatter behavior after switch', () => {
+      it('Then should transition between formatter types seamlessly', () => {
         const { mockLogger } = setupTestContext();
 
         // Given: 初期JsonFormatter設定
@@ -268,6 +270,60 @@ describe('Plugin Formatters Integration', () => {
 
         // Then: 出力が抑制される
         expect(mockLogger.getMessageCount()).toBe(0);
+      });
+    });
+
+    /**
+     * @description E2E環境でのフォーマッター切り替えテスト
+     * E2E環境での実行時フォーマッター変更の統合動作を検証
+     */
+    describe('When E2E formatter switching is performed during execution', () => {
+      const setupE2ETest = (ctx: TestContext): { mockLogger: E2eMockLogger } => {
+        const mockLogger = new E2eMockLogger('formatter-switching-e2e');
+        mockLogger.startTest(ctx.task.id);
+
+        AgLogger.resetSingleton();
+
+        ctx.onTestFinished(() => {
+          mockLogger.endTest();
+          AgLogger.resetSingleton();
+        });
+
+        return { mockLogger };
+      };
+
+      // E2E環境でのフォーマッター動的切り替え能力
+      it('Then should switch formatters correctly in E2E environment during execution', (ctx) => {
+        const { mockLogger } = setupE2ETest(ctx);
+
+        // Given: E2E環境での初期PlainFormatter設定
+        const logger = AgLogger.createLogger({
+          defaultLogger: mockLogger.createLoggerFunction(),
+          formatter: PlainFormatter,
+        });
+        logger.logLevel = AG_LOGLEVEL.INFO;
+
+        // When: PlainFormatterでの初期出力
+        logger.info('E2E plain format message', { data: 'plain' });
+
+        // When: JsonFormatterへの動的切り替え
+        logger.setLoggerConfig({ formatter: JsonFormatter });
+        logger.info('E2E json format message', { data: 'json' });
+
+        // Then: PlainFormatter形式での出力確認
+        const infoMessages = mockLogger.getMessages(AG_LOGLEVEL.INFO);
+        expect(infoMessages).toHaveLength(1);
+        expect(String(infoMessages[0])).toMatch(/\[INFO\] E2E plain format message/);
+
+        // Then: JsonFormatter形式での出力確認
+        const defaultMessages = mockLogger.getMessages(AG_LOGLEVEL.DEFAULT);
+        expect(defaultMessages).toHaveLength(1);
+        const jsonOutput = JSON.parse(String(defaultMessages[0]));
+        expect(jsonOutput).toMatchObject({
+          level: 'INFO',
+          message: 'E2E json format message',
+          args: [{ data: 'json' }],
+        });
       });
     });
   });

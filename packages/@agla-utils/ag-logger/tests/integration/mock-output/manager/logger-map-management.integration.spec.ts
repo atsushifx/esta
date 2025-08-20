@@ -32,7 +32,7 @@ import { NullLogger } from '@/plugins/logger/NullLogger';
  * @description ロガーマップ管理機能の統合動作を保証するテスト
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
-describe('AgLoggerManager Management Logger Map Integration', () => {
+describe('Mock Output Logger Map Management Integration', () => {
   const setupTestContext = (): { mockLogger: AgMockBufferLogger; mockFormatter: typeof MockFormatter.passthrough } => {
     vi.clearAllMocks();
     // Reset singleton instance for clean test state
@@ -49,10 +49,10 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
    * When: 完全なロガーマップを上書き設定した時
    * Then: 各レベルで適切なロガーが使用される
    */
-  describe('Given complex logger map configurations exist', () => {
-    describe('When applying complete logger map override', () => {
+  describe('Given logger map configuration changes', () => {
+    describe('When performing complete map override', () => {
       // 目的: ロガーマップ全面上書きの適用確認
-      it('Then should handle complete logger map override correctly', () => {
+      it('Then should replace entire configuration cleanly', () => {
         setupTestContext();
 
         // Given: レベル別の専用ロガー
@@ -92,9 +92,9 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
       });
     });
 
-    describe('When applying partial logger map configuration', () => {
+    describe('When applying partial configuration updates', () => {
       // 目的: 部分的なロガーマップ適用時のフォールバック確認
-      it('Then should handle partial logger map with proper fallback', () => {
+      it('Then should merge new settings with existing configuration', () => {
         setupTestContext();
 
         // Given: 部分的なロガーマップ設定
@@ -137,10 +137,10 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
    * When: マップエントリーが存在しないレベルにアクセスした時
    * Then: デフォルトロガーへのフォールバックが発生する
    */
-  describe('Given logger map entries are missing', () => {
-    describe('When accessing levels without map entries', () => {
+  describe('Given configuration edge cases', () => {
+    describe('When handling missing configuration entries', () => {
       // 目的: マップ未設定レベルでのdefaultロガーへのフォールバック
-      it('Then should fallback to default logger for missing map entries', () => {
+      it('Then should provide appropriate fallback behavior', () => {
         setupTestContext();
 
         // Given: マップ未設定の環境
@@ -161,9 +161,9 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
       });
     });
 
-    describe('When handling empty logger map configuration', () => {
+    describe('When processing empty logger map configuration', () => {
       // 目的: 空のロガーマップ指定時の挙動確認
-      it('Then should handle empty logger map correctly', () => {
+      it('Then should manage empty configurations without system failure', () => {
         setupTestContext();
 
         // Given: 空のロガーマップ設定
@@ -194,10 +194,10 @@ describe('AgLoggerManager Management Logger Map Integration', () => {
    * When: undefined値のマップエントリーにアクセスした時
    * Then: デフォルトロガーへの安全なフォールバックが発生する
    */
-  describe('Given logger map contains undefined values', () => {
-    describe('When accessing map entries with undefined values', () => {
+  describe('Given configuration edge cases', () => {
+    describe('When processing undefined values', () => {
       // 目的: ロガーマップにundefinedを含む場合の安定性
-      it('Then should maintain stability when logger map has undefined values', () => {
+      it('Then should handle undefined inputs gracefully', () => {
         setupTestContext();
 
         // Given: undefined値を含むマップ設定

@@ -19,6 +19,7 @@ import { AgLogger } from '@/AgLogger.class';
 
 // Plugin implementations: formatters and loggers
 import { MockFormatter } from '@/plugins/formatter/MockFormatter';
+import { E2eMockLogger } from '@/plugins/logger/E2eMockLogger';
 import { MockLogger } from '@/plugins/logger/MockLogger';
 import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
 import type { AgMockConstructor } from '@/shared/types/AgMockConstructor.class';
@@ -253,6 +254,105 @@ describe('AgLogger Performance High Load Integration', () => {
         expect(totalTime).toBeLessThan(2_000);
         expect(mockLogger.getTotalMessageCount() + errorLogger.getTotalMessageCount()).toBe(iterations);
         expect(logger.isVerbose).toBe(ENABLE);
+      });
+    });
+  });
+
+  /**
+   * Given: E2E高負荷ストレステスト環境が存在する場合
+   * When: E2E環境で高負荷処理が実行された時
+   * Then: E2E環境でもパフォーマンスが維持される
+   *
+   * @description E2E環境での高負荷ストレステスト
+   * E2E環境特有の性能特性と大量データ処理を検証
+   */
+  describe('Given E2E high-load stress test environments exist', () => {
+    /**
+     * E2E環境用テストセットアップ
+     */
+    const setupE2ETest = (ctx: TestContext): { mockLogger: E2eMockLogger } => {
+      const mockLogger = new E2eMockLogger('e2e-performance-stress');
+      mockLogger.startTest(ctx.task.id);
+
+      AgLogger.resetSingleton();
+
+      ctx.onTestFinished(() => {
+        mockLogger.endTest();
+        AgLogger.resetSingleton();
+      });
+
+      return { mockLogger };
+    };
+
+    /**
+     * @description E2E環境での高負荷メッセージ整合性テスト
+     * E2E環境特有の高負荷条件下でのメッセージ整合性を検証
+     */
+    describe('When high-load processing with message integrity is executed in E2E environment', () => {
+      // E2E環境での高負荷時のメッセージ整合性維持
+      it('Then should maintain E2E message integrity under high load conditions', (ctx) => {
+        const { mockLogger } = setupE2ETest(ctx);
+
+        // Given: E2E環境での高負荷パフォーマンス設定
+        const logger = AgLogger.createLogger({
+          defaultLogger: mockLogger.createLoggerFunction(),
+          formatter: (log) => `${log.timestamp.toISOString().replace(/\.\d{3}Z$/, 'Z')} [INFO] ${log.message}`,
+        });
+        logger.logLevel = AG_LOGLEVEL.INFO;
+
+        // When: E2E環境での高負荷処理
+        const iterations = 100;
+        for (let i = 0; i < iterations; i++) {
+          logger.info(`E2E stress test message ${i}`, { iteration: i, stress: true });
+        }
+
+        // Then: E2E環境でのメッセージ整合性確保
+        const messages = mockLogger.getMessages(AG_LOGLEVEL.INFO);
+        expect(messages).toHaveLength(iterations);
+        expect(String(messages[0])).toMatch(/\[INFO\] E2E stress test message 0/);
+        expect(String(messages[messages.length - 1])).toMatch(/\[INFO\] E2E stress test message 99/);
+      });
+    });
+
+    /**
+     * @description E2E環境での大量データセット処理テスト
+     * E2E環境での大量データ処理における性能制限と処理能力を検証
+     */
+    describe('When large dataset processing is executed in E2E environment', () => {
+      // E2E環境での大量データセット処理性能
+      it('Then should process large datasets within acceptable E2E performance limits', (ctx) => {
+        const { mockLogger } = setupE2ETest(ctx);
+
+        // Given: E2E環境での大量データ処理設定
+        const logger = AgLogger.createLogger({
+          defaultLogger: mockLogger.createLoggerFunction(),
+          formatter: (log) =>
+            JSON.stringify({
+              timestamp: log.timestamp.toISOString(),
+              level: 'INFO',
+              message: log.message,
+              args: log.args,
+            }),
+        });
+        logger.logLevel = AG_LOGLEVEL.INFO;
+
+        // When: E2E環境での大量データセット処理
+        const iterations = 120;
+        const largePayload = {
+          data: Array.from({ length: 50 }, (_, i) => ({ id: i, value: `e2e_val_${i}` })),
+          meta: { seed: 42, e2eTest: true },
+        };
+
+        const start = Date.now();
+        for (let i = 0; i < iterations; i++) {
+          logger.info(`E2E batch ${i}`, largePayload);
+        }
+        const elapsed = Date.now() - start;
+
+        // Then: E2E環境での大量データ処理性能確保
+        const messages = mockLogger.getMessages(AG_LOGLEVEL.DEFAULT);
+        expect(messages).toHaveLength(iterations);
+        expect(elapsed).toBeLessThan(1500); // E2E環境での許容処理時間
       });
     });
   });

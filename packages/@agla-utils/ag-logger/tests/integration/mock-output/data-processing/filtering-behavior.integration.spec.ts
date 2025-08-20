@@ -57,16 +57,16 @@ const setupTestContext = (_ctx?: TestContext): {
  * @description ログレベルフィルタリングとverbose機能の統合動作テスト
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
-describe('AgLogger Features Filtering Integration', () => {
+describe('Mock Output Filtering Behavior Integration', () => {
   /**
    * Given: 異なるログレベル設定が存在する場合
    * When: 各レベルでログメッセージを出力した時
    * Then: レベル設定に基づいて適切にフィルタリングされる
    */
-  describe('Given different log level settings exist', () => {
-    describe('When outputting log messages at various levels', () => {
+  describe('Given log level filtering is configured', () => {
+    describe('When filtering by specific levels', () => {
       // 目的: すべての構成要素で一貫したフィルタリングが行われる
-      it('Then should apply filtering consistently across all components', (_ctx) => {
+      it('Then should only output messages at or above configured level', (_ctx) => {
         const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: WARN レベルで設定されたロガー
@@ -93,7 +93,7 @@ describe('AgLogger Features Filtering Integration', () => {
 
     describe('When log level is set to OFF', () => {
       // 目的: OFFレベル時に全レベルで出力が抑止される
-      it('Then should suppress all log output', (_ctx) => {
+      it('Then should suppress all log output completely', (_ctx) => {
         const { mockLogger } = setupTestContext();
 
         // Given: OFFレベルで設定されたロガー
@@ -156,10 +156,10 @@ describe('AgLogger Features Filtering Integration', () => {
    * When: Verbose モードを有効/無効にした時
    * Then: 詳細な出力制御が適切に動作する
    */
-  describe('Given verbose mode configurations exist', () => {
-    describe('When enabling verbose mode', () => {
+  describe('Given dynamic level changes occur', () => {
+    describe('When using verbose mode', () => {
       // 目的: Verboseモード有効時に詳細な出力が行われる
-      it('Then should provide detailed output formatting', (_ctx) => {
+      it('Then should output all messages including debug traces', (_ctx) => {
         const { mockLogger, mockFormatter } = setupTestContext(_ctx);
 
         // Given: Verboseモード有効なロガー
