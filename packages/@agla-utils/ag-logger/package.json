@@ -2,7 +2,7 @@
   "name": "@agla-utils/ag-logger",
   "_comment": "@(#) : structured logging framework with multiple output formats",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Abstract logger system with various implementations.",
   "author": "atsushifx <https://github.com/atsushifx>",
   "license": "MIT",
