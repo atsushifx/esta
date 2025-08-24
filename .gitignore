@@ -57,11 +57,11 @@ $~*
 !.claude/commands/*
 
 # CLAUDE Memory file
-CLAUDE*.md
-AGENTS.md
+!CLAUDE*.md
+!AGENTS.md
 
 ## mcp settings/server's config
-.mcp.json
+!.mcp.json
 # mcp server's folder
 .serena/
 .lsmcp
