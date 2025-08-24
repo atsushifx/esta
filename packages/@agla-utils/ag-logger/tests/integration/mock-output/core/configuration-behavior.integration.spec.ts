@@ -140,6 +140,135 @@ describe('Core Configuration Behavior Integration', () => {
   });
 
   /**
+   * Given: 複雑な管理機能が必要な環境が存在する場合
+   * When: マネージャ経由の設定変更を実行した時
+   * Then: 適切な管理動作が発生する
+   *
+   * @description マネージャー機能統合テスト
+   * マネージャーを通じた設定管理と複雑な状態遷移を検証
+   */
+  describe('Given complex management functionality is required', () => {
+    /**
+     * @description マネージャー経由の混合設定更新テスト
+     * マネージャーを通じた複雑な設定更新の適切な処理を検証
+     */
+    describe('When executing mixed configuration updates via manager', () => {
+      // マネージャーでの複合設定更新と整合性維持
+      it('Then should handle manager-based mixed configuration updates correctly', () => {
+        const { mockLogger, mockFormatter } = setupTest();
+
+        // Given: マネージャー経由での初期設定
+        AgLoggerManager.createManager({ defaultLogger: mockLogger.default, formatter: mockFormatter });
+        const manager = AgLoggerManager.getManager();
+        const logger = manager.getLogger();
+
+        // When: 段階的な複合設定更新
+        const firstLoggerInstance = new MockLogger.buffer();
+        const firstLogger = firstLoggerInstance.info.bind(firstLoggerInstance);
+        const firstFormatter = MockFormatter.prefixed('first');
+        manager.setLoggerConfig({
+          defaultLogger: firstLogger,
+          formatter: firstFormatter,
+        });
+
+        // Then: 初期設定が適用される
+        expect(typeof logger.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe('function');
+
+        // When: フォーマッターのみ更新
+        const secondFormatter = MockFormatter.prefixed('second');
+        manager.setLoggerConfig({ formatter: secondFormatter });
+
+        // When: デフォルトロガー更新
+        const secondLoggerInstance = new MockLogger.buffer();
+        const secondLogger = secondLoggerInstance.info.bind(secondLoggerInstance);
+        manager.setLoggerConfig({ defaultLogger: secondLogger });
+
+        // Then: 設定変更が適用される
+        expect(typeof logger.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe('function');
+
+        // When: 専用ロガーマップ追加
+        const errorLoggerInstance = new MockLogger.buffer();
+        const errorLogger = errorLoggerInstance.error.bind(errorLoggerInstance);
+        manager.setLoggerConfig({
+          loggerMap: { [AG_LOGLEVEL.ERROR]: errorLogger },
+        });
+
+        // Then: 専用ロガーは新設定、デフォルトは保持
+        expect(logger.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(errorLogger);
+        expect(typeof logger.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe('function');
+      });
+    });
+
+    /**
+     * @description マネージャー経由の急速設定変更テスト
+     * マネージャーを通じた急速な設定変更の最終状態正当性を検証
+     */
+    describe('When performing rapid configuration changes via manager', () => {
+      // マネージャーでの急速設定変更と最終状態確認
+      it('Then should handle multiple rapid manager configuration changes correctly', () => {
+        const { mockLogger, mockFormatter } = setupTest();
+
+        // Given: マネージャー経由の高頻度変更対応設定
+        AgLoggerManager.createManager({ defaultLogger: mockLogger.default, formatter: mockFormatter });
+        const manager = AgLoggerManager.getManager();
+        const logger = manager.getLogger();
+
+        // When: 急速な設定変更の実行
+        const loggerInstances = Array.from({ length: 3 }, () => new MockLogger.buffer());
+        const loggers = loggerInstances.map((instance) => instance.info.bind(instance));
+        const formatters = [PlainFormatter, MockFormatter.passthrough, PlainFormatter];
+
+        loggers.forEach((logger, index) => {
+          manager.setLoggerConfig({
+            defaultLogger: logger,
+            formatter: formatters[index],
+          });
+        });
+
+        // Then: 最終設定が有効
+        const finalFn = logger.getLoggerFunction(AG_LOGLEVEL.INFO);
+        expect(typeof finalFn).toBe('function');
+        expect(finalFn).not.toBe(mockLogger.default);
+      });
+    });
+
+    /**
+     * @description マネージャーレガシーAPI互換性テスト
+     * レガシーAPIと新APIの協調動作を検証
+     */
+    describe('When using legacy API methods with manager', () => {
+      // レガシーAPI(bindLoggerFunction等)の互換動作確認
+      it('Then should handle legacy manager API methods correctly', () => {
+        const { mockLogger, mockFormatter } = setupTest();
+
+        // Given: レガシーAPI対応の設定
+        AgLoggerManager.createManager({ defaultLogger: mockLogger.default, formatter: mockFormatter });
+        const manager = AgLoggerManager.getManager();
+        const logger = manager.getLogger();
+
+        // When: レガシーAPIメソッドの使用
+        const customLoggerInstance = new MockLogger.buffer();
+        const customLogger = customLoggerInstance.error.bind(customLoggerInstance);
+        manager.bindLoggerFunction(AG_LOGLEVEL.ERROR, customLogger);
+
+        // Then: レガシーAPIで設定したロガーが有効
+        expect(logger.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(customLogger);
+
+        // When: 新APIとの組み合わせ
+        const defaultLoggerInstance = new MockLogger.buffer();
+        const defaultLogger = defaultLoggerInstance.info.bind(defaultLoggerInstance);
+        manager.setLoggerConfig({
+          defaultLogger: defaultLogger,
+        });
+
+        // Then: 新旧API設定が協調動作
+        expect(typeof logger.getLoggerFunction(AG_LOGLEVEL.INFO)).toBe('function');
+        expect(logger.getLoggerFunction(AG_LOGLEVEL.ERROR)).toBe(customLogger);
+      });
+    });
+  });
+
+  /**
    * Given: 設定競合とエラーシナリオが存在する場合
    * When: フォーマッター競合が発生した時
    * Then: 適切なエラー処理が行われる

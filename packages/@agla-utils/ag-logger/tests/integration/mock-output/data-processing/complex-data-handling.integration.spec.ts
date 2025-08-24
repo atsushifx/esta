@@ -67,16 +67,16 @@ const setupTestContext = (_ctx?: TestContext): {
  * @description 循環参照オブジェクトなど特殊データの統合処理テスト
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
-describe('AgLogger Data Handling Complex Data Integration', () => {
+describe('Mock Output Complex Data Handling Integration', () => {
   /**
    * Given: 循環参照オブジェクトが存在する場合
    * When: 循環参照を含むデータをログ出力した時
    * Then: 安全に処理され、システムが継続動作する
    */
-  describe('Given circular reference objects exist', () => {
-    describe('When logging data with circular references', () => {
+  describe('Given complex data structures exist', () => {
+    describe('When processing circular references', () => {
       // 目的: 循環参照を含むデータでも安全に処理継続
-      it('Then should handle circular references with graceful degradation', (_ctx) => {
+      it('Then should handle circular references safely without infinite loops', (_ctx) => {
         const { mockLogger } = setupTestContext();
         const circularFormatter = (logMessage: AgFormattedLogMessage): string => {
           try {
@@ -172,8 +172,8 @@ describe('AgLogger Data Handling Complex Data Integration', () => {
    * When: 深いネスト構造のデータをログ出力した時
    * Then: スタックオーバーフローなく安全に処理される
    */
-  describe('Given deeply nested object structures exist', () => {
-    describe('When logging deeply nested data structures', () => {
+  describe('Given complex data structures exist', () => {
+    describe('When processing deeply nested objects', () => {
       // 目的: 深くネストしたオブジェクトの安全な処理
       it('Then should handle deeply nested objects without stack overflow', (_ctx) => {
         const { mockLogger, mockFormatter } = setupTestContext(_ctx);
@@ -210,10 +210,10 @@ describe('AgLogger Data Handling Complex Data Integration', () => {
    * When: 複雑なErrorオブジェクトをログ出力した時
    * Then: Error固有プロパティも含めて適切に処理される
    */
-  describe('Given custom Error objects with additional properties exist', () => {
-    describe('When logging complex Error objects', () => {
+  describe('Given special data values exist', () => {
+    describe('When processing custom error objects', () => {
       // 目的: カスタムプロパティ付きErrorの取り扱い
-      it('Then should handle errors with custom properties appropriately', (_ctx) => {
+      it('Then should extract error information properly', (_ctx) => {
         const { mockLogger, mockFormatter } = setupTestContext(_ctx);
 
         // Given: Errorオブジェクト対応ロガー
@@ -262,10 +262,10 @@ describe('AgLogger Data Handling Complex Data Integration', () => {
    * When: 特殊オブジェクト（undefined, null, Symbol等）をログ出力した時
    * Then: 型安全に処理され、適切な文字列表現が生成される
    */
-  describe('Given special JavaScript objects exist', () => {
-    describe('When logging special object types', () => {
+  describe('Given special data values exist', () => {
+    describe('When processing undefined and null values', () => {
       // 目的: 特殊JavaScript値の安全な処理
-      it('Then should handle special JavaScript values safely', (_ctx) => {
+      it('Then should handle special values appropriately', (_ctx) => {
         const { mockLogger } = setupTestContext();
 
         // Given: 特殊値対応ロガー

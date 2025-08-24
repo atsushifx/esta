@@ -32,7 +32,7 @@ import type { AgMockConstructor } from '../../../../../shared/types/AgMockConstr
  * @description Mock出力でのフォーマッターとロガーの組み合わせ統合動作を保証するテスト
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
-describe('Mock Plugin Combinations Integration', () => {
+describe('Mock Output Plugin Combination Integration', () => {
   const setupTestContext = (_ctx?: TestContext): {
     mockLogger: AgMockBufferLogger;
     mockFormatter: AgMockConstructor;
@@ -59,10 +59,10 @@ describe('Mock Plugin Combinations Integration', () => {
    * When: 大量のログメッセージを処理した時
    * Then: 組み合わせでも安定したパフォーマンスを維持する
    */
-  describe('Given high-load environments use plugin combinations', () => {
-    describe('When processing large volumes of log messages', () => {
+  describe('Given high-load plugin combinations', () => {
+    describe('When combining multiple plugins under load', () => {
       // 目的: 高頻度ログ出力時の組み合わせ処理性能
-      it('Then should maintain performance with plugin combinations under high frequency', () => {
+      it('Then should maintain stability and performance across all plugins', () => {
         const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: 高負荷対応の組み合わせ設定
@@ -90,9 +90,9 @@ describe('Mock Plugin Combinations Integration', () => {
       });
     });
 
-    describe('When filtering suppresses many messages in combinations', () => {
+    describe('When applying filters with active plugin combinations', () => {
       // 目的: フィルタリングによる出力抑制時の組み合わせ低オーバーヘッド
-      it('Then should minimize overhead when combinations filter out messages', () => {
+      it('Then should coordinate filtering behavior across all components', () => {
         const { mockLogger, mockFormatter } = setupTestContext();
 
         // Given: 厳格フィルタリング + 組み合わせ設定
@@ -126,10 +126,10 @@ describe('Mock Plugin Combinations Integration', () => {
    * When: 複雑データ構造を各組み合わせで処理した時
    * Then: データ整合性を保って適切に処理される
    */
-  describe('Given complex data processing uses plugin combinations', () => {
-    describe('When processing complex data structures across combinations', () => {
+  describe('Given complex data plugin combinations', () => {
+    describe('When processing complex data through plugin combinations', () => {
       // 目的: 複雑オブジェクトを各プラグイン組合せで安定処理
-      it('Then should handle complex objects correctly across all combinations', () => {
+      it('Then should handle data complexity across all plugin layers', () => {
         const { mockLogger } = setupTestContext();
 
         // Given: 複雑データ構造
@@ -182,7 +182,7 @@ describe('Mock Plugin Combinations Integration', () => {
       });
     });
 
-    describe('When handling large data sets efficiently in combinations', () => {
+    describe('When processing large data sets across combinations', () => {
       // 目的: 大規模データ引数での組み合わせ性能検証
       it('Then should handle large data sets efficiently across combinations', () => {
         const { mockLogger } = setupTestContext();
@@ -216,10 +216,10 @@ describe('Mock Plugin Combinations Integration', () => {
    * When: 組み合わせ内でエラーが発生した時
    * Then: 適切なエラー処理と復旧が行われる
    */
-  describe('Given error recovery is needed with plugin combinations', () => {
-    describe('When errors occur within plugin combinations', () => {
+  describe('Given error recovery plugin combinations', () => {
+    describe('When plugins encounter errors in combination', () => {
       // 目的: ロガー側エラー時でもフォーマッター呼出は実施
-      it('Then should handle logger errors gracefully without affecting formatter', () => {
+      it('Then should provide coordinated error recovery behavior', () => {
         setupTestContext();
 
         // Given: エラーロガー + 正常フォーマッター組み合わせ
@@ -241,7 +241,7 @@ describe('Mock Plugin Combinations Integration', () => {
       });
     });
 
-    describe('When combinations recover from errors', () => {
+    describe('When plugins recover from errors', () => {
       // 目的: プラグインエラー発生後もシステム安定性を維持
       it('Then should maintain system stability after combination errors', () => {
         const { mockLogger, mockFormatter } = setupTestContext();

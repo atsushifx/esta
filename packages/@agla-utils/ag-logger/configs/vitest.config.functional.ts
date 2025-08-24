@@ -23,8 +23,8 @@ export default mergeConfig(baseConfig, {
   test: {
     include: [
       // Functional Test - single feature complete behavior verification
-      'src/**/__tests__/functional/**/*.functional.spec.ts',
-      'src/**/__tests__/functional/**/*.functional.test.ts',
+      'src/**/__tests__/functional/**/*.spec.ts',
+      'src/**/__tests__/functional/**/*.test.ts',
     ],
     exclude: [
       'src/**/__tests__/units/**/*',

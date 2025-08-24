@@ -27,7 +27,7 @@ import type { AgMockBufferLogger } from '@/plugins/logger/MockLogger';
  * @description マネージャーのシングルトン動作を保証する統合テスト
  * atsushifx式BDD：Given-When-Then形式で自然言語記述による仕様定義
  */
-describe('AgLoggerManager Management Singleton Integration', () => {
+describe('Mock Output Singleton Management Integration', () => {
   const setupTestContext = (): { mockLogger: AgMockBufferLogger; mockFormatter: typeof MockFormatter.passthrough } => {
     vi.clearAllMocks();
     // Reset singleton instance for clean test state
@@ -44,10 +44,10 @@ describe('AgLoggerManager Management Singleton Integration', () => {
    * When: 異なる方法でマネージャーにアクセスした時
    * Then: 同一のシングルトンインスタンスが返される
    */
-  describe('Given multiple AgLoggerManager access patterns exist', () => {
-    describe('When accessing manager through different methods', () => {
+  describe('Given multiple access points to manager', () => {
+    describe('When accessing manager from different contexts', () => {
       // 目的: getManager呼び出し間でシングルトン性が維持される
-      it('Then should maintain singleton behavior across multiple getManager calls', () => {
+      it('Then should return identical singleton instance consistently', () => {
         setupTestContext();
 
         // When: マネージャーを作成し、複数回取得
@@ -91,10 +91,10 @@ describe('AgLoggerManager Management Singleton Integration', () => {
    * When: 複数回の初期化を試行した時
    * Then: 最初の初期化のみが有効となり、後続は適切にエラーとなる
    */
-  describe('Given manager initialization conflict scenarios exist', () => {
-    describe('When attempting multiple initialization operations', () => {
+  describe('Given initialization conflicts', () => {
+    describe('When encountering concurrent initialization attempts', () => {
       // 目的: 複数回の初期化パラメータ指定で設定が更新される挙動を確認
-      it('Then should only allow first initialization and reject subsequent attempts', () => {
+      it('Then should handle initialization conflicts gracefully', () => {
         setupTestContext();
 
         // Given: 異なる設定パラメータ
@@ -148,10 +148,10 @@ describe('AgLoggerManager Management Singleton Integration', () => {
    * When: 状態変更と参照取得を並行して実行した時
    * Then: 状態の一貫性が維持される
    */
-  describe('Given manager state consistency is critical', () => {
-    describe('When performing concurrent state changes and access', () => {
+  describe('Given singleton state consistency requirements', () => {
+    describe('When verifying state consistency across access points', () => {
       // 目的: 並行アクセス時のマネージャー状態一貫性
-      it('Then should maintain state consistency during concurrent operations', () => {
+      it('Then should maintain consistent state regardless of access method', () => {
         setupTestContext();
 
         // Given: 初期マネージャー
