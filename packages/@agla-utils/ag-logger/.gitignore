@@ -12,7 +12,7 @@
 thumbs.db
 
 #	logs, patches
-*.log*
+*.log
 *.diff
 *.patch
 
@@ -26,6 +26,15 @@ thumbs.db
 .env.key*
 .env*
 
+
+## AI settings
+# mcp server's ignore
+.mcp.json
+.serena/
+.lsmcp/
+
+
+
 #	backup/swap/temp
 $~*
 ~*
@@ -33,6 +42,15 @@ $~*
 *tmp
 *swp
 *lock
+
+## AIagent files
+
+## mcp
+.mcp.json
+.serena/
+.lsmcp/
+
+
 
 ##		Editor
 #	VSCode

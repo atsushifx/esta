@@ -22,8 +22,8 @@ export { AG_LOGLEVEL } from '../shared/types';
 export type { AgLogLevel, AgLogLevelLabel } from '../shared/types';
 
 // logger main
-export { AgLogger, getLogger } from './AgLogger.class';
-export { AgLoggerManager } from './AgLoggerManager.class';
+export * from './AgLogger.class';
+export * from './AgLoggerManager.class';
 
 // plugins: logger
 export { ConsoleLogger } from './plugins/logger/ConsoleLogger';
@@ -33,9 +33,15 @@ export { NullLogger } from './plugins/logger/NullLogger';
 
 // plugins: formatter
 export { JsonFormatter } from './plugins/formatter/JsonFormatter';
+export { createMockFormatter, MockFormatter } from './plugins/formatter/MockFormatter';
 export { NullFormatter } from './plugins/formatter/NullFormatter';
 export { PlainFormatter } from './plugins/formatter/PlainFormatter';
 
 // utilities
+export * from './AgManagerUtils';
 export { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
 export { createTestId } from './utils/testIdUtils';
+
+// setup: モジュール読み込み時に自動初期化
+import { setupManager } from './AgManagerUtils';
+setupManager();

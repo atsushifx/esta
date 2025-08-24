@@ -1,4 +1,4 @@
-// src/plugins/logger/MockLogger.ts
+// src/plugins/logger/_bufferLogger.ts
 // @(#) : Mock Logger for Unit and Integration Testing
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
@@ -7,16 +7,20 @@
 // https://opensource.org/licenses/MIT
 
 // libs
-import { isValidLogLevel } from '@/utils/AgLogLevelHelpers';
+import { type AgLoggerMethodsInterface, bindLoggerMethods } from '@/utils/AgLoggerMethod';
+import { isValidLogLevel } from '../../utils/AgLogValidators';
+
+import { NullLogger } from './NullLogger';
+
 // constants
-import { AG_LOGLEVEL, AG_LOGLEVEL_KEYS } from '../../../shared/types';
+import { AG_LOGLEVEL, AG_LOGLEVEL_KEYS, AG_LOGLEVEL_VALUES } from '../../../shared/types';
 // types
 import type {
   AgFormattedLogMessage,
   AgLoggerFunction,
   AgLoggerMap,
   AgLogLevel,
-  AgLogLevelKey,
+  AgLogLevelLabel,
   AgLogMessage,
 } from '../../../shared/types';
 
@@ -31,29 +35,18 @@ import type {
  * - Thread-safe for single-threaded test scenarios
  * - Deep immutability for message objects
  */
-export class MockLogger {
-  private messages: Map<AgLogLevel, AgFormattedLogMessage[]> = new Map([
-    [AG_LOGLEVEL.VERBOSE, []], // VERBOSE (-99)
-    [AG_LOGLEVEL.OFF, []], // OFF (0) - not used for actual logging
-    [AG_LOGLEVEL.FATAL, []], // FATAL (1)
-    [AG_LOGLEVEL.ERROR, []], // ERROR (2)
-    [AG_LOGLEVEL.WARN, []], // WARN (3)
-    [AG_LOGLEVEL.INFO, []], // INFO (4)
-    [AG_LOGLEVEL.DEBUG, []], // DEBUG (5)
-    [AG_LOGLEVEL.TRACE, []], // TRACE (6)
-  ]);
+export class AgMockBufferLogger implements AgLoggerMethodsInterface {
+  public defaultLoggerMap: AgLoggerMap;
+  [key: string]: unknown;
 
-  /**
-   * Deep clone a message to ensure immutability.
-   * @param message - The message to clone
-   * @returns Deep clone of the message
-   */
-  private deepClone(message: AgFormattedLogMessage): AgFormattedLogMessage {
-    if (typeof message === 'string' || typeof message === 'number' || message === null || message === undefined) {
-      return message;
-    }
-    return JSON.parse(JSON.stringify(message));
+  constructor() {
+    this.defaultLoggerMap = this.createLoggerMap();
+    bindLoggerMethods(this);
   }
+
+  private messages: Map<AgLogLevel, AgFormattedLogMessage[]> = new Map(
+    AG_LOGLEVEL_VALUES.map((level) => [level, []]),
+  );
 
   /**
    * Validates if the provided log level is valid.
@@ -62,55 +55,74 @@ export class MockLogger {
    */
   private validateLogLevel(logLevel: AgLogLevel): void {
     if (!isValidLogLevel(logLevel)) {
-      throw new Error(`MockLogger: Invalid log level: ${logLevel}`);
+      throw new Error(`MockLogger: Invalid log level: ${String(logLevel)}`);
     }
   }
 
   // Logger methods
+  public executeLog(level: AgLogLevel, message: AgFormattedLogMessage): void {
+    this.validateLogLevel(level);
+    this.messages.get(level)!.push(message);
+  }
+
   fatal(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.FATAL)!.push(message);
+    this.executeLog(AG_LOGLEVEL.FATAL, message);
   }
 
   error(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.ERROR)!.push(message);
+    this.executeLog(AG_LOGLEVEL.ERROR, message);
   }
 
   warn(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.WARN)!.push(message);
+    this.executeLog(AG_LOGLEVEL.WARN, message);
   }
 
   info(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.INFO)!.push(message);
+    this.executeLog(AG_LOGLEVEL.INFO, message);
   }
 
   debug(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.DEBUG)!.push(message);
+    this.executeLog(AG_LOGLEVEL.DEBUG, message);
   }
 
   trace(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.TRACE)!.push(message);
+    this.executeLog(AG_LOGLEVEL.TRACE, message);
   }
 
   verbose(message: AgFormattedLogMessage): void {
-    this.messages.get(AG_LOGLEVEL.VERBOSE)!.push(message);
+    this.executeLog(AG_LOGLEVEL.VERBOSE, message);
+  }
+
+  log(message: AgFormattedLogMessage): void {
+    this.executeLog(AG_LOGLEVEL.LOG, message);
+  }
+
+  default(message: AgFormattedLogMessage): void {
+    this.executeLog(AG_LOGLEVEL.DEFAULT, message);
   }
 
   // Query methods
-  getMessages(logLevel: AgLogLevel): AgFormattedLogMessage[] {
-    this.validateLogLevel(logLevel);
-    return this.messages.get(logLevel)?.slice() ?? [];
+  getMessages(logLevel?: AgLogLevel): AgFormattedLogMessage[] {
+    const levelToUse = (arguments.length === 0)
+      ? AG_LOGLEVEL.DEFAULT
+      : (logLevel as unknown as AgLogLevel);
+    this.validateLogLevel(levelToUse);
+    return this.messages.get(levelToUse)?.slice() ?? [];
   }
 
-  getLastMessage(logLevel: AgLogLevel): AgLogMessage | string | null {
-    this.validateLogLevel(logLevel);
-    return this.messages.get(logLevel)?.slice(-1)[0] ?? null;
+  getLastMessage(logLevel?: AgLogLevel): AgLogMessage | string | null {
+    const levelToUse = (arguments.length === 0)
+      ? AG_LOGLEVEL.DEFAULT
+      : (logLevel as unknown as AgLogLevel);
+    this.validateLogLevel(levelToUse);
+    return this.messages.get(levelToUse)?.slice(-1)[0] ?? null;
   }
 
-  getAllMessages(): { [K in AgLogLevelKey]: AgFormattedLogMessage[] } {
+  getAllMessages(): { [K in AgLogLevelLabel]: AgFormattedLogMessage[] } {
     return AG_LOGLEVEL_KEYS.reduce((acc, key) => ({
       ...acc,
       [key]: this.messages.get(AG_LOGLEVEL[key])?.slice() ?? [],
-    }), {} as { [K in AgLogLevelKey]: AgFormattedLogMessage[] });
+    }), {} as { [K in AgLogLevelLabel]: AgFormattedLogMessage[] });
   }
 
   // Utility methods
@@ -120,19 +132,21 @@ export class MockLogger {
   }
 
   clearAllMessages(): void {
-    this.messages.set(AG_LOGLEVEL.VERBOSE, []);
-    this.messages.set(AG_LOGLEVEL.OFF, []);
-    this.messages.set(AG_LOGLEVEL.FATAL, []);
-    this.messages.set(AG_LOGLEVEL.ERROR, []);
-    this.messages.set(AG_LOGLEVEL.WARN, []);
-    this.messages.set(AG_LOGLEVEL.INFO, []);
-    this.messages.set(AG_LOGLEVEL.DEBUG, []);
-    this.messages.set(AG_LOGLEVEL.TRACE, []);
+    (Object.values(AG_LOGLEVEL) as AgLogLevel[]).forEach((level) => {
+      this.messages.set(level, []);
+    });
   }
 
-  getMessageCount(logLevel: AgLogLevel): number {
-    this.validateLogLevel(logLevel);
-    return this.messages.get(logLevel)!.length;
+  reset(): void {
+    this.clearAllMessages();
+  }
+
+  getMessageCount(logLevel?: AgLogLevel): number {
+    const levelToUse = (arguments.length === 0)
+      ? AG_LOGLEVEL.DEFAULT
+      : (logLevel as unknown as AgLogLevel);
+    this.validateLogLevel(levelToUse);
+    return this.messages.get(levelToUse)!.length;
   }
 
   getTotalMessageCount(): number {
@@ -143,9 +157,12 @@ export class MockLogger {
     return total;
   }
 
-  hasMessages(logLevel: AgLogLevel): boolean {
-    this.validateLogLevel(logLevel);
-    return this.messages.get(logLevel)!.length > 0;
+  hasMessages(logLevel?: AgLogLevel): boolean {
+    const levelToUse = (arguments.length === 0)
+      ? AG_LOGLEVEL.DEFAULT
+      : (logLevel as unknown as AgLogLevel);
+    this.validateLogLevel(levelToUse);
+    return this.messages.get(levelToUse)!.length > 0;
   }
 
   hasAnyMessages(): boolean {
@@ -156,14 +173,16 @@ export class MockLogger {
   }
 
   /**
-   * Create AgLoggerFunction for testing.
-   * This can be used as a plugin for ag-logger.
+   * Gets the logger function for a specific log level.
+   * @param logLevel - The log level to get the logger function for
+   * @returns The logger function for the specified level
    */
-  createLoggerFunction(): AgLoggerFunction {
-    return (formattedLogMessage: string | AgLogMessage): void => {
-      // Use info level as default for generic logger function
-      this.info(formattedLogMessage);
-    };
+  getLoggerFunction(logLevel?: AgLogLevel): AgLoggerFunction {
+    const levelToUse = (arguments.length === 0)
+      ? AG_LOGLEVEL.DEFAULT
+      : (logLevel as unknown as AgLogLevel);
+    this.validateLogLevel(levelToUse);
+    return this.defaultLoggerMap[levelToUse] ?? NullLogger;
   }
 
   /**
@@ -171,15 +190,26 @@ export class MockLogger {
    * This provides level-specific logging functions.
    */
   createLoggerMap(): AgLoggerMap {
-    return {
-      [AG_LOGLEVEL.VERBOSE]: (message: string | AgLogMessage) => this.verbose(message),
-      [AG_LOGLEVEL.OFF]: () => {}, // No-op for OFF level
-      [AG_LOGLEVEL.FATAL]: (message: string | AgLogMessage) => this.fatal(message),
-      [AG_LOGLEVEL.ERROR]: (message: string | AgLogMessage) => this.error(message),
-      [AG_LOGLEVEL.WARN]: (message: string | AgLogMessage) => this.warn(message),
-      [AG_LOGLEVEL.INFO]: (message: string | AgLogMessage) => this.info(message),
-      [AG_LOGLEVEL.DEBUG]: (message: string | AgLogMessage) => this.debug(message),
-      [AG_LOGLEVEL.TRACE]: (message: string | AgLogMessage) => this.trace(message),
-    };
+    const _loggerMap = Object.fromEntries(
+      (Object.values(AG_LOGLEVEL) as AgLogLevel[]).map((level) => [
+        level,
+        level === AG_LOGLEVEL.OFF
+          ? NullLogger
+          : ((message: AgFormattedLogMessage): void => this.executeLog(level, message)).bind(this),
+      ]),
+    ) as AgLoggerMap;
+    _loggerMap[AG_LOGLEVEL.DEFAULT] = this.default.bind(this);
+    return _loggerMap;
   }
 }
+// other functions
+
+// Export for backward compatibility
+export const MockLogger = {
+  buffer: AgMockBufferLogger,
+  throwError: (errorMessage: string): AgLoggerFunction => {
+    return () => {
+      throw new Error(errorMessage);
+    };
+  },
+} as const;

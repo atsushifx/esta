@@ -9,15 +9,20 @@
 // types
 import { AG_LOGLEVEL } from '../shared/types';
 import type { AgLogLevel } from '../shared/types';
+import { AgLoggerError } from '../shared/types/AgLoggerError.types';
 // interfaces
-import type { AgLoggerOptions } from '../shared/types/AgLogger.interface';
+import type { AgFormatFunction, AgLoggerFunction, AgLoggerOptions } from '../shared/types/AgLogger.interface';
+// constants
+import { AG_LOGGER_ERROR_MESSAGES, ERROR_TYPES } from '../shared/constants/agErrorMessages';
 
-// core
-import { AgLoggerManager } from './AgLoggerManager.class';
+// internal
+import { AgLoggerConfig } from './internal/AgLoggerConfig.class';
 // plugins
+import type { AgMockFormatter } from './plugins/formatter/AgMockFormatter';
 import { ConsoleLogger, ConsoleLoggerMap } from './plugins/logger/ConsoleLogger';
 // utils
 import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
+import { isStandardLogLevel, isValidLogger, validateFormatter, validateLogLevel } from './utils/AgLogValidators';
 
 /**
  * Abstract logger class providing singleton instance management,
@@ -26,12 +31,20 @@ import { AgLoggerGetMessage } from './utils/AgLoggerGetMessage';
  */
 export class AgLogger {
   private static _instance: AgLogger | undefined;
-  private static _logLevel: AgLogLevel = AG_LOGLEVEL.OFF;
-  private _loggerManager: AgLoggerManager;
-  private _verbose: boolean = false;
+  private _config: AgLoggerConfig;
 
   protected constructor() {
-    this._loggerManager = AgLoggerManager.getManager();
+    this._config = new AgLoggerConfig();
+
+    // Bind methods to ensure proper 'this' context when methods are extracted
+    this.fatal = this.fatal.bind(this);
+    this.error = this.error.bind(this);
+    this.warn = this.warn.bind(this);
+    this.info = this.info.bind(this);
+    this.debug = this.debug.bind(this);
+    this.trace = this.trace.bind(this);
+    this.log = this.log.bind(this);
+    this.verbose = this.verbose.bind(this);
   }
 
   /**
@@ -41,28 +54,140 @@ export class AgLogger {
    * @param options - Optional configuration options for logger setup.
    * @returns The singleton AgLogger instance.
    */
-  static getLogger(options?: AgLoggerOptions): AgLogger {
+  static createLogger(options?: AgLoggerOptions): AgLogger {
     const instance = (AgLogger._instance ??= new AgLogger());
 
-    // If configuration is passed, delegate to setManager for unified handling
+    // If configuration is passed, delegate to setLoggerConfig for unified handling
     if (options !== undefined) {
-      instance.setManager(options);
+      instance.setLoggerConfig(options);
     }
 
     return instance;
   }
+  /**
+   * Returns the singleton instance of AgLogger without configuration.
+   * Simply returns the existing instance.
+   *
+   * @returns The singleton AgLogger instance.
+   * @throws AgLoggerError when instance not created
+   */
+  static getLogger(): AgLogger {
+    if (!this._instance) {
+      throw new AgLoggerError(
+        ERROR_TYPES.INITIALIZATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.INITIALIZATION].LOGGER_NOT_CREATED,
+      );
+    }
+    return this._instance;
+  }
 
   /**
-   * Checks if a given log level passes the configured log level filter.
+   * Configures the logger manager with the specified options.
+   * If ConsoleLogger is specified without a logger map,
+   * ConsoleLoggerMap will be automatically applied.
    *
-   * @param level - Log level to check.
-   * @returns True if the level should be logged; otherwise false.
+   * @param options - Configuration options for the logger.
    */
-  private isOutputLevel(level: AgLogLevel): boolean {
-    if (AgLogger._logLevel === AG_LOGLEVEL.OFF) {
-      return false;
+  public setLoggerConfig(options: AgLoggerOptions): void {
+    // Validate options is not null or undefined first (runtime safety for type-erased environments)
+    if ((options as unknown) === null || (options as unknown) === undefined) {
+      throw new AgLoggerError(
+        ERROR_TYPES.VALIDATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.VALIDATION].NULL_CONFIGURATION,
+      );
     }
-    return level <= AgLogger._logLevel;
+
+    if ('formatter' in options) {
+      validateFormatter(options.formatter);
+    }
+    if ('defaultLogger' in options) {
+      if (!isValidLogger(options.defaultLogger)) {
+        throw new AgLoggerError(
+          ERROR_TYPES.CONFIG,
+          AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.CONFIG].INVALID_DEFAULT_LOGGER,
+        );
+      }
+    }
+    // If ConsoleLogger is specified without a logger map, apply ConsoleLoggerMap
+    const enhancedOptions = { ...options };
+    if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
+      enhancedOptions.loggerMap = ConsoleLoggerMap;
+    }
+    if ('logLevel' in options) {
+      if (!isStandardLogLevel(options.logLevel)) {
+        throw new AgLoggerError(
+          ERROR_TYPES.VALIDATION,
+          AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.VALIDATION].SPECIAL_LOG_LEVEL_NOT_ALLOWED,
+        );
+      }
+    }
+
+    // set config
+    const configResult = this._config.setLoggerConfig(enhancedOptions);
+    if (!configResult) {
+      // Check if the failure was due to special log level
+      // Generic configuration error for other validation failures
+      throw new AgLoggerError(
+        ERROR_TYPES.CONFIG,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.CONFIG].INVALID_CONFIG,
+      );
+    }
+  }
+
+  /**
+   * Sets a custom logger function for a specific log level.
+   * @param logLevel - The log level to set the logger for
+   * @param loggerFunction - The logger function to use for the specified level
+   * @returns true if the logger was set successfully
+   */
+  setLoggerFunction(logLevel: AgLogLevel, loggerFunction: AgLoggerFunction): boolean {
+    const validatedLogLevel = validateLogLevel(logLevel);
+    return this._config.setLogger(validatedLogLevel, loggerFunction);
+  }
+
+  /**
+   * Gets the logger function for a specific log level.
+   * @param logLevel - The log level to get the logger function for
+   * @returns The logger function for the specified level
+   */
+  getLoggerFunction(logLevel: AgLogLevel): AgLoggerFunction {
+    const validatedLogLevel = validateLogLevel(logLevel);
+    return this._config.getLoggerFunction(validatedLogLevel);
+  }
+
+  public setFormatter(formatter: AgFormatFunction): void {
+    validateFormatter(formatter);
+    this._config.formatter = formatter;
+  }
+
+  /**
+   * Gets the current formatter function.
+   * @returns The current formatter function
+   */
+  getFormatter(): AgFormatFunction {
+    return this._config.formatter;
+  }
+
+  /**
+   * Gets the statistics formatter instance if available.
+   * Returns the AgMockFormatter instance that provides statistics tracking capabilities.
+   *
+   * @returns AgMockFormatter instance if available, null otherwise
+   * @since 0.2.0
+   */
+  getStatsFormatter(): AgMockFormatter | null {
+    return this._config.getStatsFormatter();
+  }
+
+  /**
+   * Checks if a statistics formatter instance is available for statistics access.
+   * Returns true if a mock formatter instance is currently stored.
+   *
+   * @returns True if statistics formatter instance is available, false otherwise
+   * @since 0.2.0
+   */
+  hasStatsFormatter(): boolean {
+    return this._config.hasStatsFormatter();
   }
 
   /**
@@ -71,31 +196,48 @@ export class AgLogger {
    * @param level - Log level to set.
    * @returns The updated log level.
    */
-  setLogLevel(level: AgLogLevel): AgLogLevel {
-    AgLogger._logLevel = level;
-    return AgLogger._logLevel;
+  get isVerbose(): boolean {
+    return this._config.isVerbose;
+  }
+
+  set setVerbose(value: boolean) {
+    this._config.setVerbose = value;
   }
 
   /**
-   * Retrieves the current global log level.
-   *
-   * @returns The current log level.
+   * Gets the current log level.
+   * @returns The current log level
    */
-  getLogLevel(): AgLogLevel {
-    return AgLogger._logLevel;
+  public get logLevel(): AgLogLevel {
+    return this._config.logLevel;
   }
 
   /**
-   * Sets or gets the verbose flag.
+   * Sets the global log level filter.
    *
-   * @param value - The verbose setting. If undefined, returns current value without setting.
-   * @returns The current verbose setting.
+   * @param level - Log level to set.
+   * @returns The updated log level.
    */
-  setVerbose(value?: boolean): boolean {
-    if (value !== undefined) {
-      this._verbose = value;
+  set logLevel(level: AgLogLevel) {
+    const validatedLogLevel = validateLogLevel(level);
+    // Special log levels (VERBOSE, LOG, DEFAULT) cannot be set as default log level
+    if (!isStandardLogLevel(validatedLogLevel)) {
+      throw new AgLoggerError(
+        ERROR_TYPES.VALIDATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.VALIDATION].SPECIAL_LOG_LEVEL_NOT_ALLOWED,
+      );
     }
-    return this._verbose;
+    this._config.logLevel = validatedLogLevel;
+  }
+
+  /**
+   * Checks if a given log level passes the configured log level filter.
+   *
+   * @param level - Log level to check.
+   * @returns True if the level should be logged; otherwise false.
+   */
+  protected shouldOutput(level: AgLogLevel): boolean {
+    return this._config.shouldOutput(level);
   }
 
   /**
@@ -106,35 +248,33 @@ export class AgLogger {
    * @param args - Arguments to be logged.
    */
   protected executeLog(level: AgLogLevel, ...args: unknown[]): void {
-    if (this.isOutputLevel(level)) {
-      const logMessage = AgLoggerGetMessage(level, ...args);
-      const formatter = this._loggerManager.getFormatter();
-      const formattedMessage = formatter(logMessage);
+    // Input validation for logLevel
+    validateLogLevel(level);
 
-      // Only block logging if the formatter explicitly returns empty string
-      // and the original message had actual content (not just empty args)
-      if (formattedMessage === '' && logMessage.message !== '' && args.length > 0) {
-        return;
-      }
-
-      const logger = this._loggerManager.getLogger(level);
-      logger(formattedMessage);
+    if (!this._config.shouldOutput(level)) {
+      return;
     }
-  }
 
-  /**
-   * Configures the logger manager with the specified options.
-   * If ConsoleLogger is specified without a logger map,
-   * ConsoleLoggerMap will be automatically applied.
-   *
-   * @param options - Configuration options for the logger.
-   */
-  setManager(options: AgLoggerOptions): void {
-    const enhancedOptions = { ...options };
-    if (options.defaultLogger === ConsoleLogger && !options.loggerMap) {
-      enhancedOptions.loggerMap = ConsoleLoggerMap;
+    // Cache formatter and logger references at the start to avoid race conditions
+    // in concurrent execution scenarios where config might change
+    const formatter = this.getFormatter();
+    const logger = this.getLoggerFunction(level);
+
+    const logMessage = AgLoggerGetMessage(level, ...args);
+
+    // Suppress logs where message is empty string (but allow no args or other args)
+    if (args.length === 1 && args[0] === '') {
+      return;
     }
-    this._loggerManager.setManager(enhancedOptions);
+
+    const formattedMessage = formatter(logMessage);
+
+    // Don't output log if formatter returns empty string
+    if (formattedMessage === '') {
+      return;
+    }
+
+    logger(formattedMessage);
   }
 
   /** Logs a message at FATAL level. */
@@ -167,16 +307,14 @@ export class AgLogger {
     this.executeLog(AG_LOGLEVEL.TRACE, ...args);
   }
 
-  /** General log method logging at INFO level. */
+  /** General log method that always outputs (LOG level). */
   log(...args: unknown[]): void {
-    this.executeLog(AG_LOGLEVEL.INFO, ...args);
+    this.executeLog(AG_LOGLEVEL.LOG, ...args);
   }
 
   /** Verbose log method that only outputs when verbose flag is true. */
   verbose(...args: unknown[]): void {
-    if (this._verbose) {
-      this.log(...args);
-    }
+    this.executeLog(AG_LOGLEVEL.VERBOSE, ...args);
   }
 
   /**
@@ -185,24 +323,7 @@ export class AgLogger {
    */
   static resetSingleton(): void {
     AgLogger._instance = undefined;
-    AgLogger._logLevel = AG_LOGLEVEL.OFF;
   }
 }
-
-/**
- * Convenience function to get the AgLogger singleton instance.
- * If ConsoleLogger is specified as default without a logger map,
- * ConsoleLoggerMap is automatically applied.
- *
- * @param options - Optional configuration options for the logger.
- * @returns The singleton AgLogger instance.
- */
-export const getLogger = (options?: AgLoggerOptions): AgLogger => {
-  if (options?.defaultLogger === ConsoleLogger && !options.loggerMap) {
-    options = { ...options, loggerMap: ConsoleLoggerMap };
-  }
-
-  return AgLogger.getLogger(options);
-};
 
 export default AgLogger;

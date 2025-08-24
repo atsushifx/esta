@@ -7,7 +7,8 @@
 // https://opensource.org/licenses/MIT
 
 import type { AgLogLevel } from '../../../shared/types';
-import { AgToLabel } from '../../utils/AgLogLevelHelpers';
+import { AgToLabel } from '../../utils/AgLogHelpers';
+import { extractMessage } from '../../utils/AgLogHelpers';
 
 export type LogMessage = {
   readonly level: string;
@@ -58,13 +59,6 @@ const isTimestamp = (arg: unknown): arg is string => {
  * @param args - Array of arguments to process
  * @returns Concatenated string message
  */
-const extractMessage = (args: readonly unknown[]): string => {
-  return args
-    .filter(isMessageArgument)
-    .map((arg) => String(arg))
-    .join(' ')
-    .trim(); // 最終結果のみtrim
-};
 
 /**
  * Extracts non-message arguments for structured data storage.

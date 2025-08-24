@@ -22,9 +22,13 @@ import baseConfig from '../../../../base/configs/vitest.config.base';
 export default mergeConfig(baseConfig, {
   test: {
     include: [
-      // Unit Test (develop test) exec only sub repositories
-      '**/__tests__/*.test.ts',
-      '**/__tests__/*.spec.ts',
+      // Unit Test - pure unit tests for individual functions/methods
+      'src/**/__tests__/**/*.spec.ts',
+      'src/**/__tests__/**/*.test.ts',
+    ],
+    exclude: [
+      'src/**/__tests__/functional/**/*',
+      'tests/**/*',
     ],
     cacheDir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),
     // sequential test execution to avoid singleton state conflicts
@@ -42,8 +46,9 @@ export default mergeConfig(baseConfig, {
     },
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, '../src'),
-    },
+    alias: [
+      { find: '@', replacement: path.resolve(__dirname, '../src') },
+      { find: /^@\/shared/, replacement: path.resolve(__dirname, '../shared') },
+    ],
   },
 });

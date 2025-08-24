@@ -9,6 +9,9 @@
 // base error class
 import { AglaError } from './AglaError.types';
 
+// Error Messages
+import type { TErrorType } from '../constants/agErrorMessages';
+
 /**
  * AgLogger specific error class that extends AglaError.
  * Provides standardized error handling for AgLogger operations with structured error codes and context.
@@ -38,4 +41,15 @@ import { AglaError } from './AglaError.types';
  * @extends AglaError
  * @see AG_LOGGER_ERROR_CATEGORIES for available error categories
  */
-export class AgLoggerError extends AglaError {}
+export class AgLoggerError extends AglaError {
+  /**
+   * Creates a new AgLoggerError instance.
+   *
+   * @param errorType - The error type identifying the specific type of error
+   * @param message - The human-readable error message
+   * @param context - Optional context information for debugging
+   */
+  constructor(errorType: TErrorType, message: string, context?: Record<string, unknown>) {
+    super(errorType, message, context);
+  }
+}
