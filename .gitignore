@@ -18,7 +18,7 @@
 thumbs.db
 
 #	logs, patches
-*.log*
+*.log
 *.diff
 *.patch
 
@@ -57,7 +57,14 @@ $~*
 !.claude/commands/*
 
 # CLAUDE Memory file
-CLAUDE*.md
+!CLAUDE*.md
+!AGENTS.md
+
+## mcp settings/server's config
+!.mcp.json
+# mcp server's folder
+.serena/
+.lsmcp
 
 #  Test Result
 **/*results/*

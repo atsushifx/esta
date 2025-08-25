@@ -54,7 +54,7 @@ describe('AgLoggerGetMessage', () => {
     it('concatenates multiple parameters', () => {
       const dtDate = '2022-06-10';
       const dtTime = '10:30:00';
-      const result = AgLoggerGetMessage(AG_LOGLEVEL.WARN, 'date:', dtDate, ' time:', dtTime);
+      const result = AgLoggerGetMessage(AG_LOGLEVEL.WARN, 'date:', dtDate, 'time:', dtTime);
       expect(result.logLevel).toEqual(AG_LOGLEVEL.WARN);
       expect(result.message).toEqual('date: 2022-06-10 time: 10:30:00');
       expect(result.args).toEqual([]);
@@ -64,7 +64,7 @@ describe('AgLoggerGetMessage', () => {
      * Handles multiple primitive types concatenated into message string.
      */
     it('handles primitive types', () => {
-      const result = AgLoggerGetMessage(AG_LOGLEVEL.ERROR, 'number:', 123, ' string:', 'abc', ' boolean:', true);
+      const result = AgLoggerGetMessage(AG_LOGLEVEL.ERROR, 'number:', 123, 'string:', 'abc', 'boolean:', true);
       expect(result.logLevel).toEqual(AG_LOGLEVEL.ERROR);
       expect(result.message).toEqual('number: 123 string: abc boolean: true');
       expect(result.args).toEqual([]);

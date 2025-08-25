@@ -6,8 +6,9 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import type { AgTLogLevel } from '../../shared/types';
+import type { AgLogLevel } from '../../shared/types';
 import type { AgLogMessage } from '../../shared/types/AgLogger.types';
+import { parseArgsToAgLogMessage } from '../functional/core/parseArgsToAgLogMessage';
 
 /**
  * Parses log arguments into a structured log message object.
@@ -20,41 +21,14 @@ import type { AgLogMessage } from '../../shared/types/AgLogger.types';
  *               a timestamp string, primitive values, and complex objects.
  * @returns A structured `AgLogMessage` object with parsed timestamp, message, and arguments.
  */
-export const AgLoggerGetMessage = (logLevel: AgTLogLevel, ...args: unknown[]): AgLogMessage => {
-  const args2 = [...args];
+export const AgLoggerGetMessage = (logLevel: AgLogLevel, ...args: unknown[]): AgLogMessage => {
+  const formatted = parseArgsToAgLogMessage(logLevel, ...args);
 
-  const isArgToString = (arg: unknown): boolean => {
-    const type = typeof arg;
-    return ['string', 'number', 'boolean', 'symbol'].includes(type);
-  };
-
-  const isTimestamp = (arg: unknown): boolean => {
-    if (typeof arg !== 'string') { return false; }
-    const timestamp = new Date(arg);
-    return !isNaN(timestamp.getTime());
-  };
-
-  let timestamp: Date = new Date();
-
-  if (args2.length > 0 && isTimestamp(args2[0])) {
-    timestamp = new Date(args2[0] as string);
-    args2.shift();
-  }
-
-  const argsStr: string[] = [];
-  const argsPrm: unknown[] = [];
-  args2.forEach((arg) => {
-    if (isArgToString(arg)) {
-      argsStr.push(String(arg).trim());
-    } else {
-      argsPrm.push(arg);
-    }
-  });
-
+  // parseArgsToAgLogMessage の結果を AgLogMessage 型に変換
   return {
     logLevel,
-    timestamp,
-    message: argsStr.join(' '),
-    args: argsPrm,
+    timestamp: formatted.timestamp,
+    message: formatted.message,
+    args: [...formatted.args], // readonly を通常の配列に変換
   };
 };

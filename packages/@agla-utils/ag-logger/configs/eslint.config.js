@@ -11,6 +11,9 @@ import baseConfig from '../../../../base/configs/eslint.config.base.js';
 
 // settings
 export default [
+  {
+    ignores: [],
+  },
   ...baseConfig,
   // source codes
   {

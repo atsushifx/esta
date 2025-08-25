@@ -1,5 +1,5 @@
-// src/utils/AgLoggerManager.ts
-// @(#) : AG Logger Manager Singleton Class
+// src/AgLoggerManager.class.ts
+// @(#) : AG Logger Manager Singleton Class (Specification Compliant)
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -7,166 +7,199 @@
 // https://opensource.org/licenses/MIT
 
 // types
-import { AG_LOGLEVEL } from '../shared/types';
-import type { AgTLogLevel } from '../shared/types';
-import type { AgFormatFunction, AgLoggerFunction, AgLoggerMap } from '../shared/types/AgLogger.interface';
-
+import type { AgLoggerFunction, AgLoggerMap, AgLoggerOptions } from '../shared/types/AgLogger.interface';
+import { AgLoggerError } from '../shared/types/AgLoggerError.types';
+import type { AgLogLevel } from '../shared/types/AgLogLevel.types';
+// constants
+import { AG_LOGGER_ERROR_MESSAGES, ERROR_TYPES } from '../shared/constants/agErrorMessages';
 // plugins
-import { NullFormat } from '@/plugins/format/NullFormat';
-import { NullLogger } from '@/plugins/logger/NullLogger';
+import { NullLogger } from './plugins/logger/NullLogger';
+
+// AgLogger
+import { AgLogger } from './AgLogger.class';
 
 /**
- * Singleton manager class for handling loggers and formatters by log level.
- * Manages a map of loggers for each log level and a default logger and formatter.
+ * Singleton manager class providing AgLogger frontend interface.
+ * Handles initialization, retrieval, and disposal of AgLogger instances.
+ *
+ * @description 仕様書準拠: docs/specs/refactor-agLoggerManager.spec.md
  */
 export class AgLoggerManager {
   private static instance: AgLoggerManager | undefined;
-  private loggerMap: AgLoggerMap<AgLoggerFunction>;
-  private defaultLogger: AgLoggerFunction;
-  private formatter: AgFormatFunction;
+  private logger: AgLogger | undefined;
 
   private constructor() {
-    this.defaultLogger = NullLogger;
-    this.formatter = NullFormat;
-    this.loggerMap = {
-      [AG_LOGLEVEL.OFF]: NullLogger,
-      [AG_LOGLEVEL.FATAL]: NullLogger,
-      [AG_LOGLEVEL.ERROR]: NullLogger,
-      [AG_LOGLEVEL.WARN]: NullLogger,
-      [AG_LOGLEVEL.INFO]: NullLogger,
-      [AG_LOGLEVEL.DEBUG]: NullLogger,
-      [AG_LOGLEVEL.TRACE]: NullLogger,
-    };
+    // Private constructor for singleton pattern
   }
 
   /**
-   * Returns the singleton instance of AgLoggerManager.
-   * Optionally sets default logger, formatter, and/or logger map on first initialization.
+   * Creates and initializes the AgLoggerManager singleton.
+   * Must be called before getManager().
    *
-   * @param defaultLogger - Optional default logger function.
-   * @param formatter - Optional formatter function.
-   * @param loggerMap - Optional partial map of loggers by log level.
-   * @returns The singleton instance of AgLoggerManager.
+   * @param options - Optional AgLogger configuration options
+   * @returns The AgLoggerManager singleton instance
+   * @throws AgLoggerError if manager already created
    */
-  static getInstance(
-    defaultLogger?: AgLoggerFunction,
-    formatter?: AgFormatFunction,
-    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>,
-  ): AgLoggerManager {
-    AgLoggerManager.instance ??= new AgLoggerManager();
-
-    if (defaultLogger) {
-      AgLoggerManager.instance.defaultLogger = defaultLogger;
+  static createManager(options?: AgLoggerOptions): AgLoggerManager {
+    if (AgLoggerManager.instance !== undefined) {
+      throw new AgLoggerError(
+        ERROR_TYPES.INITIALIZATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.INITIALIZATION].LOGGER_ALREADY_CREATED,
+      );
     }
 
-    if (formatter) {
-      AgLoggerManager.instance.formatter = formatter;
-    }
+    AgLoggerManager.instance = new AgLoggerManager();
+    AgLoggerManager.instance.logger = AgLogger.createLogger(options);
 
-    // Update logger map with provided default logger or custom logger map
-    if (defaultLogger || loggerMap) {
-      AgLoggerManager.instance.updateLogMap(defaultLogger, loggerMap);
+    return AgLoggerManager.instance;
+  }
+
+  /**
+   * Gets the AgLoggerManager singleton instance.
+   * Must be called after createManager() or setLogger().
+   *
+   * @returns The AgLoggerManager singleton instance
+   * @throws AgLoggerError if manager not created
+   */
+  static getManager(): AgLoggerManager {
+    if (AgLoggerManager.instance === undefined) {
+      throw new AgLoggerError(
+        ERROR_TYPES.INITIALIZATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.INITIALIZATION].LOGGER_NOT_CREATED,
+      );
     }
 
     return AgLoggerManager.instance;
   }
 
   /**
-   * Retrieves the logger function associated with the given log level.
-   * Returns the default logger if no specific logger is found.
+   * Gets the AgLogger instance managed by this manager.
    *
-   * @param logLevel - The log level to get the logger for.
-   * @returns The logger function for the specified log level.
+   * @returns The AgLogger instance
+   * @throws AgLoggerError if logger not initialized
    */
-  getLogger(logLevel: AgTLogLevel): AgLoggerFunction {
-    return this.loggerMap[logLevel] ?? this.defaultLogger;
-  }
-
-  /**
-   * Retrieves the current formatter function.
-   *
-   * @returns The formatter function.
-   */
-  getFormatter(): AgFormatFunction {
-    return this.formatter;
-  }
-
-  /**
-   * Updates the internal logger map.
-   * Sets all log levels to the given default logger,
-   * then overrides with any provided specific loggers in the map.
-   *
-   * @param defaultLogger - The default logger function to assign.
-   * @param loggerMap - A partial map of loggers to override default ones.
-   */
-  private updateLogMap(defaultLogger?: AgLoggerFunction, loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>): void {
-    const targetLogger = defaultLogger ?? this.defaultLogger;
-
-    // Set all log levels to the default logger
-    Object.keys(AG_LOGLEVEL).forEach((key) => {
-      const levelCode = AG_LOGLEVEL[key as keyof typeof AG_LOGLEVEL];
-      this.loggerMap[levelCode] = targetLogger;
-    });
-
-    // Override specific log levels with provided loggers
-    if (loggerMap) {
-      Object.keys(loggerMap).forEach((key) => {
-        const levelCode = parseInt(key) as AgTLogLevel;
-        if (loggerMap[levelCode] !== undefined) {
-          this.loggerMap[levelCode] = loggerMap[levelCode]!;
-        }
-      });
+  getLogger(): AgLogger {
+    if (this.logger === undefined) {
+      throw new AgLoggerError(
+        ERROR_TYPES.INITIALIZATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.INITIALIZATION].LOGGER_NOT_CREATED,
+      );
     }
+    return this.logger;
   }
 
   /**
-   * Sets loggers or options.
-   * Supports two overloads:
-   * - Set a logger function for a specific log level.
-   * - Set options including default logger, formatter, and logger map.
+   * Sets an external AgLogger instance for dependency injection.
+   * Only allowed when manager is uninitialized.
    *
-   * @param logLevelOrOptions - Either a log level or an options object.
-   * @param logFunction - Logger function or null (optional, only for log level overload).
+   * @param logger - The AgLogger instance to inject
+   * @throws AgLoggerError if logger already initialized
    */
-  setLogger(logLevel: AgTLogLevel, logFunction: AgLoggerFunction | null): void;
-  setLogger(options: {
-    defaultLogger?: AgLoggerFunction;
-    formatter?: AgFormatFunction;
-    loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
-  }): void;
-  setLogger(
-    logLevelOrOptions: AgTLogLevel | {
-      defaultLogger?: AgLoggerFunction;
-      formatter?: AgFormatFunction;
-      loggerMap?: Partial<AgLoggerMap<AgLoggerFunction>>;
-    },
-    logFunction?: AgLoggerFunction | null,
-  ): void {
-    if (typeof logLevelOrOptions === 'number') {
-      // Old-style: setLogger(logLevel, logFunction)
-      this.loggerMap[logLevelOrOptions] = logFunction ?? this.defaultLogger;
-    } else {
-      // New-style: setLogger(options)
-      const options = logLevelOrOptions;
-      if (options.defaultLogger !== undefined) {
-        this.defaultLogger = options.defaultLogger;
-      }
-      if (options.formatter !== undefined) {
-        this.formatter = options.formatter;
-      }
-
-      // Update logger map if default logger or logger map provided
-      if (options.defaultLogger || options.loggerMap) {
-        this.updateLogMap(options.defaultLogger, options.loggerMap);
-      }
+  setLogger(logger: AgLogger): void {
+    if (this.logger !== undefined) {
+      throw new AgLoggerError(
+        ERROR_TYPES.INITIALIZATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.INITIALIZATION].LOGGER_ALREADY_INITIALIZED,
+      );
     }
+
+    this.logger = logger;
   }
 
   /**
-   * Resets the singleton instance.
-   * This method is intended for testing purposes to ensure clean state between tests.
+   * Updates the logger configuration by delegating to AgLogger.setLoggerConfig.
+   *
+   * @param options - Partial logger configuration options to update
+   * @throws AgLoggerError if logger not initialized
    */
+  /**
+   * Updates the logger configuration by delegating to AgLogger.setLoggerConfig.
+   *
+   * @param options - Partial logger configuration options to update
+   * @throws AgLoggerError if logger not initialized
+   */
+  setLoggerConfig(options: AgLoggerOptions): void {
+    if (this.logger === undefined) {
+      throw new AgLoggerError(
+        ERROR_TYPES.INITIALIZATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.INITIALIZATION].LOGGER_NOT_CREATED,
+      );
+    }
+
+    this.logger.setLoggerConfig(options);
+  }
+
+  /**
+   * Binds a logger function to a specific log level by delegating to AgLogger.
+   *
+   * @param level - The log level to bind the function to
+   * @param fn - The logger function to bind
+   * @returns true if binding was successful
+   * @throws AgLoggerError if logger not initialized
+   */
+  bindLoggerFunction(level: AgLogLevel, fn: AgLoggerFunction): boolean {
+    if (this.logger === undefined) {
+      throw new AgLoggerError(
+        ERROR_TYPES.INITIALIZATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.INITIALIZATION].LOGGER_NOT_CREATED,
+      );
+    }
+
+    this.logger.setLoggerFunction(level, fn);
+    return true;
+  }
+
+  /**
+   * Updates the logger map by delegating to AgLogger.setLoggerConfig.
+   *
+   * @param map - Partial logger map to update
+   * @throws AgLoggerError if logger not initialized
+   */
+  updateLoggerMap(map: Partial<AgLoggerMap<AgLoggerFunction>>): void {
+    if (this.logger === undefined) {
+      throw new AgLoggerError(
+        ERROR_TYPES.INITIALIZATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.INITIALIZATION].LOGGER_NOT_CREATED,
+      );
+    }
+
+    this.logger.setLoggerConfig({ loggerMap: map });
+  }
+  /**
+   * Sets the default logger for a specific level (legacy method).
+   *
+   * @param level - The log level to set default logger for
+   * @throws AgLoggerError if logger not initialized
+   */
+  /**
+   * Removes the custom logger function for a specific level, reverting to default.
+   *
+   * @param level - The log level to remove custom logger function for
+   * @throws AgLoggerError if logger not initialized
+   */
+  /**
+   * Removes the custom logger function for a specific level, reverting to default.
+   *
+   * @param level - The log level to remove custom logger function for
+   * @throws AgLoggerError if logger not initialized
+   */
+  removeLoggerFunction(level: AgLogLevel): void {
+    if (this.logger === undefined) {
+      throw new AgLoggerError(
+        ERROR_TYPES.INITIALIZATION,
+        AG_LOGGER_ERROR_MESSAGES[ERROR_TYPES.INITIALIZATION].LOGGER_NOT_CREATED,
+      );
+    }
+
+    // Reset the specified level to use the default logger by setting NullLogger
+    this.logger.setLoggerFunction(level, NullLogger);
+  }
+
   static resetSingleton(): void {
+    if (AgLoggerManager.instance?.logger !== undefined) {
+      AgLogger.resetSingleton();
+    }
     AgLoggerManager.instance = undefined;
   }
 }
+export default AgLoggerManager;
