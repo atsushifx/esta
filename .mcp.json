@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "lsmcp": {
+      "type": "stdio",
+      "command": "lsmcp",
+      "args": [
+        "-p",
+        "typescript"
+      ]
+    },
+    "serena-mcp": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/app/develop/mcp/serena",
+        "serena-mcp-server",
+        "--context",
+        "ide-assistant",
+        "--project",
+        "~/workspaces/develop/esta"
+      ],
+      "env": {}
+    }
+  }
+}
