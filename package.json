@@ -15,7 +15,7 @@
     "typescript",
     "monorepo"
   ],
-  "packageManager": "pnpm@10.14.0",
+  "packageManager": "pnpm@10.15.0",
   "scripts": {
     "build": "pnpm -r run build",
     "build:esm": "pnpm -r run build:esm",
@@ -27,7 +27,7 @@
     "check:spells": "cspell  --config .vscode/cspell.json --cache --cache-location .cache/cspell/cSpellCache",
     "lint": "pnpm -r run lint",
     "lint:types": "pnpm -r run lint:types",
-    "lint:fix": "echo 'skip where project root'",
+    "lint:all": "pnpm run lint && pnpm run lint:types",
     "lint-all": "pnpm exec eslint --config ./configs/eslint.config.all.js --cache --cache-location .cache/eslint-cache/esLintCache",
     "lint-all:types": "pnpm exec eslint --config ./configs/eslint.config.all.typed.js  --cache --cache-location .cache/eslint-cache/esLintCache",
     "lint:filenames": "pnpm exec ls-lint --config ./configs/ls-lint.yaml ",

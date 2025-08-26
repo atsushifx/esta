@@ -7,15 +7,12 @@
 // https://opensource.org/licenses/MIT
 {
   "extends": "./base/configs/tsconfig.base.json",
-  "include": [
-    "packages/**/*.ts",
-    "shared/common/**/*.ts"
-  ],
   "exclude": [
     ".git",
     "lib",
     "module",
     "node_modules",
+    "dist",
     ".cache"
   ],
   "compilerOptions": {
@@ -25,12 +22,37 @@
     // alias
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "packages/@ag-utils/e2e-fixture-framework/src/*"
+      // monorepo 全体共通の shared
+      "@shared/*": [
+        "shared/packages/*"
+      ],
+      // agla packages
+      "@agla-utils/*": [
+        "packages/@agla-utils/*/",
+        "packages/@agla-utils/*/src"
+      ],
+      "@agla-e2e/*": [
+        "packages/@agla-e2e/*/",
+        "packages/@agla-e2e/*/src"
+      ],
+      // esta packages
+      "@esta-core/*": [
+        "packages/@esta-core/*/",
+        "packages/@esta-core/*/src"
+      ],
+      "@esta-runtime/*": [
+        "packages/@esta-runtime/*/",
+        "packages/@esta-runtime/*/src"
+      ],
+      "@esta-actions/*": [
+        "packages/@esta-actions/*/",
+        "packages/@esta-actions/*/src"
+      ],
+      "@esta-utils/*": [
+        "packages/@esta-utils/*/",
+        "packages/@esta-utils/*/src"
       ]
-    },
-    // types
-    // cache
-    "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"
+    }
   }
+  // types
 }

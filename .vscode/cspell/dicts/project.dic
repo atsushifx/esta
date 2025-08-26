@@ -19,6 +19,7 @@ eget
 ENOENT
 ENOSPC
 errno
+esm
 ESM
 estarc
 extname
