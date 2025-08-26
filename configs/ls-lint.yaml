@@ -9,8 +9,8 @@
 ls:
   .dir: kebab-case | regex:^[@#.]?[a-z-_]+$
   .ts: kebab-case
-  .types.ts: camelCase
-  .class.ts: PascalCase
+  .type.ts: camelCase | PascalCase
+  .class.ts: camelCase | PascalCase
 
   scripts:
     .*: kebab-case
@@ -23,8 +23,8 @@ ls:
 
   packages:
     .ts: camelCase | PascalCase
-    .type.ts: camelCase
-    .class.ts: PascalCase
+    .type.ts: camelCase | PascalCase
+    .class.ts: camelCase | PascalCase
 
 # ignore directories
 ignore:
