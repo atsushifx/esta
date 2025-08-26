@@ -10,6 +10,7 @@
   // "include": []
   // "exclude": [],
   // --- compile options
+  // src: ./shared/configs/tsconfig.base.json
   "compilerOptions": {
     // ✅ 厳格チェック
     "alwaysStrict": true,
@@ -20,20 +21,21 @@
     "module": "ES2022",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "verbatimModuleSyntax": false,
     // ✅ 型解決と互換性
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "emitDeclarationOnly": true,
     "allowImportingTsExtensions": true,
     "skipLibCheck": true,
+    // ✅ 宣言ファイル
     "declaration": true,
     "declarationMap": true,
-    // typesRoots : 必要な場合に設定
-    // ✅ 出力・ソースマップ
+    // ✅ 出力
     "sourceMap": false,
+    "outDir": "./dist",
     "newLine": "LF",
     "composite": false,
+    // ✅ 増分ビルド
     // incremental build
     "incremental": true,
     // ✅ ライブラリ
@@ -41,13 +43,6 @@
       "ESNext",
       "DOM"
     ],
-    // input/output Dir
-    // "rootDir": "./src",
-    "outDir": "./dist",
-    // ✅ エイリアス設定（←追加！）
-    // "baseUrl": "./src",
-    // ✅ 型補完
-    // "typeRoots": [],   // typesが読み込めない場合に設定
     "types": [
       "node"
     ]

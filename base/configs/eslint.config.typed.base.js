@@ -37,7 +37,7 @@ export default [
       parser: tsparser,
       parserOptions: {
         project: ['./tsconfig.json'],
-        tsconfigRootDir: '.',
+        tsconfigRootDir: process.cwd(),
         sourceType: 'module',
       },
     },
