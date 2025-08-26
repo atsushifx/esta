@@ -7,7 +7,7 @@
 // https://opensource.org/licenses/MIT
 
 // import commitlint config type
-import { default as baseConfig } from '../../configs/commitlint.config.base.js'; // ← .js拡張子を必ず付ける
+import { default as baseConfig } from '../../../../base/configs/commitlint.config.base.js'; // ← .js拡張子を必ず付ける
 
 import type { UserConfig } from '@commitlint/types';
 
