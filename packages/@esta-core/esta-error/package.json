@@ -1,0 +1,53 @@
+{
+  "name": "@esta-core/esta-error",
+  "_comment": "@(#) : structured logging framework with multiple output formats",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Abstract logger system with various implementations.",
+  "author": "atsushifx <https://github.com/atsushifx>",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./lib/index.js",
+  "module": "./module/index.js",
+  "types": "./lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./module/index.js",
+      "require": "./lib/index.cjs"
+    }
+  },
+  "files": [
+    "lib",
+    "module"
+  ],
+  "scripts": {
+    "build": "pnpm run build:cjs && pnpm run build:esm",
+    "build:cjs": "tsup --config ./configs/tsup.config.ts",
+    "build:esm": "tsup --config ./configs/tsup.config.module.ts",
+    "clean": "rimraf lib module .cache",
+    "format:dprint": "dprint fmt",
+    "check:dprint": "dprint check",
+    "check:types": "tsc --noEmit --incremental",
+    "check:spells": "cspell --config .vscode/cspell.json --cache --cache-location ../../../.cache/cspell/cSpellCache",
+    "lint": "pnpm exec eslint --config ./configs/eslint.config.js --cache --cache-location ../../../.cache/eslint-cache/esLintCache ",
+    "lint:types": "pnpm exec eslint --config ./configs/eslint.config.typed.js --cache --cache-location ../../../.cache/eslint-cache/esLintCache",
+    "lint:all": "pnpm run lint && pnpm run lint:types",
+    "lint:fix": "pnpm run lint --fix",
+    "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*",
+    "test:all": "pnpm run test:develop && pnpm run test:functional && pnpm run test:ci && pnpm run test:e2e",
+    "test:develop": "pnpm exec vitest run --config ./configs/vitest.config.unit.ts",
+    "test:functional": "pnpm exec vitest run --config ./configs/vitest.config.functional.ts",
+    "test:ci": "pnpm exec vitest run --config ./configs/vitest.config.integration.ts",
+    "test:e2e": "pnpm exec vitest run --config ./configs/vitest.config.e2e.ts",
+    "sync:configs": "bash ../../../scripts/sync-configs.sh . "
+  },
+  "engines": {
+    "pnpm": ">=10",
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@shared/types": "workspace:*"
+  }
+}
