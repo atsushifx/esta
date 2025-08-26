@@ -8,7 +8,7 @@
 {
   "extends": "../../../base/configs/tsconfig.base.json",
   "include": [
-    "base/**/*.ts"
+    "constants/*.ts"
   ],
   "exclude": [
     ".git",
@@ -26,6 +26,6 @@
     // "paths": {},
     // types
     // cache
-    "tsBuildInfoFile": ".cache/tsbuild-cache/tsbuildinfo"
+    "tsBuildInfoFile": ".cache/tsconfig/tsbuildinfo"
   }
 }

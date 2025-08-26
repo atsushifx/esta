@@ -34,7 +34,6 @@
     "composite": false,
     // incremental build
     "incremental": true,
-    "tsBuildInfoFile": ".cache/tsbuildinfo",
     // ✅ ライブラリ
     "lib": [
       "ESNext",
