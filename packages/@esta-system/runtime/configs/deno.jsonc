@@ -1,0 +1,15 @@
+// src: configs/deno.jsonc
+// @(#) : deno build options
+//
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+{
+  "extends": "../../../../base/configs/deno.base.jsonc",
+  "importMap": "./deno_map.jsonc",
+  "tasks": {
+    "check": "deno check ./deno/mod.ts",
+    "test": "deno test -A ./test",
+  },
+}

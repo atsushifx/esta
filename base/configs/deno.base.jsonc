@@ -1,0 +1,37 @@
+// src: base/configs/deno.base.jsonc
+// @(#) : Deno base options for build
+//
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+{
+  "compilerOptions": {
+    // ✅ 厳格チェック
+    "strict": true,
+    "alwaysStrict": true,
+    "forceConsistentCasingInFileNames": true,
+    // ✅ ECMAScriptターゲット
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    // ✅ モジュール解決
+    // DenoはデフォルトでESMなので "module": "esnext" でOK
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    // ✅ interop
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    // ✅ skipLibCheck相当
+    "skipLibCheck": true,
+    // ✅ 出力先はDenoが直接扱うので outDir は通常不要
+    // "outDir": "./dist" は使わない（Denoは型チェック専用）
+    "sourceMap": false
+  },
+  // ✅ tasks (tsconfigにはないがdeno.jsonc独自)
+  "tasks": {
+    "check": "deno check ./deno/mod.ts",
+    "test": "deno test -A"
+  }
+}
