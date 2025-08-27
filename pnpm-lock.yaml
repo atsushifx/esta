@@ -172,6 +172,8 @@ importers:
         specifier: workspace:*
         version: link:../../../shared/packages/constants
 
+  packages/@esta-system/runtime: {}
+
   packages/@esta-utils/command-runner:
     dependencies:
       '@esta-utils/get-platform':
