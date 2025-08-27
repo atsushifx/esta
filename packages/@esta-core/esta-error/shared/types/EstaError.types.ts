@@ -1,19 +1,29 @@
-// shared/types/AgLoggerError.types.ts
-// @(#) : AgLogger Specific Error Class
+// src: shared/types/EstaError.types.ts
+// @(#) : Esta specific error class with severity levels and chaining
 //
-// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// base error class
+// Shared dependencies - Internal shared packages and monorepo modules
 import { AglaError } from '@shared/types';
+
+// Local types - Type definitions and interfaces from current package
 import type { ErrorSeverity } from './ErrorSeverity.types';
 
-// Error Messages
+/**
+ * Esta-specific error class that extends AglaError with additional context and features.
+ * Provides severity levels, error codes, timestamps, and error chaining capabilities.
+ *
+ * @extends AglaError
+ */
 export class EstaError extends AglaError {
+  /** The error code for identification and categorization */
   public readonly code: string;
+  /** The timestamp when this error was created */
   public readonly timestamp: Date;
+  /** The severity level of this error */
   public readonly severity: ErrorSeverity;
 
   /**
@@ -38,6 +48,19 @@ export class EstaError extends AglaError {
     this.timestamp = new Date();
   }
 
+  /**
+   * Serializes the error to a JSON object containing all error information.
+   *
+   * @returns Object representation of the error with all relevant fields
+   *
+   * @example
+   * ```typescript
+   * const error = new EstaError('AUTH_ERROR', 'Login failed', 'AUTH_001', ErrorSeverity.ERROR);
+   * const json = error.toJSON();
+   * console.log(json.errorType); // 'AUTH_ERROR'
+   * console.log(json.severity); // 'error'
+   * ```
+   */
   toJSON(): object {
     return {
       errorType: this.errorType,
@@ -49,11 +72,40 @@ export class EstaError extends AglaError {
     };
   }
 
+  /**
+   * Returns a formatted string representation of the error with severity level and timestamp.
+   *
+   * @returns Formatted string with severity, timestamp, and error details
+   *
+   * @example
+   * ```typescript
+   * const error = new EstaError('DB_ERROR', 'Connection failed', 'DB_001', ErrorSeverity.ERROR);
+   * console.log(error.toString());
+   * // Output: "[ERROR] 2025-01-27T10:30:45.123Z DB_ERROR: Connection failed"
+   * ```
+   */
   toString(): string {
     const baseStr = super.toString();
     return `[${this.severity.toUpperCase()}] ${this.timestamp.toISOString()} ${baseStr}`;
   }
 
+  /**
+   * Creates a new EstaError that chains this error with a causing error.
+   * Combines error messages and preserves context information.
+   *
+   * @param cause - The error that caused this error
+   * @returns New EstaError instance with chained error information
+   *
+   * @example
+   * ```typescript
+   * const originalError = new Error('Database connection lost');
+   * const estaError = new EstaError('DB_ERROR', 'Query failed', 'DB_001', ErrorSeverity.ERROR);
+   * const chainedError = estaError.chain(originalError);
+   *
+   * console.log(chainedError.message);
+   * // Output: "Query failed (caused by: Database connection lost)"
+   * ```
+   */
   chain(cause: Error): EstaError {
     const chainedError = new EstaError(
       this.errorType,

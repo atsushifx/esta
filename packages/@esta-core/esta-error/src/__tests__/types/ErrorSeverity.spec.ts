@@ -1,4 +1,15 @@
+// src: src/__tests__/types/ErrorSeverity.spec.ts
+// @(#) : Unit tests for ErrorSeverity enum and validation functions
+//
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// Testing framework - Testing utilities and assertions
 import { describe, expect, it } from 'vitest';
+
+// Local modules - Application code and utilities from current package
 import { ErrorSeverity, isValidErrorSeverity } from '../../../shared/types';
 
 describe('ErrorSeverity enum', () => {
