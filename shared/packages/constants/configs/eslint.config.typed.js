@@ -6,6 +6,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// resolve root directory
+import path from 'path';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+// directories
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const __rootDir = path.resolve(__dirname, '..');
+
 // parser
 import tsparser from '@typescript-eslint/parser';
 
@@ -26,7 +35,7 @@ export default [
       parser: tsparser,
       parserOptions: {
         project: ['./tsconfig.json'],
-        tsconfigRootDir: '.',
+        tsconfigRootDir: __rootDir,
         sourceType: 'module',
       },
     },
