@@ -1,4 +1,4 @@
-// src: shared/types/src/TExecRuntime.ts
+// src: shared/types/TExecRuntime.types.ts
 // @(#) : TypeScript execution runtime enum
 //
 // Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
