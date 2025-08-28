@@ -31,7 +31,7 @@ export const getRuntime = (): TExecRuntime => {
   }
 
   // 4. Node.js detection
-  if (typeof process !== 'undefined' && 'versions' in process && process.versions?.node) {
+  if (typeof process !== 'undefined' && 'versions' in process && process.versions.node) {
     return TExecRuntime.Node;
   }
 
