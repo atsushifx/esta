@@ -6,6 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// Shared types for runtime enum
 import { TExecRuntime } from '../shared/types/TExecRuntime.types.ts';
 
 // Type declarations for global objects

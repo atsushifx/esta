@@ -6,21 +6,46 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// Node.js built-in modules
 import { exec } from 'child_process';
 import { promisify } from 'util';
+
+// Test framework utilities
 import { expect } from 'vitest';
 
+/** 非同期exec関数 - child_processのexecをPromise化 */
 const execAsync = promisify(exec);
 
+/**
+ * ランタイム検出テストの結果を表す型定義
+ */
 export type RuntimeTestResult = {
+  /** 実行ステータス - 通常は'success'または'error' */
   status: string;
+
+  /** 検出されたランタイム名 - TExecRuntimeのenum値と対応 */
   runtime: string;
+
+  /** テスト実行時のタイムスタンプ - ISO 8601形式 */
   timestamp: string;
+
+  /** プロセス情報 - Node.jsの場合はversion、他の環境では識別情報 */
   process: string;
 };
 
 /**
- * Execute runtime detector helper and return parsed result
+ * ランタイム検出ヘルパープログラムを実行し、パースされた結果を返す
+ *
+ * @param command - 実行コマンド（'node', 'deno run', 'bun run'等）
+ * @param helperPath - ヘルパープログラムのファイルパス
+ * @returns ランタイム検出結果のPromise
+ * @throws コマンド実行失敗またはJSON解析失敗時にエラーをthrow
+ *
+ * @example
+ * ```typescript
+ * const result = await executeRuntimeDetector('node', './helper.js');
+ * console.log(result.runtime); // 'Node'
+ * ```
  */
 export const executeRuntimeDetector = async (command: string, helperPath: string): Promise<RuntimeTestResult> => {
   try {
@@ -54,7 +79,18 @@ export const executeRuntimeDetector = async (command: string, helperPath: string
 };
 
 /**
- * Check if runtime is available
+ * 指定されたランタイムが利用可能かチェックする
+ *
+ * @param command - チェックするランタイムコマンド（'node', 'deno', 'bun'等）
+ * @returns ランタイムが利用可能な場合はtrue、そうでなければfalse
+ *
+ * @example
+ * ```typescript
+ * const isAvailable = await isRuntimeAvailable('deno');
+ * if (isAvailable) {
+ *   // Denoを使ったテストを実行
+ * }
+ * ```
  */
 export const isRuntimeAvailable = async (command: string): Promise<boolean> => {
   try {

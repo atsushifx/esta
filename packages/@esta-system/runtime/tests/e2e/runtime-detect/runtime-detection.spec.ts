@@ -1,9 +1,23 @@
+// src: tests/e2e/runtime-detect/runtime-detection.spec.ts
+// @(#) : E2E test suite for runtime detection
+//
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// Node.js built-in modules
 import { existsSync } from 'fs';
 import path from 'path';
+
+// Test framework utilities
 import { describe, expect, it } from 'vitest';
+
+// Test helper utilities
 import { executeRuntimeDetector, isRuntimeAvailable } from '../helpers/runtimeTestUtils';
 
 describe('Runtime Detection E2E Tests', () => {
+  /** ランタイム検出ヘルパープログラムの絶対パス */
   const helperPath = path.resolve(__dirname, 'helpers', 'runtime-detector.ts');
 
   /**

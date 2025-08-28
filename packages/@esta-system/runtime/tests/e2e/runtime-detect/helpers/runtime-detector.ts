@@ -1,29 +1,36 @@
-/**
- * Runtime detector helper program
- * This program will be executed by different runtimes to test runtime detection
- *
- * Usage:
- * - Node.js: `node runtime-detector.js`
- * - Deno: `deno run runtime-detector.ts`
- * - Bun: `bun run runtime-detector.ts`
- *
- * Output: JSON format for easy E2E test parsing
- */
+// src: tests/e2e/runtime-detect/helpers/runtime-detector.ts
+// @(#) : Runtime detector helper program for E2E testing
+//
+// Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
-// Import for both re-export and main execution
+// Internal module imports - runtime detection functionality
 import { getRuntime } from '../../../../src/getRuntime.ts';
 
-// Re-export for E2E tests
+// Type exports for E2E tests
 export type { TExecRuntime } from '../../../../shared/types/TExecRuntime.types.ts';
 export { getRuntime } from '../../../../src/getRuntime.ts';
 
-// Output runtime detection result as JSON for E2E testing
+/** 現在のランタイム環境を検出した結果 */
 const runtime = getRuntime();
 
+/**
+ * E2Eテスト用のJSON出力結果オブジェクト
+ * ランタイム検出結果、タイムスタンプ、プロセス情報、実行ステータスを含む
+ */
 const result = {
+  /** 検出されたランタイム環境 */
   runtime,
+
+  /** 実行時のタイムスタンプ（ISO 8601形式） */
   timestamp: new Date().toISOString(),
+
+  /** プロセスバージョン情報または'unknown' */
   process: process.version || 'unknown',
+
+  /** 実行ステータス - 成功時は'success' */
   status: 'success',
 };
 

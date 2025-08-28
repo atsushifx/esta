@@ -6,9 +6,14 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// Test framework utilities
 import { describe, expect, it } from 'vitest';
+
+// Types and target function
 import { TExecRuntime } from '../../shared/types/TExecRuntime.types';
 import { getRuntime } from '../getRuntime';
+
+// Test helper utilities
 import { withEnvVar, withMockRuntime } from './helpers/testUtils';
 
 describe('getRuntime function', () => {
