@@ -14,7 +14,7 @@
     // ✅ ECMAScriptターゲット
     "lib": [
       "esnext",
-      "dom"
+      "dom",
     ],
     // ✅ モジュール解決
     // DenoはデフォルトでESMなので "module": "esnext" でOK
@@ -27,11 +27,11 @@
     "skipLibCheck": true,
     // ✅ 出力先はDenoが直接扱うので outDir は通常不要
     // "outDir": "./dist" は使わない（Denoは型チェック専用）
-    "sourceMap": false
+    "sourceMap": false,
   },
   // ✅ tasks (tsconfigにはないがdeno.jsonc独自)
   "tasks": {
     "check": "deno check ./deno/mod.ts",
-    "test": "deno test -A"
-  }
+    "test": "deno test -A",
+  },
 }
