@@ -17,7 +17,7 @@ declare global {
 
 export const getRuntime = (): TExecRuntime => {
   // 1. GitHub Actions detection (highest priority)
-  if (process.env.GITHUB_ACTIONS === 'true') {
+  if (typeof process !== 'undefined' && process.env?.GITHUB_ACTIONS === 'true') {
     return TExecRuntime.GHA;
   }
 
@@ -32,7 +32,7 @@ export const getRuntime = (): TExecRuntime => {
   }
 
   // 4. Node.js detection
-  if (typeof process !== 'undefined' && 'versions' in process && process.versions.node) {
+  if (typeof process !== 'undefined' && 'versions' in process && process.versions?.node) {
     return TExecRuntime.Node;
   }
 
