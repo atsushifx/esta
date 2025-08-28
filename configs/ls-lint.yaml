@@ -22,7 +22,7 @@ ls:
       .*: PascalCase
 
   packages:
-    .ts: camelCase | PascalCase
+    .ts: kebab-case | camelCase | PascalCase
     .type.ts: camelCase | PascalCase
     .class.ts: camelCase | PascalCase
 
