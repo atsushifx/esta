@@ -87,4 +87,86 @@ describe('Runtime Detection E2E Tests', () => {
       }, 10_000);
     });
   });
+
+  /**
+   * @description ランタイム検出のエラーハンドリング機能テスト
+   * - 不正なコマンドでの実行時の例外処理
+   * - 存在しないファイルパスでの実行エラー処理
+   * - タイムアウト時の適切な処理
+   */
+  describe('Given: ランタイム検出のエラーハンドリング', () => {
+    /**
+     * @description エラー状況での実行とエラー処理の検証
+     * - コマンド実行失敗時の例外キャッチ
+     * - 不正なパス指定時の適切なエラーメッセージ
+     * - 長時間実行コマンドのタイムアウト処理
+     */
+    describe('When: エラー状況でランタイム検出を実行する', () => {
+      it('存在しないコマンドでの実行時、適切なエラーが投げられる', async () => {
+        await expect(executeRuntimeDetector('nonexistent-command', helperPath))
+          .rejects.toThrow();
+      }, 5_000);
+
+      it('存在しないファイルパスでの実行時、適切なエラーが投げられる', async () => {
+        const nonExistentPath = path.resolve(__dirname, 'nonexistent-file.ts');
+
+        await expect(executeRuntimeDetector('pnpm exec tsx', nonExistentPath))
+          .rejects.toThrow();
+      }, 5_000);
+
+      it('タイムアウト発生時、適切にエラーハンドリングされる', async () => {
+        const timeoutCommand = process.platform === 'win32'
+          ? 'timeout /t 15'
+          : 'sleep 15';
+
+        await expect(executeRuntimeDetector(timeoutCommand, helperPath))
+          .rejects.toThrow();
+      }, 8_000);
+    });
+  });
+
+  /**
+   * @description 環境変数汚染対策とテスト分離機能テスト
+   * - テスト実行前後での環境変数状態の保持
+   * - 複数テスト実行時の相互影響の排除
+   * - プロセス環境の適切なクリーンアップ
+   */
+  describe('Given: テスト環境の分離とクリーンアップ', () => {
+    /**
+     * @description 環境変数とプロセス状態の分離テスト
+     * - 各テスト実行前後での環境変数の一貫性確認
+     * - テスト間でのランタイム検出結果の独立性検証
+     * - グローバル状態のクリーンアップ動作確認
+     */
+    describe('When: 複数のテストを連続実行する', () => {
+      it('GITHUB_ACTIONS環境変数が設定されても他のテストに影響しない', async () => {
+        // 最初のテスト: GITHUB_ACTIONS=true で実行
+        process.env.GITHUB_ACTIONS = 'true';
+        const firstResult = await executeRuntimeDetector('pnpm exec tsx', helperPath);
+
+        // 環境変数をクリア
+        delete process.env.GITHUB_ACTIONS;
+
+        // 2番目のテスト: 通常のNode.js環境での実行
+        const secondResult = await executeRuntimeDetector('pnpm exec tsx', helperPath);
+
+        // 結果の独立性を確認
+        expect(firstResult.runtime).not.toBe(secondResult.runtime);
+        expect(secondResult.runtime).toBe('Node');
+      }, 15_000);
+
+      it('複数回の実行で一貫したランタイム検出結果が得られる', async () => {
+        const results: string[] = [];
+
+        // 3回連続でランタイム検出を実行
+        for (let i = 0; i < 3; i++) {
+          const result = await executeRuntimeDetector('pnpm exec tsx', helperPath);
+          results.push(result.runtime);
+        }
+
+        // 全ての結果が同じであることを確認
+        expect(results.every((runtime) => runtime === results[0])).toBe(true);
+      }, 20_000);
+    });
+  });
 });
