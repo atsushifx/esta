@@ -24,6 +24,8 @@
     // ✅ 型解決と互換性
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "emitDeclarationOnly": true,
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "declaration": true,
     "declarationMap": true,

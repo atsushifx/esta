@@ -34,6 +34,10 @@ $WinGetPackages = @(
 )
 
 $ScoopPackages = @(
+    # Deno Runtime
+    "deno",
+    # Bun Runtime
+    "bun",
     # Gitフックマネージャー
     "lefthook",
     # フォーマッター
