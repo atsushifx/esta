@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { TExecRuntime } from '../shared/types/TExecRuntime.types';
+import { TExecRuntime } from '../shared/types/TExecRuntime.types.ts';
 
 // Type declarations for global objects
 declare global {
