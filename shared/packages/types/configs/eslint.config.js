@@ -19,8 +19,9 @@ export default [
   {
     files: [
       'index.ts',
-      'constants/**/*.ts',
+      'src/**/*.ts',
       'types/**/*.ts',
+      'tests/**/*.ts',
     ],
     settings: {
       'import/resolver': {

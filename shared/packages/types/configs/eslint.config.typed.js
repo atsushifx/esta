@@ -28,8 +28,9 @@ export default [
   {
     files: [
       'index.ts',
-      'constants/**/*.ts',
+      'src/**/*.ts',
       'types/**/*.ts',
+      'tests/**/*.ts',
     ],
     languageOptions: {
       parser: tsparser,

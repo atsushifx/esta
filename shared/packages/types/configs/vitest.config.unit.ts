@@ -11,6 +11,7 @@ import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 // base directory
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const __rootDir = path.relative(__dirname, '../');
 
 // system config
 import { mergeConfig } from 'vitest/config';
@@ -30,7 +31,7 @@ export default mergeConfig(baseConfig, {
       'src/**/__tests__/functional/**/*',
       'tests/**/*',
     ],
-    cacheDir: path.resolve(__dirname, '../../../.cache/vitest-cache/unit/'),
+    cacheDir: path.resolve(__rootDir, '.cache/vitest-cache/unit/'),
     // sequential test execution to avoid singleton state conflicts
     sequence: {
       concurrent: false,
@@ -47,8 +48,8 @@ export default mergeConfig(baseConfig, {
   },
   resolve: {
     alias: [
-      { find: '@', replacement: path.resolve(__dirname, '../src') },
-      { find: /^@\/shared/, replacement: path.resolve(__dirname, '../shared') },
+      { find: '@', replacement: path.resolve(__rootDir, './src') },
+      { find: /^@\/shared/, replacement: path.resolve(__rootDir, './shared') },
     ],
   },
 });
