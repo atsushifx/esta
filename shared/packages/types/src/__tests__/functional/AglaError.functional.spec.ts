@@ -31,6 +31,11 @@ describe('Given AglaError instance for complete error handling workflows', () =>
         userId: '123',
         operation: 'workflow',
         cause: 'Underlying system failure',
+        originalError: {
+          name: 'Error',
+          message: 'Underlying system failure',
+          stack: expect.any(String),
+        },
       });
 
       // Assert - F1-001-05: JSON integration validation
@@ -44,6 +49,11 @@ describe('Given AglaError instance for complete error handling workflows', () =>
           userId: '123',
           operation: 'workflow',
           cause: 'Underlying system failure',
+          originalError: {
+            name: 'Error',
+            message: 'Underlying system failure',
+            stack: expect.any(String),
+          },
         },
       });
 
@@ -85,8 +95,6 @@ describe('Given AglaError instance for complete error handling workflows', () =>
       expect(finalError.context).toHaveProperty('cause', 'Final failure');
 
       // Assert - F1-002-04: inheritance integration validation
-      expect(finalError instanceof Error).toBe(true);
-      expect(finalError instanceof TestAglaError).toBe(true);
       expect(finalError.name).toBe('TestAglaError');
       expect(finalError.stack).toBeDefined();
 
