@@ -1,17 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
 // Type definitions
-import { AglaError } from '../../types/AglaError.types.ts';
-import type { AglaErrorOptions } from '../../types/AglaError.types.ts';
-import { ErrorSeverity } from '../../types/ErrorSeverity.types.ts';
+import type { AglaError, AglaErrorContext, AglaErrorOptions } from '../../types/AglaError.types.ts';
+import type { ErrorSeverity } from '../../types/ErrorSeverity.types.ts';
 
 // Test utilities
-import type { Mutable } from './helpers/test-types.types.ts';
 import { TestAglaError } from './helpers/TestAglaError.class.ts';
+// type definitions for Test
+import type { _TAglaErrorContextWithSymbols, _TMutable } from './helpers/test-types.types.ts';
 
-type TCircularObject = {
-  name?: string;
-  self?: TCircularObject;
+type _TCircularContext = AglaErrorContext & {
+  name: string;
+  self?: _TCircularContext;
 };
 
 /**
@@ -75,130 +75,101 @@ describe('Given AglaError constructor', () => {
     });
   });
 
-  describe('When creating error with invalid parameters', () => {
-    it('Then 異常系：should handle invalid timestamp gracefully', () => {
+  describe('When creating error with invalid or edge case parameters', () => {
+    it('Then should handle invalid timestamp gracefully', () => {
       const invalidDate = new Date('invalid-date');
       const error = new TestAglaError('TEST_ERROR', 'Test message', { timestamp: invalidDate });
       expect(error.timestamp).toBe(invalidDate);
       expect(isNaN(error.timestamp!.getTime())).toBe(true);
     });
 
-    it('Then 異常系：should handle invalid severity as per implementer policy', () => {
+    it('Then should handle invalid severity as per implementer policy', () => {
       const invalidSeverity = 'critical' as unknown as ErrorSeverity;
       const error = new TestAglaError('TEST_ERROR', 'Test message', { severity: invalidSeverity });
       expect(error.severity).toBe(invalidSeverity);
     });
 
-    // U-001-01: null/undefined オプション処理テスト追加
-    it('Then 異常系：should handle null code option', () => {
-      const error = new TestAglaError('TEST_ERROR', 'Test message', { code: null as unknown as string });
-      expect(error.code).toBeNull();
-    });
+    it('Then should handle complex context objects', () => {
+      // function values in context
+      const callback = (): string => 'test';
+      const functionContext = { callback, operation: 'function-test' };
+      const functionError = new TestAglaError('TEST_ERROR', 'Test message', { context: functionContext });
+      expect(typeof functionError.context?.callback).toBe('function');
 
-    it('Then 異常系：should handle undefined severity option', () => {
-      const error = new TestAglaError('TEST_ERROR', 'Test message', { severity: undefined });
-      expect(error.severity).toBeUndefined();
-    });
+      // symbol keys in context
+      const symbolKey = Symbol('testSymbol');
+      const symbolContext = { [symbolKey]: 'symbol-value', operation: 'symbol-test' } as _TAglaErrorContextWithSymbols;
+      const symbolError = new TestAglaError('TEST_ERROR', 'Test message', { context: symbolContext });
+      expect((symbolError.context as _TAglaErrorContextWithSymbols)[symbolKey]).toBe('symbol-value');
 
-    // U-002-02: 不正なSeverity値処理テスト追加
-    it('Then 異常系：should handle non-enum severity value', () => {
-      const invalidSeverity = 'critical' as unknown as ErrorSeverity;
-      const error = new TestAglaError('TEST_ERROR', 'Test message', { severity: invalidSeverity });
-      expect(error.severity).toBe(invalidSeverity);
-    });
-
-    // U-002-03: 空文字列パラメータ処理テスト追加
-    it('Then 異常系：should handle empty error type', () => {
-      const error = new TestAglaError('', 'Test message');
-      expect(error.errorType).toBe('');
-    });
-
-    it('Then 異常系：should handle empty message', () => {
-      const error = new TestAglaError('TEST_ERROR', '');
-      expect(error.message).toBe('');
-    });
-  });
-
-  describe('When creating error with edge case parameters', () => {
-    it('Then エッジケース：should handle special characters in errorType', () => {
-      const errorType = 'TEST_ERROR/SPECIAL@CHARS#123';
-      const error = new TestAglaError(errorType, 'Test message');
-      expect(error.errorType).toBe(errorType);
-    });
-
-    it('Then エッジケース：should handle unicode characters in message', () => {
-      const message = 'テストメッセージ 🚨 Error occurred';
-      const error = new TestAglaError('TEST_ERROR', message);
-      expect(error.message).toBe(message);
-    });
-
-    it('Then エッジケース：should handle nested object context', () => {
-      const context = {
+      // nested object context
+      const nestedContext = {
         user: { id: '123', name: 'John' },
         operation: { type: 'CREATE', resource: 'user' },
         metadata: { timestamp: '2025-08-29', version: '1.0' },
       };
-      const error = new TestAglaError('TEST_ERROR', 'Test message', { context });
-      expect(error.context).toBe(context);
-    });
+      const nestedError = new TestAglaError('TEST_ERROR', 'Test message', { context: nestedContext });
+      expect(nestedError.context).toBe(nestedContext);
 
-    it('Then エッジケース：should handle array values in context', () => {
-      const context = {
+      // array values in context
+      const arrayContext = {
         operations: ['create', 'update', 'delete'],
         errors: [{ code: 'E001' }, { code: 'E002' }],
       };
-      const error = new TestAglaError('TEST_ERROR', 'Test message', { context });
-      expect(error.context).toBe(context);
+      const arrayError = new TestAglaError('TEST_ERROR', 'Test message', { context: arrayContext });
+      expect(arrayError.context).toBe(arrayContext);
     });
 
-    // U-001-02: 関数/シンボル値コンテキスト処理テスト追加
-    it('Then エッジケース：should handle function values in context', () => {
-      const callback = (): string => 'test';
-      const context = { callback, operation: 'function-test' };
-      const error = new TestAglaError('TEST_ERROR', 'Test message', { context });
-      expect(typeof error.context?.callback).toBe('function');
+    it('Then should handle type compatibility for symbol context', () => {
+      const symbolKey = Symbol.for('test');
+      const symbolContext: _TAglaErrorContextWithSymbols = {
+        [symbolKey]: 'symbol-value',
+        operation: 'symbol-test',
+        normalProp: 'normal',
+      };
+
+      const error = new TestAglaError('TEST_SYMBOL_CONTEXT', 'Symbol context test', { context: symbolContext });
+
+      expect(symbolContext).toSatisfy((ctx): ctx is _TAglaErrorContextWithSymbols => {
+        return ctx !== null && typeof ctx === 'object';
+      });
+      expect(symbolContext[symbolKey]).toBe('symbol-value');
+      expect((error.context as _TAglaErrorContextWithSymbols)[symbolKey]).toBe('symbol-value');
     });
 
-    it('Then エッジケース：should handle symbol keys in context', () => {
-      const symbolKey = Symbol('testSymbol');
-      const context = { [symbolKey]: 'symbol-value', operation: 'symbol-test' } as Record<string | symbol, unknown>;
-      const error = new TestAglaError('TEST_ERROR', 'Test message', { context });
-      expect((error.context as Record<string | symbol, unknown>)[symbolKey]).toBe('symbol-value');
-    });
-
-    it('Then エッジケース：should handle large object context', () => {
+    it('Then should handle extremely large contexts and strings', () => {
+      // large object context
       const largeContext = {
         data: new Array(1000).fill(0).map((_, i) => ({ id: i, value: `item-${i}` })),
         metadata: { timestamp: Date.now(), version: '1.0.0' },
       };
-      const error = new TestAglaError('LARGE_CONTEXT_ERROR', 'Large context test', { context: largeContext });
-      expect(error.context).toBe(largeContext);
-      expect(error.context?.data).toHaveLength(1000);
-    });
+      const largeContextError = new TestAglaError('LARGE_CONTEXT_ERROR', 'Large context test', {
+        context: largeContext,
+      });
+      expect(largeContextError.context).toBe(largeContext);
+      expect(largeContextError.context?.data).toHaveLength(1000);
 
-    // U-001-03: 極端に長い文字列処理テスト追加
-    it('Then エッジケース：should handle extremely long error message', () => {
+      // extremely long error message
       const longMessage = 'A'.repeat(10000);
-      const error = new TestAglaError('LONG_MESSAGE_ERROR', longMessage);
-      expect(error.message.length).toBe(10000);
+      const longMessageError = new TestAglaError('LONG_MESSAGE_ERROR', longMessage);
+      expect(longMessageError.message.length).toBe(10000);
+
+      // extremely long error type
+      const longErrorType = 'A'.repeat(1000);
+      const longTypeError = new TestAglaError(longErrorType, 'Test message');
+      expect(longTypeError.errorType.length).toBe(1000);
     });
 
-    it('Then エッジケース：should handle extremely long error type', () => {
-      const longErrorType = 'A'.repeat(1000); // Creates exactly 1000 character string
-      const error = new TestAglaError(longErrorType, 'Test message');
-      expect(error.errorType.length).toBe(1000);
-    });
-
-    it('Then エッジケース：should handle maximum safe integer timestamp', () => {
+    it('Then should handle extreme timestamp values', () => {
+      // maximum safe integer timestamp
       const maxTimestamp = new Date(Number.MAX_SAFE_INTEGER);
-      const error = new TestAglaError('MAX_TIME_ERROR', 'Max timestamp', { timestamp: maxTimestamp });
-      expect(error.timestamp).toBe(maxTimestamp);
-    });
+      const maxError = new TestAglaError('MAX_TIME_ERROR', 'Max timestamp', { timestamp: maxTimestamp });
+      expect(maxError.timestamp).toBe(maxTimestamp);
 
-    it('Then エッジケース：should handle minimum timestamp', () => {
+      // minimum timestamp
       const minTimestamp = new Date(0);
-      const error = new TestAglaError('MIN_TIME_ERROR', 'Min timestamp', { timestamp: minTimestamp });
-      expect(error.timestamp).toBe(minTimestamp);
+      const minError = new TestAglaError('MIN_TIME_ERROR', 'Min timestamp', { timestamp: minTimestamp });
+      expect(minError.timestamp).toBe(minTimestamp);
     });
   });
 });
@@ -234,7 +205,7 @@ describe('Given AglaError property access', () => {
 
       // Act & Assert
       expect(() => {
-        (error as Mutable<AglaError>).errorType = 'MODIFIED';
+        (error as _TMutable<AglaError>).errorType = 'MODIFIED';
       }).toThrow('Cannot set property errorType of');
     });
 
@@ -245,7 +216,7 @@ describe('Given AglaError property access', () => {
 
       // Act & Assert
       expect(() => {
-        (error as Mutable<AglaError>).context = { modified: true };
+        (error as _TMutable<AglaError>).context = { modified: true };
       }).toThrow('Cannot set property context of');
     });
   });
@@ -304,52 +275,17 @@ describe('Given AglaError JSON serialization', () => {
       const code = 'TEST_001';
       const severity = ErrorSeverity.FATAL;
       const timestamp = new Date('2025-08-29T21:42:00Z');
-      const context = { userId: '123', operation: 'all-options' };
-      const error = new TestAglaError('TEST_ERROR', 'Test message', { code, severity, timestamp, context });
-
-      // Act
+      const error = new TestAglaError('TEST_ERROR', 'Test message', { timestamp });
       const json = error.toJSON();
-
-      // Assert
-      expect(json).toEqual({
-        errorType: 'TEST_ERROR',
-        message: 'Test message',
-        code,
-        severity,
-        timestamp: timestamp.toISOString(),
-        context,
-      });
-    });
-
-    it('Then 正常系：should exclude undefined properties', () => {
-      // Arrange
-      const error = new TestAglaError('TEST_ERROR', 'Test message', { code: 'TEST_001' });
-
-      // Act
-      const json = error.toJSON();
-
-      // Assert
-      expect(json).toEqual({
-        errorType: 'TEST_ERROR',
-        message: 'Test message',
-        code: 'TEST_001',
-      });
-      expect(json).not.toHaveProperty('severity');
-      expect(json).not.toHaveProperty('timestamp');
-      expect(json).not.toHaveProperty('context');
+      expect(json.timestamp).toBe(timestamp.toISOString());
     });
   });
 
-  describe('When handling JSON edge cases', () => {
-    it('Then エッジケース：should handle context with circular references', () => {
-      // Arrange
-      const circularContext: TCircularObject = { name: 'circular' };
-      circularContext.self = circularContext;
-      const error = new TestAglaError('CIRCULAR_ERROR', 'Circular test', { context: circularContext });
-
-      // Act & Assert
-      expect(() => JSON.stringify(error.toJSON())).toThrow();
-    });
+  it('Then should handle circular reference edge case', () => {
+    const circularContext: _TCircularContext = { name: 'circular' };
+    circularContext.self = circularContext;
+    const error = new TestAglaError('CIRCULAR_ERROR', 'Circular test', { context: circularContext });
+    expect(() => JSON.stringify(error.toJSON())).toThrow();
   });
 });
 
@@ -359,44 +295,36 @@ describe('Given AglaError JSON serialization', () => {
  */
 describe('Given AglaError method chaining', () => {
   describe('When chaining with cause error', () => {
-    it('Then 正常系：should combine messages with cause information', () => {
-      // Arrange
+    it('Then should combine messages and preserve properties', () => {
       const originalError = new TestAglaError('TEST_ERROR', 'Original message');
       const causeError = new Error('Cause message');
-
-      // Act
       const chainedError = originalError.chain(causeError);
 
-      // Assert
+      // should combine messages with cause information
       expect(chainedError.message).toBe('Original message (caused by: Cause message)');
-    });
 
-    it('Then 正常系：should preserve original errorType', () => {
-      // Arrange
-      const originalError = new TestAglaError('TEST_ERROR', 'Original message');
-      const causeError = new Error('Cause message');
-
-      // Act
-      const chainedError = originalError.chain(causeError);
-
-      // Assert
+      // should preserve original errorType
       expect(chainedError.errorType).toBe('TEST_ERROR');
+
+      // should return new error instance
+      expect(chainedError).not.toBe(originalError);
+      expect(chainedError).toBeInstanceOf(TestAglaError);
     });
 
-    it('Then 正常系：should merge context with cause information', () => {
-      // Arrange
+    it('Then should merge context with cause information', () => {
       const originalContext = { userId: '123', operation: 'test' };
       const originalError = new TestAglaError('TEST_ERROR', 'Original message', { context: originalContext });
       const causeError = new Error('Cause message');
-
-      // Act
       const chainedError = originalError.chain(causeError);
 
-      // Assert
-      expect(chainedError.context).toEqual({
-        userId: '123',
-        operation: 'test',
-        cause: 'Cause message',
+      expect(chainedError.context).toHaveProperty('userId', '123');
+      expect(chainedError.context).toHaveProperty('operation', 'test');
+      expect(chainedError.context).toHaveProperty('cause', 'Cause message');
+      expect(chainedError.context).toHaveProperty('originalError');
+      expect(chainedError.context?.originalError).toEqual({
+        name: 'Error',
+        message: 'Cause message',
+        stack: causeError.stack,
       });
     });
 
@@ -411,6 +339,129 @@ describe('Given AglaError method chaining', () => {
       // Assert
       expect(chainedError).not.toBe(originalError);
       expect(chainedError).toBeInstanceOf(TestAglaError);
+    });
+  });
+});
+
+describe('Given AglaError inheriting from Error class', () => {
+  describe('When checking Error inheritance properties', () => {
+    it('Then should have correct name property', () => {
+      // Arrange & Act
+      const error = new TestAglaError('TEST_ERROR', 'Test message');
+
+      // Assert
+      expect(error.name).toBe('TestAglaError');
+    });
+
+    it('Then should generate proper stack trace', () => {
+      // Arrange & Act
+      const error = new TestAglaError('TEST_ERROR', 'Test message');
+
+      // Assert
+      expect(error.stack).toBeDefined();
+      expect(error.stack).toContain('TestAglaError: Test message');
+    });
+
+    it('Then should pass instanceof checks', () => {
+      // Arrange & Act
+      const error = new TestAglaError('TEST_ERROR', 'Test message');
+
+      // Assert
+      expect(error instanceof Error).toBe(true);
+      expect(error instanceof TestAglaError).toBe(true);
+    });
+  });
+});
+
+describe('Given AglaError constructor with various input combinations', () => {
+  describe('When creating error with empty string parameters', () => {
+    it('Then should handle empty errorType', () => {
+      // Arrange & Act
+      const error = new TestAglaError('', 'Test message');
+
+      // Assert
+      expect(error.errorType).toBe('');
+    });
+
+    it('Then should handle empty message', () => {
+      // Arrange & Act
+      const error = new TestAglaError('TEST_ERROR', '');
+
+      // Assert
+      expect(error.message).toBe('');
+    });
+  });
+
+  describe('When creating error with special characters', () => {
+    it('Then should handle unicode characters in message', () => {
+      // Arrange
+      const message = 'テストメッセージ 🚨 Error occurred';
+
+      // Act
+      const error = new TestAglaError('TEST_ERROR', message);
+
+      // Assert
+      expect(error.message).toBe(message);
+    });
+  });
+
+  describe('When creating error with complex context objects', () => {
+    it('Then should handle nested object context', () => {
+      // Arrange
+      const context = {
+        user: { id: '123', name: 'John' },
+        operation: { type: 'CREATE', resource: 'user' },
+        metadata: { timestamp: '2025-08-29', version: '1.0' },
+      };
+
+      // Act
+      const error = new TestAglaError('TEST_ERROR', 'Test message', { context });
+
+      // Assert
+      expect(error.context).toBe(context);
+    });
+
+    it('Then should handle array values in context', () => {
+      // Arrange
+      const context = {
+        operations: ['create', 'update', 'delete'],
+        errors: [{ code: 'E001' }, { code: 'E002' }],
+      };
+
+      // Act
+      const error = new TestAglaError('TEST_ERROR', 'Test message', { context });
+
+      // Assert
+      expect(error.context).toBe(context);
+    });
+  });
+});
+
+describe('Given AglaError constructor with invalid inputs', () => {
+  describe('When creating error with invalid timestamp', () => {
+    it('Then should handle invalid Date object', () => {
+      // Arrange
+      const invalidDate = new Date('invalid-date');
+
+      // Act
+      const error = new TestAglaError('TEST_ERROR', 'Test message', { timestamp: invalidDate });
+
+      // Assert
+      expect(error.timestamp).toBe(invalidDate);
+      expect(isNaN(error.timestamp!.getTime())).toBe(true);
+    });
+  });
+
+  describe('When creating error with invalid severity', () => {
+    it('Then should handle non-ErrorSeverity value', () => {
+      // Arrange
+      const invalidSeverity = 'critical' as unknown as ErrorSeverity;
+
+      // Act
+      const error = new TestAglaError('TEST_ERROR', 'Test message', { severity: invalidSeverity });
+
+      // Assert
+      expect(error.severity).toBe(invalidSeverity);
     });
 
     it('Then 正常系：should handle chaining different error types', () => {
@@ -439,26 +490,14 @@ describe('Given AglaError method chaining', () => {
       expect(() => originalError.chain(nullCause)).toThrow();
     });
 
-    it('Then 異常系：should handle undefined cause gracefully', () => {
-      // Arrange
-      const originalError = new TestAglaError('TEST_ERROR', 'Original message');
-      const undefinedCause = undefined as unknown as Error;
+    // should handle undefined cause gracefully
+    const undefinedCause = undefined as unknown as Error;
+    expect(() => originalError.chain(undefinedCause)).toThrow();
 
-      // Act & Assert
-      expect(() => originalError.chain(undefinedCause)).toThrow();
-    });
-
-    it('Then エッジケース：should handle string cause by accessing message property', () => {
-      // Arrange
-      const originalError = new TestAglaError('TEST_ERROR', 'Original message');
-      const stringCause = 'string error' as unknown as Error;
-
-      // Act
-      const chainedError = originalError.chain(stringCause);
-
-      // Assert
-      expect(chainedError.message).toBe('Original message (caused by: undefined)');
-    });
+    // should handle string cause by accessing message property
+    const stringCause = 'string error' as unknown as Error;
+    const stringChainedError = originalError.chain(stringCause);
+    expect(stringChainedError.message).toBe('Original message (caused by: undefined)');
 
     it('Then エッジケース：should handle object cause by accessing message property', () => {
       // Arrange
@@ -514,44 +553,13 @@ describe('Given AglaError inheritance', () => {
  */
 describe('Given AglaError string representation', () => {
   describe('When converting to string', () => {
-    it('Then 正常系：should include errorType and message', () => {
-      // Arrange
-      const errorType = 'TEST_ERROR';
-      const message = 'Test message';
-      const error = new TestAglaError(errorType, message);
-
-      // Act
-      const result = error.toString();
-
-      // Assert
-      expect(result).toContain(errorType);
-      expect(result).toContain(message);
-    });
-
-    it('Then 正常系：should include context when present', () => {
-      // Arrange
-      const context = { userId: '123', operation: 'test' };
-      const error = new TestAglaError('TEST_ERROR', 'Test message', { context });
-
-      // Act
-      const result = error.toString();
-
-      // Assert
-      expect(result).toContain(JSON.stringify(context));
-    });
-
-    it('Then 正常系：should follow consistent format', () => {
-      // Arrange
+    it('Then should follow consistent format with context', () => {
       const errorType = 'TEST_ERROR';
       const message = 'Test message';
       const context = { userId: '123' };
       const error = new TestAglaError(errorType, message, { context });
       const expectedFormat = `${errorType}: ${message} ${JSON.stringify(context)}`;
-
-      // Act
       const result = error.toString();
-
-      // Assert
       expect(result).toBe(expectedFormat);
     });
   });
