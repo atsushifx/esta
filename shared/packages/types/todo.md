@@ -3,6 +3,65 @@
 ## プロジェクト概要
 
 テストレベル分離と異常系・エッジケース追加による包括的テストカバレッジの実現
+汎用Record<>型から専用型への置き換えによる型安全性向上
+
+---
+
+## Phase 0: Record<>型リファクタリング (R-001~R-012)
+
+### R-001 グループ: 外部公開型定義
+
+- [x] R-001-01: AglaErrorContext型定義テスト追加
+  - `expect(context).toSatisfy<AglaErrorContext>` for type compatibility
+- [x] R-001-02: AglaErrorContext型バリデーション機能実装
+  - `expect(isValidAglaErrorContext(validContext)).toBe(true)` for validation function
+- [x] R-001-03: AglaErrorContext型ガード機能実装
+  - `expect(typeof guardedContext).toBe('object')` for type guard
+
+### R-002 グループ: HttpHeaders型定義
+
+- [x] R-002-01: HttpHeaders型定義テスト追加
+  - `expect(headers).toSatisfy<HttpHeaders>` for header type compatibility
+- [x] R-002-02: HttpHeaders型バリデーション実装
+  - `expect(isValidHttpHeaders({'content-type': 'application/json'})).toBe(true)` for header validation
+
+### R-003 グループ: テスト専用型定義
+
+- [x] R-003-01: _TErrorStatistics型定義テスト追加
+  - `expect(stats).toSatisfy<_TErrorStatistics>` for test statistics type
+- [x] R-003-02: _TAglaErrorContextWithSymbols型定義テスト追加
+  - `expect(symbolContext[Symbol.for('test')]).toBeDefined()` for symbol key support
+- [x] R-003-03: _TTestBuffer型定義テスト追加
+  - `expect(buffer).toSatisfy<_TTestBuffer>` for test buffer type
+
+### R-004 グループ: 既存コード置き換え（AglaError.types.ts）
+
+- [x] R-004-01: AglaErrorOptions.context型置き換えテスト
+  - `expect(options.context).toSatisfy<AglaErrorContext>` after refactoring
+- [x] R-004-02: _AglaErrorOptions.context型置き換えテスト
+  - `expect(internalOptions.context).toSatisfy<AglaErrorContext>` after refactoring
+- [x] R-004-03: AglaError.context getter型置き換えテスト
+  - `expect(error.context).toSatisfy<AglaErrorContext | undefined>` after refactoring
+
+### R-005 グループ: テストファイル置き換え
+
+- [ ] R-005-01: AglaError.serialization.spec.ts型置き換えテスト
+  - `expect(createComplexContext()).toSatisfy<AglaErrorContext>` for complex context
+  - `expect(result.context).toSatisfy<AglaErrorContext>` for serialized context
+  - `expect(context.user).toSatisfy<AglaErrorContext>` for nested context
+- [ ] R-005-02: AglaError.spec.ts型置き換えテスト
+  - `expect(symbolContext).toSatisfy<_TAglaErrorContextWithSymbols>` for symbol context
+- [ ] R-005-03: エラーチェーンE2Eテスト型置き換え
+  - `expect(testHeaders).toSatisfy<HttpHeaders>` for HTTP headers
+  - `expect(metadata).toSatisfy<AglaErrorContext>` for error metadata
+
+### R-006 グループ: エラー報告テスト型置き換え
+
+- [ ] R-006-01: エラー統計型置き換えテスト
+  - `expect(errorCounts).toSatisfy<_TErrorStatistics>` for error counting
+  - `expect(severityCounts).toSatisfy<_TErrorStatistics>` for severity statistics
+- [ ] R-006-02: 統計集計テスト型置き換え
+  - `expect(aggregatedStats).toSatisfy<_TErrorStatistics>` for aggregated data
 
 ---
 

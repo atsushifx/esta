@@ -1,4 +1,9 @@
 import { describe, expect, it } from 'vitest';
+
+// Type imports
+import type { AglaErrorContext } from '../../types/AglaError.types.js';
+
+// Test utilities
 import { TestAglaError } from './helpers/TestAglaError.class.js';
 
 /**
@@ -7,7 +12,7 @@ import { TestAglaError } from './helpers/TestAglaError.class.js';
  */
 
 // Helper function for creating complex context
-const createComplexContext = (): Record<string, unknown> => ({
+const createComplexContext = (): AglaErrorContext => ({
   user: { id: '123', roles: ['admin', 'user'] },
   operation: { type: 'CREATE', timestamp: new Date('2025-01-01T00:00:00Z').toISOString() },
   metadata: { version: '1.0', tags: ['critical'] },
@@ -61,15 +66,38 @@ describe('Given AglaError serialization functionality', () => {
         expect(typeof result.context).toBe('object');
         expect(result.context).not.toBeNull();
 
-        const context = result.context as Record<string, unknown>;
+        const context = result.context as AglaErrorContext;
         expect(context).toHaveProperty('user');
         expect(context.user).toBeDefined();
         expect(typeof context.user).toBe('object');
         expect(context.user).not.toBeNull();
 
-        const user = context.user as Record<string, unknown>;
+        const user = context.user as AglaErrorContext;
         expect(user).toHaveProperty('roles');
         expect(Array.isArray(user.roles)).toBe(true);
+      });
+    });
+
+    // R-005-01: Type compatibility tests for createComplexContext() and result.context
+    it('Then should satisfy AglaErrorContext type for complex context', () => {
+      const complexContext = createComplexContext();
+      // Type satisfaction test - will fail if createComplexContext doesn't return AglaErrorContext
+      expect(createComplexContext()).toSatisfy((ctx): ctx is AglaErrorContext => {
+        return ctx !== null && typeof ctx === 'object';
+      });
+
+      const error = new TestAglaError('TEST_TYPE_COMPLEX', 'Type test message', { context: complexContext });
+      const result = error.toJSON();
+
+      // Type satisfaction test for serialized context
+      expect(result.context).toSatisfy((ctx): ctx is AglaErrorContext => {
+        return ctx !== null && typeof ctx === 'object';
+      });
+
+      // Nested context validation
+      const context = result.context as AglaErrorContext;
+      expect(context.user).toSatisfy((user): user is AglaErrorContext => {
+        return user !== null && typeof user === 'object';
       });
     });
   });

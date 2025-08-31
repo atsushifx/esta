@@ -1,5 +1,5 @@
 // src: tests/e2e/AglaError.e2e.spec.ts
-// @(#) : E2E tests verifying package-level usage of shared types
+// @(#) : E2E tests verifying real-world usage scenarios of AglaError
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
@@ -14,22 +14,9 @@ import type { AglaError, AglaErrorOptions } from '../../types/AglaError.types.js
 import { ErrorSeverity } from '../../types/ErrorSeverity.types.js';
 
 // Test-specific context types
-// Suite-specific context types for better type safety and readability
-
-// Developer custom error workflow context (E1-xxx tests)
-type CustomErrorWorkflowContext = {
-  // Basic error info
-  module?: string;
-  service?: string;
-  method?: string;
-  layer?: string;
-  controller?: string;
-  action?: string;
+type TestErrorContext = {
+  // Top-level API info used in tests
   endpoint?: string;
-  feature?: string;
-  test?: boolean;
-
-  // Complex application context for E1-002-01
   request?: {
     id: string;
     method: string;
@@ -57,11 +44,11 @@ type CustomErrorWorkflowContext = {
     id: string;
     type: string;
   };
-
-  // Chain propagation context
   cause?: string;
-
-  // Serialization test context
+  tags?: string[];
+  metadata?: {
+    correlation_id: string;
+  };
   data?: {
     numbers: number[];
     nested: {
@@ -72,47 +59,6 @@ type CustomErrorWorkflowContext = {
   };
   special_chars?: string;
   unicode?: string;
-};
-
-// Logging and report generation workflow context (E2-001-xxx tests)
-type LoggingReportContext = {
-  // Logging metadata
-  metadata?: {
-    correlation_id: string;
-  };
-  tags?: string[];
-  module?: string;
-  user?: string;
-  component?: string;
-  test?: boolean;
-  version?: string;
-  build?: string;
-};
-
-// Upper layer error propagation workflow context (E2-003-xxx tests)
-type LayerPropagationContext = {
-  // Layer propagation properties
-  layer?: string;
-  operation?: string;
-  cause?: string;
-
-  // Client/server transformation properties
-  client_safe?: boolean;
-  client_error?: unknown;
-  server_error?: unknown;
-
-  // Database context for server errors
-  database?: string;
-  connection_pool?: string;
-
-  // Traceability properties
-  initial?: boolean;
-  trace?: {
-    trace_id: string;
-    operation: string;
-    layer: string;
-    timestamp: string;
-  };
 };
 
 // Test utilities
@@ -362,14 +308,14 @@ describe('Given developer creating custom error handling workflows', () => {
 
       // Assert - Complex context preserved
       expect(error.context).toEqual(complexContext);
-      const contextData = error.context as CustomErrorWorkflowContext;
+      const contextData = error.context as TestErrorContext;
       expect(contextData.request?.id).toBe('req-12345');
       expect(contextData.user?.permissions).toEqual(['read', 'write', 'delete']);
       expect(contextData.business?.metadata.campaign).toBe('signup-2025');
 
       // JSON serialization handles complex nested data
       const json = error.toJSON();
-      const jsonContext = json.context as CustomErrorWorkflowContext;
+      const jsonContext = json.context as TestErrorContext;
       expect(jsonContext.request?.method).toBe('POST');
       expect(jsonContext.system?.environment).toBe('production');
     });
@@ -411,7 +357,7 @@ describe('Given developer creating custom error handling workflows', () => {
       // Assert - Chain structure preserved
       expect(apiChain.message).toContain('API request processing failed');
       expect(apiChain.message).toContain('API controller request failed');
-      expect((apiChain.context as CustomErrorWorkflowContext).cause).toContain('API controller request failed');
+      expect((apiChain.context as TestErrorContext).cause).toContain('API controller request failed');
 
       expect(controllerChain.message).toContain('User service operation failed');
       expect(serviceChain.message).toContain('Connection timeout after 30 seconds');
@@ -447,13 +393,13 @@ describe('Given developer creating custom error handling workflows', () => {
       const finalChain = firstChain.chain(timeoutError);
 
       // Assert - Original context preserved and enhanced
-      const finalContext = finalChain.context as CustomErrorWorkflowContext;
+      const finalContext = finalChain.context as TestErrorContext;
       expect(finalContext.transaction).toEqual({ id: 'tx-001', type: 'payment' });
       expect(finalContext.user).toEqual({ id: 'user-123', tier: 'premium' });
       expect(finalContext.cause).toBe('Request timeout');
 
       // Intermediate context also preserved
-      const firstContext = firstChain.context as CustomErrorWorkflowContext;
+      const firstContext = firstChain.context as TestErrorContext;
       expect(firstContext.transaction).toEqual({ id: 'tx-001', type: 'payment' });
       expect(firstContext.cause).toBe('Network unreachable');
 
@@ -542,11 +488,11 @@ describe('Given developer creating custom error handling workflows', () => {
       expect(jsonLog).toHaveProperty('errorType', 'LOGGING_INTEGRATION_ERROR');
       expect(jsonLog).toHaveProperty('code', 'LOG001');
       expect(jsonLog).toHaveProperty('context');
-      expect((jsonLog.context as LoggingReportContext).metadata?.correlation_id).toBe('log-12345');
+      expect((jsonLog.context as TestErrorContext).metadata?.correlation_id).toBe('log-12345');
 
       expect(structuredLog.level).toBe('error');
       expect(structuredLog.error_type).toBe('LOGGING_INTEGRATION_ERROR');
-      expect((structuredLog.context as LoggingReportContext).tags).toEqual(['critical', 'user-facing']);
+      expect((structuredLog.context as TestErrorContext).tags).toEqual(['critical', 'user-facing']);
 
       expect(stringLog).toContain('LOGGING_INTEGRATION_ERROR');
       expect(stringLog).toContain('Structured logging test');
@@ -586,7 +532,7 @@ describe('Given developer creating custom error handling workflows', () => {
       // Assert - Serialization accuracy
       expect(json.errorType).toBe('SERIALIZATION_TEST_ERROR');
       expect(json.message).toContain('Serialization cause');
-      const jsonContext = json.context as CustomErrorWorkflowContext;
+      const jsonContext = json.context as TestErrorContext;
       expect(jsonContext.data?.numbers).toEqual([1, 2, 3]);
       expect(jsonContext.data?.nested.deep.value).toBe('test');
       expect(jsonContext.special_chars).toBe('Special: äöü @#$%^&*()');
@@ -595,9 +541,7 @@ describe('Given developer creating custom error handling workflows', () => {
 
       // Round-trip consistency
       expect(parsedBack).toEqual(json);
-      const parsedContext = parsedBack.context as CustomErrorWorkflowContext & {
-        data: { boolean: boolean; null_value: null };
-      };
+      const parsedContext = parsedBack.context as TestErrorContext & { data: { boolean: boolean; null_value: null } };
       expect(parsedContext.data.boolean).toBe(true);
       expect(parsedContext.data.null_value).toBe(null);
     });
@@ -658,443 +602,3 @@ describe('Given developer creating custom error handling workflows', () => {
 
 // フェーズE2: パッケージ利用者シナリオ（10テスト）
 // E2-001 シナリオは tests/e2e/AglaError.consumer-usage.e2e.spec.ts に移行
-
-// E2-002: エラー情報ロギング・レポート生成ワークフロー
-describe('Given package user implementing error logging and report generation workflow', () => {
-  describe('When generating structured error reports', () => {
-    // E2-002-01
-    it('Then should generate structured error reports', () => {
-      // Arrange - Error reporting system
-      const reportGenerator = {
-        generateReport(errors: TestAglaError[]): object {
-          return {
-            report_id: 'RPT-001',
-            generated_at: new Date().toISOString(),
-            summary: {
-              total_errors: errors.length,
-              severities: errors.reduce((acc, err) => {
-                const severity = err.severity ?? 'unknown';
-                acc[severity] = (acc[severity] || 0) + 1;
-                return acc;
-              }, {} as Record<string, number>),
-            },
-            errors: errors.map((error, index) => ({
-              id: `ERR-${String(index + 1).padStart(3, '0')}`,
-              type: error.errorType,
-              message: error.message,
-              code: error.code,
-              severity: error.severity,
-              timestamp: error.timestamp?.toISOString(),
-              context: error.context,
-            })),
-          };
-        },
-      };
-
-      const errors = [
-        new TestAglaError('REPORT_ERROR_1', 'First report error', {
-          code: 'RPT001',
-          severity: ErrorSeverity.ERROR,
-          timestamp: new Date('2025-08-31T10:00:00Z'),
-          context: { module: 'reporting', user: 'admin' },
-        }),
-        new TestAglaError('REPORT_ERROR_2', 'Second report error', {
-          code: 'RPT002',
-          severity: ErrorSeverity.WARNING,
-          timestamp: new Date('2025-08-31T10:05:00Z'),
-          context: { module: 'validation', user: 'user123' },
-        }),
-      ];
-
-      // Act - Generate report
-      const report = reportGenerator.generateReport(errors);
-
-      // Assert - Report structure and content
-      expect(report).toHaveProperty('report_id', 'RPT-001');
-      expect(report).toHaveProperty('summary.total_errors', 2);
-      const typedReport = report as {
-        report_id: string;
-        generated_at: string;
-        summary: {
-          total_errors: number;
-          severities: Record<string, number>;
-        };
-        errors: Array<{
-          id: string;
-          type: string;
-          message: string;
-          code?: string;
-          severity?: ErrorSeverity;
-          timestamp?: string;
-          context?: unknown;
-        }>;
-      };
-      expect(typedReport.summary.severities).toEqual({
-        error: 1,
-        warning: 1,
-      });
-      expect(typedReport.errors).toHaveLength(2);
-      expect(typedReport.errors[0]).toHaveProperty('type', 'REPORT_ERROR_1');
-      expect(typedReport.errors[1]).toHaveProperty('type', 'REPORT_ERROR_2');
-    });
-
-    // E2-002-02
-    it('Then should format errors for different log levels', () => {
-      // Arrange - Multi-level logging system
-      const logFormatter = {
-        formatForLevel(error: TestAglaError, level: 'debug' | 'info' | 'warn' | 'error'): string {
-          const baseInfo = `${error.errorType}: ${error.message}`;
-
-          switch (level) {
-            case 'debug':
-              return `[DEBUG] ${baseInfo} | Context: ${JSON.stringify(error.context)} | Code: ${error.code} | Stack: ${error.stack?.split('\n')[0]
-                }`;
-            case 'info':
-              return `[INFO] ${baseInfo} | Code: ${error.code}`;
-            case 'warn':
-              return `[WARN] ${baseInfo} | Severity: ${error.severity}`;
-            case 'error':
-              return `[ERROR] ${baseInfo} | Code: ${error.code} | Severity: ${error.severity} | Context: ${JSON.stringify(error.context)
-                }`;
-            default:
-              return baseInfo;
-          }
-        },
-      };
-
-      const error = new TestAglaError('LOG_FORMAT_ERROR', 'Log formatting test', {
-        code: 'LF001',
-        severity: ErrorSeverity.ERROR,
-        context: { component: 'logger', test: true },
-      });
-
-      // Act - Format for different levels
-      const debugLog = logFormatter.formatForLevel(error, 'debug');
-      const infoLog = logFormatter.formatForLevel(error, 'info');
-      const warnLog = logFormatter.formatForLevel(error, 'warn');
-      const errorLog = logFormatter.formatForLevel(error, 'error');
-
-      // Assert - Level-appropriate formatting
-      expect(debugLog).toContain('[DEBUG]');
-      expect(debugLog).toContain('Context:');
-      expect(debugLog).toContain('Stack:');
-
-      expect(infoLog).toContain('[INFO]');
-      expect(infoLog).toContain('Code: LF001');
-      expect(infoLog).not.toContain('Context:');
-
-      expect(warnLog).toContain('[WARN]');
-      expect(warnLog).toContain('Severity: error');
-
-      expect(errorLog).toContain('[ERROR]');
-      expect(errorLog).toContain('Context:');
-      expect(errorLog).toContain('Severity:');
-    });
-
-    // E2-002-03
-    it('Then should create error summaries for monitoring', () => {
-      // Arrange - Monitoring system integration
-      const monitoringSystem = {
-        createSummary(errors: TestAglaError[], timeWindow: string): object {
-          const now = new Date();
-          const errorsByType = errors.reduce((acc, err) => {
-            acc[err.errorType] = (acc[err.errorType] || 0) + 1;
-            return acc;
-          }, {} as Record<string, number>);
-
-          const errorsBySeverity = errors.reduce((acc, err) => {
-            const severity = err.severity ?? 'unknown';
-            acc[severity] = (acc[severity] || 0) + 1;
-            return acc;
-          }, {} as Record<string, number>);
-
-          return {
-            monitoring_summary: {
-              time_window: timeWindow,
-              generated_at: now.toISOString(),
-              total_errors: errors.length,
-              error_types: errorsByType,
-              severities: errorsBySeverity,
-              alerts: errors
-                .filter((err) => err.severity === ErrorSeverity.FATAL || err.severity === ErrorSeverity.ERROR)
-                .map((err) => ({
-                  type: err.errorType,
-                  message: err.message,
-                  severity: err.severity,
-                  code: err.code,
-                })),
-            },
-          };
-        },
-      };
-
-      const monitoringErrors = [
-        new TestAglaError('MONITORING_ERROR_1', 'Monitor test 1', { severity: ErrorSeverity.FATAL }),
-        new TestAglaError('MONITORING_ERROR_2', 'Monitor test 2', { severity: ErrorSeverity.ERROR }),
-        new TestAglaError('MONITORING_ERROR_1', 'Monitor test 3', { severity: ErrorSeverity.WARNING }),
-      ];
-
-      // Act - Create monitoring summary
-      const summary = monitoringSystem.createSummary(monitoringErrors, '1h');
-
-      // Assert - Monitoring summary structure
-      expect(summary).toHaveProperty('monitoring_summary');
-      const typedSummary = summary as {
-        monitoring_summary: {
-          time_window: string;
-          generated_at: string;
-          total_errors: number;
-          error_types: Record<string, number>;
-          severities: Record<string, number>;
-          alerts: Array<{
-            type: string;
-            message: string;
-            severity?: ErrorSeverity;
-            code?: string;
-          }>;
-        };
-      };
-      const monSummary = typedSummary.monitoring_summary;
-
-      expect(monSummary.time_window).toBe('1h');
-      expect(monSummary.total_errors).toBe(3);
-      expect(monSummary.error_types).toEqual({
-        MONITORING_ERROR_1: 2,
-        MONITORING_ERROR_2: 1,
-      });
-      expect(monSummary.severities).toEqual({
-        fatal: 1,
-        error: 1,
-        warning: 1,
-      });
-      expect(monSummary.alerts).toHaveLength(2); // Only FATAL and ERROR
-    });
-  });
-});
-
-// E2-003: 上位層エラー伝播処理ワークフロー
-describe('Given package user implementing upper layer error propagation workflow', () => {
-  describe('When propagating errors through application layers', () => {
-    // E2-003-01
-    it('Then should propagate errors through application layers', () => {
-      // Arrange - Multi-layer application architecture
-      const applicationLayers = {
-        dataLayer: {
-          processData(): TestAglaError {
-            throw new TestAglaError('DATA_LAYER_ERROR', 'Data processing failed', {
-              code: 'DL001',
-              severity: ErrorSeverity.ERROR,
-              context: { layer: 'data', operation: 'process' },
-            });
-          },
-        },
-
-        serviceLayer: {
-          handleDataOperation(): TestAglaError {
-            try {
-              return applicationLayers.dataLayer.processData();
-            } catch (error) {
-              if (error instanceof TestAglaError) {
-                throw error.chain(new Error('Service layer processing failed'));
-              }
-              throw error;
-            }
-          },
-        },
-
-        apiLayer: {
-          handleRequest(): { success: boolean; error?: TestAglaError } {
-            try {
-              applicationLayers.serviceLayer.handleDataOperation();
-              return { success: true };
-            } catch (error) {
-              if (error instanceof TestAglaError) {
-                const apiError = error.chain(new Error('API request failed'));
-                return { success: false, error: apiError };
-              }
-              return { success: false };
-            }
-          },
-        },
-      };
-
-      // Act - Propagate error through layers
-      const result = applicationLayers.apiLayer.handleRequest();
-
-      // Assert - Error propagation
-      expect(result.success).toBe(false);
-      expect(result.error).toBeInstanceOf(TestAglaError);
-      expect(result.error?.errorType).toBe('DATA_LAYER_ERROR');
-      expect(result.error?.message).toContain('Data processing failed');
-      expect(result.error?.message).toContain('Service layer processing failed');
-      expect(result.error?.message).toContain('API request failed');
-
-      const errorContext = result.error?.context as LayerPropagationContext;
-      expect(errorContext.layer).toBe('data');
-      expect(errorContext.operation).toBe('process');
-      expect(errorContext.cause).toBe('API request failed');
-    });
-
-    // E2-003-02
-    it('Then should transform errors for different contexts', () => {
-      // Arrange - Error transformation system
-      const errorTransformer = {
-        transformForClient(serverError: TestAglaError): TestAglaError {
-          // Transform internal server error to client-friendly format
-          const clientMessage = serverError.severity === ErrorSeverity.FATAL
-            ? 'Service temporarily unavailable'
-            : 'Operation failed';
-
-          return new TestAglaError(
-            'CLIENT_ERROR',
-            clientMessage,
-            {
-              code: 'CE001',
-              severity: ErrorSeverity.WARNING,
-              context: {
-                original_type: serverError.errorType,
-                client_safe: true,
-                timestamp: new Date().toISOString(),
-              },
-            },
-          );
-        },
-
-        transformForLogging(clientError: TestAglaError, originalError: TestAglaError): TestAglaError {
-          return new TestAglaError(
-            'LOG_ERROR',
-            'Error occurred during request processing',
-            {
-              code: 'LE001',
-              severity: originalError.severity,
-              context: {
-                client_error: {
-                  type: clientError.errorType,
-                  message: clientError.message,
-                  code: clientError.code,
-                },
-                server_error: {
-                  type: originalError.errorType,
-                  message: originalError.message,
-                  code: originalError.code,
-                  context: originalError.context,
-                },
-                transformation_timestamp: new Date().toISOString(),
-              },
-            },
-          );
-        },
-      };
-
-      const serverError = new TestAglaError('INTERNAL_SERVER_ERROR', 'Database connection failed', {
-        code: 'ISE001',
-        severity: ErrorSeverity.FATAL,
-        context: { database: 'users', connection_pool: 'primary' },
-      });
-
-      // Act - Transform for different contexts
-      const clientError = errorTransformer.transformForClient(serverError);
-      const logError = errorTransformer.transformForLogging(clientError, serverError);
-
-      // Assert - Context-appropriate transformations
-      expect(clientError.errorType).toBe('CLIENT_ERROR');
-      expect(clientError.message).toBe('Service temporarily unavailable');
-      expect(clientError.severity).toBe(ErrorSeverity.WARNING);
-      expect((clientError.context as LayerPropagationContext).client_safe).toBe(true);
-
-      expect(logError.errorType).toBe('LOG_ERROR');
-      expect(logError.severity).toBe(ErrorSeverity.FATAL);
-      const logContext = logError.context as LayerPropagationContext;
-      expect(logContext.client_error).toBeDefined();
-      expect(logContext.server_error).toBeDefined();
-    });
-
-    // E2-003-03
-    it('Then should preserve error traceability', () => {
-      // Arrange - Traceability system
-      type TraceableError = {
-        trace_id: string;
-        span_id: string;
-        parent_span?: string;
-        operation: string;
-        layer: string;
-      };
-
-      const traceabilitySystem = {
-        addTrace(error: TestAglaError, traceInfo: TraceableError): TestAglaError {
-          return new TestAglaError(
-            error.errorType,
-            error.message,
-            {
-              code: error.code,
-              severity: error.severity,
-              timestamp: error.timestamp,
-              context: {
-                ...error.context,
-                trace: traceInfo,
-              },
-            },
-          );
-        },
-
-        propagateTrace(error: TestAglaError, newSpanInfo: Omit<TraceableError, 'trace_id'>): TestAglaError {
-          const errorContext = error.context as { trace?: TraceableError } | undefined;
-          const existingTrace = errorContext?.trace;
-          const newTrace: TraceableError = {
-            ...newSpanInfo,
-            trace_id: existingTrace?.trace_id ?? 'trace-' + Math.random().toString(36).substr(2, 9),
-          };
-
-          return this.addTrace(error, newTrace);
-        },
-      };
-
-      // Create initial error with trace
-      const initialError = new TestAglaError('TRACEABLE_ERROR', 'Initial traceable error', {
-        code: 'TE001',
-        severity: ErrorSeverity.ERROR,
-        context: { initial: true },
-      });
-
-      // Act - Add and propagate traces through layers
-      const databaseError = traceabilitySystem.addTrace(initialError, {
-        trace_id: 'trace-12345',
-        span_id: 'span-001',
-        operation: 'database_query',
-        layer: 'database',
-      });
-
-      const serviceError = traceabilitySystem.propagateTrace(databaseError, {
-        span_id: 'span-002',
-        parent_span: 'span-001',
-        operation: 'service_process',
-        layer: 'service',
-      });
-
-      const apiError = traceabilitySystem.propagateTrace(serviceError, {
-        span_id: 'span-003',
-        parent_span: 'span-002',
-        operation: 'api_request',
-        layer: 'api',
-      });
-
-      // Assert - Traceability preserved and enhanced
-      const databaseTrace = (databaseError.context as { trace: TraceableError }).trace;
-      expect(databaseTrace.trace_id).toBe('trace-12345');
-      expect(databaseTrace.span_id).toBe('span-001');
-      expect(databaseTrace.operation).toBe('database_query');
-
-      const serviceTrace = (serviceError.context as { trace: TraceableError }).trace;
-      expect(serviceTrace.trace_id).toBe('trace-12345'); // Same trace ID
-      expect(serviceTrace.span_id).toBe('span-002');
-      expect(serviceTrace.parent_span).toBe('span-001');
-
-      const apiTrace = (apiError.context as { trace: TraceableError }).trace;
-      expect(apiTrace.trace_id).toBe('trace-12345'); // Same trace ID
-      expect(apiTrace.span_id).toBe('span-003');
-      expect(apiTrace.parent_span).toBe('span-002');
-      expect(apiTrace.operation).toBe('api_request');
-      expect(apiTrace.layer).toBe('api');
-    });
-  });
-});
