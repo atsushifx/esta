@@ -44,7 +44,10 @@ describe('when handling complex error scenarios with all features', () => {
     expect(chained.code).toBe(code);
     expect(chained.severity).toBe(severity);
     expect(chained.timestamp).toBe(timestamp);
-    expect(chained.context).toEqual({ ...context, cause: 'Root cause' });
+    // コンテキストはスタック情報を除外してキーワード部分のみをチェック
+    expect(chained.context?.userId).toBe('u-123');
+    expect(chained.context?.operation).toBe('integrated');
+    expect(chained.context?.cause).toBe('Root cause');
 
     expect(json).toEqual({
       errorType,
@@ -52,12 +55,18 @@ describe('when handling complex error scenarios with all features', () => {
       code,
       severity,
       timestamp: timestamp.toISOString(),
-      context: { ...context, cause: 'Root cause' },
+      context: expect.objectContaining({
+        userId: 'u-123',
+        operation: 'integrated',
+        cause: 'Root cause',
+      }),
     });
 
     expect(str).toContain(errorType);
     expect(str).toContain(chained.message);
-    expect(str).toContain(JSON.stringify({ ...context, cause: 'Root cause' }));
+    expect(str).toContain('"userId":"u-123"');
+    expect(str).toContain('"operation":"integrated"');
+    expect(str).toContain('"cause":"Root cause"');
   });
 });
 
