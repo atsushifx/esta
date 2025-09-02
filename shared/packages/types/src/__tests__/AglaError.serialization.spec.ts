@@ -1,3 +1,12 @@
+// src: src/__tests__/AglaError.serialization.spec.ts
+// @(#) : AglaError シリアライゼーション機能の単体テスト
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// Testing framework
 import { describe, expect, it } from 'vitest';
 
 // Type imports

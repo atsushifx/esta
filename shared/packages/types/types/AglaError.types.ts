@@ -1,11 +1,12 @@
-// shared/types/error.types.ts
-// @(#) : Base Error Classes for unified error handling
+// src: types/AglaError.types.ts
+// @(#) : Base Error Classes for unified error handling across all packages
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+// Internal type definitions
 import type { ErrorSeverity } from './ErrorSeverity.types.js';
 
 /**
@@ -76,6 +77,11 @@ class _AglaErrorOptions {
   readonly context?: AglaErrorContext;
   readonly cause?: string;
 
+  /**
+   * Creates internal options object from constructor parameters.
+   * @param errorType - The error type identifying the specific type of error
+   * @param options - Optional configuration or legacy context object
+   */
   constructor(
     errorType: string,
     options?: AglaErrorOptions | AglaErrorContext,

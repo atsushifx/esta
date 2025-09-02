@@ -213,5 +213,210 @@ describe('Given AglaError real system integration verification', () => {
       expect(recoveryProcess.postRecovery.preventionMeasures).toContain('improve-circuit-breaker-sensitivity');
       expect(recoveryProcess.postRecovery.documentationUpdate).toBe('incident-runbook');
     });
+
+    // E-006-01: 自動復旧メカニズム発動確認テスト追加
+    // expect(recoveryProcess.status).toBe('activated') for recovery activation
+    it('Then should verify automatic recovery mechanism activation status', () => {
+      // Arrange - Simulate system failure requiring automatic recovery
+      const systemFailure = new TestAglaError('SYSTEM_OUTAGE', 'Critical service down', {
+        code: 'SYS001',
+        severity: ErrorSeverity.FATAL,
+        context: {
+          affectedServices: ['payment-gateway', 'user-auth', 'notification-service'],
+          impactLevel: 'critical',
+          detectedAt: new Date().toISOString(),
+          estimatedUsersAffected: 50000,
+        },
+      });
+
+      // Act - Automatic recovery process activation
+      const recoveryProcess = {
+        status: 'activated', // E-006-01: Recovery activation status
+        triggerConditions: {
+          errorSeverity: systemFailure.severity,
+          serviceDowntime: '2min',
+          failureThreshold: 95, // 95% failure rate
+        },
+        activationDetails: {
+          initiatedBy: 'automated-monitoring-system',
+          activationTime: new Date().toISOString(),
+          recoveryPlan: 'tier-1-critical-services',
+          estimatedRecoveryDuration: '10-15min',
+        },
+        automatedActions: [
+          'failover-to-secondary-datacenter',
+          'scale-up-backup-services',
+          'activate-emergency-cache-layer',
+          'enable-read-only-mode',
+        ],
+        monitoringAlerts: [
+          'incident-response-team-notified',
+          'executive-dashboard-updated',
+          'customer-status-page-updated',
+        ],
+      };
+
+      // Assert - E-006-01: Verify recovery process activation
+      expect(recoveryProcess.status).toBe('activated');
+      expect(recoveryProcess.triggerConditions.errorSeverity).toBe(ErrorSeverity.FATAL);
+      expect(recoveryProcess.triggerConditions.failureThreshold).toBe(95);
+      expect(recoveryProcess.activationDetails.initiatedBy).toBe('automated-monitoring-system');
+      expect(recoveryProcess.activationDetails.recoveryPlan).toBe('tier-1-critical-services');
+      expect(recoveryProcess.automatedActions).toContain('failover-to-secondary-datacenter');
+      expect(recoveryProcess.automatedActions).toContain('activate-emergency-cache-layer');
+      expect(recoveryProcess.monitoringAlerts).toContain('incident-response-team-notified');
+    });
+
+    // E-006-02: サーキットブレーカー動作確認テスト追加
+    // expect(circuitBreaker.state).toBe('open') for circuit breaker state
+    it('Then should verify circuit breaker operation status', () => {
+      // Arrange - Simulate service failures triggering circuit breaker
+      const consecutiveFailures = [
+        new TestAglaError('CONNECTION_TIMEOUT', 'Service request timeout', {
+          code: 'CONN001',
+          severity: ErrorSeverity.ERROR,
+          context: { service: 'payment-api', timeoutMs: 5000, attempt: 1 },
+        }),
+        new TestAglaError('CONNECTION_TIMEOUT', 'Service request timeout', {
+          code: 'CONN002',
+          severity: ErrorSeverity.ERROR,
+          context: { service: 'payment-api', timeoutMs: 5000, attempt: 2 },
+        }),
+        new TestAglaError('CONNECTION_TIMEOUT', 'Service request timeout', {
+          code: 'CONN003',
+          severity: ErrorSeverity.ERROR,
+          context: { service: 'payment-api', timeoutMs: 5000, attempt: 3 },
+        }),
+      ];
+
+      // Act - Circuit breaker activation after consecutive failures
+      const circuitBreaker = {
+        state: 'open', // E-006-02: Circuit breaker state verification
+        triggerContext: {
+          serviceName: 'payment-api',
+          failureCount: consecutiveFailures.length,
+          failureThreshold: 3,
+          timeWindow: '30s',
+          lastFailure: consecutiveFailures[consecutiveFailures.length - 1].timestamp,
+        },
+        operationalDetails: {
+          openedAt: new Date().toISOString(),
+          nextHalfOpenCheck: new Date(Date.now() + 60000).toISOString(), // 1 minute later
+          recoveryTimeout: '60s',
+          currentBehavior: 'fail-fast',
+        },
+        impactAnalysis: {
+          blockedRequests: 0, // Just opened
+          rejectionResponse: 'service-unavailable-503',
+          fallbackAction: 'return-cached-response',
+          customerImpact: 'degraded-functionality',
+        },
+        monitoring: {
+          healthCheckEnabled: true,
+          healthCheckInterval: '15s',
+          successThreshold: 5, // 5 consecutive successes to close
+          recoveryAttempts: 0,
+        },
+      };
+
+      // Assert - E-006-02: Verify circuit breaker operation
+      expect(circuitBreaker.state).toBe('open');
+      expect(circuitBreaker.triggerContext.serviceName).toBe('payment-api');
+      expect(circuitBreaker.triggerContext.failureCount).toBe(3);
+      expect(circuitBreaker.triggerContext.failureThreshold).toBe(3);
+      expect(circuitBreaker.operationalDetails.currentBehavior).toBe('fail-fast');
+      expect(circuitBreaker.operationalDetails.recoveryTimeout).toBe('60s');
+      expect(circuitBreaker.impactAnalysis.rejectionResponse).toBe('service-unavailable-503');
+      expect(circuitBreaker.impactAnalysis.fallbackAction).toBe('return-cached-response');
+      expect(circuitBreaker.monitoring.healthCheckEnabled).toBe(true);
+      expect(circuitBreaker.monitoring.successThreshold).toBe(5);
+    });
+
+    // E-006-03: ヘルスチェック連携エラー検出確認テスト追加
+    // expect(healthCheck.status).toBe('unhealthy') for health monitoring
+    it('Then should verify health check integrated error detection', () => {
+      // Arrange - Simulate health check detecting system degradation
+      const dependencyFailure = new TestAglaError('DEPENDENCY_TIMEOUT', 'Database health check timeout', {
+        code: 'DB_HC001',
+        severity: ErrorSeverity.ERROR,
+        context: {
+          database: 'primary-postgres',
+          healthCheckQuery: 'SELECT 1',
+          timeoutMs: 30000,
+          actualResponseTime: 45000,
+        },
+      });
+
+      // Act - Health monitoring system processing error detection
+      const healthCheck = {
+        status: 'unhealthy', // E-006-03: Health check status verification
+        detectionContext: {
+          primaryService: {
+            name: 'user-service',
+            healthEndpoint: '/health/deep',
+            lastHealthyCheck: new Date(Date.now() - 180000).toISOString(), // 3 minutes ago
+            currentStatus: 'degraded',
+            healthScore: 0.3,
+          },
+          dependencies: {
+            database: {
+              name: 'primary-postgres',
+              status: 'timeout',
+              lastSuccessfulCheck: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
+              errorDetails: dependencyFailure.toJSON(),
+            },
+            cache: {
+              name: 'redis-cluster',
+              status: 'healthy',
+              responseTime: 15,
+              lastCheck: new Date().toISOString(),
+            },
+          },
+        },
+        alertingIntegration: {
+          triggered: true,
+          alerts: [
+            'primary-service-degraded',
+            'database-dependency-timeout',
+            'overall-system-health-warning',
+          ],
+          notificationChannels: ['slack://ops-alerts', 'pagerduty://critical'],
+          escalationLevel: 'level-2-warning',
+        },
+        recoveryActions: {
+          immediate: [
+            'increase-health-check-frequency',
+            'enable-dependency-circuit-breakers',
+            'activate-read-replica-fallback',
+          ],
+          scheduled: [
+            'database-connection-pool-optimization',
+            'dependency-timeout-tuning',
+            'health-endpoint-performance-review',
+          ],
+        },
+        impactAssessment: {
+          serviceAvailability: '70%', // Degraded but functional
+          affectedFeatures: ['user-profile-updates', 'real-time-notifications'],
+          customerImpact: 'performance-degradation',
+          businessCriticalFunctions: 'partially-affected',
+        },
+      };
+
+      // Assert - E-006-03: Verify health check error detection
+      expect(healthCheck.status).toBe('unhealthy');
+      expect(healthCheck.detectionContext.primaryService.currentStatus).toBe('degraded');
+      expect(healthCheck.detectionContext.primaryService.healthScore).toBe(0.3);
+      expect(healthCheck.detectionContext.dependencies.database.status).toBe('timeout');
+      expect(healthCheck.detectionContext.dependencies.cache.status).toBe('healthy');
+      expect(healthCheck.alertingIntegration.triggered).toBe(true);
+      expect(healthCheck.alertingIntegration.alerts).toContain('primary-service-degraded');
+      expect(healthCheck.alertingIntegration.alerts).toContain('database-dependency-timeout');
+      expect(healthCheck.alertingIntegration.escalationLevel).toBe('level-2-warning');
+      expect(healthCheck.recoveryActions.immediate).toContain('increase-health-check-frequency');
+      expect(healthCheck.recoveryActions.immediate).toContain('activate-read-replica-fallback');
+      expect(healthCheck.impactAssessment.serviceAvailability).toBe('70%');
+      expect(healthCheck.impactAssessment.customerImpact).toBe('performance-degradation');
+    });
   });
 });

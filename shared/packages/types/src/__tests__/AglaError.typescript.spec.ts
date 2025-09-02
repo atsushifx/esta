@@ -1,4 +1,15 @@
+// src: src/__tests__/AglaError.typescript.spec.ts
+// @(#) : AglaError TypeScript型安全性テスト
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// Testing framework
 import { describe, expect, it } from 'vitest';
+
+// Type definitions
 import { AglaError } from '../../types/AglaError.types.js';
 import type { AglaErrorContext, AglaErrorOptions } from '../../types/AglaError.types.js';
 

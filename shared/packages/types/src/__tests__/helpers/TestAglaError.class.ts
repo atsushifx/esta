@@ -1,10 +1,25 @@
+// src: src/__tests__/helpers/TestAglaError.class.ts
+// @(#) : Test utility class for AglaError testing
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// Internal type definitions
 import { AglaError, type AglaErrorOptions } from '../../../types/AglaError.types.js';
 
 /**
- * Test utility class extending AglaError for testing purposes
- * Provides additional test-specific functionality like error chaining
+ * Test utility class extending AglaError for testing purposes.
+ * Provides concrete implementation of the abstract AglaError class with test-specific functionality.
  */
 export class TestAglaError extends AglaError {
+  /**
+   * Creates a new TestAglaError instance for testing.
+   * @param errorType - The error type identifying the specific type of error
+   * @param message - The human-readable error message
+   * @param options - Optional configuration including code, severity, timestamp, and context
+   */
   constructor(
     errorType: string,
     message: string,
