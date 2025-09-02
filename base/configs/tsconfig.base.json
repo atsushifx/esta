@@ -9,6 +9,15 @@
   // --- files settings (set sub-packages)
   // "include": []
   // "exclude": [],
+  "exclude": [
+    ".git",
+    "dist",
+    "lib",
+    "module",
+    "node_modules",
+    ".cache",
+    "temp"
+  ],
   // --- compile options
   // src: ./shared/configs/tsconfig.base.json
   "compilerOptions": {
