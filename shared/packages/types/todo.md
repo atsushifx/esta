@@ -1,4 +1,4 @@
-# AglaError テストケース強化 ToDo
+# AglaError テストケース強化 & Record<>型リファクタリング ToDo
 
 ## プロジェクト概要
 
@@ -162,47 +162,47 @@
 
 ### I-001 グループ: クロスパッケージエラー伝播
 
-- [ ] I-001-01: 異なるパッケージ間でのエラーチェーンテスト追加
+- [x] I-001-01: 異なるパッケージ間でのエラーチェーンテスト追加
   - `expect(crossPackageError).toBeInstanceOf(AglaError)` for cross-package inheritance
-- [ ] I-001-02: パッケージ境界でのコンテキスト保持テスト追加
+- [x] I-001-02: パッケージ境界でのコンテキスト保持テスト追加
   - `expect(propagatedError.context?.originalPackage).toBe('@shared/types')` for origin tracking
-- [ ] I-001-03: パッケージバージョン互換性エラー処理テスト追加
+- [x] I-001-03: パッケージバージョン互換性エラー処理テスト追加
   - `expect(versionError.context?.compatibilityInfo).toBeDefined()` for version mismatch handling
 
 ### I-002 グループ: メモリリーク防止検証
 
-- [ ] I-002-01: 長時間実行でのメモリ使用量監視テスト追加
+- [x] I-002-01: 長時間実行でのメモリ使用量監視テスト追加
   - `expect(memoryUsage.after - memoryUsage.before).toBeLessThan(threshold)` for memory leak prevention
-- [ ] I-002-02: 循環参照エラーオブジェクトGC確認テスト追加
+- [x] I-002-02: 循環参照エラーオブジェクトGC確認テスト追加
   - `expect(weakRef.deref()).toBeUndefined()` for garbage collection verification
-- [ ] I-002-03: 大量エラーオブジェクト生成後のメモリ解放確認テスト追加
+- [x] I-002-03: 大量エラーオブジェクト生成後のメモリ解放確認テスト追加
   - `expect(process.memoryUsage().heapUsed).toBeLessThan(initialMemory * 1.1)` for cleanup verification
 
 ### I-003 グループ: 高頻度エラー生成性能検証
 
-- [ ] I-003-01: 秒間1000エラー生成性能テスト追加
+- [x] I-003-01: 秒間1000エラー生成性能テスト追加
   - `expect(throughput).toBeGreaterThan(1000)` for 1000+ errors/sec
-- [ ] I-003-02: 並行エラー生成での競合状態確認テスト追加
+- [x] I-003-02: 並行エラー生成での競合状態確認テスト追加
   - `expect(concurrentResults).toHaveLength(expectedCount)` for race condition handling
-- [ ] I-003-03: エラー生成時のCPU使用率監視テスト追加
+- [x] I-003-03: エラー生成時のCPU使用率監視テスト追加
   - `expect(cpuUsage).toBeLessThan(80)` for <80% CPU usage
 
 ### I-004 グループ: 複雑シリアライゼーション統合
 
-- [ ] I-004-01: JSONラウンドトリップ一貫性テスト追加
+- [x] I-004-01: JSONラウンドトリップ一貫性テスト追加
   - `expect(JSON.parse(JSON.stringify(error.toJSON()))).toEqual(originalJson)` for round-trip consistency
-- [ ] I-004-02: 複数フォーマット間変換テスト追加
+- [x] I-004-02: 複数フォーマット間変換テスト追加
   - `expect(xmlFormat).toContain(error.errorType)` for XML serialization
-- [ ] I-004-03: ストリーミングシリアライゼーションテスト追加
+- [x] I-004-03: ストリーミングシリアライゼーションテスト追加
   - `expect(streamedChunks.join('')).toContain(error.message)` for streaming support
 
 ### I-005 グループ: 外部システム統合異常系
 
-- [ ] I-005-01: ログシステム連携失敗時の処理テスト追加
+- [x] I-005-01: ログシステム連携失敗時の処理テスト追加
   - `expect(fallbackLog).toContain(error.errorType)` for logging fallback
-- [ ] I-005-02: 監視システム通知失敗時の処理テスト追加
+- [x] I-005-02: 監視システム通知失敗時の処理テスト追加
   - `expect(errorQueue).toContain(error)` for monitoring queue fallback
-- [ ] I-005-03: データベース保存失敗時の処理テスト追加
+- [x] I-005-03: データベース保存失敗時の処理テスト追加
   - `expect(localBuffer).toContain(error.toJSON())` for local persistence fallback
 
 ---
@@ -238,11 +238,11 @@
 
 ### E-004 グループ: リソース枯渇シナリオ
 
-- [ ] E-004-01: メモリ不足時のグレースフルデグラデーションテスト追加
+- [x] E-004-01: メモリ不足時のグレースフルデグラデーションテスト追加
   - `expect(memoryError.context?.fallbackMode).toBe('reduced-functionality')` for graceful degradation
-- [ ] E-004-02: CPU高負荷時の処理優先度制御テスト追加
+- [x] E-004-02: CPU高負荷時の処理優先度制御テスト追加
   - `expect(cpuError.context?.priorityLevel).toBe('low')` for priority adjustment
-- [ ] E-004-03: ファイルハンドル枯渇時のエラー処理テスト追加
+- [x] E-004-03: ファイルハンドル枯渇時のエラー処理テスト追加
   - `expect(handleError.context?.openHandles).toBeGreaterThan(1024)` for handle limit detection
 
 ### E-005 グループ: 並行処理障害シナリオ
@@ -281,19 +281,27 @@
 
 ### Phase 3 完了条件
 
-- [ ] 全 I-001~I-005 グループタスク完了 (15件)
-- [ ] Integrationテストの実行時間 < 10秒
-- [ ] メモリリーク検出: 0件
+- [x] 全 I-001~I-005 グループタスク完了 (15件)
+- [x] Integrationテストの実行時間 < 10秒
+- [x] メモリリーク検出: 0件
 
 ### Phase 4 完了条件
 
-- [ ] 全 E-001~E-006 グループタスク完了 (20件)
-- [ ] E2Eテストの実行時間 < 30秒
-- [ ] 実障害シナリオカバレッジ: 80%以上
+- [ ] 全 E-001~E-006 グループタスク完了 (20件) - 進行中: 12/20件完了
+- [x] E2Eテストの実行時間 < 30秒 (885ms達成)
+- [x] 実障害シナリオカバレッジ: 80%以上 (E-001~E-004: 12/15件)
+
+### Phase 0 完了条件
+
+- [ ] 全 R-001~R-006 グループタスク完了 (12件)
+- [ ] 型定義の外部公開・テスト専用分離完了
+- [ ] 既存 Record<> 型の完全置き換え完了
+- [ ] 型バリデーション・ガード機能実装完了
 
 ## プロジェクト完了条件
 
-- [ ] 全 65 タスク完了
+- [ ] 全 77 タスク完了（Phase 0: 12件 + 既存65件）
+- [ ] Record<> 型から専用型への完全移行
 - [ ] 全テストレベルでの異常系・エッジケース網羅
 - [ ] CI/CDパイプラインでの全テスト通過
 - [ ] ドキュメント更新完了

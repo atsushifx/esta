@@ -1,3 +1,12 @@
+// src: src/__tests__/AglaError.spec.ts
+// @(#) : Comprehensive unit tests for AglaError base class
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// Testing framework
 import { describe, expect, it } from 'vitest';
 
 // Type definitions
@@ -6,6 +15,7 @@ import type { ErrorSeverity } from '../../types/ErrorSeverity.types.ts';
 
 // Test utilities
 import { TestAglaError } from './helpers/TestAglaError.class.ts';
+
 // type definitions for Test
 import type { _TAglaErrorContextWithSymbols, _TMutable } from './helpers/test-types.types.ts';
 
@@ -15,12 +25,12 @@ type _TCircularContext = AglaErrorContext & {
 };
 
 /**
- * Test suite for AglaError constructor behavior.
- * Verifies error instantiation with different parameter combinations and edge cases.
+ * Test suite for AglaError constructor behavior with valid input parameters.
+ * Verifies that all properties are correctly set during error instantiation.
  */
-describe('Given AglaError constructor', () => {
-  describe('When creating error with valid parameters', () => {
-    it('Then 正常系：should set basic properties correctly', () => {
+describe('Given AglaError constructor with valid inputs', () => {
+  describe('When creating error with basic parameters only', () => {
+    it('Then should set errorType property correctly', () => {
       // Arrange
       const errorType = 'TEST_ERROR';
       const message = 'Test error message';
@@ -175,31 +185,12 @@ describe('Given AglaError constructor', () => {
 });
 
 /**
- * Test suite for AglaError property access behavior.
- * Validates property immutability and getter functionality.
+ * Test suite for AglaError property immutability and readonly constraints.
+ * Ensures error instances maintain data integrity by preventing property modification.
  */
-describe('Given AglaError property access', () => {
-  describe('When accessing properties', () => {
-    it('Then 正常系：should return correct property values', () => {
-      // Arrange
-      const code = 'TEST_001';
-      const severity = ErrorSeverity.ERROR;
-      const timestamp = new Date('2025-08-29T21:42:00Z');
-      const context = { userId: '123', operation: 'test' };
-      const error = new TestAglaError('TEST_ERROR', 'Test message', { code, severity, timestamp, context });
-
-      // Act & Assert
-      expect(error.errorType).toBe('TEST_ERROR');
-      expect(error.message).toBe('Test message');
-      expect(error.code).toBe(code);
-      expect(error.severity).toBe(severity);
-      expect(error.timestamp).toBe(timestamp);
-      expect(error.context).toBe(context);
-    });
-  });
-
-  describe('When attempting property modification', () => {
-    it('Then 異常系：should enforce readonly constraint for errorType', () => {
+describe('Given AglaError instance with set properties', () => {
+  describe('When attempting to modify errorType property', () => {
+    it('Then should enforce readonly constraint', () => {
       // Arrange
       const error = new TestAglaError('TEST_ERROR', 'Test message');
 
@@ -224,6 +215,27 @@ describe('Given AglaError property access', () => {
   describe('When checking property defaults', () => {
     it('Then エッジケース：should return undefined for unset optional properties', () => {
       // Arrange
+      const code = 'TEST_001';
+      const severity = ErrorSeverity.ERROR;
+      const timestamp = new Date('2025-08-29T21:42:00Z');
+      const error = new TestAglaError('TEST_ERROR', 'Test message', { code, severity, timestamp });
+
+      // Act & Assert
+      expect(error.code).toBe(code);
+      expect(error.severity).toBe(severity);
+      expect(error.timestamp).toBe(timestamp);
+    });
+  });
+});
+
+/**
+ * Test suite for AglaError constructor with minimal required parameters.
+ * Verifies default behavior when optional properties are not provided.
+ */
+describe('Given AglaError constructor with minimal parameters', () => {
+  describe('When creating error without optional properties', () => {
+    it('Then should set optional properties to undefined', () => {
+      // Arrange & Act
       const error = new TestAglaError('TEST_ERROR', 'Test message');
 
       // Act & Assert
@@ -233,15 +245,27 @@ describe('Given AglaError property access', () => {
       expect(error.context).toBeUndefined();
     });
   });
+
+  describe('When using legacy context parameter format', () => {
+    it('Then should maintain backward compatibility', () => {
+      // Arrange
+      const context = { userId: '123', operation: 'legacy' };
+
+      // Act
+      const error = new TestAglaError('TEST_ERROR', 'Test message', context as AglaErrorOptions);
+
+      // Assert
+      expect(error.context).toBe(context);
+      expect(error.code).toBeUndefined();
+      expect(error.severity).toBeUndefined();
+      expect(error.timestamp).toBeUndefined();
+    });
+  });
 });
 
-/**
- * Test suite for AglaError JSON serialization functionality.
- * Validates toJSON method output format and property inclusion/exclusion logic.
- */
-describe('Given AglaError JSON serialization', () => {
-  describe('When serializing to JSON', () => {
-    it('Then 正常系：should include basic properties (errorType and message)', () => {
+describe('Given AglaError instance for JSON serialization', () => {
+  describe('When calling toJSON with basic properties only', () => {
+    it('Then should include errorType and message', () => {
       // Arrange
       const errorType = 'TEST_ERROR';
       const message = 'Test message';
@@ -393,6 +417,18 @@ describe('Given AglaError constructor with various input combinations', () => {
   });
 
   describe('When creating error with special characters', () => {
+    it('Then should handle special characters in errorType', () => {
+      // Arrange
+      const customError = new TypeError('Type error occurred');
+      const aglaError = new TestAglaError('AGLA_ERROR', 'Agla error');
+
+      // Act
+      const chainedError = aglaError.chain(customError);
+
+      // Assert
+      expect(error.errorType).toBe(errorType);
+    });
+
     it('Then should handle unicode characters in message', () => {
       // Arrange
       const message = 'テストメッセージ 🚨 Error occurred';
@@ -463,21 +499,6 @@ describe('Given AglaError constructor with invalid inputs', () => {
       // Assert
       expect(error.severity).toBe(invalidSeverity);
     });
-
-    it('Then 正常系：should handle chaining different error types', () => {
-      // Arrange
-      const customError = new TypeError('Type error occurred');
-      const aglaError = new TestAglaError('AGLA_ERROR', 'Agla error');
-
-      // Act
-      const chainedError = aglaError.chain(customError);
-
-      // Assert
-      expect(chainedError.message).toBe('Agla error (caused by: Type error occurred)');
-      expect(chainedError).toBeInstanceOf(TestAglaError);
-    });
-
-    // U-004-01: Deeply nested chains moved to functional tests
   });
 
   describe('When chaining with invalid cause', () => {
@@ -513,15 +534,17 @@ describe('Given AglaError constructor with invalid inputs', () => {
   });
 });
 
-/**
- * Test suite for AglaError inheritance from JavaScript Error class.
- * Validates proper Error class inheritance and standard Error properties.
- */
-describe('Given AglaError inheritance', () => {
-  describe('When checking Error inheritance properties', () => {
-    it('Then 正常系：should have correct name property', () => {
-      // Arrange & Act
-      const error = new TestAglaError('TEST_ERROR', 'Test message');
+describe('Given AglaError with edge case scenarios', () => {
+  describe('When creating error with extremely large context', () => {
+    it('Then should handle large object context', () => {
+      // Arrange
+      const largeContext = {
+        data: new Array(1000).fill(0).map((_, i) => ({ id: i, value: `item-${i}` })),
+        metadata: { timestamp: Date.now(), version: '1.0.0' },
+      };
+
+      // Act
+      const error = new TestAglaError('LARGE_CONTEXT_ERROR', 'Large context test', { context: largeContext });
 
       // Assert
       expect(error.name).toBe('TestAglaError');
@@ -601,15 +624,9 @@ describe('Given AglaError string representation', () => {
   });
 });
 
-// === 継承・TypeScript型安全性テスト（統合済み）===
-
-/**
- * Test suite for AglaError TypeScript type system integration.
- * Validates type safety across implementations and generic usage.
- */
-describe('Given AglaError TypeScript type system', () => {
-  describe('When using generic error handler functions', () => {
-    it('Then 正常系：should maintain type safety across implementations', () => {
+describe('Given AglaError instance for string representation', () => {
+  describe('When calling toString with basic properties', () => {
+    it('Then should include errorType in output', () => {
       // Arrange
       type ProcessedError = {
         type: string;

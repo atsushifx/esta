@@ -1,7 +1,16 @@
+// src: src/__tests__/AglaError.inheritance.spec.ts
+// @(#) : AglaError 継承機能の単体テスト
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// Testing framework
 import { describe, expect, it } from 'vitest';
 
 // Type definitions
-import type { AglaError } from '../../types/AglaError.types.js';
+import { AglaError } from '../../types/AglaError.types.js';
 
 // Test utilities
 import { TestAglaError } from './helpers/TestAglaError.class.js';

@@ -1,5 +1,5 @@
-// shared/types/ErrorSeverity.types.ts
-// @(#) : Error Severity Types for unified error handling
+// src: types/ErrorSeverity.types.ts
+// @(#) : Error Severity Types for unified error handling across all packages
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //

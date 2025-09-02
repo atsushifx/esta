@@ -10,8 +10,11 @@
 import { describe, expect, it } from 'vitest';
 
 // Type definitions
-import type { AglaError, AglaErrorOptions } from '../../types/AglaError.types.js';
+import type { AglaError, AglaErrorContext, AglaErrorOptions } from '../../types/AglaError.types.js';
 import { ErrorSeverity } from '../../types/ErrorSeverity.types.js';
+
+// Test types
+import type { _THttpHeaders } from '../../src/__tests__/helpers/test-types.types.js';
 
 // Test-specific context types
 type TestErrorContext = {
@@ -21,7 +24,7 @@ type TestErrorContext = {
     id: string;
     method: string;
     url: string;
-    headers: Record<string, string>;
+    headers: _THttpHeaders;
   };
   user?: {
     id: string;
@@ -38,7 +41,7 @@ type TestErrorContext = {
     operation: string;
     workflow: string;
     step: string;
-    metadata: Record<string, unknown>;
+    metadata: AglaErrorContext;
   };
   transaction?: {
     id: string;

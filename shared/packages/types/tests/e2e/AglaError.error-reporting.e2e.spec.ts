@@ -12,6 +12,9 @@ import { describe, expect, it } from 'vitest';
 // Type definitions
 import { ErrorSeverity } from '../../types/ErrorSeverity.types.js';
 
+// Test types
+import type { _TErrorStatistics } from '../../src/__tests__/helpers/test-types.types.js';
+
 // Test utilities
 import { TestAglaError } from '../../src/__tests__/helpers/TestAglaError.class.js';
 
@@ -35,7 +38,7 @@ describe('Given package user implementing error logging and report generation wo
                 const severity = err.severity ?? 'unknown';
                 acc[severity] = (acc[severity] || 0) + 1;
                 return acc;
-              }, {} as Record<string, number>),
+              }, {} as _TErrorStatistics),
             },
             errors: errors.map((error, index) => ({
               id: `ERR-${String(index + 1).padStart(3, '0')}`,
@@ -76,7 +79,7 @@ describe('Given package user implementing error logging and report generation wo
         generated_at: string;
         summary: {
           total_errors: number;
-          severities: Record<string, number>;
+          severities: _TErrorStatistics;
         };
         errors: Array<{
           id: string;
@@ -159,13 +162,19 @@ describe('Given package user implementing error logging and report generation wo
           const errorsByType = errors.reduce((acc, err) => {
             acc[err.errorType] = (acc[err.errorType] || 0) + 1;
             return acc;
-          }, {} as Record<string, number>);
+          }, {} as _TErrorStatistics);
 
           const errorsBySeverity = errors.reduce((acc, err) => {
             const severity = err.severity ?? 'unknown';
             acc[severity] = (acc[severity] || 0) + 1;
             return acc;
-          }, {} as Record<string, number>);
+          }, {} as _TErrorStatistics);
+
+          // R-006-01: エラー統計型置き換えテスト
+          expect(errorsByType).toSatisfy((x: unknown): x is _TErrorStatistics => typeof x === 'object' && x !== null);
+          expect(errorsBySeverity).toSatisfy((x: unknown): x is _TErrorStatistics =>
+            typeof x === 'object' && x !== null
+          );
 
           return {
             monitoring_summary: {
@@ -203,8 +212,8 @@ describe('Given package user implementing error logging and report generation wo
           time_window: string;
           generated_at: string;
           total_errors: number;
-          error_types: Record<string, number>;
-          severities: Record<string, number>;
+          error_types: _TErrorStatistics;
+          severities: _TErrorStatistics;
           alerts: Array<{
             type: string;
             message: string;
@@ -227,6 +236,13 @@ describe('Given package user implementing error logging and report generation wo
         warning: 1,
       });
       expect(monSummary.alerts).toHaveLength(2); // Only FATAL and ERROR
+
+      // R-006-02: 統計集計テスト型置き換え
+      const aggregatedStats: _TErrorStatistics = {
+        ...monSummary.error_types,
+        ...monSummary.severities,
+      };
+      expect(aggregatedStats).toSatisfy((x: unknown): x is _TErrorStatistics => typeof x === 'object' && x !== null);
     });
   });
 });

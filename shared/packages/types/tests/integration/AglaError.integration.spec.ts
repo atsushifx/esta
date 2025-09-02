@@ -1,4 +1,15 @@
+// src: tests/integration/AglaError.integration.spec.ts
+// @(#) : AglaError 統合テスト
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// Testing framework
 import { describe, expect, it } from 'vitest';
+
+// Test utilities
 import { TestAglaError } from '../../src/__tests__/helpers/TestAglaError.class.ts';
 
 // Type definitions

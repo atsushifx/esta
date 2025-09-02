@@ -1,5 +1,18 @@
+// src: tests/integration/AglaError.external-systems.integration.spec.ts
+// @(#) : AglaError 外部システム連携テスト
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// Testing framework
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Test utilities
 import { TestAglaError } from '../../src/__tests__/helpers/TestAglaError.class.ts';
+
+// Type definitions
 import type { AglaError } from '../../types/AglaError.types.js';
 import { ErrorSeverity } from '../../types/ErrorSeverity.types.js';
 

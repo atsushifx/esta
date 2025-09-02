@@ -1,13 +1,24 @@
+// src: src/__tests__/ErrorSeverity.spec.ts
+// @(#) : Unit tests for ErrorSeverity enum and validation functions
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// Testing framework
 import { describe, expect, it } from 'vitest';
+
+// Type definitions and utilities
 import { ErrorSeverity, isValidErrorSeverity } from '../../types/ErrorSeverity.types.js';
 
 /**
- * Test suite for ErrorSeverity enum values and validation.
- * Validates enum integrity and type guard functionality.
+ * Test suite for ErrorSeverity enum constant values.
+ * Verifies that enum members have correct string values.
  */
-describe('Given ErrorSeverity enum and validation', () => {
-  describe('When accessing enum values', () => {
-    it('Then 正常系：should have correct enum constants', () => {
+describe('Given ErrorSeverity enum values', () => {
+  describe('When accessing enum constants', () => {
+    it('Then should return fatal string value', () => {
       // Act & Assert
       expect(ErrorSeverity.FATAL).toBe('fatal');
       expect(ErrorSeverity.ERROR).toBe('error');

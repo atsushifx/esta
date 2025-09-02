@@ -10,15 +10,19 @@
 import { describe, expect, it } from 'vitest';
 
 // Type definitions
+import type { AglaErrorContext } from '../../types/AglaError.types.js';
 import { ErrorSeverity } from '../../types/ErrorSeverity.types.js';
 
-// Test-specific context types
-type CustomErrorWorkflowContext = {
+// Test utilities
+import type { _THttpHeaders } from '../../src/__tests__/helpers/test-types.types.js';
+
+// Test-specific context types - extending AglaErrorContext
+type CustomErrorWorkflowContext = AglaErrorContext & {
   request?: {
     id: string;
     method: string;
     url: string;
-    headers: Record<string, string>;
+    headers: _THttpHeaders;
   };
   user?: {
     id: string;
@@ -35,7 +39,7 @@ type CustomErrorWorkflowContext = {
     operation: string;
     workflow: string;
     step: string;
-    metadata: Record<string, unknown>;
+    metadata: AglaErrorContext;
   };
   transaction?: {
     id: string;
@@ -236,6 +240,53 @@ describe('Given developer creating error handling workflows', () => {
       // String representation includes metadata
       expect(stringRep).toContain('METADATA_TEST_ERROR');
       expect(stringRep).toContain('Underlying cause');
+    });
+
+    // R-005-03: Type compatibility tests for HttpHeaders and AglaErrorContext
+    it('Then should satisfy HttpHeaders and AglaErrorContext types', () => {
+      const testHeaders: _THttpHeaders = {
+        'content-type': 'application/json',
+        'user-agent': 'TestClient/1.0',
+        'authorization': 'Bearer token123',
+      };
+
+      const metadata: AglaErrorContext = {
+        source: 'web-app',
+        campaign: 'signup-2025',
+        version: '1.0.0',
+      };
+
+      const contextWithTypes: CustomErrorWorkflowContext = {
+        request: {
+          id: 'req-types-test',
+          method: 'POST',
+          url: '/api/test',
+          headers: testHeaders,
+        },
+        business: {
+          operation: 'type-test',
+          workflow: 'validation',
+          step: 'type-check',
+          metadata: metadata,
+        },
+      };
+
+      // Type satisfaction tests
+      expect(testHeaders).toSatisfy((headers): headers is _THttpHeaders => {
+        return headers !== null && typeof headers === 'object';
+      });
+      expect(metadata).toSatisfy((ctx): ctx is AglaErrorContext => {
+        return ctx !== null && typeof ctx === 'object';
+      });
+      expect(contextWithTypes).toSatisfy((ctx): ctx is CustomErrorWorkflowContext => {
+        return ctx !== null && typeof ctx === 'object';
+      });
+
+      // Runtime validation
+      const error = new TestAglaError('TYPE_TEST_ERROR', 'Type test', { context: contextWithTypes });
+      const typedContext = error.context as CustomErrorWorkflowContext;
+      expect(typedContext.request!.headers['content-type']).toBe('application/json');
+      expect(typedContext.business!.metadata.source).toBe('web-app');
     });
   });
 });

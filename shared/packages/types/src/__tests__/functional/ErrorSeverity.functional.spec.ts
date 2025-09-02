@@ -1,5 +1,18 @@
+// src: src/__tests__/functional/ErrorSeverity.functional.spec.ts
+// @(#) : ErrorSeverity 機能的テスト
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+// Testing framework
 import { describe, expect, it } from 'vitest';
+
+// Type definitions and utilities
 import { ErrorSeverity, isValidErrorSeverity } from '../../../types/ErrorSeverity.types.js';
+
+// Test utilities
 import { TestAglaError } from '../helpers/TestAglaError.class.ts';
 
 describe('Given ErrorSeverity for complete integration workflows', () => {
