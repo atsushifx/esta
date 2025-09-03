@@ -30,6 +30,7 @@ extname
 gdpr
 GHA
 GHAexecutor
+grafana
 istio
 jqlang
 jsonlint
@@ -41,7 +42,9 @@ Mbps
 mdast
 mikefarah
 mttr
+NXDOMAIN
 oncall
+pagerduty
 picklist
 readdir
 REGPATH
