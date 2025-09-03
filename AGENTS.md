@@ -1,51 +1,74 @@
-# Repository Guidelines
+---
+header:
+  - src: AGENTS.md
+  - @(#): Agents向けリファレンスの読み込み指針と参照ハブ
+title: Agents Guide
+description: Codex/Claude等のエージェントがdocs/claude配下を正として参照・読込するためのガイド
+version: 0.2.2
+created: 2025-09-06
+authors:
+  - atsushifx
+  - Claude Code
+changes:
+  - 2025-09-06: docs/claude参照ハブとして再構成 (H2起点・FM追加)
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
 
-## Project Structure & Module Organization
+## 目的
 
-- `src/`: TypeScript sources. Core classes (`AgLogger.class.ts`, `AgLoggerManager.class.ts`), `plugins/{logger,formatter}/`, `utils/`, and `__tests__/` for unit specs.
-- `shared/`: Shared types and constants exported by the package.
-- `tests/`: Integration (`tests/integration/`) and E2E (`tests/e2e/`) specs.
-- `configs/`: Tooling configs (Vitest, ESLint, tsup, commitlint, secretlint).
-- Build outputs: `lib/` (CJS) and `module/` (ESM). Do not edit generated files.
-- `docs/`: Design notes and specs.
+本ドキュメントは、リポジトリ内の実作業ガイドを重複掲載せず、`docs/claude/` 配下のモジュラー文書を「正」として参照・読み込みするためのハブです。Codex CLI / Claude Code などのエージェントは、以降のリンクを優先的に読み込み、運用時の根拠資料としてください。
 
-## Build, Test, and Development Commands
+## 参照 (Canonical Docs)
 
-- `pnpm build`: Build CJS and ESM bundles via tsup.
-- `pnpm clean`: Remove build artifacts and caches.
-- `pnpm test:develop` | `test:ci` | `test:e2e` | `test:all`: Run unit, integration, e2e, or all tests with Vitest.
-- `pnpm check:types`: Type-check with `tsc` (no emit).
-- `pnpm lint` | `lint:types` | `lint:fix`: Lint (ESLint flat config), typed rules, or apply fixes.
-- `pnpm format:dprint` | `check:dprint`: Format or verify formatting.
-- `pnpm lint:secrets`: Scan repository for secrets with Secretlint.
+- `docs/claude/project-overview.md`: プロジェクト概要・パッケージ構成
+- `docs/claude/commands.md`: 開発コマンド総覧 (build/test/lint/format 等)
+- `docs/claude/architecture.md`: アーキテクチャとビルド構成
+- `docs/claude/development.md`: 開発フロー・実務手順 (BDD 含む)
+- `docs/claude/testing.md`: テスト戦略とテスト階層
+- `docs/claude/quality-assurance.md`: 品質保証・コード品質チェック
+- `docs/claude/pending-tasks.md`: 未了タスク・優先度
+- `docs/claude/conventions.md`: コーディング規約・重要リマインダー
 
-## Coding Style & Naming Conventions
+## ドキュメント作成ルール (最小抜粋)
 
-- Language: TypeScript (Node ≥20, ESM; CJS build emitted).
-- Files: Classes use `PascalCase` and may end with `.class.ts` (e.g., `AgLogger.class.ts`). Utilities and functions use `camelCase` file names where applicable.
-- Imports: Prefer ESM imports; path alias `@/*` maps to `src/*`.
-- Lint/Format: ESLint (`configs/eslint.config.js`), typed lint (`configs/eslint.config.typed.js`), and dprint. Keep diffs clean and run format + lint before pushing.
+<!-- textlint-disable ja-technical-writing/sentence-length -->
 
-## Testing Guidelines
+- 新規 Markdown はフロントマター必須、見出しは H2から (本書は準拠済み) 。
+- 生成器を優先: `pnpm run new:doc docs/<path>/<file>.md --title "..." --description "..." --tags tag1,tag2 --author <name>`
+- テンプレート: `docs/_templates/template.md`
 
-- Framework: Vitest. Unit tests in `src/__tests__/`; integration/E2E under `tests/`.
-- Naming: `*.spec.ts` or `*.test.ts` under the appropriate folder.
-- Coverage: Text reporter configured; exclude tool/config files. Run `pnpm test:all` before PRs.
+詳細は `docs/claude/conventions.md` を参照してください。
 
-## Commit & Pull Request Guidelines
+<!-- textlint-enable -->
 
-- Commits: Follow Conventional Commits (enforced via commitlint base). Examples: `feat(logger): add JSON formatter`, `fix(core): handle null options`.
-- PRs: Include a clear description, linked issues, test evidence (output or screenshots for E2E), and notes on docs/typing impacts. Ensure green CI locally: build, type-check, lint, tests.
+## 開発・運用の即時参照
 
-## Security & Configuration Tips
+- ビルド/テスト/リント等: `docs/claude/commands.md`
+- パッケージ構造とリファクタ状況: `docs/claude/project-overview.md`
+- 開発フローと手順: `docs/claude/development.md`
 
-- Secrets: Use `pnpm lint:secrets` before publishing. Do not commit credentials.
-- Config sync: Some configs inherit from the workspace base; avoid local drift unless justified.
+## MCP (Codex CLI)
 
-## MCP in Codex CLI
+- 設定: ルートの `.mcp.json` でサーバー定義 (例: `lsmcp`, `serena-mcp`)。
+- 利用: Codex はワークスペースの `.mcp.json` を自動読込。`/mcp` で状態・ツール確認。
+- 追加: `.mcp.json` に `type`/`command`/`args` を追記 (可能な限り相対パス)。
+- ローカル状態: `.lsmcp/` はキャッシュ/メモリ領域 (再生成され得る)。
 
-- Purpose: Enable MCP servers for Codex in this repo.
-- Config file: `.mcp.json` at the repo root defines servers (e.g., `lsmcp`, `serena-mcp`).
-- Codex usage: Codex auto-loads `.mcp.json` from the workspace. Use your Codex `/mcp` command to view status and available tools.
-- Add a server: Edit `.mcp.json` to include an entry with `type`, `command`, and `args`. Keep paths workspace-relative when possible.
-- Local state: `.lsmcp/` holds cache/memories for the `lsmcp` server; it may be regenerated.
+## 注意事項
+
+- 生成物 (`lib/`, `module/`) は編集禁止。`src/` を変更し、ビルドしてください。
+- ESM を優先し、パスエイリアス `@/*` は `src/*` を指す。
+- コミットは Conventional Commits に準拠。詳細は `docs/claude/conventions.md`。
+
+## 参考 (作業ドキュメント)
+
+`temp/` は Git 管理外の作業用資料です。必要時に直接参照可能です。
+
+- `temp/README.md`: 作業用ノートと補足事項の索引
+- `temp/project-structure-map.md`: プロジェクト/パッケージの構造マップ
+- `temp/document-heading-map.md`: ドキュメント見出しの設計・構成マップ
+- `temp/symbol-search-map.md`: シンボル検索パターンとガイド
+- `temp/lsmcp-serena-search-guide.md`: 高度な検索ツール (lsmcp/serena) 利用ガイド
