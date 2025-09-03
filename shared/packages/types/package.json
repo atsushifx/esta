@@ -2,7 +2,7 @@
   "name": "@shared/types",
   "_comment": "@(#) shared/common: shared constants and types for all packages",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Internal shared constants, types, and configs for the monorepo",
   "author": "atsushifx <https://github.com/atsushifx>",
   "license": "MIT",
