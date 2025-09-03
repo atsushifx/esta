@@ -34,17 +34,17 @@
 - [x] DOC-012: todo.md - 既存内容アーカイブセクション作成
 - [x] DOC-013: todo.md - 新ドキュメント作成・更新ToDo構造作成
 - [x] DOC-014: todo.md - フェーズ分割とタスクID設定
-- [ ] DOC-015: @shared/types関連 - 他ファイルからの参照確認・更新
+- [x] DOC-015: @shared/types関連 - 他ファイルからの参照確認・更新
 
 ### @agla-utils/ag-loggerパッケージ
 
-- [ ] DOC-016: docs/api/README.md - バージョン情報確認(0.3.0)
-- [ ] DOC-017: docs/api/README.md - APIリファレンス一覧の完全性確認
-- [ ] DOC-018: docs/api/README.md - コード例の動作確認
-- [ ] DOC-019: docs/api/types/ - 全型定義ドキュメント存在確認
-- [ ] DOC-020: docs/api/plugins/ - 全プラグインドキュメント存在確認
-- [ ] DOC-021: docs/user-guides/ - ユーザーガイド整合性確認
-- [ ] DOC-022: ag-logger全ドキュメント - 内部リンクチェック
+- [x] DOC-016: docs/api/README.md - バージョン情報確認(0.3.0)
+- [x] DOC-017: docs/api/README.md - APIリファレンス一覧の完全性確認
+- [x] DOC-018: docs/api/README.md - コード例の動作確認
+- [x] DOC-019: docs/api/types/ - 全型定義ドキュメント存在確認
+- [x] DOC-020: docs/api/plugins/ - 全プラグインドキュメント存在確認
+- [x] DOC-021: docs/user-guides/ - ユーザーガイド整合性確認
+- [x] DOC-022: ag-logger全ドキュメント - 内部リンクチェック
 
 ---
 
@@ -106,12 +106,12 @@
 **合計**: 48タスク
 
 - **Phase 1**: メインプロジェクト (DOC-001~010) - 10タスク (完了: 10, 残り: 0)
-- **Phase 2**: パッケージ固有 (DOC-011~022) - 12タスク (完了: 4, 残り: 8)
+- **Phase 2**: パッケージ固有 (DOC-011~022) - 12タスク (完了: 12, 残り: 0)
 - **Phase 3**: 新規作成 (DOC-023~031) - 9タスク (完了: 0, 残り: 9)
 - **Phase 4**: API整合性 (DOC-032~037) - 6タスク (完了: 0, 残り: 6)
 - **Phase 5**: 品質保証 (DOC-038~048) - 11タスク (完了: 0, 残り: 11)
 
-**進捗**: 17/48 タスク完了 (35.4%)
+**進捗**: 25/48 タスク完了 (52.1%)
 
 ---
 
