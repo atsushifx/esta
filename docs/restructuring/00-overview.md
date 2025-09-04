@@ -1,25 +1,22 @@
 ---
 header:
   - src: docs/restructuring/00-overview.md
-  - @(#) : ESTA monorepo restructuring overview and vision
-title: 📋 ESTAモノレポリストラクチャリング概要（00-overview）
+  - @(#): ESTA モノレポリストラクチャリング概要とビジョン
+title: ESTAモノレポリストラクチャリング概要（00-overview）
+description: ESTAシステムのモノレポ構造を体系的に再編するプロジェクトの概要とビジョン
 version: 1.0.0
-created: 2025-08-28
-updated: 2025-08-28
+created: 2025-09-04
 authors:
-  - 🤖 Claude（初期設計・API仕様策定）
-  - 👤 atsushifx（要件定義・仕様確定）
+  - atsushifx
 changes:
-  - 2025-08-28: 初回作成（ドキュメント整備）
+  - 2025-09-04: 標準化対応（descriptionフィールド追加・フロントマター統一）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-## 00. Overview - ESTA Monorepo Restructuring
-
-## 🎯 総合概要
+## 総合概要
 
 ESTA (Easy Setup Tools Action) monorepo のリストラクチャリングプランです。
 現在の断片化されたパッケージ構成を体系的に再編し、統一されたアーキテクチャを構築するプロジェクトです。

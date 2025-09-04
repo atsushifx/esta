@@ -1,25 +1,22 @@
 ---
 header:
   - src: docs/restructuring/02-target-architecture.md
-  - @(#) : Target architecture design and system structure
-title: 🏗️ 目標アーキテクチャ設計（02-target-architecture）
+  - @(#): 目標アーキテクチャ設計とシステム構造
+title: 目標アーキテクチャ設計（02-target-architecture）
+description: リストラクチャリング後の目標アーキテクチャ設計とシステム構造定義
 version: 1.0.0
-created: 2025-08-28
-updated: 2025-08-28
+created: 2025-09-04
 authors:
-  - 🤖 Claude（初期設計・API仕様策定）
-  - 👤 atsushifx（要件定義・仕様確定）
+  - atsushifx
 changes:
-  - 2025-08-28: 初回作成（ドキュメント整備）
+  - 2025-09-04: 標準化対応（フロントマター統一・見出し調整）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-## 02. Target Architecture - 目標アーキテクチャ設計
-
-### 🏗️ 新アーキテクチャ概要
+## 新アーキテクチャ概要
 
 #### 設計原則
 
