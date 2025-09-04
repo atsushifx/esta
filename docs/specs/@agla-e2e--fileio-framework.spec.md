@@ -1,33 +1,32 @@
 ---
 header:
   - src: docs/specs/@agla-e2e--fileio-framework.spec.md
-  - @(#) : E2E file I/O testing framework specification
+  - @(#): E2Eファイル入出力テストフレームワーク仕様書
 title: 📁 E2Eファイル入出力テストフレームワーク仕様書（@agla-e2e/fileio-framework）
+description: E2Eテストにおけるファイル入出力操作を簡素化しテストの信頼性を向上させるフレームワークの技術仕様書
 version: 1.0.0
-created: 2025-07-18
-updated: 2025-07-18
+created: 2025-09-04
 authors:
-  - 🤖 Claude（初期設計・API仕様策定）
-  - 👤 atsushifx（要件定義・仕様確定）
+  - atsushifx
 changes:
-  - 2025-07-18: 初回作成（ドキュメント整備）
+  - 2025-09-04: フロントマター標準化対応
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# 📁 E2Eファイル入出力テストフレームワーク仕様書
+## 📁 E2Eファイル入出力テストフレームワーク仕様書
 
 ## 概要
 
-`@agla-e2e/fileio-framework`は、E2Eテストにおけるファイル入出力操作を簡素化し、テストの信頼性を向上させるためのフレームワークです。ファイル操作のテスト、一時ファイルの管理、非同期・同期両方のファイル操作をサポートします。
+`@agla-e2e/fileio-framework`は、E2E テストにおけるファイル入出力操作を簡素化し、テストの信頼性を向上させるためのフレームワークです。ファイル操作のテスト、一時ファイルの管理、非同期・同期両方のファイル操作をサポートします。
 
 ## 主要機能
 
 ### 1. ファイル操作テスト支援
 
-- 同期・非同期両方のファイル操作API
+- 同期・非同期両方のファイル操作 API
 - テスト用一時ファイルの作成・管理
 - ファイル内容の検証機能
 
@@ -39,7 +38,7 @@ copyright:
 
 ### 3. 非同期操作サポート
 
-- Promise/async-awaitベースのAPI
+- Promise/async-await ベースの API
 - 同期処理との統一インターフェース
 - エラーハンドリングの統一
 
@@ -49,7 +48,7 @@ copyright:
 
 #### `AgE2eFileIoFramework`
 
-E2Eファイル操作テストのメインクラス。
+E2E ファイル操作テストのメインクラス。
 
 **主要メソッド:**
 
@@ -323,7 +322,7 @@ function handleFileError(operation: string, path: string, error: Error): never {
 
 ### 2. 使いやすさ
 
-- 直感的なAPI設計
+- 直感的な API 設計
 - 同期・非同期両対応
 - エラーメッセージの充実
 
@@ -343,9 +342,9 @@ function handleFileError(operation: string, path: string, error: Error): never {
 
 ### 外部依存
 
-- `fs/promises`: Node.js標準ファイルシステムAPI
+- `fs/promises`: Node.js 標準ファイルシステム API
 - `path`: パス操作ユーティリティ
-- `os`: OS情報取得
+- `os`: OS 情報取得
 
 ### 内部依存
 
@@ -356,7 +355,7 @@ function handleFileError(operation: string, path: string, error: Error): never {
 
 ### ユニットテスト
 
-- 各API関数の動作確認
+- 各 API 関数の動作確認
 - エラーハンドリングの検証
 - 同期・非同期両方の動作確認
 
@@ -427,29 +426,3 @@ it('バッチ処理テスト', async () => {
   }
 });
 ```
-
-## 今後の拡張予定
-
-### 1. 高度なファイル操作
-
-- バイナリファイル操作サポート
-- ファイル権限操作
-- シンボリックリンク操作
-
-### 2. パフォーマンステスト支援
-
-- 大容量ファイルの生成・操作
-- 並行ファイル操作のテスト
-- メモリ使用量の監視
-
-### 3. クラウドストレージ対応
-
-- AWS S3等のクラウドストレージテスト
-- 仮想ファイルシステムの提供
-- リモートファイル操作のモック
-
-### 4. 開発者体験向上
-
-- テストレポートの可視化
-- ファイル操作履歴の記録
-- デバッグ機能の強化

@@ -1,27 +1,26 @@
 ---
 header:
   - src: docs/specs/@shared--constants.spec.md
-  - @(#) : Shared constants package specification
+  - @(#): 共通定数パッケージ仕様書
 title: 🔧 共通定数パッケージ仕様書（@shared/constants）
+description: estaモノレポ全体で使用される共通定数を集約したパッケージの技術仕様書
 version: 1.0.0
-created: 2025-07-18
-updated: 2025-07-18
+created: 2025-09-04
 authors:
-  - 🤖 Claude（初期設計・API仕様策定）
-  - 👤 atsushifx（要件定義・仕様確定）
+  - atsushifx
 changes:
-  - 2025-07-18: 初回作成（ドキュメント整備）
+  - 2025-09-04: フロントマター標準化対応
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# 🔧 共通定数パッケージ仕様書
+## 🔧 共通定数パッケージ仕様書
 
 ## 概要
 
-`@shared/constants`は、estaモノレポ全体で使用される共通定数を集約したパッケージです。アプリケーション全体で一貫した設定値・定数を提供し、重複を排除して保守性を向上させます。
+`@shared/constants`は、esta モノレポ全体で使用される共通定数を集約したパッケージです。アプリケーション全体で一貫した設定値・定数を提供し、重複を排除して保守性を向上させます。
 
 ## 主要機能
 
@@ -39,7 +38,7 @@ copyright:
 
 ### 3. 型安全な定数定義
 
-- TypeScriptの型システムを活用
+- TypeScript の型システムを活用
 - `const assertion`による型推論
 - 実行時の値変更防止
 
@@ -197,27 +196,27 @@ function parseFile(format: SupportedFormat) {
 
 ### 1. 命名規則
 
-- **大文字スネークケース**: `DEFAULT_TIMEOUT`
-- **意味のある名前**: `MAX_RETRY_COUNT`（`MAX_CNT`ではない）
-- **プレフィックス**: カテゴリ別のプレフィックス使用
+- 大文字スネークケース: `DEFAULT_TIMEOUT`
+- 意味のある名前: `MAX_RETRY_COUNT`（`MAX_CNT`ではない）
+- プレフィックス: カテゴリ別のプレフィックス使用
 
 ### 2. 値の定義
 
-- **const assertion**: `as const`を使用
-- **型安全性**: TypeScriptの型システムを活用
-- **不変性**: 値の変更を防止
+- const assertion: `as const`を使用
+- 型安全性: TypeScript の型システムを活用
+- 不変性: 値の変更を防止
 
 ### 3. グループ化
 
-- **機能別分類**: 関連する定数をまとめる
-- **ファイル分割**: 用途に応じたファイル分割
-- **明確な境界**: 各カテゴリの責任範囲を明確化
+- 機能別分類: 関連する定数をまとめる
+- ファイル分割: 用途に応じたファイル分割
+- 明確な境界: 各カテゴリの責任範囲を明確化
 
 ### 4. ドキュメント化
 
-- **コメント**: 定数の用途・意味を記述
-- **例**: 使用例を含める
-- **制約**: 値の制約や条件を記述
+- コメント: 定数の用途・意味を記述
+- 例: 使用例を含める
+- 制約: 値の制約や条件を記述
 
 ## 設計原則
 
@@ -236,7 +235,7 @@ function parseFile(format: SupportedFormat) {
 ### 3. 可読性
 
 - 自己文書化する命名
-- 適切なコメント
+- 読みやすいコメント
 - 論理的なグループ化
 
 ### 4. 再利用性
@@ -249,7 +248,7 @@ function parseFile(format: SupportedFormat) {
 
 ### ディレクトリ構成
 
-```
+```bash
 @shared/constants/
 ├── base/
 │   ├── common.ts      # 共通定数
@@ -264,9 +263,9 @@ function parseFile(format: SupportedFormat) {
 
 ### ビルドシステム
 
-- **tsup**: CJS/ESM両対応
-- **型定義**: `.d.ts`ファイル生成
-- **ソースマップ**: デバッグ用マップ生成
+- tsup: CJS/ESM 両対応
+- 型定義: `.d.ts`ファイル生成
+- ソースマップ: デバッグ用マップ生成
 
 ## 依存関係
 

@@ -1,4 +1,22 @@
-# @agla-utils/ag-logger 使用ガイド
+---
+header:
+  - src: doc/guide/ag-logger.guide.md
+  - @(#): AgLogger用ユーザーガイド
+title: "@agla-utils/ag-logger 使用ガイド"
+description: "ag-loggerライブラリの使用方法とAPI説明"
+version: "1.0.0"
+authors:
+  - "👤 atsushifx"
+  - "🤖 Claude"
+changes:
+  - 2025-09-04: 初版作成
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
+
+## @agla-utils/ag-logger 使用ガイド
 
 ## 概要
 

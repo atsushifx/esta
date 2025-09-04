@@ -1,23 +1,21 @@
 ---
 header:
   - src: docs/specs/@esta-utils--config-loader.spec.md
-  - @(#) : Universal configuration file loader specification
+  - @(#): ユニバーサル設定ファイルローダー仕様書
 title: 📂 ユニバーサル設定ファイルローダー仕様書（@esta-utils/config-loader）
+description: 多様な設定ファイル形式に JSON、YAML、JavaScript/TypeScript に対応したユニバーサルローダーの技術仕様書
 version: 1.0.0
-created: 2025-07-18
-updated: 2025-07-18
 authors:
-  - 🤖 Claude（初期設計・API仕様策定）
-  - 👤 atsushifx（要件定義・仕様確定）
+  - atsushifx
 changes:
-  - 2025-07-18: 初回作成（ドキュメント整備）
+  - 2025-09-04: フロントマター標準化対応
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# 📂 ユニバーサル設定ファイルローダー仕様書
+## 📂 ユニバーサル設定ファイルローダー仕様書
 
 ## 概要
 
@@ -27,9 +25,9 @@ copyright:
 
 ### 1. 対応ファイル形式
 
-- **JSON**: `.json`、`.jsonc`（コメント付きJSON）
-- **YAML**: `.yaml`、`.yml`
-- **JavaScript/TypeScript**: `.js`、`.ts`、`.mjs`、`.cjs`
+- JSON: `.json`、`.jsonc`（コメント付き JSON）
+- YAML: `.yaml`、`.yml`
+- JavaScript/TypeScript: `.js`、`.ts`、`.mjs`、`.cjs`
 
 ### 2. 設定ファイル検索
 
@@ -51,13 +49,13 @@ copyright:
 
 設定ファイルを検索・読み込み・パースして返します。
 
-**パラメータ:**
+**パラメータ:
 
 - `options.configName`: 設定ファイル名（拡張子なし）
 - `options.searchDirs`: 検索対象ディレクトリ配列
 - `options.extensions`: 対応拡張子配列（省略可能）
 
-**戻り値:**
+**戻り値:
 
 - 成功時: パースされた設定オブジェクト
 - ファイルが見つからない場合: `null`
@@ -67,11 +65,11 @@ copyright:
 
 指定された設定ファイルを直接パースします。
 
-**パラメータ:**
+**パラメータ:
 
 - `filePath`: 設定ファイルの絶対パス
 
-**戻り値:**
+**戻り値:
 
 - パースされた設定オブジェクト
 
@@ -79,13 +77,13 @@ copyright:
 
 設定ファイルを検索してパスを返します。
 
-**パラメータ:**
+**パラメータ:
 
 - `options.configName`: 設定ファイル名
 - `options.searchDirs`: 検索ディレクトリ配列
 - `options.extensions`: 対応拡張子配列
 
-**戻り値:**
+**戻り値:
 
 - 見つかった設定ファイルの絶対パス、または `null`
 
@@ -171,7 +169,7 @@ const eslintConfig = await loadConfig({
 #### JavaScript/TypeScriptパーサー
 
 - 動的インポートによる実行時読み込み
-- ESモジュール・CommonJSモジュール両対応
+- ES モジュール・CommonJS モジュール両対応
 
 ### エラーハンドリング
 
@@ -183,8 +181,8 @@ const eslintConfig = await loadConfig({
 
 ### 外部依存
 
-- `js-yaml`: YAML形式のパース
-- `strip-json-comments`: JSONコメント除去
+- `js-yaml`: YAML 形式のパース
+- `strip-json-comments`: JSON コメント除去
 
 ### 内部依存
 
@@ -207,15 +205,15 @@ const eslintConfig = await loadConfig({
 
 ## 設計原則
 
-1. **ユニバーサル対応**: 主要な設定ファイル形式すべてに対応
-2. **型安全性**: TypeScriptの型システムを活用した安全な設定読み込み
-3. **エラーハンドリング**: 詳細で理解しやすいエラーメッセージ
-4. **パフォーマンス**: 必要時のみファイル読み込みを実行
-5. **拡張性**: 新しいファイル形式への対応が容易
+1. **ユニバーサル対応: 主要な設定ファイル形式すべてに対応
+2. **型安全性: TypeScript の型システムを活用した安全な設定読み込み
+3. **エラーハンドリング: 詳細で理解しやすいエラーメッセージ
+4. **パフォーマンス: 必要時のみファイル読み込みを実行
+5. **拡張性: 新しいファイル形式への対応が容易
 
 ## 今後の拡張予定
 
-- TOML形式サポート
+- TOML 形式サポート
 - 設定ファイルの監視機能
 - 設定値の検証機能
 - キャッシュ機能の実装

@@ -3,9 +3,8 @@ header:
   - src: docs/specs/@agla-utils--ag-logger.spec.md
   - @(#) : Structured logging framework specification
 title: 📝 構造化ログフレームワーク仕様書（@agla-utils/ag-logger）
+description: agla-utilsパッケージの構造化ログフレームワークの仕様書
 version: 1.0.0
-created: 2025-07-18
-updated: 2025-07-18
 authors:
   - 🤖 Claude（初期設計・API仕様策定）
   - 👤 atsushifx（要件定義・仕様確定）
@@ -17,11 +16,11 @@ copyright:
   - https://opensource.org/licenses/MIT
 ---
 
-# 📝 構造化ログフレームワーク仕様書
+## 📝 構造化ログフレームワーク仕様書
 
 ## 概要
 
-`@agla-utils/ag-logger`は、TypeScriptアプリケーション向けの柔軟で拡張可能な構造化ログフレームワークです。AWS CloudWatch Logs準拠のログレベルを使用し、プラグイン式アーキテクチャにより、カスタムロガーとフォーマッターをサポートします。
+`@agla-utils/ag-logger`は、TypeScript アプリケーション向けの柔軟で拡張可能な構造化ログフレームワークです。AWS CloudWatch Logs 準拠のログレベルを使用し、プラグイン式アーキテクチャにより、カスタムロガーとフォーマッターをサポートします。
 
 ## 主要機能
 
@@ -49,11 +48,11 @@ copyright:
 - カスタムロガーとフォーマッターの組み合わせ
 - 既存プラグインの拡張・置換が容易
 - レベル別の個別ロガー設定
-- 集中管理される`AgLoggerManager`による効率的な管理
+- `AgLoggerManager` による集中管理
 
 ### 4. 並列テスト対応
 
-- テストID付きE2Eモックロガー
+- テスト ID 付き E2E モックロガー
 - 並列テスト実行での独立したログキャプチャ
 - テスト用ユーティリティ関数の提供
 
@@ -70,7 +69,7 @@ copyright:
 - `getInstance(defaultLogger?, formatter?, loggerMap?): AgLogger` - シングルトンインスタンス取得
 - `setLogLevel(level: AgTLogLevel): AgTLogLevel` - ログレベル設定
 - `getLogLevel(): AgTLogLevel` - 現在のログレベル取得
-- `setVerbose(value?: boolean): boolean` - verboseフラグの設定・取得
+- `setVerbose(value?: boolean): boolean` - verbose フラグの設定・取得
 - `setLogger(options: AgLoggerOptions): void` - ロガー設定
 - `fatal(...args: unknown[]): void` - 致命的エラーログ
 - `error(...args: unknown[]): void` - エラーログ
@@ -78,8 +77,8 @@ copyright:
 - `info(...args: unknown[]): void` - 情報ログ
 - `debug(...args: unknown[]): void` - デバッグログ
 - `trace(...args: unknown[]): void` - トレースログ
-- `log(...args: unknown[]): void` - 汎用ログ（INFOレベル）
-- `verbose(...args: unknown[]): void` - verboseフラグが有効時のみ出力
+- `log(...args: unknown[]): void` - 汎用ログ（INFO レベル）
+- `verbose(...args: unknown[]): void` - verbose フラグが有効時のみ出力
 - `resetSingleton(): void` - シングルトンインスタンスのリセット（テスト用）
 
 #### `AgLoggerManager`
@@ -95,7 +94,7 @@ copyright:
 
 #### `getLogger(defaultLogger?, formatter?, loggerMap?): AgLogger`
 
-便利関数。AgLoggerのシングルトンインスタンスを取得します。
+便利関数。AgLogger のシングルトンインスタンスを取得します。
 
 ### 型定義
 
@@ -143,7 +142,7 @@ type AgLoggerOptions = {
 #### `ConsoleLogger`
 
 - 標準的なコンソール出力
-- レベル別のconsoleメソッド使用
+- レベル別の console メソッド使用
 - FATAL/ERROR → `console.error`
 - WARN → `console.warn`
 - INFO → `console.info`
@@ -156,8 +155,8 @@ type AgLoggerOptions = {
 
 #### `E2eMockLogger`
 
-- E2Eテスト用モックロガー（並列テスト対応）
-- テストID付きログメッセージキャプチャ機能
+- E2E テスト用モックロガー（並列テスト対応）
+- テスト ID 付きログメッセージキャプチャ機能
 - `startTest(testId)` - 新しいテストの開始
 - `endTest(testId)` - テストの終了
 - `getMessages(level, testId?)` - レベル別メッセージ取得
@@ -169,7 +168,7 @@ type AgLoggerOptions = {
 
 - 統合テスト用モックロガー
 - シンプルなメッセージキャプチャ機能
-- E2eMockLoggerの軽量版
+- E2eMockLogger の軽量版
 
 ### フォーマッタープラグイン
 
@@ -181,7 +180,7 @@ type AgLoggerOptions = {
 
 #### `JsonFormat`
 
-- JSON形式
+- JSON 形式
 - 構造化ログ出力
 - ログ解析ツールとの親和性
 
@@ -282,7 +281,7 @@ const testId2 = createTestIdFromFile(__filename);
 
 ### 2. 型安全性
 
-- TypeScriptの型システムを活用
+- TypeScript の型システムを活用
 - 型安全なログメッセージ構造
 - コンパイル時エラー検出
 
@@ -290,15 +289,15 @@ const testId2 = createTestIdFromFile(__filename);
 
 - レベル別のフィルタリング
 - 最小限の処理オーバーヘッド
-- シングルトンパターンによる効率的なインスタンス管理
+- シングルトンパターンにより、関数やクラス内で同一のログ出力が可能
 
 ### 4. テスト容易性
 
-- E2eMockLoggerによる並列テストサポート
-- IntegrationMockLoggerによる統合テストサポート
-- テストID管理による独立したテスト環境
+- E2eMockLogger による並列テストサポート
+- IntegrationMockLogger による統合テストサポート
+- テスト ID 管理による独立したテスト環境
 - 依存性注入対応
-- TDD手法との親和性
+- TDD 手法との親和性
 
 ## 内部実装
 
@@ -339,7 +338,7 @@ class AgLogger {
 
 ### 関数型コア
 
-ログメッセージの処理には関数型アプローチを採用し、純粋関数による処理が可能：
+ログメッセージの処理には関数型アプローチを採用し、純粋関数による処理が可能:
 
 ```typescript
 import { formatLogMessage } from '@agla-utils/ag-logger/functional/core/formatLogMessage';
@@ -357,7 +356,7 @@ const formattedMessage = formatLogMessage(AG_LOGLEVEL.INFO, 'メッセージ', d
 ### 内部依存
 
 - `shared/types`: パッケージ内共通型定義（AgLogger.types.ts, AgLogger.interface.ts, LogLevel.types.ts）
-- Node.js標準モジュール: `crypto`, `path`（テストID生成用）
+- Node.js 標準モジュール: `crypto`, `path`（テスト ID 生成用）
 
 ## テスト仕様
 
@@ -368,31 +367,31 @@ const formattedMessage = formatLogMessage(AG_LOGLEVEL.INFO, 'メッセージ', d
 - カスタムロガー・フォーマッターの動作
 - シングルトンパターンの検証
 - 関数型コアの純粋関数テスト
-- verboseモードの動作確認
+- verbose モードの動作確認
 
 ### 統合テスト
 
 - プラグイン間の相互作用テスト
-- AgLoggerManagerとの統合動作確認
-- IntegrationMockLoggerによるテスト
+- AgLoggerManager との統合動作確認
+- IntegrationMockLogger によるテスト
 
 ### E2Eテスト
 
 - 実際のログ出力統合テスト
 - 複数レベルでの同時使用
-- 並列テスト実行でのテストID分離
+- 並列テスト実行でのテスト ID 分離
 - パフォーマンステスト
 
 ## 追加されたユーティリティ
 
 ### `AgLoggerGetMessage`
 
-ログの引数を解析してAgLogMessage構造に変換するユーティリティ関数。
+ログの引数を解析して AgLogMessage 構造に変換するユーティリティ関数。
 
 ### テストID生成関数
 
-- `createTestId(name: string): string` - 手動でのテストID生成
-- `createTestIdFromFile(filename: string): string` - ファイルパスからのテストID生成
+- `createTestId(name: string): string` - 手動でのテスト ID 生成
+- `createTestIdFromFile(filename: string): string` - ファイルパスからのテスト ID 生成
 
 ## 今後の拡張予定
 

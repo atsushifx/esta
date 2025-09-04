@@ -3,9 +3,8 @@ header:
   - src: docs/specs/@esta-utils-command-runner.spec.md
   - @(#) : ESTA Utils command execution utilities
 title: 🏃 コマンド実行ユーティリティ仕様書（@esta-utils/command-runner）
+description: クロスプラットフォーム環境で安全で信頼性の高いコマンド実行を提供するユーティリティ。適切なエスケープ、プラットフォーム固有のシェル管理、コマンド存在確認を処理。
 version: 1.0.0
-created: 2025-07-14
-updated: 2025-07-14
 authors:
   - 🧠 つむぎ（コマンド実行アーキテクチャ）
   - 🧁 小紅（クロスプラットフォーム対応）
@@ -170,7 +169,7 @@ function commandExist(command: string): Promise<boolean>;
 ### Module Structure
 
 ```
-src/
+packages/esta-utils/command-runner/src/
 ├── index.ts           # Main entry point
 ├── commandExist.ts    # Command existence checking
 ├── wrapCommand.ts     # Command wrapping utilities (planned)
