@@ -1,10 +1,28 @@
-# Quality Assurance
+---
+header:
+  - src: quality-assurance.md
+  - @(#): コード品質保証ツールとプロセスガイド
+title: Quality Assurance
+description: モノレポ全体で使用するコード品質ツール、リンティング設定、品質保証プロセスの説明
+version: 1.0.0
+created: 2025-09-04
+authors:
+  - atsushifx
+changes:
+  - 2025-09-04: 初版作成
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
+
+## Quality Assurance
 
 This file describes the code quality tools, linting configurations, and quality assurance processes used across the monorepo.
 
-## Code Quality Tools
+### Code Quality Tools
 
-### Linting
+##### Linting
 
 - **ESLint**: ESLint with TypeScript support and separate typed/untyped configs
 - **Basic Config**: Standard ESLint rules for general code quality
@@ -40,31 +58,31 @@ This file describes the code quality tools, linting configurations, and quality 
 - **markdownlint-cli2**: Markdown-specific linting
 - **Documentation**: Ensures high-quality documentation
 
-## Quality Assurance Commands
+### Quality Assurance Commands
 
 ### Global Quality Checks
 
 Run these commands from the root directory:
 
 ```bash
-# Linting
+### Linting
 pnpm run lint                    # Basic linting for all packages
 pnpm run lint:types              # Type-aware linting for all packages
 pnpm run lint-all                # Lint all files with basic ESLint config
 pnpm run lint-all:types          # Lint all files with TypeScript-aware ESLint config
 
-# Specialized Linting
+### Specialized Linting
 pnpm run lint:filenames          # Check filename conventions with ls-lint
 pnpm run lint:text               # Check text files with textlint
 pnpm run lint:markdown           # Check markdown files with markdownlint
 pnpm run lint:secrets            # Check for secrets with secretlint
 
-# Formatting and Code Quality
+### Formatting and Code Quality
 pnpm run format:dprint           # Format code with dprint
 pnpm run check:dprint            # Check code formatting with dprint
 pnpm run check:spells            # Spell checking with cspell
 
-# Type Checking
+### Type Checking
 pnpm run check:types             # Type check all packages
 ```
 
@@ -73,19 +91,19 @@ pnpm run check:types             # Type check all packages
 Run these commands from individual package directories:
 
 ```bash
-# Linting
+### Linting
 pnpm run lint                    # ESLint with basic config
 pnpm run lint:types              # ESLint with TypeScript rules
 pnpm run lint:all                # Run both lint commands
 pnpm run lint:fix                # Auto-fix linting issues
 pnpm run lint:secrets            # Check for secrets with secretlint
 
-# Type Checking and Spell Checking
+### Type Checking and Spell Checking
 pnpm run check:types             # TypeScript type checking
 pnpm run check:spells            # Spell checking for package files
 ```
 
-## Quality Assurance Workflow
+### Quality Assurance Workflow
 
 ### Pre-commit Integration
 
@@ -108,7 +126,7 @@ pnpm run check:spells **/*.{ts,md,json}  # Spell checking
 pnpm run check:dprint            # Code formatting verification
 ```
 
-## Configuration Management
+### Configuration Management
 
 ### Centralized Configuration
 
@@ -123,7 +141,7 @@ pnpm run check:dprint            # Code formatting verification
 - **TypeScript**: `tsconfig.base.json` with package extensions
 - **Spell Checking**: Custom dictionaries and cspell configuration
 
-## Quality Standards
+### Quality Standards
 
 ### Code Standards
 
@@ -143,7 +161,7 @@ pnpm run check:dprint            # Code formatting verification
 - **Security Linting**: Automated security vulnerability detection
 - **Best Practices**: Follow security best practices for TypeScript/Node.js
 
-## Integration with Development Workflow
+### Integration with Development Workflow
 
 Quality assurance is integrated throughout the development process:
 

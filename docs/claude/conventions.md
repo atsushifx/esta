@@ -1,8 +1,26 @@
-# Conventions and Guidelines
+---
+header:
+  - src: conventions.md
+  - @(#): コーディング規約とガイドライン
+title: Conventions and Guidelines
+description: 重要なコーディング規約、ファイル作成ルール、開発ガイドライン
+version: 1.0.0
+created: 2025-09-04
+authors:
+  - atsushifx
+changes:
+  - 2025-09-04: 初版作成
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
+
+## Conventions and Guidelines
 
 This file contains important coding conventions, file creation rules, and development guidelines.
 
-## Important Instruction Reminders
+### Important Instruction Reminders
 
 ### Core Development Principles
 
@@ -18,7 +36,7 @@ This file contains important coding conventions, file creation rules, and develo
 3. **Documentation Policy**: Never create documentation files unless explicitly requested
 4. **README Policy**: Never proactively create README files
 
-## Code Style Guidelines
+### Code Style Guidelines
 
 ### Comments Policy
 
@@ -33,7 +51,7 @@ This file contains important coding conventions, file creation rules, and develo
 - Maintain consistency with surrounding code
 - Follow TypeScript strict mode conventions
 
-## Testing Conventions
+### Testing Conventions
 
 ### Error Message Testing
 
@@ -48,7 +66,7 @@ This file contains important coding conventions, file creation rules, and develo
 - Implement RED/GREEN cycle confirmation
 - Write minimal implementation for test passage only
 
-## Security and Quality Standards
+### Security and Quality Standards
 
 ### Security Requirements
 
@@ -63,7 +81,7 @@ This file contains important coding conventions, file creation rules, and develo
 - Ensure comprehensive error handling
 - Implement type-safe patterns
 
-## Development Workflow Conventions
+### Development Workflow Conventions
 
 ### Library and Framework Usage
 
@@ -83,7 +101,7 @@ This file contains important coding conventions, file creation rules, and develo
 - Understand existing framework and library choices
 - Make changes that are idiomatic to the existing codebase
 
-## Project-Specific Conventions
+### Project-Specific Conventions
 
 ### Package Structure
 

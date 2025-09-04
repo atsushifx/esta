@@ -1,8 +1,26 @@
-# Pending Implementation Tasks
+---
+header:
+  - src: pending-tasks.md
+  - @(#): 実装保留タスクと優先度管理
+title: Pending Implementation Tasks
+description: 現在の実装優先度と保留中開発タスクの追跡管理
+version: 1.0.0
+created: 2025-09-04
+authors:
+  - atsushifx
+changes:
+  - 2025-09-04: 初版作成
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
+
+## Pending Implementation Tasks
 
 This file tracks current implementation priorities and pending development tasks.
 
-## Completed Major Projects
+### Completed Major Projects
 
 ### AglaError Type System Enhancement (✅ Completed)
 
@@ -28,7 +46,7 @@ This file tracks current implementation priorities and pending development tasks
 
 ---
 
-## Current Priority Tasks
+### Current Priority Tasks
 
 ### LogLevel Validation Implementation (Priority: High)
 
@@ -77,7 +95,7 @@ All invalid LogLevel inputs (undefined, null, wrong types, out-of-range numbers)
 
 ---
 
-## Future Architecture Plans
+### Future Architecture Plans
 
 ### AglaError Package Migration (Future)
 
@@ -109,7 +127,7 @@ All invalid LogLevel inputs (undefined, null, wrong types, out-of-range numbers)
 
 ---
 
-## Task Management Notes
+### Task Management Notes
 
 ### Implementation Guidelines
 

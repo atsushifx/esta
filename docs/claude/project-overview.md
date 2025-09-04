@@ -1,8 +1,26 @@
-# Project Overview
+---
+header:
+  - src: project-overview.md
+  - @(#): TypeScriptモノレポ構造とパッケージ構成概要
+title: Project Overview
+description: TypeScriptモノレポの構造とパッケージ組織の概要説明
+version: 1.0.0
+created: 2025-09-04
+authors:
+  - atsushifx
+changes:
+  - 2025-09-04: 初版作成
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
+
+## Project Overview
 
 This file provides an overview of the TypeScript monorepo structure and package organization.
 
-## Project Description
+### Project Description
 
 This is a TypeScript monorepo focused on building GitHub Actions and utility packages, particularly for CLI tool installation and automation. The primary project is the "Easy Setup Tools Action" which uses eget to install CLI tools in GitHub Actions workflows.
 
@@ -10,7 +28,7 @@ The action supports configuration-based tool installation with JSON config files
 
 **Note**: This repository is currently undergoing a major refactoring to reorganize packages and improve the codebase structure. Some packages may be in transition or have been recently moved/renamed.
 
-## Monorepo Structure
+### Monorepo Structure
 
 This is a TypeScript monorepo using pnpm workspaces with 6 main categories plus shared packages:
 
@@ -53,7 +71,7 @@ package-name/
 
 **Note**: The `@shared/` packages are located in `shared/packages/` at the root level, not in the `packages/` directory.
 
-## Completed Major Projects
+### Completed Major Projects
 
 ### AglaError Type System Enhancement (✅ Completed)
 
@@ -79,7 +97,7 @@ package-name/
 
 ---
 
-## Key Architecture Patterns
+### Key Architecture Patterns
 
 ### GitHub Actions Integration
 

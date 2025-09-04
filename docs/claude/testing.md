@@ -1,8 +1,26 @@
-# Testing Strategy
+---
+header:
+  - src: testing.md
+  - @(#): テスト戦略とフレームワークガイド
+title: Testing Strategy
+description: モノレポ全体で使用するテストフレームワーク、テストカテゴリ、テストアプローチの説明
+version: 1.0.0
+created: 2025-09-04
+authors:
+  - atsushifx
+changes:
+  - 2025-09-04: 初版作成
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
+
+## Testing Strategy
 
 This file describes the testing framework, test categories, and testing approaches used across the monorepo.
 
-## Testing Framework
+### Testing Framework
 
 - **Test Runner**: Vitest with separate configs for unit, functional, integration, and E2E tests
 
@@ -14,7 +32,7 @@ This file describes the testing framework, test categories, and testing approach
 - **E2E Tests**: `./configs/vitest.config.e2e.ts`
 - **GitHub Actions Tests**: Special config for testing GitHub Actions workflows
 
-## Test Categories
+### Test Categories
 
 ### Unit Tests
 
@@ -49,7 +67,7 @@ This file describes the testing framework, test categories, and testing approach
 - **Purpose**: Special config for testing GitHub Actions workflows
 - **Command**: `pnpm run test:gha`
 
-## Special Testing Features
+### Special Testing Features
 
 ### File I/O Testing
 
@@ -75,7 +93,7 @@ This file describes the testing framework, test categories, and testing approach
 - **Methodology**: Following atsushifx式 BDD methodology
 - **Success Case**: `@shared/types` AglaError implementation with 77-task comprehensive test coverage
 
-## Testing Strategy
+### Testing Strategy
 
 ### Unit Testing Strategy
 
@@ -99,7 +117,7 @@ This file describes the testing framework, test categories, and testing approach
 - **Integration**: Workflow and action testing
 - **Environment**: Testing in GitHub Actions environment
 
-## Test Organization
+### Test Organization
 
 ### Test File Naming Conventions
 
@@ -115,7 +133,7 @@ This file describes the testing framework, test categories, and testing approach
 - **Clear Structure**: Arrange/Act/Assert pattern
 - **BDD Approach**: Behavior-driven development methodology
 
-## Quality Assurance Integration
+### Quality Assurance Integration
 
 Testing integrates with the overall quality assurance process:
 

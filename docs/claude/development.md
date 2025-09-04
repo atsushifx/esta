@@ -1,4 +1,22 @@
-# Development Workflow
+---
+header:
+  - src: claude/development.md
+  - @(#): 開発ワークフローと実装プロセスの詳細ガイド
+title: Development Workflow
+description: 開発プラクティス、ワークフローパターン、パッケージ固有の開発プロセスの詳細ガイド
+version: 1.0.0
+created: 2025-09-04
+authors:
+  - atsushifx
+changes:
+  - 2025-09-04: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
+
+## Development Workflow
 
 This file describes development practices, workflow patterns, and package-specific development processes.
 
@@ -72,6 +90,98 @@ When making changes to files:
 
 - **ESM-first**: Prefer ESM modules with CommonJS compatibility
 - **Type Safety**: Use TypeScript strict mode and comprehensive typing
-- **Error Handling**: Implement comprehensive error handling with descriptive messages
+- **Error Handling**: Implement comprehensive error handling with AglaError system (see below)
 - **Validation**: Include validation at both configuration and runtime levels
 - **Testing**: Follow multi-tier testing strategy with appropriate test categories
+
+## Error Handling Patterns
+
+### AglaError System (Enhanced 2025-09-02)
+
+The project now uses a comprehensive AglaError system with enhanced type safety and testing coverage:
+
+#### Enhanced Type Safety
+
+**Preferred Pattern**: Use structured `AglaErrorContext` instead of generic `Record<>`
+
+```typescript
+// ✅ Recommended: Type-safe context
+const context: AglaErrorContext = {
+  userId: 'user123',
+  requestId: 'req-456',
+  timestamp: new Date().toISOString(),
+  metadata: { source: 'api' },
+};
+
+const error = new MyAglaError('API_ERROR', 'Request failed', {
+  code: 'API001',
+  severity: ErrorSeverity.ERROR,
+  context: context, // Full type safety
+});
+
+// ❌ Legacy pattern (still supported but not recommended)
+const legacyContext: Record<string, unknown> = { legacy: true };
+```
+
+#### Error Creation Patterns
+
+```typescript
+// Standard error with full context
+const standardError = new MyAglaError('VALIDATION_ERROR', 'Invalid input', {
+  code: 'VAL001',
+  severity: ErrorSeverity.WARN,
+  context: {
+    field: 'email',
+    value: 'invalid-email',
+    validationRule: 'email-format',
+  },
+});
+
+// Error chaining for root cause analysis
+const chainedError = apiError.chain(networkError);
+```
+
+#### BDD Testing Requirements
+
+All new error handling must include BDD-structured tests:
+
+```typescript
+describe('Given API error scenario', () => {
+  describe('When processing invalid request', () => {
+    it('Then should create properly structured error', () => {
+      // Given: Invalid request scenario
+      const invalidData = { email: 'not-an-email' };
+
+      // When: Error is created
+      const error = new ValidationError('INVALID_EMAIL', 'Email format invalid', {
+        code: 'VAL001',
+        context: { field: 'email', value: invalidData.email },
+      });
+
+      // Then: Error should be properly structured
+      expect(error.errorType).toBe('INVALID_EMAIL');
+      expect(error.context?.field).toBe('email');
+      expect(error.code).toBe('VAL001');
+    });
+  });
+});
+```
+
+### Test Coverage Improvements
+
+**Enhanced Coverage (77 tasks completed)**:
+
+- **Unit Tests**: 13 files covering core functionality
+- **Functional Tests**: 2 files for workflow integration
+- **Integration Tests**: 8 files for system-level testing
+- **E2E Tests**: 17 files for real-world scenarios
+- **Total**: 38 comprehensive test files
+
+### Type Safety Migration
+
+**Completed Migration**:
+
+- ✅ `Record<string, unknown>` → `AglaErrorContext` (100% complete)
+- ✅ Type guards and validation functions implemented
+- ✅ Full backward compatibility maintained (0 breaking changes)
+- ✅ IDE support and IntelliSense improvements
