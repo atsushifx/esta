@@ -1,23 +1,22 @@
 ---
 header:
   - src: docs/restructuring/05-quality-assurance.md
-  - @(#) : Quality assurance and testing strategy
-title: 🔍 品質保証・テスト戦略（05-quality-assurance）
+  - @(#): 品質保証・テスト戦略
+title: 品質保証・テスト戦略（05-quality-assurance）
+description: リストラクチャリング全体の品質保証基準とテスト戦略および実装方針
 version: 1.0.0
-created: 2025-08-28
-updated: 2025-08-28
+created: 2025-09-04
 authors:
-  - 🤖 Claude（初期設計・API仕様策定）
-  - 👤 atsushifx（要件定義・仕様確定）
+  - atsushifx
 changes:
-  - 2025-08-28: 初回作成（ドキュメント整備）
+  - 2025-09-04: 標準化対応（H2開始・フロントマター統一）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-## 05. Quality Assurance - 品質保証・テスト戦略
+## 品質保証・テスト戦略
 
 ### 🎯 品質保証目標
 

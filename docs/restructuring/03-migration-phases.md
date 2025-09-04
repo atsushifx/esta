@@ -1,23 +1,22 @@
 ---
 header:
   - src: docs/restructuring/03-migration-phases.md
-  - @(#) : Phased migration plan and implementation strategy
-title: 📈 段階的移行計画（03-migration-phases）
+  - @(#): 段階的移行計画と実装戦略
+title: 段階的移行計画（03-migration-phases）
+description: モノレポ構造の段階的移行を実現するためのフェーズ別戦略と実装ガイド
 version: 1.0.0
-created: 2025-08-28
-updated: 2025-08-28
+created: 2025-09-04
 authors:
-  - 🤖 Claude（初期設計・API仕様策定）
-  - 👤 atsushifx（要件定義・仕様確定）
+  - atsushifx
 changes:
-  - 2025-08-28: 初回作成（ドキュメント整備）
+  - 2025-09-04: 標準化対応（H2開始・フロントマター統一）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-## 03. Migration Phases - 段階的移行計画
+## 段階的移行計画
 
 ### 移行戦略概要
 
