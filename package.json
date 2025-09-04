@@ -40,7 +40,8 @@
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*",
     "test:develop": "pnpm -r run test:develop",
     "test:ci": "pnpm -r run test:ci",
-    "test:gha": "pnpm exec vitest run --config ./configs/vitest.config.gha.ts",
+    "new:doc": "tsx ./scripts/new-doc.ts",
+    "lint:docs": "tsx ./scripts/check-doc-frontmatter.ts",
     "sync:configs": "bash scripts/sync-configs.sh"
   },
   "devDependencies": {
