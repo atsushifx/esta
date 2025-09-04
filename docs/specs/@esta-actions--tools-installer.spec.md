@@ -3,9 +3,8 @@ header:
   - src: docs/specs/@esta-actions-tools-installer.spec.md
   - @(#) : ESTA Actions Tools Installer framework
 title: 📦 ツールインストーラー統合実行仕様書（@esta-actions/tools-installer）
+description: この仕様書は @esta-actions パッケージのツールインストーラー統合実行機能の仕様を定義します
 version: 1.0.0
-created: 2025-07-14
-updated: 2025-07-14
 authors:
   - 🧠 つむぎ（executor分離設計）
   - 🧁 小紅（実行環境統合設計）
@@ -168,7 +167,7 @@ export async function DenoExecutor<T>(
 
 ```bash
 @esta/esta-executor/
-├── src/
+├── packages/esta-actions/tools-installer/src/
 │   ├── CLIexecutor.ts
 │   ├── GHAexecutor.ts
 │   ├── DenoExecutor.ts

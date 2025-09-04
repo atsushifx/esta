@@ -3,9 +3,8 @@ header:
   - src: docs/specs/@esta-core--tools-config.spec.md
   - @(#) : ESTA Install Tools configuration reader
 title: 🔧 ツール設定統合管理仕様書（@esta-core/tools-config）
+description: CLIツール設定の統合管理を行うパッケージ。個別のツール設定を読み込み、egetなどのインストーラーで使用するための統合インストール設定を生成。複数の設定ファイル形式をサポートし、型安全な解析・検証を提供。
 version: 1.2.0
-created: 2025-07-14
-updated: 2025-07-19
 authors:
   - 🤖 Claude（初期設計・API仕様策定・実装更新）
   - 👤 atsushifx（要件定義・仕様確定）
@@ -241,7 +240,7 @@ export const CompleteToolsConfigSchema = pipe(
 ### パッケージ構造
 
 ```bash
-src/
+packages/esta-core/tools-config/src/
 ├── core/
 │   └── config/              # 設定読み込み・マージ機能
 ├── internal/

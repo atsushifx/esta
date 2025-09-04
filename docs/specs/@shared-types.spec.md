@@ -1,27 +1,25 @@
 ---
 header:
-  - src: docs/specs/@shared--types.spec.md
-  - @(#) : Shared types package specification
+  - src: docs/specs/@shared-types.spec.md
+  - @(#): 共通型定義パッケージ仕様書
 title: 🔷 共通型定義パッケージ仕様書（@shared/types）
+description: estaモノレポ全体で使用される共通型定義を集約したTypeScriptパッケージの技術仕様書
 version: 1.0.0
-created: 2025-07-18
-updated: 2025-07-18
 authors:
-  - 🤖 Claude（初期設計・API仕様策定）
-  - 👤 atsushifx（要件定義・仕様確定）
+  - atsushifx
 changes:
-  - 2025-07-18: 初回作成（ドキュメント整備）
+  - 2025-09-04: フロントマター標準化対応
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# 🔷 共通型定義パッケージ仕様書
+## 🔷 共通型定義パッケージ仕様書
 
 ## 概要
 
-`@shared/types`は、estaモノレポ全体で使用される共通型定義を集約したパッケージです。TypeScriptの型システムを活用し、アプリケーション全体での型安全性と一貫性を確保します。
+`@shared/types`は、esta モノレポ全体で使用される共通型定義を集約したパッケージです。TypeScript の型システムを活用し、アプリケーション全体での型安全性と一貫性を確保します。
 
 ## 主要機能
 
@@ -33,7 +31,7 @@ copyright:
 
 ### 2. 型安全性の確保
 
-- TypeScriptの型システムを活用
+- TypeScript の型システムを活用
 - コンパイル時の型チェック
 - 実行時エラーの予防
 
@@ -41,7 +39,7 @@ copyright:
 
 - 共通型による開発速度向上
 - 型定義の再利用促進
-- APIの一貫性確保
+- API の一貫性確保
 
 ## 型定義カテゴリ
 
@@ -77,6 +75,8 @@ copyright:
 // メインエクスポート（現在は空）
 export {}; // モジュールとして扱うための空エクスポート
 ```
+
+<!-- markdownlint-disable no-duplicate-heading -->
 
 ### 型定義パターン
 
@@ -184,27 +184,27 @@ interface ExtendedConfig extends AppConfig {
 
 ### 1. 命名規則
 
-- **PascalCase**: 型名・インターフェース名
-- **camelCase**: プロパティ名
-- **UPPER_SNAKE_CASE**: 定数型
+- PascalCase: 型名・インターフェース名
+- camelCase: プロパティ名
+- UPPER_SNAKE_CASE: 定数型
 
 ### 2. 型定義の原則
 
-- **不変性**: `readonly`修飾子の使用
-- **型安全性**: `unknown`の適切な使用
-- **拡張性**: 将来の変更に対応した設計
+- 不変性: `readonly`修飾子の使用
+- 型安全性: `any`を使用しない
+- 拡張性: 将来の変更に対応した設計
 
 ### 3. ドキュメント化
 
-- **JSDoc**: 型の説明を記述
-- **例**: 使用例を含める
-- **制約**: 型の制約や条件を記述
+- JSDoc: 型の説明を記述
+- 例: 使用例を含める
+- 制約: 型の制約や条件を記述
 
 ### 4. 型の分離
 
-- **責任の分離**: 機能別の型定義
-- **依存関係**: 循環依存の回避
-- **粒度**: 適切な抽象化レベル
+- 責任の分離: 機能別の型定義
+- 依存関係: 循環依存の回避
+- 粒度: 責任に伴う抽象化
 
 ## 設計原則
 
@@ -223,7 +223,7 @@ interface ExtendedConfig extends AppConfig {
 ### 3. 可読性
 
 - 自己文書化する型名
-- 適切なコメント
+- What,Why などを示すコメント
 - 論理的なグループ化
 
 ### 4. 保守性
@@ -236,7 +236,7 @@ interface ExtendedConfig extends AppConfig {
 
 ### ディレクトリ構成
 
-```
+```bash
 @shared/types/
 ├── base/
 │   └── index.ts       # メインエクスポート
@@ -247,15 +247,15 @@ interface ExtendedConfig extends AppConfig {
 
 ### ビルドシステム
 
-- **tsup**: CJS/ESM両対応
-- **型定義**: `.d.ts`ファイル生成
-- **型チェック**: 厳密な型チェック
+- tsup: CJS/ESM 両対応
+- 型定義: `.d.ts`ファイル生成
+- 型チェック: 厳密な型チェック
 
 ## 依存関係
 
 ### 外部依存
 
-- なし（TypeScriptの型システムのみ）
+- なし（TypeScript の型システムのみ）
 
 ### 内部依存
 
@@ -375,3 +375,5 @@ export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
 ```
+
+<!-- markdownlint-enable -->
