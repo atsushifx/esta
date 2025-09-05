@@ -1,28 +1,32 @@
 ---
 header:
-  - src: AgLoggerInterface.md
-  - "@(#)": ログ出力基本インターフェース APIリファレンス
+  - src: packages/@agla-utils/ag-logger/docs/api/types/AgLoggerInterface.md
+  - @(#): ログ出力基本インターフェース APIリファレンス
 title: AgLoggerInterface
 description: ログ出力メソッドの標準インターフェース定義のAPIリファレンス
 version: 0.3.0
-created: 2025-08-25
+created: 2025-09-05
 authors:
   - atsushifx
 changes:
-  - 2025-08-25: 初版作成
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-## AgLoggerInterface
+## 概要
 
-### 概要
+<!-- textlint-disable ja-technical-writing/sentence-length,ja-technical-writing/max-comma -->
 
-**AgLoggerInterface**は、ログ出力メソッドの標準インターフェースを定義するTypeScript型です。このインターフェースを実装することで、コンソール出力、ファイル出力、テスト用モックなど、さまざまなログ出力先に対応したロガーを作成できます。8つのログレベル(fatal, error, warn, info, debug, trace, verbose, log) に対応したメソッドを提供します。
+**AgLoggerInterface**は、ログ出力メソッドの標準インターフェースを定義する TypeScript 型です。
+このインターフェースを実装することで、コンソール出力、ファイル出力、テスト用モックなど、さまざまなログ出力先に対応したロガーを作成できます。
+8つのログレベル(fatal, error, warn, info, debug, trace, verbose, log) に対応したメソッドを提供します。
 
-### インターフェース定義
+<!-- textlint-enable -->
+
+## インターフェース定義
 
 ```typescript
 export type AgLoggerInterface = {
@@ -45,59 +49,63 @@ export type AgLoggerInterface = {
 };
 ```
 
-### メソッド詳細
+## メソッド詳細
 
-#### fatal(message)
+<!-- textlint-disable ja-technical-writing/sentence-length -->
 
-**用途**: 致命的エラーの記録 (アプリケーション終了レベル)
-**ログレベル**: `AG_LOGLEVEL.FATAL` (1)
-**パラメータ**: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト
+### fatal(message)
 
-#### error(message)
+用途: 致命的エラーの記録 (アプリケーション終了レベル)
+ログレベル: `AG_LOGLEVEL.FATAL` (1)
+パラメータ: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト。
 
-**用途**: エラーの記録 (回復可能なエラー)
-**ログレベル**: `AG_LOGLEVEL.ERROR` (2)
-**パラメータ**: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト
+### error(message)
 
-#### warn(message)
+用途: エラーの記録 (回復可能なエラー)
+ログレベル: `AG_LOGLEVEL.ERROR` (2)
+パラメータ: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト。
 
-**用途**: 警告メッセージの記録 (注意が必要な状況)
-**ログレベル**: `AG_LOGLEVEL.WARN` (3)
-**パラメータ**: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト
+### warn(message)
 
-#### info(message)
+用途: 警告メッセージの記録 (注意が必要な状況)
+ログレベル: `AG_LOGLEVEL.WARN` (3)
+パラメータ: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト。
 
-**用途**: 情報メッセージの記録 (一般的な動作状況)
-**ログレベル**: `AG_LOGLEVEL.INFO` (4)
-**パラメータ**: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト
+### info(message)
 
-#### debug(message)
+用途: 情報メッセージの記録 (一般的な動作状況)
+ログレベル: `AG_LOGLEVEL.INFO` (4)
+パラメータ: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト。
 
-**用途**: デバッグ情報の記録 (開発時のデバッグ用)
-**ログレベル**: `AG_LOGLEVEL.DEBUG` (5)
-**パラメータ**: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト
+### debug(message)
 
-#### trace(message)
+用途: デバッグ情報の記録 (開発時のデバッグ用)
+ログレベル: `AG_LOGLEVEL.DEBUG` (5)
+パラメータ: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト。
 
-**用途**: トレース情報の記録 (詳細な実行経路追跡)
-**ログレベル**: `AG_LOGLEVEL.TRACE` (6)
-**パラメータ**: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト
+### trace(message)
 
-#### verbose(message)
+用途: トレース情報の記録 (詳細な実行経路追跡)
+ログレベル: `AG_LOGLEVEL.TRACE` (6)
+パラメータ: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト。
 
-**用途**: 詳細情報の記録 (verboseモード時のみ有効)
-**ログレベル**: `AG_LOGLEVEL.VERBOSE` (-99)
-**パラメータ**: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト
+### verbose(message)
 
-#### log(message)
+用途: 詳細情報の記録 (verbose モード時のみ有効)
+ログレベル: `AG_LOGLEVEL.VERBOSE` (-99)
+パラメータ: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト。
 
-**用途**: 汎用ログメッセージの記録 (特別なレベル指定)
-**ログレベル**: `AG_LOGLEVEL.LOG` (99)
-**パラメータ**: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト
+### log(message)
 
-### 使用例
+用途: 汎用ログメッセージの記録 (特別なレベル指定)
+ログレベル: `AG_LOGLEVEL.LOG` (99)
+パラメータ: `message: string | AgLogMessage` - ログメッセージまたはログオブジェクト。
 
-#### 基本的な実装例
+<!-- textlint-enable -->
+
+## 使用例
+
+### 基本的な実装例
 
 ```typescript
 import type { AgLoggerInterface, AgLogMessage } from '@agla-utils/ag-logger';
@@ -137,7 +145,7 @@ class ConsoleLogger implements AgLoggerInterface {
 }
 ```
 
-#### ファイル出力ロガーの実装
+### ファイル出力ロガーの実装
 
 ```typescript
 import type { AgLoggerInterface, AgLogMessage } from '@agla-utils/ag-logger';
@@ -186,7 +194,7 @@ class FileLogger implements AgLoggerInterface {
 }
 ```
 
-#### テスト用モックロガーの実装
+### テスト用モックロガーの実装
 
 ```typescript
 import type { AgLoggerInterface, AgLogMessage } from '@agla-utils/ag-logger';
@@ -261,25 +269,25 @@ describe('Logger Test', () => {
 });
 ```
 
-### 注意事項
+## 注意事項
 
-#### メッセージ型
+### メッセージ型
 
-- パラメータは `string | AgLogMessage` 型を受け入れる必要があります
+- パラメータは `string | AgLogMessage` 型を受け入れる必要がある
 - `AgLogMessage` オブジェクトの場合、適切にシリアライズして出力してください
 
-#### パフォーマンス
+### パフォーマンス
 
-- ログ出力処理は同期的に実行されます
+- ログ出力処理は同期的に実行される
 - ファイル出力など重い処理を行う場合は、非同期処理やバッファリングを検討してください
 - メッセージ構築処理は必要時のみ実行するよう注意してください
 
-#### エラーハンドリング
+### エラーハンドリング
 
-- ログ出力自体がエラーを発生させないよう適切な例外処理を実装してください
+- ログ出力自体がエラーを発生させないよう例外処理を実装する
 - 出力先が利用できない場合の代替処理を検討してください
 
-### 関連項目
+## 関連項目
 
 - [`AgLogMessage`](./AgLogMessage.md) - ログメッセージオブジェクト型
 - [`AgLoggerFunction`](./AgLoggerFunction.md) - ロガー関数型

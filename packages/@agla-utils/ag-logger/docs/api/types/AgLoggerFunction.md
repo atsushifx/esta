@@ -1,45 +1,43 @@
 ---
 header:
-  - src: AgLoggerFunction.md
-  - "@(#)": ロガー関数型 APIリファレンス
+  - src: packages/@agla-utils/ag-logger/docs/api/types/AgLoggerFunction.md
+  - @(#): ロガー関数型 APIリファレンス
 title: AgLoggerFunction
 description: フォーマット済みログメッセージを出力する関数の型定義のAPIリファレンス
 version: 0.3.0
-created: 2025-08-25
+created: 2025-09-05
 authors:
   - atsushifx
 changes:
-  - 2025-08-25: 初版作成
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-## AgLoggerFunction
-
-### 概要
+## 概要
 
 **AgLoggerFunction**は、フォーマット済みログメッセージを実際に出力する関数の型定義です。フォーマッターで整形されたメッセージを受け取り、コンソール、ファイル、外部サービスなど様々な出力先に送信します。`AgLoggerMap`と組み合わせることで、ログレベルごとに異なる出力先を指定できます。
 
-### 型定義
+## 型定義
 
 ```typescript
 export type AgLoggerFunction = (formattedLogMessage: AgFormattedLogMessage) => void;
 ```
 
-### パラメータ詳細
+## パラメータ詳細
 
-#### formattedLogMessage
+### formattedLogMessage
 
-**型**: `AgFormattedLogMessage` (通常は `string`)
-**説明**: フォーマッター関数によって整形済みのログメッセージ
+**型**: `AgFormattedLogMessage` ((通常は `string`)
+**説明**: フォーマッター関数によって整形済みのログメッセージ。
 
 この引数は`AgFormatFunction`によって処理された結果で、出力可能な形式になっています。
 
-### 出力先バリエーション例
+## 出力先バリエーション例
 
-#### コンソール出力
+### コンソール出力
 
 最も基本的な出力先で、標準出力やコンソールにログを表示します。
 
@@ -66,7 +64,7 @@ const leveledConsoleLogger: AgLoggerFunction = (message) => {
 };
 ```
 
-#### ファイル出力
+### ファイル出力
 
 ログをファイルに保存する実装例です。
 
@@ -106,9 +104,9 @@ const asyncFileLogger: AgLoggerFunction = (message) => {
 };
 ```
 
-#### 外部サービス送信
+### 外部サービス送信
 
-ログ監視サービスや外部APIにログを送信する実装例です。
+ログ監視サービスや外部 API にログを送信する実装例です。
 
 ```typescript
 import type { AgLoggerFunction } from '@agla-utils/ag-logger';
@@ -171,9 +169,9 @@ const monitoringLogger: AgLoggerFunction = (message) => {
 };
 ```
 
-#### 無効化ロガー
+### 無効化ロガー
 
-ログ出力を無効にするためのNullロガーです。
+ログ出力を無効にするための Null ロガーです。
 
 ```typescript
 import type { AgLoggerFunction } from '@agla-utils/ag-logger';
@@ -184,11 +182,11 @@ const nullLogger: AgLoggerFunction = () => {
 };
 ```
 
-### LoggerMap活用例
+## LoggerMap活用例
 
 `AgLoggerMap`と組み合わせることで、ログレベルごとに異なる出力先を指定できます。
 
-#### レベル別出力先指定
+### レベル別出力先指定
 
 ```typescript
 import { AG_LOGLEVEL, ConsoleLogger, createManager, getLogger } from '@agla-utils/ag-logger';
@@ -223,7 +221,7 @@ logger.error('処理に失敗'); // → error.logファイルに記録
 logger.fatal('システム停止'); // → アラート送信
 ```
 
-#### 環境別設定
+### 環境別設定
 
 ```typescript
 // 開発環境：すべてコンソール出力
@@ -250,7 +248,7 @@ const prodOptions: AgLoggerOptions = {
 const options = process.env.NODE_ENV === 'production' ? prodOptions : devOptions;
 ```
 
-#### テスト用設定
+### テスト用設定
 
 ```typescript
 // テスト用バッファロガー
@@ -272,17 +270,17 @@ function getTestLogs(): string[] {
 }
 ```
 
-### 注意事項
+## 注意事項
 
-#### パフォーマンス
+### パフォーマンス
 
 - ログ出力は頻繁に呼び出されるため、重い処理は避けてください
 - ファイル出力では非同期処理の使用を検討してください
 - ネットワーク通信を伴う場合は、エラーハンドリングを適切に行ってください
 
-#### エラーハンドリング
+### エラーハンドリング
 
-- ロガー自体がエラーを発生させると、ログ出力全体が停止する可能性があります
+- ロガー自体がエラーを発生させた場合、ログ出力全体が停止する可能性
 - 外部サービス通信では必ず例外処理を実装してください
 
 ```typescript
@@ -298,12 +296,12 @@ const safeLogger: AgLoggerFunction = (message) => {
 };
 ```
 
-#### リソース管理
+### リソース管理
 
-- ファイル出力では適切なリソース管理を行ってください
+- ファイル出力ではリソース管理をしてください
 - 長時間実行されるアプリケーションでは、ファイルハンドルのリークに注意してください
 
-### 関連項目
+## 関連項目
 
 - [`AgFormattedLogMessage`](./AgFormattedLogMessage.md) - ロガー関数の入力型
 - [`AgLoggerMap`](./AgLoggerMap.md) - ロガー関数をマッピングする型

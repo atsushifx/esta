@@ -1,15 +1,15 @@
 ---
 header:
-- src: quick-start.guide.md
-- @(#): AgLogger クイックスタートガイド
+  - src: docs/user-guides/quick-start.guide.md
+  - @(#): AgLogger クイックスタートガイド
 title: AgLogger クイックスタートガイド
 description: AgLoggerを5分で使い始めるための最小限ガイド
-version: 1.0.0
-created: 2025-08-24
+version: 0.3.0
+created: 2025-09-05
 authors:
   - atsushifx
 changes:
-  - 2025-08-24: 初版作成
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.

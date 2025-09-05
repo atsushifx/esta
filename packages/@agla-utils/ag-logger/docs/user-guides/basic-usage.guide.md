@@ -1,15 +1,15 @@
 ---
 header:
-  - src: basic-usage.guide.md
+  - src: docs/user-guides/basic-usage.guide.md
   - @(#): 基本的なロガーの使い方
 title: 基本的なロガーの使い方
 description: ag-loggerパッケージの基本的な使用方法について説明
-version: 1.0.0
-created: 2025-08-25
+version: 0.3.0
+created: 2025-09-05
 authors:
   - atsushifx
 changes:
-  - 2025-08-25: 初版作成
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.

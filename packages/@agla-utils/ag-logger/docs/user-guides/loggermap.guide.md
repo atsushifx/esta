@@ -1,15 +1,15 @@
 ---
 header:
-  - src: loggermap.guide.md
+  - src: docs/user-guides/loggermap.guide.md
   - @(#): AgLogger LoggerMap 詳細ガイド
 title: AgLogger LoggerMap 詳細ガイド
 description: loggerMap の基本・設計指針・実用パターン・注意点を解説
-version: 1.0.0
-created: 2025-08-25
+version: 0.3.0
+created: 2025-09-05
 authors:
   - atsushifx
 changes:
-  - 2025-08-25: 初版作成
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.

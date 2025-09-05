@@ -1,28 +1,24 @@
 ---
 header:
-  - src: types/LogLevel.md
+  - src: packages/@agla-utils/ag-logger/docs/api/types/LogLevel.md
   - @(#): ログレベル 型定義 APIリファレンス
 title: ログレベル
 description: AgLoggerで使用されるログレベルの定義と型情報のAPIリファレンス
 version: 0.3.0
-created: 2025-08-24
+created: 2025-09-05
 authors:
   - atsushifx
 changes:
-  - 2025-08-24: 初版作成
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# ログレベル
-
-AgLoggerで使用されるログレベルの定義と型情報。
-
 ## 概要
 
-AgLoggerは、AWS CloudWatch Logs規約に基づいたログレベルシステムを採用しています。数値ベースのログレベルと文字列ラベルの両方をサポートしています。
+`AgLogger`は、`AWS CloudWatch Logs`規約に基づいたログレベルシステムを採用しています。数値ベースのログレベルと文字列ラベルの両方をサポートしています。
 
 ## ログレベル定数
 
@@ -49,19 +45,19 @@ export const AG_LOGLEVEL = {
 
 #### 標準ログレベル (0-6)
 
-- **OFF (0)**: ログ出力を行いません
-- **FATAL (1)**: アプリケーション終了を引き起こす致命的エラー
-- **ERROR (2)**: アプリケーションは継続するエラー状況
-- **WARN (3)**: 潜在的に有害な状況の警告
-- **INFO (4)**: 一般的な情報メッセージ
-- **DEBUG (5)**: デバッグ用の詳細情報
-- **TRACE (6)**: 非常に詳細なトレース情報
+- OFF (0): ログ出力を行いません
+- FATAL (1): アプリケーション終了を引き起こす致命的エラー
+- ERROR (2): アプリケーションは継続するエラー状況
+- WARN (3): 潜在的に有害な状況の警告
+- INFO (4): 一般的な情報メッセージ
+- DEBUG (5): デバッグ用の詳細情報
+- TRACE (6): 非常に詳細なトレース情報
 
 #### 特殊ログレベル
 
-- **VERBOSE (-11)**: 詳細フラグが有効な時のみ出力
-- **LOG (-12)**: ログレベルフィルタを無視して常に出力
-- **DEFAULT (-99)**: デフォルト設定（INFOレベルと同等の動作）
+- VERBOSE (-11): 詳細フラグが有効なときのみ出力
+- LOG (-12): ログレベルフィルタを無視して常に出力
+- DEFAULT (-99): デフォルト設定（INFO レベルと同等の動作）
 
 ## 型定義
 
@@ -209,7 +205,7 @@ function shouldLog(messageLevel: AgLogLevel, currentLevel: AgLogLevel): boolean 
 - 特殊ログレベル（VERBOSE、LOG、DEFAULT）は `logLevel` プロパティの設定値としては使用できません
 - ログレベルフィルタリングは数値の大小比較で行われます（小さい値ほど重要度が高い）
 - `OFF` レベルが設定されている場合、特殊レベル以外のすべてのログが出力されません
-- `DEFAULT` レベルは内部的に `INFO` レベルと同等として扱われます
+- `DEFAULT` レベルは内部的に `INFO` レベルと同等として扱われる
 
 ## 関連項目
 
