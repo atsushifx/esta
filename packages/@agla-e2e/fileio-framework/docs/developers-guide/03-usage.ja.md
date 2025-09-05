@@ -1,16 +1,28 @@
 ---
+header:
+  - src: packages/@agla-e2e/fileio-framework/docs/developers-guide/03-usage.ja.md
+  - @(#): AgE2eFileIOFramework 使い方（Usage）
 title: 使い方（Usage）
 description: AgE2eFileIOFrameworkの主要APIの使い方や応用例を解説します。
-sidebar_position: 3
+version: 1.0.0
+created: 2025-09-05
+authors:
+  - atsushifx
+changes:
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 ---
 
-# 使い方（Usage）
+## 使い方（Usage）
 
-この章では、`AgE2eFileIOFramework` を中心に、設定ファイル操作をテストするためのE2Eフレームワークで利用できる主なAPIの使い方と応用例を紹介します。
+この章では、`AgE2eFileIOFramework` を中心に、設定ファイル操作をテストするための E2E フレームワークで利用できる主な API の使い方と応用例を紹介します。
 
 ---
 
-## 1. フレームワークの初期化
+### フレームワークの初期化
 
 ```typescript
 import { AgE2eFileIOFramework } from '@agla-e2e/fileio-framework/src/AgE2eFileIoFramework';
@@ -18,8 +30,8 @@ import { AgE2eFileIOFramework } from '@agla-e2e/fileio-framework/src/AgE2eFileIo
 const framework = new AgE2eFileIOFramework();
 ```
 
-- フレームワークのインスタンスを作成します。
-- テスト中に繰り返し使うため、一度生成すれば使い回しが可能です。
+- フレームワークのインスタンスを作成。
+- テスト中に繰り返し使うため、一度生成すれば使い回しが可能。
 
 ---
 
@@ -31,8 +43,8 @@ const framework = new AgE2eFileIOFramework();
 await framework.writeFile('./temp/example.txt', 'テスト用の内容');
 ```
 
-- 指定したパスにテキストを書き込みます。
-- 非同期処理なので、`await`を使って完了を待ちます。
+- 指定したパスにテキストを書き込み。
+- 非同期処理なので、`await`を使って完了を待つ。
 
 ### 2.2 ファイルの読み込み
 
@@ -41,8 +53,8 @@ const content = await framework.readFile('./temp/example.txt');
 console.log(content);
 ```
 
-- ファイルの内容を文字列として取得します。
-- 文字コードはUTF-8を想定しています。
+- ファイルの内容を文字列として取得。
+- 文字コードは UTF-8を想定。
 
 ---
 
@@ -55,8 +67,8 @@ const tempDir = await framework.createTempDirectory();
 console.log(`一時ディレクトリを作成: ${tempDir}`);
 ```
 
-- テスト用の一時ディレクトリを自動作成します。
-- テスト終了後のクリーンアップにも利用可能です。
+- テスト用の一時ディレクトリを自動作成する。
+- テスト終了後のクリーンアップにも利用可能。
 
 ### 3.2 ディレクトリの削除
 
@@ -64,7 +76,7 @@ console.log(`一時ディレクトリを作成: ${tempDir}`);
 await framework.removeDirectory(tempDir);
 ```
 
-- 指定したディレクトリを再帰的に削除します。
+- 指定したディレクトリを再帰的に削除する。
 
 ---
 
@@ -77,14 +89,14 @@ if (exists) {
 }
 ```
 
-- 指定ファイルやディレクトリの存在を確認します。
-- 結果は`boolean`で返されます。
+- 指定ファイルやディレクトリの存在を確認。
+- 結果は`boolean`で返される。
 
 ---
 
 ## 5. エラーハンドリング
 
-各メソッドはPromiseを返すため、`try/catch`でエラー処理を行います。
+各メソッドは Promise を返すため、`try/catch`でエラー処理を行います。
 
 ```typescript
 try {
@@ -98,9 +110,9 @@ try {
 
 ## 6. まとめ
 
-- `AgE2eFileIOFramework` はファイル・ディレクトリ操作を簡潔に扱えます。
-- 非同期APIを活用し、テストの信頼性と柔軟性を高めましょう。
-- まずは基本APIを使いこなし、徐々に応用ケースを増やしてください。
+- `AgE2eFileIOFramework` はファイル・ディレクトリ操作を簡潔に扱える。
+- 非同期 API を活用し、テストの信頼性と柔軟性を高めましょう。
+- まずは基本 API を使いこなし、徐々に応用ケースを増やしてください。
 
 ---
 

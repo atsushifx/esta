@@ -1,13 +1,24 @@
 ---
+header:
+  - src: packages/@agla-e2e/fileio-framework/docs/developers-guide/README.ja.md
+  - @(#): AgE2eFileIOFramework 開発者ガイド
 title: AgE2eFileIOFramework 開発者ガイド
 description: 設定ファイル操作をテストするためのE2Eフレームワークの使い方と開発者向けガイドです。
-slug: /fileio-framework/
-sidebar_position: 0
+version: 1.0.0
+created: 2025-09-05
+authors:
+  - atsushifx
+changes:
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 ---
 
 ## AgE2eFileIOFramework 開発者ガイド
 
-このドキュメントは、設定ファイル操作をテストするためのE2Eフレームワークの利用・開発に関わる方向けのガイドです。
+このドキュメントは、設定ファイル操作をテストするための E2E フレームワークの利用・開発に関わる方向けのガイドです。
 テストの基本から応用、よくある質問まで体系的にまとめています。
 
 ---
@@ -22,8 +33,8 @@ sidebar_position: 0
 
 ---
 
-このドキュメントを参考に、AgE2eFileIOFrameworkの理解と活用を進めてください。
-何か質問や改善点があれば、IssueやPRでお知らせください。
+このドキュメントを参考に、AgE2eFileIOFramework の理解と活用を進めてください。
+何か質問や改善点があれば、Issue や PR でお知らせください。
 
 よろしくお願いいたします。
 
