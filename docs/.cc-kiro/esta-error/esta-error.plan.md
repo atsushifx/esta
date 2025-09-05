@@ -5,8 +5,6 @@ header:
 title: EstaError リストラクチャプラン
 description: EstaError の統合エラーデザインへの整備プラン
 version: 1.0.0
-created: 2025-08-28
-updated: 2025-08-28
 authors:
   - atsushifx
 changes:
