@@ -1,13 +1,29 @@
-# 🧩 Exit Code 仕様書（v1.2・POSIX準拠・@esta-core/error-handler）
+---
+header:
+  - src: docs/detailed-design/exit-codes.md
+  - @(#): Exit Code 仕様書（POSIX準拠・@esta-core/error-handler）
+title: Exit Code 仕様書
+description: @esta-core/error-handlerモジュールで使用する終了コード（ExitCode）の定義と使用方針。POSIX/Bash/GNU標準との競合を避け、保守性・互換性を確保するための仕様。
+version: 1.2.0
+created: 2025-07-09
+authors:
+  - atsushifx
+changes:
+  - 2025-09-04: フロントマター追加とH1→H2変更
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
 
-## 1. 概要
+## 概要
 
 この文書では、`@esta-core/error-handler` モジュールで使用する終了コード（ExitCode）の定義と使用方針を示します。
 本仕様は POSIX/Bash/GNU 標準との競合を避け、保守性・互換性を確保するために設計されています。
 
 ---
 
-## 2. 基本方針
+## 基本方針
 
 - `0`：正常終了（`SUCCESS`）
 - `1`：実行失敗（`EXEC_FAILURE`）
@@ -19,7 +35,7 @@
 
 ---
 
-## 3. Exit Code 一覧（定義テーブル）
+## Exit Code 一覧（定義テーブル）
 
 | コード | 識別子                    | 説明                               |
 | ------ | ------------------------- | ---------------------------------- |
@@ -34,15 +50,15 @@
 
 ---
 
-## 4. 使用指針
+## 使用指針
 
-### 4.1 コード選択の基準
+### コード選択の基準
 
 - **0**: 正常終了（すべての処理が成功）
 - **1**: 未補足例外、予期しない致命的な異常
 - **11〜**: 明示的に意味付けされた終了コードを利用
 
-### 4.2 使用例（TypeScript）
+### 使用例（TypeScript）
 
 ```ts
 import { errorExit, ExitCode } from '@esta-core/error-handler';
@@ -59,7 +75,7 @@ errorExit(ExitCode.INVALID_ARGS, '--target は必須です');
 
 ---
 
-## 5. Executorとの連携
+## Executorとの連携
 
 `CLIExecutor`, `GHAExecutor` にて `ExitError` を補足し、
 対応する終了コードを `process.exit()` または `@actions/core.setFailed()` に変換します。
@@ -78,12 +94,12 @@ try {
 
 ---
 
-## 6. 将来拡張ルール
+## 将来拡張ルール
 
 - `100〜199` は将来の拡張用に予約
 - 拡張時は以下の原則に従うこと
 
-### 6.1 拡張原則
+### 拡張原則
 
 1. **2〜10の範囲は使用禁止（標準コードと競合）**
 2. **カテゴリごとに連番でまとめて定義**
@@ -92,7 +108,7 @@ try {
 
 ---
 
-## 7. 参考資料
+## 参考資料
 
 - [POSIX.1-2017 - exit(3)](https://pubs.opengroup.org/onlinepubs/9699919799/functions/exit.html)
 - [GNU Coding Standards - Error Reporting](https://www.gnu.org/prep/standards/html_node/Errors.html)
@@ -102,7 +118,7 @@ try {
 
 **バージョン**: 1.2
 **作成日**: 2025年7月9日
-**最終更新**: 2025年7月9日
+**最終更新**: 2025年9月5日
 **管理者**: [`@esta-core/error-handler`](https://github.com/esta-core/error-handler)
 **作成者**:
 
