@@ -1,6 +1,6 @@
 ---
 header:
-  - src: AgLogHelpers.md
+  - src: docs/api/utils/AgLogHelpers.md
   - "@(#)": ログヘルパー関数群 ユーティリティ APIリファレンス
 title: AgLogHelpers
 description: ログレベル変換やメッセージ処理のためのヘルパー関数群のAPIリファレンス
@@ -10,19 +10,22 @@ authors:
   - atsushifx
 changes:
   - 2025-08-25: 初版作成
+  - 2025-09-05: フロントマター標準化・見出し階層修正
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# AgLogHelpers
+## AgLogHelpers
 
 ## 概要
 
 **AgLogHelpers**は、ログレベル変換、メッセージ抽出、文字列処理などのヘルパー関数を提供するユーティリティモジュールです。主にフォーマッターやロガープラグインで使用され、ログメッセージの処理を効率化し、一貫性のあるログデータ変換機能を提供します。
 
 ## 関数一覧
+
+<!-- markdownlint-disable no-duplicate-heading -->
 
 ### AgToLabel
 
@@ -62,9 +65,9 @@ const invalidLabel = AgToLabel(999 as AgLogLevel); // '' (空文字列)
 
 #### 注意事項
 
-- LOG レベル（-12）に対しては常に空文字列を返します
-- 無効なログレベル値に対しては空文字列を返します
-- バリデーションは内部で isValidLogLevel を使用して実行されます
+- LOG レベル（-12）に対しては常に空文字列を返す
+- 無効なログレベル値に対しては空文字列を返す
+- バリデーションは内部で isValidLogLevel を使用して実行される
 
 ### AgToLogLevel
 
@@ -110,9 +113,9 @@ const invalid3 = AgToLogLevel(null as any); // undefined
 
 #### 注意事項
 
-- 入力値の型チェックを実行し、文字列以外は undefined を返します
-- 大文字小文字を区別せず、内部で toUpperCase() を使用します
-- 前後の空白は自動的にトリムされます
+- 入力値の型チェックを実行し、文字列以外は undefined を返す
+- 大文字小文字を区別せず、内部で toUpperCase() を使用
+- 前後の空白は自動的にトリムされる
 
 ### extractMessage
 
@@ -162,8 +165,8 @@ const message5 = extractMessage(['Value:', null, 'and', undefined]);
 #### 注意事項
 
 - オブジェクト、配列、関数などの複合型は結果に含まれません
-- null や undefined はプリミティブとして扱われ、文字列として処理されます
-- Symbol 型もプリミティブとして処理されます
+- null や undefined はプリミティブとして扱われ、文字列として処理される
+- Symbol 型もプリミティブとして処理される
 
 ### valueToString
 
@@ -181,7 +184,7 @@ export const valueToString = (value: unknown): string
 
 #### 動作
 
-任意の値を型に応じて適切な文字列表現に変換します。JSON.stringify では処理できない値に対して安全なフォールバック処理を提供します。
+任意の値を型に応じて文字列表現に変換します。JSON.stringify では処理できない値に対して安全なフォールバック処理を提供します。
 
 #### 使用例
 
@@ -211,10 +214,10 @@ const complexObj = valueToString({ a: 1, b: { c: 2 } }); // 'object'
 
 #### 注意事項
 
-- 文字列値はダブルクォートで囲まれて返されます
-- 空配列は 'array' として返されます
-- 匿名関数は 'function' として、名前付き関数は 'function 名前' として返されます
-- すべてのオブジェクトは単純に 'object' として返されます
+- 文字列値はダブルクォートで囲まれて返される
+- 空配列は 'array' として返される
+- 匿名関数は 'function' として、名前付き関数は 'function 名前' として返される
+- すべてのオブジェクトは単純に 'object' として返される
 
 ### argsToString
 
@@ -268,9 +271,9 @@ const circularResult = argsToString([circular]);
 
 #### 注意事項
 
-- JSON.stringify が失敗した場合は自動的に valueToString にフォールバックします
-- 空配列の場合は空文字列を返します
-- 循環参照を含むオブジェクトも安全に処理されます
+- JSON.stringify が失敗した場合は自動的に valueToString にフォールバック
+- 空配列の場合は空文字列を返す
+- 循環参照を含むオブジェクトも安全に処理される
 
 ### createLoggerFunction
 
@@ -326,8 +329,8 @@ const logger = AgLogger.createLogger({
 
 #### 注意事項
 
-- 実際のログレベルは呼び出し元のコンテキストで管理されます
-- moduleFunc は同期的に実行されます
+- 実際のログレベルは呼び出し元のコンテキストで管理される
+- moduleFunc は同期的に実行される
 
 ## 組み合わせ使用例
 
@@ -469,10 +472,10 @@ function robustArgumentProcessing(args: unknown): string {
 
 ### 効率的な使用パターン
 
-- **AgToLabel/AgToLogLevel**: マップベースの O(1) 変換を使用しており、高速です
-- **extractMessage**: フィルタリング処理のため、引数数に比例した計算量です
-- **valueToString**: 型チェックが最小限で、軽量な処理です
-- **argsToString**: JSON.stringify を優先使用するため、大きなオブジェクトでは注意が必要です
+- AgToLabel/AgToLogLevel: マップベースの O(1) 変換を使用しており、高速
+- extractMessage: フィルタリング処理のため、引数数に比例した計算量
+- valueToString: 型チェックが最小限で、軽量な処理
+- argsToString: JSON.stringify を優先使用するため、大きなオブジェクトでは注意が必要
 
 ### 推奨事項
 
@@ -483,11 +486,13 @@ function robustArgumentProcessing(args: unknown): string {
 ## 注意事項
 
 - すべての関数は null-safe に設計されており、予期しない入力でもエラーを投げません
-- 型チェックは実行時に行われるため、TypeScript の型システムと併用することを推奨します
-- 特殊なログレベル（LOG, VERBOSE, DEFAULT）は通常のレベルとは異なる動作をします
-- argsToString は JSON.stringify に依存するため、循環参照や非シリアライズ可能なオブジェクトに注意してください
+- 型チェックは実行時に行われるため、TypeScript の型システムと併用することを推奨
+- 特殊なログレベル（LOG, VERBOSE, DEFAULT）は通常のレベルとは異なる動作をする
+- argsToString は JSON.stringify に依存するため、循環参照や非シリアライズ可能なオブジェクトに注意する
 
 ## 関連項目
+
+<!-- markdownlint-enable -->
 
 - [AgLogLevel](../types/AgLogLevel.md) - ログレベル型定義
 - [AgLogValidators](./AgLogValidators.md) - バリデーション関数群

@@ -1,6 +1,6 @@
 ---
 header:
-  - src: README.md
+  - src: docs/api/README.md
   - @(#): AgLogger API リファレンス
 title: AgLogger API リファレンス
 description: AgLogger構造化ログライブラリの包括的なAPIリファレンス
@@ -10,15 +10,16 @@ authors:
   - atsushifx
 changes:
   - 2025-08-24: 初版作成
+  - 2025-09-05: フロントマター標準化・見出し階層修正
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# AgLogger API リファレンス
+## AgLogger API リファレンス
 
-AgLoggerは構造化ログ機能を提供するTypeScriptライブラリです。複数の出力フォーマットとプラグイン可能なロガー/フォーマッターアーキテクチャを特徴としています。
+AgLogger は構造化ログ機能を提供する TypeScript ライブラリです。複数の出力フォーマットとプラグイン可能なロガー/フォーマッターアーキテクチャを特徴としています。
 
 ## 目次
 
@@ -35,24 +36,24 @@ AgLoggerは構造化ログ機能を提供するTypeScriptライブラリです�
 
 ### [AgLoggerManager](./AgLoggerManager.md)
 
-AgLoggerインスタンスを管理するためのマネージャークラス。
+AgLogger インスタンスを管理するためのマネージャークラス。
 
 ### [AgManagerUtils](./AgManagerUtils.md)
 
-AgLoggerManagerの便利なユーティリティ関数群。簡潔なロガー操作を提供します。
+AgLoggerManager の便利なユーティリティ関数群。簡潔なロガー操作を提供します。
 
 ## プラグイン
 
 ### ロガープラグイン
 
 - **[ConsoleLogger](./plugins/loggers/ConsoleLogger.md)** - コンソール出力用のロガー
-- **[E2eMockLogger](./plugins/loggers/E2eMockLogger.md)** - E2Eテスト用のモックロガー
+- **[E2eMockLogger](./plugins/loggers/E2eMockLogger.md)** - E2E テスト用のモックロガー
 - **[MockLogger](./plugins/loggers/MockLogger.md)** - ユニットテスト用のモックロガー
 - **[NullLogger](./plugins/loggers/NullLogger.md)** - 出力しないヌルロガー
 
 ### フォーマッタープラグイン
 
-- **[JsonFormatter](./plugins/formatters/JsonFormatter.md)** - JSON形式でフォーマット
+- **[JsonFormatter](./plugins/formatters/JsonFormatter.md)** - JSON 形式でフォーマット
 - **[PlainFormatter](./plugins/formatters/PlainFormatter.md)** - プレーンテキストでフォーマット
 - **[MockFormatter](./plugins/formatters/MockFormatter.md)** - テスト用のモックフォーマッター
 - **[NullFormatter](./plugins/formatters/NullFormatter.md)** - 何もしないヌルフォーマッター
@@ -83,7 +84,7 @@ AgLoggerManagerの便利なユーティリティ関数群。簡潔なロガー�
 
 ### [testIdUtils](./utils/testIdUtils.md)
 
-テストID生成のためのユーティリティ。
+テスト ID 生成のためのユーティリティ。
 
 ## 基本的な使用方法
 

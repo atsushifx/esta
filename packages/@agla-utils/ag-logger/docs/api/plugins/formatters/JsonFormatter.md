@@ -1,6 +1,6 @@
 ---
 header:
-  - src: JsonFormatter.md
+  - src: docs/api/plugins/formatters/JsonFormatter.md
   - "@(#)": JSON形式フォーマッター プラグイン APIリファレンス
 title: JsonFormatter
 description: ログメッセージをJSON形式でフォーマットするフォーマッタープラグインのAPIリファレンス
@@ -10,17 +10,18 @@ authors:
   - atsushifx
 changes:
   - 2025-08-25: 初版作成
+  - 2025-09-05: フロントマター標準化・見出し階層修正
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# JsonFormatter
+## JsonFormatter
 
 ## 概要
 
-**JsonFormatter**は、ログメッセージをJSON形式の構造化データとしてフォーマットするフォーマッタープラグインです。本番環境でのログ解析やログ監視システムとの連携に適しており、機械可読な形式でログデータを出力します。
+**JsonFormatter**は、ログメッセージを JSON 形式の構造化データとしてフォーマットするフォーマッタープラグインです。本番環境でのログ解析やログ監視システムとの連携に適しており、機械可読な形式でログデータを出力します。
 
 ## 関数定義
 
@@ -38,17 +39,17 @@ export const JsonFormatter: AgFormatFunction = (logMessage: AgLogMessage): strin
 
 ### 戻り値
 
-- **`string`**: JSON形式でシリアライズされたログエントリ文字列
+- `string`: JSON 形式でシリアライズされたログエントリ文字列
 
 ### 動作
 
-JsonFormatterは以下の手順でログメッセージを処理します：
+JsonFormatter は以下の手順でログメッセージを処理:
 
 1. **レベル変換**: `AgToLabel()`を使用してログレベル数値を文字列ラベルに変換
-2. **条件付きフィールド**: levelとargsは該当する場合のみJSONオブジェクトに含める
-3. **JSONシリアライズ**: `JSON.stringify()`で単一行のJSON文字列として出力
+2. **条件付きフィールド**: level と args は該当する場合のみ JSON オブジェクトに含める
+3. **JSONシリアライズ**: `JSON.stringify()`で単一行の JSON 文字列として出力
 
-出力されるJSONオブジェクトの構造：
+出力される JSON オブジェクトの構造:
 
 ```typescript
 {
@@ -143,7 +144,7 @@ prodLogger.error('API呼び出し失敗', {
 
 ### 循環参照の制限
 
-JsonFormatterは`JSON.stringify()`を使用するため、循環参照を含むオブジェクトをログ引数に渡すとエラーが発生します：
+JsonFormatter は循環参照を含むオブジェクトをログ引数に渡すとエラーが発生:
 
 ```typescript
 const circularObj = { name: 'test' };
@@ -155,8 +156,8 @@ logger.info('循環参照テスト', circularObj); // TypeError: Converting circ
 
 ### パフォーマンス考慮事項
 
-- JSON変換処理により、PlainFormatterより若干のオーバーヘッドがあります
-- 大きなオブジェクトのシリアライズは処理時間に影響する可能性があります
+- JSON 変換処理により、PlainFormatter より若干のオーバーヘッドがある
+- 大きなオブジェクトのシリアライズは処理時間に影響する可能性がある
 
 ## 関連項目
 

@@ -1,6 +1,6 @@
 ---
 header:
-  - src: AgLogger.md
+  - src: docs/api/AgLogger.md
   - @(#): AgLogger クラス APIリファレンス
 title: AgLogger クラス
 description: メインロガークラスの詳細なAPIリファレンス
@@ -10,13 +10,14 @@ authors:
   - atsushifx
 changes:
   - 2025-08-24: 初版作成
+  - 2025-09-05: フロントマター標準化・見出し階層修正
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# AgLogger クラス
+## AgLogger クラス
 
 メインロガークラス。シングルトンパターンで実装された中心的なロギング機能を提供します。
 
@@ -26,17 +27,19 @@ copyright:
 
 ## 静的メソッド
 
+<!-- textlint-disable ja-technical-writing/no-exclamation-question-mark -->
+
 ### createLogger(options?: AgLoggerOptions): AgLogger
 
-AgLoggerのシングルトンインスタンスを取得または作成します。オプションでロガーの設定を同時に行うことができます。
+AgLogger のシングルトンインスタンスを取得または作成します。オプションでロガーの設定を同時に行うことができます。
 
-**パラメータ:**
+**パラメータ**:
 
 - `options` (オプション): ロガーの設定オプション
 
-**戻り値:** AgLoggerのシングルトンインスタンス
+**戻り値** AgLogger のシングルトンインスタンス:
 
-**例:**
+例:
 
 ```typescript
 // 基本的な使用方法
@@ -52,15 +55,15 @@ const logger = AgLogger.createLogger({
 
 ### getLogger(): AgLogger
 
-既存のAgLoggerシングルトンインスタンスを取得します。インスタンスが作成されていない場合はエラーをスローします。
+既存の AgLogger シングルトンインスタンスを取得します。インスタンスが作成されていない場合はエラーをスローします。
 
-**戻り値:** AgLoggerのシングルトンインスタンス
+**戻り値** AgLogger のシングルトンインスタンス:
 
-**例外:**
+**例外**:
 
 - `AgLoggerError` - インスタンスが作成されていない場合
 
-**例:**
+例:
 
 ```typescript
 const logger = AgLogger.getLogger();
@@ -70,7 +73,7 @@ const logger = AgLogger.getLogger();
 
 シングルトンインスタンスをリセットします。主にテスト目的で使用されます。
 
-**例:**
+例:
 
 ```typescript
 // テスト後のクリーンアップ
@@ -81,9 +84,9 @@ AgLogger.resetSingleton();
 
 ### setLoggerConfig(options: AgLoggerOptions): void
 
-ロガーの設定を行います。設定オプションには、ログレベル、ロガー関数、フォーマッター等が含まれます。
+ロガーを設定します。設定オプションには、ログレベル、ロガー関数、フォーマッター等が含まれます。
 
-**パラメータ:**
+**パラメータ**:
 
 - `options`: ロガーの設定オプション
 
@@ -91,7 +94,7 @@ AgLogger.resetSingleton();
 
 - `AgLoggerError` - 設定が無効な場合
 
-**例:**
+REI
 
 ```typescript
 logger.setLoggerConfig({
@@ -106,14 +109,14 @@ logger.setLoggerConfig({
 
 特定のログレベルに対してカスタムロガー関数を設定します。
 
-**パラメータ:**
+**パラメータ**:
 
 - `logLevel`: ログレベル
 - `loggerFunction`: ロガー関数
 
-**戻り値:** 設定が成功した場合は `true`
+**戻り値** 設定が成功した場合は `true`
 
-**例:**
+例:
 
 ```typescript
 logger.setLoggerFunction(AG_LOGLEVEL.ERROR, ConsoleLogger);
@@ -123,13 +126,13 @@ logger.setLoggerFunction(AG_LOGLEVEL.ERROR, ConsoleLogger);
 
 指定されたログレベルのロガー関数を取得します。
 
-**パラメータ:**
+**パラメータ**:
 
 - `logLevel`: ログレベル
 
-**戻り値:** ロガー関数
+**戻り値** ロガー関数:
 
-**例:**
+例:
 
 ```typescript
 const errorLogger = logger.getLoggerFunction(AG_LOGLEVEL.ERROR);
@@ -139,11 +142,11 @@ const errorLogger = logger.getLoggerFunction(AG_LOGLEVEL.ERROR);
 
 ログメッセージのフォーマッター関数を設定します。
 
-**パラメータ:**
+**パラメータ**:
 
 - `formatter`: フォーマッター関数
 
-**例:**
+例:
 
 ```typescript
 logger.setFormatter(JsonFormatter);
@@ -153,9 +156,9 @@ logger.setFormatter(JsonFormatter);
 
 現在のフォーマッター関数を取得します。
 
-**戻り値:** フォーマッター関数
+**戻り値** フォーマッター関数:
 
-**例:**
+例:
 
 ```typescript
 const currentFormatter = logger.getFormatter();
@@ -167,7 +170,7 @@ const currentFormatter = logger.getFormatter();
 
 現在のログレベルを取得または設定します。
 
-**例:**
+例:
 
 ```typescript
 // ログレベルを設定
@@ -181,7 +184,7 @@ const currentLevel = logger.logLevel;
 
 詳細モードの状態を取得します。
 
-**例:**
+例:
 
 ```typescript
 if (logger.isVerbose) {
@@ -193,7 +196,7 @@ if (logger.isVerbose) {
 
 詳細モードを設定します。
 
-**例:**
+例:
 
 ```typescript
 logger.setVerbose = true;
@@ -205,11 +208,11 @@ logger.setVerbose = true;
 
 FATAL レベルのログメッセージを出力します。
 
-**パラメータ:**
+**パラメータ**:
 
 - `...args`: ログ出力する引数
 
-**例:**
+例:
 
 ```typescript
 logger.fatal('致命的なエラーが発生しました', error);
@@ -219,7 +222,7 @@ logger.fatal('致命的なエラーが発生しました', error);
 
 ERROR レベルのログメッセージを出力します。
 
-**例:**
+例:
 
 ```typescript
 logger.error('エラーが発生しました', errorDetails);
@@ -229,7 +232,7 @@ logger.error('エラーが発生しました', errorDetails);
 
 WARN レベルのログメッセージを出力します。
 
-**例:**
+例:
 
 ```typescript
 logger.warn('警告: 非推奨のメソッドが使用されています');
@@ -239,7 +242,7 @@ logger.warn('警告: 非推奨のメソッドが使用されています');
 
 INFO レベルのログメッセージを出力します。
 
-**例:**
+例:
 
 ```typescript
 logger.info('処理が正常に完了しました');
@@ -249,7 +252,7 @@ logger.info('処理が正常に完了しました');
 
 DEBUG レベルのログメッセージを出力します。
 
-**例:**
+例:
 
 ```typescript
 logger.debug('デバッグ情報', { userId: 123, action: 'login' });
@@ -259,7 +262,7 @@ logger.debug('デバッグ情報', { userId: 123, action: 'login' });
 
 TRACE レベルのログメッセージを出力します。
 
-**例:**
+例:
 
 ```typescript
 logger.trace('関数呼び出し: calculateTotal', parameters);
@@ -269,7 +272,7 @@ logger.trace('関数呼び出し: calculateTotal', parameters);
 
 LOG レベル（常に出力）のログメッセージを出力します。
 
-**例:**
+例:
 
 ```typescript
 logger.log('重要な情報（レベルフィルタを無視）');
@@ -279,7 +282,7 @@ logger.log('重要な情報（レベルフィルタを無視）');
 
 VERBOSE レベル（詳細モード時のみ出力）のログメッセージを出力します。
 
-**例:**
+例:
 
 ```typescript
 logger.verbose('詳細な実行ログ', executionDetails);
@@ -291,13 +294,13 @@ logger.verbose('詳細な実行ログ', executionDetails);
 
 統計フォーマッターインスタンスを取得します。
 
-**戻り値:** AgMockFormatterインスタンスまたは `null`
+**戻り値** AgMockFormatter インスタンスまたは `null`
 
 ### hasStatsFormatter(): boolean
 
 統計フォーマッターが利用可能かどうかを確認します。
 
-**戻り値:** 統計フォーマッターが利用可能な場合は `true`
+**戻り値** 統計フォーマッターが利用可能な場合は `true`
 
 ## 使用例
 
@@ -354,12 +357,14 @@ logger.setLoggerFunction(AG_LOGLEVEL.ERROR, (message: string) => {
 logger.error('カスタムロガーによるエラー出力');
 ```
 
+<!-- textlint-enable -->
+
 ## 注意事項
 
-- AgLoggerはシングルトンパターンで実装されているため、アプリケーション全体で同じインスタンスが使用されます
+- AgLogger はシングルトンパターンで実装されているため、アプリケーション全体で同じインスタンスが使用される
 - 特殊ログレベル（VERBOSE、LOG、DEFAULT）は `logLevel` プロパティに設定できません
 - 空文字列のメッセージやフォーマッターが空文字列を返した場合、ログは出力されません
-- メソッドは自動的に `this` コンテキストにバインドされるため、メソッドを抽出して使用することができます
+- メソッドは自動的に `this` コンテキストにバインドされるため、メソッドを抽出して使用できる
 
 ## 関連項目
 

@@ -1,45 +1,43 @@
 ---
 header:
-  - src: AgLoggerMap.md
-  - "@(#)": ログレベル別ロガーマッピング 型定義 APIリファレンス
+  - src: packages/@agla-utils/ag-logger/docs/api/types/AgLoggerMap.md
+  - @(#): ログレベル別ロガーマッピング 型定義 APIリファレンス
 title: AgLoggerMap
 description: ログレベルごとに異なるロガー関数を指定するためのマッピング型のAPIリファレンス
 version: 0.3.0
-created: 2025-08-25
+created: 2025-09-05
 authors:
   - atsushifx
 changes:
-  - 2025-08-25: 初版作成
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-## AgLoggerMap
-
-### 概要
+## 概要
 
 **AgLoggerMap**は、ログレベルごとに異なるロガー関数を指定するためのマッピング型です。各ログレベルに対して専用のロガー関数を設定することで、エラーはファイルに出力、致命的エラーは外部サービスに送信するなど、レベル別の柔軟な出力先制御が可能になります。
 
-### 型定義
+## 型定義
 
 ```typescript
 export type AgLoggerMap<T extends AgLoggerFunction = AgLoggerFunction> = Record<AgLogLevel, T | null>;
 ```
 
-#### ジェネリック型パラメータ
+### ジェネリック型パラメータ
 
-##### T
+#### T
 
 **型**: `T extends AgLoggerFunction = AgLoggerFunction`
 **説明**: ロガー関数の型。デフォルトは `AgLoggerFunction` ですが、カスタムロガー型を指定できます。
 
-### プロパティ
+## プロパティ
 
-AgLoggerMapは以下のログレベルをキーとするレコード型です：
+AgLoggerMap は以下のログレベルをキーとするレコード型:
 
-#### ログレベルキー
+### ログレベルキー
 
 - `AG_LOGLEVEL.OFF` (0) - ログ無効化（通常は `null` を設定）
 - `AG_LOGLEVEL.FATAL` (1) - 致命的エラー
@@ -53,11 +51,11 @@ AgLoggerMapは以下のログレベルをキーとするレコード型です：
 
 各キーの値は `T | null` 型で、ロガー関数または `null`（そのレベルでの出力無効化）を指定できます。
 
-### 使用例
+## 使用例
 
-#### 基本的な使用方法
+### 基本的な使用方法
 
-##### 完全なマッピング指定
+#### 完全なマッピング指定
 
 ```typescript
 import { AG_LOGLEVEL, type AgLoggerMap, ConsoleLogger } from '@agla-utils/ag-logger';
@@ -75,7 +73,7 @@ const fullLoggerMap: AgLoggerMap = {
 };
 ```
 
-##### 部分的なオーバーライド（推奨）
+#### 部分的なオーバーライド（推奨）
 
 ```typescript
 import { AG_LOGLEVEL, type AgLoggerOptions, ConsoleLogger } from '@agla-utils/ag-logger';
@@ -102,7 +100,7 @@ const options: AgLoggerOptions = {
 };
 ```
 
-#### 環境別設定例
+### 環境別設定例
 
 ```typescript
 // 開発環境用：すべてコンソール出力
@@ -127,19 +125,19 @@ const options: AgLoggerOptions = {
 };
 ```
 
-### 注意事項
+## 注意事項
 
-#### デフォルト動作
+### デフォルト動作
 
-- マップに含まれないレベルでは `NullLogger` が使用されます
-- マップ内のLoggerが`NullLogger`のばあい、`defaultLogger`にフォールバックされます
+- マップに含まれないレベルでは `NullLogger` が使用される
+- マップ内の Logger が`NullLogger`のばあい、`defaultLogger`にフォールバックされる
 
-#### パフォーマンス
+### パフォーマンス
 
 - ログレベルフィルタリングは出力前に実行されるため、無効化されたレベルでのロガー呼び出しは発生しません
 - ただし、メッセージ構築処理は実行されるため、重いメッセージ生成処理は避けてください
 
-### 関連項目
+## 関連項目
 
 - [`AgLoggerOptions`](./AgLoggerOptions.md) - AgLoggerMap を利用する設定オプション
 - [`AgLoggerFunction`](./AgLoggerFunction.md) - マップの値として使用するロガー関数型
