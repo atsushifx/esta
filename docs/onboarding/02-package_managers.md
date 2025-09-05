@@ -1,6 +1,18 @@
 ---
+header:
+  - src: docs/onboarding/02-package_managers.md
+  - "@(#) : ESTA Onboarding Guide - Package Managers Setup"
 title: パッケージマネージャーの導入
 description: このプロジェクトで使用する各種開発ツールを導入するために、各種パッケージマネージャーをインストールする方法
+version: 1.0.0
+authors:
+  - 👤 atsushifx（オンボーディングガイド作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 sidebar_position: 2
 ---
 
@@ -15,7 +27,7 @@ Windows では以下のパッケージマネージャーを使用します:<!-- 
 
 - `winget`： Microsoft 公式のパッケージ管理コマンド
 - `scoop`： CLI ツール向けに優れた軽量パッケージマネージャー
-- 'Volta': `Node.js`, `pnpm`などの JavaScript ツール用バージョン管理ツール
+- `Volta`: `Node.js`, `pnpm`などの JavaScript ツール用バージョン管理ツール
 - `pnpm` : 高速かつ効率のよぴ`Node.js`用パッケージマネージャー
 
 <!-- vale on -->

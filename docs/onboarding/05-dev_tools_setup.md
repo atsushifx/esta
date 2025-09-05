@@ -1,6 +1,18 @@
 ---
+header:
+  - src: docs/onboarding/05-dev_tools_setup.md
+  - "@(#) : ESTA Onboarding Guide - Development and Validation Tools Setup"
 title: 開発ツールと検証ツールのセットアップ
 description: pnpm でプロジェクトに必要な開発・検証ツールをローカルおよびグローバルにインストールします。
+version: 1.0.0
+authors:
+  - 👤 atsushifx（オンボーディングガイド作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 sidebar_position: 5
 ---
 

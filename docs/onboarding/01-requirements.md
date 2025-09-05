@@ -1,6 +1,18 @@
 ---
+header:
+  - src: docs/onboarding/01-requirements.md
+  - "@(#) : ESTA Onboarding Guide - Development Requirements"
 title: 開発環境の前提要件
 description: このプロジェクトを開発するために必要な環境やインストール済みツールの要件一覧
+version: 1.0.0
+authors:
+  - 👤 atsushifx（オンボーディングガイド作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 slug: requirements
 sidebar_position: 1
 tags:
@@ -75,7 +87,7 @@ tags:
 ## 📁 推奨ディレクトリ構成
 
 - `C:\Users\<user>\workspaces\develop\easy-setup-tools-action`
-- Windows のパス長制限の影響で依存関係解決やビルドに失敗する場合があります。できるだけ浅い階層で開発をしてください。
+- Windows のパス長制限の影響で依存関係解決やビルドに失敗する場合がある。できるだけ浅い階層で開発をしてください。
 
 ---
 

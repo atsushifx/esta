@@ -1,6 +1,18 @@
 ---
+header:
+  - src: docs/onboarding/04-writers_tools.md
+  - "@(#) : ESTA Onboarding Guide - Writing Support Tools Setup"
 title: ライティング支援ツールのセットアップ
 description: ドキュメントの品質向上のためのツール群をインストール、設定します
+version: 1.0.0
+authors:
+  - 👤 atsushifx（オンボーディングガイド作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 sidebar_position: 4
 ---
 
@@ -33,9 +45,9 @@ sidebar_position: 4
 
 ### 4.3 利用方法とセットアップ時の注意点
 
-- `pnpm` がインストール済みであることを前提とします。
-- スクリプトは `pnpm` を遣ってツールをグローバルにインストールします。
-- 設定ファイルはモノレポルートの `configs/` と `.vscode/` へコピーされます。
+- `pnpm` がインストール済みであることを前提とする。
+- スクリプトは `pnpm` を遣ってツールをグローバルにインストールする。
+- 設定ファイルはモノレポルートの `configs/` と `.vscode/` へコピーする。
 - インストール後は各ツールのバージョンを確認し、正しくインストールされたかをチェックしてください。
 
 ### 4.4 `cSpell` の辞書設定
