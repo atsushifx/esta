@@ -1,7 +1,23 @@
 ---
+header:
+  - src: docs/onboarding/07-shared_configs.md
+  - "@(#) : ESTA Onboarding Guide - Shared Configuration Files Management"
 title: 設定ファイルの共通化と拡張
 description: monorepoにおける設定ファイルの共通化運用と各サブパッケージでの拡張方法を解説します。
+version: 1.0.0
+authors:
+  - 👤 atsushifx（オンボーディングガイド作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 sidebar_position: 7
+tags:
+  - onboarding
+  - configuration
+  - monorepo
 ---
 
 ## 7 設定ファイルの共通化と拡張
@@ -26,9 +42,9 @@ sidebar_position: 7
 🔍 図の読み解きポイント:
 
 - `/shared/configs/tsconfig.base.json` は、TypeScript の基本設定ファイルであり、
-  `monorepo`ルートや`各サブリポジトリの`tsconfig.json`から`extends`によって参照されます
+  `monorepo`ルートや`各サブリポジトリの`tsconfig.json`から`extends`によって参照される
 - `lefthook.yml`は、**他の設定を参照せずに設定する自己完結型の設定ファイル**であり、`/shared/configs/`下に基本設定ファイルはありません
-- 一部の設定ファイル (例: `secretlint.config.yaml`)は、同期スクリプト`pnpm run sync:configs`による**同期コピー**によって共通化しています
+- 一部の設定ファイル (例: `secretlint.config.yaml`)は、同期スクリプト`pnpm run sync:configs`による**同期コピー**によって共通化する
 
 #### 参照による共通化
 
@@ -248,20 +264,20 @@ pnpm run sync:configs secretlint
 
 設定ファイルを共通化し、拡張して運用する際には、以下のポイントを確認します。
 
-- **共通設定の適用範囲確認**:
+- 共通設定の適用範囲確認:
   すべてのサブリポジトリやモノレポルートが最新の共通設定を正しく参照しているかを確認する
   特に参照パスの誤りやバージョン不整合に注意
 
-- **同期コピー運用の注意点**:
+- 同期コピー運用の注意点:
   同期対象のファイル (例: `secretlint.config.yaml`) は、必ず、共通設定側のファイルを編集し、同期をかける運用ルールを徹底する
 
-- **自己完結型設定ファイルの妥当性確認**
+- 自己完結型設定ファイルの妥当性確認
   自己完結型の設定ファイルがプロジェクト構成に適合しているか、依存関係が不要なことを確認
 
-- **拡張設定のテスト実施**:
+- 拡張設定のテスト実施:
   拡張設定が意図通り動作するか、CI やローカル環境で必ず検証する
 
-- **ドキュメント・運用ルールの整備**:
+- ドキュメント・運用ルールの整備:
   設定ファイルの更新方法や同期スクリプトの使い方など、チーム全体で共有するドキュメントを用意する
 
 これらをチェックしながら運用することで、設定ファイルの統一と拡張のバランスが取れ、メンテナンス性が向上します。
@@ -291,4 +307,4 @@ pnpm run sync:configs secretlint
 - [ ] **チーム全体への共有と教育**
       新旧メンバーに共通設定の使い方や運用ルールを周知徹底しているか
 
-このチェックリストを活用することで、`monorepo`環境における設定ファイル管理の品質を保ち、効率的な開発運用が可能になります。
+このチェックリストを活用することで、`monorepo`環境における設定ファイル管理の品質を保った開発運用が可能になります。

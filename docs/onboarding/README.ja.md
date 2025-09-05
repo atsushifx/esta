@@ -1,8 +1,19 @@
 ---
+header:
+  - src: docs/onboarding/README.ja.md
+  - "@(#) : ESTA Onboarding Guide - Main Index"
 title: オンボーディングガイド
 description: 新しくプロジェクトに参加する開発者向けの初期セットアップとツール導入ガイド
+version: 1.0.0
+authors:
+  - 👤 atsushifx（オンボーディングガイド作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 slug: onboarding
-sidebar_position: 1
 tags:
   - onboarding
   - setup
@@ -40,7 +51,7 @@ tags:
 
 1. 開発マシンのセットアップが終わっていない場合は、上から順に読み進めてください。
 2. セットアップ済みであれば、必要な章のみを参照してください。
-3. 質問・改善提案は issue や PR にて歓迎します。
+3. 質問・改善提案は issue や PR にて歓迎。
 
 ---
 

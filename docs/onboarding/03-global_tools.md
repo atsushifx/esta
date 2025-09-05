@@ -1,6 +1,18 @@
 ---
+header:
+  - src: docs/onboarding/03-global_tools.md
+  - "@(#) : ESTA Onboarding Guide - Global Development Tools Setup"
 title: グローバル開発ツールの一括セットアップ
 description: プロジェクトでグローバルに使用する開発ツールのセットアップ手順の説明
+version: 1.0.0
+authors:
+  - 👤 atsushifx（オンボーディングガイド作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 sidebar_position: 2
 ---
 

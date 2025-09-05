@@ -1,6 +1,18 @@
 ---
+header:
+  - src: docs/onboarding/00-intro.md
+  - "@(#) : ESTA Onboarding Guide - Project Introduction"
 title: プロジェクト概要
 description: プロジェクトの概要と参加方法
+version: 1.0.0
+authors:
+  - 👤 atsushifx（オンボーディングガイド作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 sidebar_position: 0
 ---
 
@@ -15,9 +27,9 @@ sidebar_position: 0
 
 ## プロジェクトの目的
 
-<!-- vale off -->"
+<!-- vale off -->
 
-easy-setup-tools-action (ESTA)"は、環境構築時に必要なツールを自動で導入することを目的にしています。
+`easy-setup-tools-action` (`ESTA`)は、環境構築時に必要なツールを自動で導入することを目的にしています。
 とくに GitHub Actions では自分がおこないたいテストやリントなどの環境を設定するのに手間がかかります。
 ESTA は、CLI での引数、または GitHub Actions での with で、簡単に複数のツールがインストールできることを目指しています。
 
@@ -51,7 +63,7 @@ ESTA は、CLI での引数、または GitHub Actions での with で、簡単�
 
 1. 本ドキュメントを読み、ESTA 開発の全体像と環境構築手順を理解してください。
 2. 開発環境構築手順に沿ってセットアップを進め、ローカルでのビルドやテストが動作する状態を作りましょう。
-3. 開発に参加する際は、ブランチ運用や PR 作成の手順を確認し、適切な流れで作業を進めてください。
+3. 開発に参加する際は、ブランチ運用や PR 作成の手順を確認し、手順にあった流れで作業を進めてください。
 4. 困ったことがあれば、Issue やコミュニティで質問し、積極的に交流しながら解決しましょう。
 
 ---
