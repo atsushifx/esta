@@ -6,7 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// Internal type definitions
+// Type definitions
 import { AglaError, type AglaErrorOptions } from '../../../types/AglaError.types.js';
 
 /**

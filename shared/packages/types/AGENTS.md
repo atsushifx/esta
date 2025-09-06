@@ -1,80 +1,198 @@
-# Repository Guidelines
+---
+header:
+  - src: AGENTS.md
+  - @(#): AI エージェント向け参照ハブ (@shared/types パッケージ)
+title: AI Agents Guide for @shared/types Package
+description: Claude Code, Codex, その他の AI エージェント向けの @shared/types パッケージガイド
+version: 0.1.0
+created: 2025-09-06
+authors:
+  - atsushifx
+  - Claude Code
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
 
-このドキュメントは、本リポジトリに貢献する際の最小限かつ実践的なガイドです。変更前に一読し、CI が緑になることをローカルで確認してください。
+## 目的
 
-## Project Structure & Module Organization
+@shared/types パッケージの AI エージェント向け総合ガイドです。
+Claude Code, GitHub Codex, その他の AI 開発支援ツールが効率的に作業できるよう、
+パッケージ構造、シンボル、ワークフローを整理しています。
 
-- `src/`: TypeScript 本体。コア (`AgLogger.class.ts`, `AgLoggerManager.class.ts`)、`plugins/{logger,formatter}/`、`utils/`、ユニットテストは `__tests__/`。
-- `shared/`: パッケージが公開する共通型・定数。
-- `tests/`: 統合 `tests/integration/`、E2E `tests/e2e/`。
-- `configs/`: Vitest, ESLint, tsup などの設定。
-- ビルド成果物: `lib/`(CJS), `module/`(ESM) — 直接編集しないこと。
-- `docs/`: 設計ノート・仕様。
+## 参照階層
 
-## Build, Test, and Development Commands
+### プロジェクト全体の参照
 
-- `pnpm build`: tsup で CJS/ESM をビルド。
-- `pnpm clean`: ビルド生成物とキャッシュ削除。
-- `pnpm test:develop | test:ci | test:e2e | test:all`: Vitest 実行（ユニット/CI/E2E/全て）。
-- `pnpm check:types`: `tsc` の型チェック（noEmit）。
-- `pnpm lint | lint:types | lint:fix`: ESLint の通常/型対応/自動修正。
-- `pnpm format:dprint | check:dprint`: dprint で整形/検証。
-- `pnpm lint:secrets`: Secretlint による秘匿情報スキャン。
+- `../../../AGENTS.md`: ルートレベルの AI エージェントガイド
+- `../../../docs/claude/`: プロジェクト全体のドキュメント体系
 
-## Docs & Handover
+### パッケージ専用リソース
 
-- **`handover.md`**: 完全な引き継ぎ資料・実装ガイド
-- **`TODO.md`**: 実行計画書（Markdownチェックボックス形式）
-- **`TODO.optimized.md`**: 詳細実装チェックリスト（Red-Green-Refactor組み込み）
-- **`docs/refactor.plan.md`**: テスト構造リファクタリング計画
-- （任意）`docs/test-optimization.plan.md`: 最適化の参考資料（軽量化は必須要件ではない）
-- **`README.md`**: パッケージ概要・使用方法・開発ガイド
-- **`./temp/*.md`**: 開発時の分析資料（参考用）
+- `CLAUDE.md`: Claude Code 専用ガイド（本パッケージ）
+- `temp/`: MCP ツール最適化ドキュメント群
 
-## Execution Method: atsushifx式BDD
+## MCP ツール統合ドキュメント
 
-- 概要: t-wada の TDD を AI 向けに具体化。実行タスクをユニットテストの `it`/`expect` 単位まで細分化。
-- ToDo 記法: フェーズ/タスク種別でグルーピングし、タスクIDを付与して `todo.md` に列挙（例: `PH1-API-003: logger JSON 出力を検証`）。
-- 進め方: 1 タスクずつ Red-Green-Refactor を厳守。最初に失敗テスト（Red）→最小実装でグリーン→安全にリファクタ。
-- 品質担保: 中途半端な変更を残さず、常に全テスト緑を維持してコミット/PR。
-- 補助: 仕様要約や差分抽出は `lsmcp`/`serena-mcp` を活用し、長文貼付を避けプロンプトのトークンを節約。
+### 効率的なコードナビゲーション
 
-## Coding Style & Naming Conventions
+1. **`temp/symbol-analysis.md`**
+   - 全シンボル詳細解析（クラス・型・関数・メソッド）
+   - アーキテクチャパターン説明
+   - 設計思想とメモリ管理戦略
 
-- ランタイム: Node ≥ 20, ESM（CJSはビルド出力）。
-- 命名: クラスは `PascalCase` + `*.class.ts`、ユーティリティは `camelCase`。
-- インポート: ESM を優先。パスエイリアス `@/*` → `src/*`。
-- 静的解析: ESLint（`configs/eslint.config.js`/typed）、フォーマッタは dprint。PR 前に整形→Lint を実行。
+2. **`temp/serena-mcp-navigation-guide.md`**
+   - serena-mcp ツール最適化ワークフロー
+   - シンボル階層ナビゲーション
+   - 編集操作のベストプラクティス
 
-## Testing Guidelines
+3. **`temp/lsmcp-search-guide.md`**
+   - lsmcp ツールのシンボル検索パターン
+   - 横断検索・参照解析コマンド
+   - 型システムナビゲーション
 
-### テスト構成・方針
+4. **`temp/test-structure-analysis.md`**
+   - テスト構成の最適化提案
+   - 削除候補・統合候補の特定
+   - テスト種別分類とベストプラクティス
 
-- **BDD構造**: Given/When/Then の3階層で統一し、共通操作の下に正常系/異常系/エッジケースを集約。
-- **テスト増減方針**: 必要な正常/異常/エッジの追加は許容（品質優先、重複・冗長は排除）。
-- **品質指標**: カバレッジ90%以上を維持、実行時間は実用性能を確保。
+## パッケージアーキテクチャ
 
-### テスト分類
+### 中核コンポーネント
 
-- **ユニットテスト** (`src/__tests__/`): 単一機能・クラス・メソッド
-- **ファンクショナルテスト** (`src/__tests__/functional/`): 機能統合・ワークフロー
-- **インテグレーションテスト** (`tests/integration/`): システム統合
-- **E2Eテスト** (`tests/e2e/`): エンドユーザー視点（必要に応じて）
+```typescript
+// 抽象ベースクラス
+export abstract class AglaError extends Error {
+  // エラーチェーン・コンテキスト管理・シリアライゼーション
+}
 
-### 実行・開発
+// 重要度管理
+export enum ErrorSeverity {
+  FATAL = 'fatal',
+  ERROR = 'error',
+  WARNING = 'warning',
+  INFO = 'info',
+}
 
-- フレームワーク: Vitest、命名: `*.spec.ts`
-- Red-Green-Refactorサイクル: 🔴失敗確認 → 🟢最小実装 → 🔄リファクタリング
-- Given/When/Then構造、Markdownチェックボックス形式
-- 実行例: `pnpm test:all` をPR前必須実行
+// 型安全性
+export type AglaErrorContext = { [key: string]: unknown };
+export function isValidAglaErrorContext(value: unknown): value is AglaErrorContext;
+```
 
-## Commit & Pull Request Guidelines
+### 設計原則
 
-- コミット: Conventional Commits。例: `feat(logger): add JSON formatter`、`fix(core): handle null options`。
-- PR 要件: 目的の説明、関連 Issue、テスト証跡（出力や E2E スクリーンショット）、型やドキュメント影響の記載。ローカルで build / type-check / lint / tests をすべて緑に。
+1. **抽象化による拡張性**: AglaError を継承した具象実装
+2. **不変性**: readonly プロパティで状態保護
+3. **型安全性**: 実行時バリデーション + TypeScript 型推論
+4. **フルエント API**: メソッドチェーンによる直感的操作
 
-## Security & Configuration Tips
+## AI エージェント用ワークフロー
 
-- 秘密情報: 事前に `pnpm lint:secrets` を実行。資格情報はコミット禁止。
-- 設定同期: 一部設定はワークスペース継承。独自変更は理由を明記。
-- MCP (Codex CLI): ルートの `.mcp.json` で `lsmcp`/`serena-mcp` を有効化。`/mcp` で状態・ツール確認。仕様要約や検索は MCP ツールを使い、長文貼り付けを避けてプロンプトのトークンを削減する。`.lsmcp/` はローカルキャッシュ（再生成される場合あり）。
+### コード理解フェーズ
+
+```bash
+# 1. プロジェクト概要把握
+cat CLAUDE.md AGENTS.md
+
+# 2. シンボル全体像理解
+cat temp/symbol-analysis.md
+
+# 3. 詳細ナビゲーション
+# serena-mcp の場合
+get_symbols_overview --relative_path "types"
+find_symbol --name_path "AglaError" --include_body true
+
+# lsmcp の場合
+search_symbols --kind Class --name "AglaError"
+get_symbol_details --symbol "AglaError" --includeChildren true
+```
+
+### 開発・編集フェーズ
+
+```bash
+# 1. 型定義の編集
+replace_symbol_body --name_path "AglaError/toString" --relative_path "types/AglaError.types.ts"
+
+# 2. テスト追加・修正
+insert_after_symbol --name_path "last_test_case" --relative_path "src/__tests__/unit-level/AglaError.spec.ts"
+
+# 3. 検証
+pnpm test
+pnpm check:types
+```
+
+### テスト最適化フェーズ
+
+```bash
+# 1. 現状分析
+cat temp/test-structure-analysis.md
+
+# 2. 削除対象特定
+search_for_pattern --substring_pattern "expect.*toBe.*undefined" --relative_path "src/__tests__"
+
+# 3. 統合候補特定
+find_symbol --name_path "describe" --substring_matching true
+```
+
+## AI エージェント固有の考慮事項
+
+### Claude Code 用
+
+- **MCP サーバー活用**: lsmcp, serena-mcp の併用推奨
+- **段階的編集**: ファイル単位での変更後にテスト実行
+- **型安全性重視**: TypeScript エラーの即座解決
+
+### GitHub Codex 用
+
+- **コンテキスト最適化**: `temp/` ドキュメント並行参照
+- **パターン認識**: BDD テスト構造の理解
+- **レガシー互換**: 既存 API を破壊しない変更
+
+### 汎用 AI ツール用
+
+- **シンボル索引**: `temp/symbol-analysis.md` を活用
+- **アーキテクチャ理解**: 設計パターンの把握
+- **テスト戦略**: 単体・機能・統合・E2E の区分
+
+## 品質保証
+
+### 自動検証
+
+```bash
+# 型チェック
+pnpm check:types
+
+# リント
+pnpm lint
+
+# テスト実行
+pnpm test
+
+# ビルド確認
+pnpm build
+```
+
+### 手動検証項目
+
+- エラーチェーンの動作確認
+- シリアライゼーションの一貫性
+- 型ガード関数の正確性
+- テストカバレッジの妥当性
+
+## 制約・注意事項
+
+### 編集禁止領域
+
+- `lib/`, `module/` ディレクトリ（生成物）
+- `node_modules/`
+- `.lsmcp/` （MCP キャッシュ）
+
+### 必須遵守事項
+
+- **ESM 優先**: import/export 構文の使用
+- **型安全性**: any 型の回避
+- **不変性**: 既存オブジェクトの変更禁止
+- **テスト実行**: 変更後の検証必須
+
+この参照ガイドにより、AI エージェントは効率的かつ安全に @shared/types パッケージでの作業を実行できます。

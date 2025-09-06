@@ -1,13 +1,13 @@
-// src: src/__tests__/helpers/test-types.ts
-// @(#) : テストユーティリティ型定義
+// src: src/__tests__/helpers/test-types.types.ts
+// @(#): Test utility type definitions for AglaError testing
 //
 // Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
 //
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// Import required for _TAglaErrorContextWithSymbols
-import type { AglaErrorContext } from '../../../types/AglaError.types';
+// Type definitions
+import type { AglaErrorContext } from '../../../types/AglaError.types.js';
 
 /**
  * Utility type that makes all readonly properties of T mutable.
