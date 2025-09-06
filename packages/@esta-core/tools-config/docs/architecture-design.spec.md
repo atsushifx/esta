@@ -1,15 +1,15 @@
 ---
 header:
-  - src: docs/specs/architecture-design.spec.md
+  - src: docs/architecture-design.spec.md
   - @(#) : @esta-core/tools-config architecture specs
 title:  @esta-core/tools-config アーキテクチャ仕様
-version: 1.0.0
+version: 0.0.0
 created: 2025-07-19
-updated: 2025-07-19
 authors:
     - atsushifx（要件定義・仕様確定）
 changes:
-  - 2025-07-19 初回作成（ドキュメント整備）
+  - 2025-07-19: 初回作成（ドキュメント整備）
+  - 2025-09-06: パッケージドキュメント標準化
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
