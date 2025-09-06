@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 
 // Type definitions
-import { AglaError } from '../../types/AglaError.types.js';
+// （未使用のため削除）
 
 // Test utilities
 import { TestAglaError } from './helpers/TestAglaError.class.js';

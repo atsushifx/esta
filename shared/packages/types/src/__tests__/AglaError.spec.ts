@@ -10,8 +10,9 @@
 import { describe, expect, it } from 'vitest';
 
 // Type definitions
-import type { AglaError, AglaErrorContext, AglaErrorOptions } from '../../types/AglaError.types.ts';
-import type { ErrorSeverity } from '../../types/ErrorSeverity.types.ts';
+import { AglaError } from '../../types/AglaError.types.ts';
+import type { AglaErrorContext, AglaErrorOptions } from '../../types/AglaError.types.ts';
+import { ErrorSeverity } from '../../types/ErrorSeverity.types.ts';
 
 // Test utilities
 import { TestAglaError } from './helpers/TestAglaError.class.ts';
@@ -296,8 +297,6 @@ describe('Given AglaError instance for JSON serialization', () => {
 
     it('Then 正常系：should include all properties with correct formatting', () => {
       // Arrange
-      const code = 'TEST_001';
-      const severity = ErrorSeverity.FATAL;
       const timestamp = new Date('2025-08-29T21:42:00Z');
       const error = new TestAglaError('TEST_ERROR', 'Test message', { timestamp });
       const json = error.toJSON();
@@ -426,7 +425,8 @@ describe('Given AglaError constructor with various input combinations', () => {
       const chainedError = aglaError.chain(customError);
 
       // Assert
-      expect(error.errorType).toBe(errorType);
+      // チェーン後も errorType は変化しない
+      expect(chainedError.errorType).toBe('AGLA_ERROR');
     });
 
     it('Then should handle unicode characters in message', () => {
@@ -511,14 +511,26 @@ describe('Given AglaError constructor with invalid inputs', () => {
       expect(() => originalError.chain(nullCause)).toThrow();
     });
 
-    // should handle undefined cause gracefully
-    const undefinedCause = undefined as unknown as Error;
-    expect(() => originalError.chain(undefinedCause)).toThrow();
+    it('Then 異常系：should handle undefined cause gracefully', () => {
+      // Arrange
+      const originalError = new TestAglaError('TEST_ERROR', 'Original message');
+      const undefinedCause = undefined as unknown as Error;
 
-    // should handle string cause by accessing message property
-    const stringCause = 'string error' as unknown as Error;
-    const stringChainedError = originalError.chain(stringCause);
-    expect(stringChainedError.message).toBe('Original message (caused by: undefined)');
+      // Act & Assert
+      expect(() => originalError.chain(undefinedCause)).toThrow();
+    });
+
+    it('Then 正常系：should handle string cause by accessing message property', () => {
+      // Arrange
+      const originalError = new TestAglaError('TEST_ERROR', 'Original message');
+      const stringCause = 'string error' as unknown as Error;
+
+      // Act
+      const stringChainedError = originalError.chain(stringCause);
+
+      // Assert
+      expect(stringChainedError.message).toBe('Original message (caused by: undefined)');
+    });
 
     it('Then エッジケース：should handle object cause by accessing message property', () => {
       // Arrange
