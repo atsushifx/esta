@@ -1,7 +1,25 @@
-# 📦 @esta-actions/tools-installer
+---
+header:
+  - src: @esta-actions/tools-installer/README.ja.md
+  - @(#): GitHub Actions用汎用ツールインストーラーフレームワーク
+title: 📦 @esta-actions/tools-installer
+description: GitHub Actions用汎用ツールインストーラーフレームワーク（egetベース）
+version: 0.1.0
+created: 2025-09-06
+authors:
+  - atsushifx
+changes:
+  - 2025-09-06: 初版作成（パッケージドキュメント標準化）
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
 
-GitHub Actions 向けに外部CLIツールを柔軟にセットアップするユニバーサルツールインストーラーフレームワークです。
-eget ベースのインストール機能を提供し、pnpm環境・マルチパッケージ構成に最適化されています。
+## 📦 @esta-actions/tools-installer
+
+GitHub Actions 向けに外部 CLI ツールを柔軟にセットアップするユニバーサルツールインストーラーフレームワークです。
+eget ベースのインストール機能を提供し、pnpm 環境・マルチパッケージ構成に最適化されています。
 
 ---
 
@@ -11,17 +29,17 @@ eget ベースのインストール機能を提供し、pnpm環境・マルチ�
 
 #### ToolConfigManager
 
-- **ファイル**: `src/helper/configs/ToolConfigManager.class.ts`
-- **用途**: ツール設定の管理とストレージ
-- **主要メソッド**:
+- ファイル: `src/helper/configs/ToolConfigManager.class.ts`
+- 用途: ツール設定の管理とストレージ
+- 主要メソッド:
   - `getToolConfig(tool: string)`: 指定ツールの設定を取得
   - `addToolConfigs(configs: AgActionToolConfig[])`: 設定を追加
 
 #### HandleInstaller
 
-- **ファイル**: `src/installer/AgActionHandleInstaller.class.ts`
-- **用途**: インストール操作の制御とエグゼキュータ管理
-- **主要メソッド**:
+- ファイル: `src/installer/AgActionHandleInstaller.class.ts`
+- 用途: インストール操作の制御とエグゼキュータ管理
+- 主要メソッド:
   - `handle(type: AgActionInstallerType, options: AgActionInstallOptions)`: インストール実行
   - `getSupportedTypes()`: サポートされるインストーラータイプを取得
 
@@ -29,23 +47,23 @@ eget ベースのインストール機能を提供し、pnpm環境・マルチ�
 
 #### EgetInitializer
 
-- **ファイル**: `src/installer/executor/EgetInitializer.ts`
-- **用途**: eget CLI ツールの初期化とインストール
-- **主要メソッド**:
+- ファイル: `src/installer/executor/EgetInitializer.ts`
+- 用途: eget CLI ツールの初期化とインストール
+- 主要メソッド:
   - `execute(options: AgActionInstallOptions)`: eget インストール実行
   - Windows/Linux 対応の個別インストールメソッド
 
 #### NullExecutor
 
-- **ファイル**: `src/installer/executor/NullExecutor.ts`
-- **用途**: 未サポートインストールタイプ用プレースホルダー
+- ファイル: `src/installer/executor/NullExecutor.ts`
+- 用途: 未サポートインストールタイプ用プレースホルダー
 
 ### ユーティリティ関数
 
 #### prepareInstallDirectory
 
-- **ファイル**: `src/utils/prepareInstallDirectory.ts`
-- **用途**: GitHub Actions 用インストールディレクトリの準備と PATH 設定
+- ファイル: `src/utils/prepareInstallDirectory.ts`
+- 用途: GitHub Actions 用インストールディレクトリの準備と PATH 設定
 
 ---
 
