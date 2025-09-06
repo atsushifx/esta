@@ -1,11 +1,29 @@
-# @esta-utils/get-platform
+---
+header:
+  - src: README.ja.md
+  - @(#): プラットフォーム検出ユーティリティ（クロスプラットフォーム対応）
+title: @esta-utils/get-platform
+description: プラットフォーム検出ユーティリティ（クロスプラットフォーム対応）
+version: 0.0.2
+created: 2025-09-06
+authors:
+  - atsushifx
+changes:
+  - 2025-09-06: 初版作成（パッケージドキュメント標準化）
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
+---
+
+## @esta-utils/get-platform
 
 ---
 
 ## 概要
 
-Node.js/TypeScript用のOSプラットフォーム判定ユーティリティです。
-Windows/Linux/macOS判定・PATH区切り記号取得・型安全なenum/判定関数を提供します。
+Node.js/TypeScript 用の OS プラットフォーム判定ユーティリティです。
+Windows/Linux/macOS 判定・PATH 区切り記号取得・型安全な enum/判定関数を提供します。
 
 ---
 
@@ -23,9 +41,9 @@ npm install @esta-utils/get-platform
 
 ## 主なエクスポート
 
-- `getPlatform()` — 現在のプラットフォーム名を型安全なenumで取得
-- `PLATFORM_TYPE` — 判定用enum型 (`WINDOWS`/`LINUX`/`MACOS`/`UNKNOWN`)
-- `getDelimiter()` — PATH区切り記号を返す（Windowsは`;`、他は`:`）
+- `getPlatform()` — 現在のプラットフォーム名を型安全な enum で取得
+- `PLATFORM_TYPE` — 判定用 enum 型 (`WINDOWS`/`LINUX`/`MACOS`/`UNKNOWN`)
+- `getDelimiter()` — PATH 区切り記号を返す（Windows は`;`、他は`:`）
 - 判定関数：`isWindows()` / `isLinux()` / `isMacOS()`
 - キャッシュ管理：`clearPlatformCache()` — プラットフォーム情報キャッシュをクリア
 - まとめて使う場合：`estaUtils`ネームスペースオブジェクト
@@ -135,9 +153,9 @@ export type TSupportedPlatform = PLATFORM_TYPE;
 
 ### 型安全性
 
-- 全て文字列ベースのenum設計
+- すべて文字列ベースの enum 設計
 - 詳細な型定義によるコンパイル時エラー検出
-- TypeScript strict modeに完全対応
+- TypeScript strict mode に完全対応
 
 ### 拡張性
 
