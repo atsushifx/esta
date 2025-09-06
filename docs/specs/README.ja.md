@@ -1,8 +1,14 @@
 ---
 header:
-  - src: docs/specs/@esta-core--tools-config.spec.md
-  - @(#) : ESTA Install Tools configuration reader
+  - src: docs/specs/README.ja.md
+  - "@(#) : ESTA Specifications Documentation Guidelines"
 title: /docs/specs/ 仕様書作成ガイドライン
+description: ESTAプロジェクトの仕様書作成における統一運用ルールとスタイルガイド
+version: 1.0.0
+authors:
+  - 👤 atsushifx（ガイドライン作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.

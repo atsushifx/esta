@@ -1,15 +1,15 @@
 ---
 header:
-  - src: formatters.guide.md
+  - src: docs/user-guides/formatters.guide.md
   - @(#): AgLogger Formatters ガイド
 title: AgLogger Formatters ガイド
 description: Plain/JSON/Mock 各フォーマッターの用途と使い分けの指針
-version: 1.0.0
-created: 2025-08-25
+version: 0.3.0
+created: 2025-09-05
 authors:
   - atsushifx
 changes:
-  - 2025-08-25: 初版作成
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.

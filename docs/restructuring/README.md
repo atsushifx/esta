@@ -1,23 +1,22 @@
 ---
 header:
   - src: docs/restructuring/README.md
-  - @(#) : ESTA monorepo restructuring directory overview and index
-title: 📚 ESTAリストラクチャリング計画（README）
+  - @(#): ESTAモノレポリストラクチャリング計画ディレクトリ概要
+title: ESTAリストラクチャリング計画（README）
+description: ESTAモノレポリストラクチャリング計画のディレクトリ概要とドキュメント索引
 version: 1.0.0
-created: 2025-08-28
-updated: 2025-08-28
+created: 2025-09-04
 authors:
-  - 🤖 Claude（初期設計・API仕様策定）
-  - 👤 atsushifx（要件定義・仕様確定）
+  - atsushifx
 changes:
-  - 2025-08-28: 初回作成（ドキュメント整備）
+  - 2025-09-04: 標準化対応（フロントマター統一・見出し調整）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-## ESTA Monorepo Restructuring Plan
+## ESTAモノレポリストラクチャリング計画
 
 このディレクトリには、ESTA monorepoの包括的リストラクチャリング計画が含まれています。
 

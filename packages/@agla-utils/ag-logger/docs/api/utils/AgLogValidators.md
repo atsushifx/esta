@@ -1,7 +1,7 @@
 ---
 header:
-  - src: AgLogValidators.md
-  - "@(#)": ログバリデーション関数群 ユーティリティ APIリファレンス
+  - src: docs/api/utils/AgLogValidators.md
+  - @(#): ログバリデーション関数群 ユーティリティ APIリファレンス
 title: AgLogValidators
 description: ログレベルやパラメーターの検証を行うバリデーション関数群のAPIリファレンス
 version: 0.3.0
@@ -10,19 +10,22 @@ authors:
   - atsushifx
 changes:
   - 2025-08-25: 初版作成
+  - 2025-09-05: フロントマター標準化・見出し階層修正
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# AgLogValidators
+## AgLogValidators
 
 ## 概要
 
-**AgLogValidators**は、ログレベルやパラメーターの検証を行うバリデーション関数群を提供するユーティリティモジュールです。型安全性を保証し、実行時のエラーを防ぐためのバリデーション機能を提供します。AgLoggerError を使用した構造化エラーハンドリングにより、詳細なエラー情報を提供します。
+**AgLogValidators**は、ログレベルやパラメーターを検証するバリデーション関数群を提供するユーティリティモジュールです。型安全性を保証し、実行時のエラーを防ぐためのバリデーション機能を提供します。AgLoggerError を使用した構造化エラーハンドリングにより、詳細なエラー情報を提供します。
 
 ## 関数一覧
+
+<!-- markdownlint-disable no-duplicate-heading -->
 
 ### validateLogLevel
 
@@ -91,9 +94,9 @@ try {
 
 #### 注意事項
 
-- 入力値の型チェック、有限性チェック、整数チェック、範囲チェックを順次実行します
-- AgLoggerError を投げるため、適切な try-catch ブロックで囲んでください
-- エラーメッセージには具体的な値と失敗理由が含まれます
+- 入力値の型チェック、有限性チェック、整数チェック、範囲チェックを順次実行
+- AgLoggerError を投げるため、try-catch ブロックで囲んでください
+- エラーメッセージには具体的な値と失敗理由が含まれる
 
 ### isValidLogLevel
 
@@ -141,9 +144,9 @@ function processLogLevel(input: unknown): string {
 
 #### 注意事項
 
-- エラーを投げずに boolean 値を返します
-- TypeScript の型ガード関数として機能します
-- validateLogLevel 内部で使用されています
+- エラーを投げずに boolean 値を返す
+- TypeScript の型ガード関数として機能
+- validateLogLevel 内部で使用されている
 
 ### validateFormatter
 
@@ -197,9 +200,9 @@ try {
 
 #### 注意事項
 
-- 有効な場合は何も返さず、無効な場合のみ例外を投げます
-- エラータイプは CONFIG です
-- 関数の内容や署名は検証せず、関数型かどうかのみをチェックします
+- 有効な場合は何も返さず、無効な場合のみ例外を投げる
+- エラータイプは CONFIG
+- 関数の内容や署名は検証せず、関数型かどうかのみをチェックする
 
 ### isValidFormatter
 
@@ -249,8 +252,8 @@ function setFormatterSafely(formatter: unknown): void {
 
 #### 注意事項
 
-- エラーを投げずに boolean 値を返します
-- validateFormatter 内部で使用されています
+- エラーを投げずに boolean 値を返す
+- validateFormatter 内部で使用される
 
 ### validateLogger
 
@@ -305,9 +308,9 @@ try {
 
 #### 注意事項
 
-- 有効な場合は何も返さず、無効な場合のみ例外を投げます
-- エラータイプは CONFIG です
-- 関数の内容や署名は検証せず、関数型かどうかのみをチェックします
+- 有効な場合は何も返さず、無効な場合のみ例外を投げる
+- エラータイプは CONFIG
+- 関数の内容や署名は検証せず、関数型かどうかのみをチェック
 
 ### isValidLogger
 
@@ -367,7 +370,12 @@ export const isStandardLogLevel = (logLevel: AgLogLevel | undefined): boolean
 
 #### 動作
 
-ログレベルが標準レベル (OFF(0), FATAL(1), ERROR(2), WARN(3), INFO(4), DEBUG(5), TRACE(6)) かどうかを判定します。特殊レベル (VERBOSE, LOG, DEFAULT) は false を返します。
+<!-- textlint-disable ja-technical-writing/max-comma -->
+
+ログレベルが標準レベル (OFF(0), FATAL(1), ERROR(2), WARN(3), INFO(4), DEBUG(5), TRACE(6)) かどうかを判定します。
+特殊レベル (VERBOSE, LOG, DEFAULT) は false を返します。
+
+<!-- textlint-enable -->
 
 #### 使用例
 
@@ -399,9 +407,9 @@ function processStandardLevel(level: AgLogLevel): string {
 
 #### 注意事項
 
-- 内部で isValidLogLevel を使用して事前チェックを行います
-- 0-6 の範囲のみを標準レベルとして扱います
-- パフォーマンスを考慮した早期リターン設計になっています
+- 内部で isValidLogLevel を使用して事前チェックする
+- 0-6 の範囲のみを標準レベルとして扱う
+- パフォーマンスを考慮した早期リターン設計になっている
 
 ### isAgMockConstructor
 
@@ -447,8 +455,8 @@ function handleValue(value: unknown): string {
 
 #### 注意事項
 
-- TypeScript の型ガード関数として機能します
-- **特殊な内部マーカーに依存します**
+- TypeScript の型ガード関数として機能
+- **特殊な内部マーカーに依存**
 
 ## 組み合わせ使用例
 
@@ -651,10 +659,10 @@ function validateConfiguration(config: {
 
 ### 効率的な使用パターン
 
-- **validateLogLevel**: 段階的チェックによる早期リターンで高速化
-- **isValidLogLevel**: Boolean チェックのため軽量
-- **isStandardLogLevel**: 範囲チェックによる O(1) 判定
-- **型ガード関数**: TypeScript コンパイル時の型推論支援
+- validateLogLevel: 段階的チェックによる早期リターンで高速化
+- isValidLogLevel: Boolean チェックのため軽量
+- isStandardLogLevel: 範囲チェックによる O(1) 判定
+- 型ガード関数: TypeScript コンパイル時の型推論支援
 
 ### 推奨事項
 
@@ -664,11 +672,13 @@ function validateConfiguration(config: {
 
 ## 注意事項
 
-- すべてのバリデーション関数は実行時チェックを行います
-- TypeScript の型システムと併用することで、コンパイル時と実行時の両方で型安全性を確保できます
-- AgLoggerError はエラータイプ (VALIDATION, CONFIG) で分類されており、適切なエラーハンドリングが可能です
-- `validate*` 系関数は例外を投げるため、必要に応じて try-catch での処理が必要です
-- `is*` 系関数は例外を投げず、安全な boolean 判定を提供します
+- すべてのバリデーション関数は実行時チェックを行う
+- TypeScript の型システムと併用することで、コンパイル時と実行時の両方で型安全性を確保
+- AgLoggerError はエラータイプ (VALIDATION, CONFIG) で分類されており、エラーハンドリングが可能
+- `validate*` 系関数は例外を投げるため、try-catch での処理が必要
+- `is*` 系関数は例外を投げず、安全な boolean 判定を提供する
+
+<!-- markdownlint-enable -->
 
 ## 関連項目
 

@@ -3,9 +3,8 @@ header:
   - src: docs/specs/@esta-system-exit-status.spec.md
   - @(#) : ESTA System exit status management
 title: 🚪 終了ステータス管理仕様書（@esta-system/exit-status）
+description: アプリケーション全体で一貫した終了ステータス管理を提供するシングルトンクラス。一度非ゼロ値が設定されると、ゼロ値での上書きを防ぐフェイルファスト動作を実現。
 version: 1.0.0
-created: 2025-07-14
-updated: 2025-07-14
 authors:
   - 🧠 つむぎ（シングルトン設計）
   - ⚙️ エルファ（フェイルファスト動作実装）
@@ -215,9 +214,3 @@ console.log(`Process completed with status: ${status}`);
 - 負の終了コードは設定できない
 - 一度設定された非ゼロ値は reset() 以外では変更できない
 - シングルトンパターンのため、テスト時は beforeEach でリセットが必要
-
-## 今後の拡張予定
-
-- 終了ステータスの理由情報保持
-- 複数エラーの蓄積機能
-- ログ統合機能

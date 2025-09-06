@@ -1,7 +1,24 @@
 ---
+header:
+  - src: docs/onboarding/09-code_quality_tools.md
+  - @(#) : ESTA Onboarding Guide - Code Quality Tools
 title: コード品質チェックツール
-description: monorepoで使用される静的解析・整形・スペルチェックなどの品質向上ツール群について解説します。
+description: monorepoで使用される静的解析・整形・スペルチェックなどの品質向上ツール群について解説します
+version: 1.0.0
+authors:
+  - 👤 atsushifx（オンボーディングガイド作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 sidebar_position: 9
+tags:
+  - onboarding
+  - quality
+  - tools
+  - linting
 ---
 
 ## 9 開発時のコード品質チェックツール

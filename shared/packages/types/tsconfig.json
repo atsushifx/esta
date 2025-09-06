@@ -8,7 +8,9 @@
 {
   "extends": "../../../base/configs/tsconfig.base.json",
   "include": [
-    "types/*.ts"
+    "types/*.ts",
+    "src/**/*.ts",
+    "tests/**/*.ts"
   ],
   "exclude": [
     ".git",

@@ -1,15 +1,15 @@
 ---
 header:
-  - src: docs/specs/uni-test.spec.md
+  - src: docs/unit-test.spec.md
   - @(#) : @esta-core/tools-config Unit Test specs
 title: @esta-core/tools-config ユニットテスト仕様書
-version: 1.0.0
+version: 0.0.0
 created: 2025-07-19
-updated: 2025-07-19
 authors:
     - atsushifx（要件定義・仕様確定）
 changes:
-  - 2025-07-19 初回作成（ドキュメント整備）
+  - 2025-07-19: 初回作成（ドキュメント整備）
+  - 2025-09-06: パッケージドキュメント標準化
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
@@ -38,7 +38,7 @@ copyright:
 
 ## テストスイート構成
 
-### 1. メイン機能テスト (`src/__tests__/getToolsConfig.spec.ts`)
+### 1. メイン機能テスト (`src/tests/getToolsConfig.spec.ts`)
 
 #### 1.1 getToolsConfig関数のテスト
 
@@ -66,7 +66,7 @@ describe('getToolsConfig', () => {
 });
 ```
 
-### 2. デフォルト設定テスト (`src/__tests__/defaultToolsConfig.spec.ts`)
+### 2. デフォルト設定テスト (`src/tests/defaultToolsConfig.spec.ts`)
 
 #### 2.1 defaultToolsConfig関数のテスト
 
@@ -114,7 +114,7 @@ describe('defaultToolsConfig', () => {
 });
 ```
 
-### 3. 設定読み込みテスト (`src/core/config/__tests__/loadConfig.spec.ts`)
+### 3. 設定読み込みテスト (`src/core/config/tests/loadConfig.spec.ts`)
 
 #### 3.1 正常系テスト
 
@@ -216,7 +216,7 @@ describe('設定検証', () => {
 });
 ```
 
-### 4. 設定マージテスト (`src/core/config/__tests__/mergeConfig.spec.ts`)
+### 4. 設定マージテスト (`src/core/config/tests/mergeConfig.spec.ts`)
 
 #### 4.1 正常系テスト
 
@@ -256,7 +256,7 @@ describe('mergeToolsConfig', () => {
 });
 ```
 
-### 5. スキーマ検証テスト (`src/internal/schemas/__tests__/tools.schemas.spec.ts`)
+### 5. スキーマ検証テスト (`src/internal/schemas/tests/tools.schemas.spec.ts`)
 
 #### 5.1 ToolsConfigSchemaの検証
 
@@ -360,7 +360,7 @@ describe('ToolEntrySchema', () => {
 
 ### 6. ツール検証テスト
 
-#### 6.1 基本検証テスト (`src/tools-validator/validator/__tests__/validateTools.spec.ts`)
+#### 6.1 基本検証テスト (`src/tools-validator/validator/tests/validateTools.spec.ts`)
 
 **目的**: ツール検証の基本機能テスト。
 
@@ -392,7 +392,7 @@ describe('validateTools', () => {
 });
 ```
 
-#### 6.2 egetバリデーターAPIテスト (`src/tools-validator/validator/__tests__/egetValidator.api.spec.ts`)
+#### 6.2 egetバリデーターAPIテスト (`src/tools-validator/validator/tests/egetValidator.api.spec.ts`)
 
 **目的**: 公開 API の機能テスト。
 
@@ -424,7 +424,7 @@ describe('egetValidator API', () => {
 });
 ```
 
-#### 6.3 egetバリデーター内部テスト (`src/tools-validator/validator/__tests__/egetValidator.internal.spec.ts`)
+#### 6.3 egetバリデーター内部テスト (`src/tools-validator/validator/tests/egetValidator.internal.spec.ts`)
 
 **目的**: 内部実装の詳細テスト。
 
@@ -456,7 +456,7 @@ describe('egetValidator 内部実装', () => {
 });
 ```
 
-#### 6.4 境界値テスト (`src/tools-validator/validator/__tests__/boundary.spec.ts`)
+#### 6.4 境界値テスト (`src/tools-validator/validator/tests/boundary.spec.ts`)
 
 **目的**: 境界値とエッジケースの検証。
 
@@ -496,7 +496,7 @@ describe('境界値テスト', () => {
 
 ### 7. パスユーティリティテスト
 
-#### 7.1 基本機能テスト (`src/utils/__tests__/pathUtils.spec.ts`)
+#### 7.1 基本機能テスト (`src/utils/tests/pathUtils.spec.ts`)
 
 **目的**: パス処理の基本機能テスト。
 
@@ -552,7 +552,7 @@ describe('クロスプラットフォーム対応', () => {
 });
 ```
 
-#### 7.3 エッジケーステスト (`src/utils/__tests__/pathUtils.edge.spec.ts`)
+#### 7.3 エッジケーステスト (`src/utils/tests/pathUtils.edge.spec.ts`)
 
 **目的**: パス処理のエッジケース検証。
 

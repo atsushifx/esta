@@ -1,6 +1,6 @@
 ---
 header:
-  - src: AgLoggerManager.md
+  - src: docs/api/AgLoggerManager.md
   - @(#): AgLoggerManager クラス APIリファレンス
 title: AgLoggerManager クラス
 description: AgLoggerインスタンス管理のためのマネージャークラスのAPIリファレンス
@@ -10,33 +10,36 @@ authors:
   - atsushifx
 changes:
   - 2025-08-24: 初版作成
+  - 2025-09-05: フロントマター標準化・見出し階層修正
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# AgLoggerManager クラス
+## AgLoggerManager クラス
 
-AgLoggerインスタンスを管理するためのマネージャークラス。
+AgLogger インスタンスを管理するためのマネージャークラス。
 
 ## 概要
 
-`AgLoggerManager` はAgLoggerインスタンスの作成、設定、管理を行うクラスです。シングルトンパターンを採用し、アプリケーション全体でロガーの統一管理を提供します。
+`AgLoggerManager` は AgLogger インスタンスの作成、設定、管理をするクラスです。シングルトンパターンを採用し、アプリケーション全体でロガーの統一管理を提供します。
+
+<!-- textlint-disable ja-technical-writing/no-exclamation-question-mark -->
 
 ## 静的メソッド
 
 ### createManager(options?: AgLoggerOptions): AgLoggerManager
 
-AgLoggerManagerのシングルトンインスタンスを取得または作成します。オプションでロガーの設定を同時に行うことができます。
+AgLoggerManager のシングルトンインスタンスを取得または作成します。オプションでロガーの設定を同時に行うことができます。
 
-**パラメータ:**
+**パラメータ**:
 
 - `options` (オプション): ロガーマネージャーの設定オプション
 
-**戻り値:** AgLoggerManagerのシングルトンインスタンス
+**戻り値**: AgLoggerManager のシングルトンインスタンス。
 
-**例:**
+例:
 
 ```typescript
 import { AG_LOGLEVEL, AgLoggerManager, ConsoleLogger, PlainFormatter } from '@agla-utils/ag-logger';
@@ -54,15 +57,15 @@ const manager = AgLoggerManager.createManager({
 
 ### getManager(): AgLoggerManager
 
-既存のAgLoggerManagerシングルトンインスタンスを取得します。インスタンスが作成されていない場合はエラーをスローします。
+既存の AgLoggerManager シングルトンインスタンスを取得します。インスタンスが作成されていない場合はエラーをスローします。
 
-**戻り値:** AgLoggerManagerのシングルトンインスタンス
+**戻り値**: AgLoggerManager のシングルトンインスタンス。
 
-**例外:**
+**例外**:
 
 - `AgLoggerError` - インスタンスが作成されていない場合
 
-**例:**
+例:
 
 ```typescript
 const manager = AgLoggerManager.getManager();
@@ -72,7 +75,7 @@ const manager = AgLoggerManager.getManager();
 
 シングルトンインスタンスをリセットし、管理下のロガーもリセットします。主にテスト目的で使用されます。
 
-**例:**
+例:
 
 ```typescript
 // テスト後のクリーンアップ
@@ -83,11 +86,11 @@ AgLoggerManager.resetSingleton();
 
 ### getLogger(): AgLogger
 
-管理下のAgLoggerインスタンスを取得します。
+管理下の AgLogger インスタンスを取得します。
 
-**戻り値:** 管理されているAgLoggerインスタンス
+**戻り値**: 管理されている AgLogger インスタンス。
 
-**例:**
+例:
 
 ```typescript
 const manager = AgLoggerManager.createManager();
@@ -98,13 +101,13 @@ logger.info('ログメッセージ');
 
 ### setLogger(logger: AgLogger): void
 
-管理するAgLoggerインスタンスを設定します。
+管理する AgLogger インスタンスを設定します。
 
-**パラメータ:**
+**パラメータ**:
 
-- `logger`: 管理するAgLoggerインスタンス
+- `logger`: 管理する AgLogger インスタンス
 
-**例:**
+例:
 
 ```typescript
 const manager = AgLoggerManager.createManager();
@@ -115,13 +118,13 @@ manager.setLogger(customLogger);
 
 ### setLoggerConfig(options: AgLoggerOptions): void
 
-管理下のロガーの設定を行います。内部のAgLoggerインスタンスに設定を適用します。
+管理下のロガーを設定します。内部の AgLogger インスタンスに設定を適用します。
 
-**パラメータ:**
+**パラメータ**:
 
 - `options`: ロガーの設定オプション
 
-**例:**
+例:
 
 ```typescript
 const manager = AgLoggerManager.createManager();
@@ -138,14 +141,14 @@ manager.setLoggerConfig({
 
 特定のログレベルに対してロガー関数をバインドします。管理下のロガーに設定を適用します。
 
-**パラメータ:**
+**パラメータ**:
 
 - `logLevel`: ログレベル
 - `loggerFunction`: ロガー関数
 
-**戻り値:** バインドが成功した場合は `true`
+**戻り値**: バインドが成功した場合は `true`
 
-**例:**
+例:
 
 ```typescript
 const manager = AgLoggerManager.createManager();
@@ -157,11 +160,11 @@ manager.bindLoggerFunction(AG_LOGLEVEL.ERROR, ConsoleLogger);
 
 ロガーマップを更新します。複数のログレベルに対して一度に設定を適用できます。
 
-**パラメータ:**
+**パラメータ**:
 
 - `loggerMap`: ログレベルとロガー関数のマッピング
 
-**例:**
+例:
 
 ```typescript
 const manager = AgLoggerManager.createManager();
@@ -177,13 +180,13 @@ manager.updateLoggerMap({
 
 特定のログレベルのロガー関数を削除します。
 
-**パラメータ:**
+**パラメータ**:
 
 - `logLevel`: 削除するログレベル
 
-**戻り値:** 削除が成功した場合は `true`
+**戻り値**: 削除が成功した場合は `true`
 
-**例:**
+例:
 
 ```typescript
 const manager = AgLoggerManager.createManager();
@@ -279,10 +282,12 @@ logger.debug('JSON形式のログ');
 
 ## 注意事項
 
-- AgLoggerManagerはシングルトンパターンで実装されているため、アプリケーション全体で同じインスタンスが使用されます
-- 管理下のロガーは単一のAgLoggerインスタンスであり、マネージャーを通じて設定が適用されます
-- `resetSingleton()` を呼び出すと、マネージャーと管理下のロガーの両方がリセットされます
-- マネージャーが作成されていない状態で `getManager()` を呼び出すとエラーがスローされます
+<!-- textlint-enable -->
+
+- AgLoggerManager はシングルトンパターンで実装されているため、アプリケーション全体で同じインスタンスが使用される
+- 管理下のロガーは単一の AgLogger インスタンスであり、マネージャーを通じて設定が適用される
+- `resetSingleton()` を呼び出すと、マネージャーと管理下のロガーの両方がリセットされる
+- マネージャーが作成されていない状態で `getManager()` を呼び出すとエラーがスローされる
 
 ## 関連項目
 

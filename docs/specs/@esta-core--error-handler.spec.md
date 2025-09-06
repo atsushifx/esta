@@ -3,9 +3,8 @@ header:
   - src: docs/specs/@esta-core-error-handler.spec.md
   - @(#) : ESTA Core error handling framework
 title: 📘 エラーハンドリング統一仕様書（@esta-core/error-handler）
+description: esta-coreパッケージのエラーハンドリング統一フレームワークの仕様書
 version: 1.2.0
-created: 2025-07-09
-updated: 2025-07-14
 authors:
   - 🧠 つむぎ（設計統一・exec 分離提案）
   - 🧁 小紅（例示＆分岐設計）
@@ -240,7 +239,7 @@ export const getExitCodeMessage = (code: TExitCode): string => {
 ```bash
 packages/@esta-core/error-handler/
 ├── package.json
-├── src/
+├── packages/esta-core/error-handler/src/
 │   ├── index.ts                    # エクスポート定義
 │   ├── errorExit.ts                # 非致命的エラー終了
 │   ├── fatalExit.ts                # 致命的エラー終了

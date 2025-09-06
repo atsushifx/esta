@@ -1,7 +1,24 @@
 ---
+header:
+  - src: docs/onboarding/08-package_json_scripts.md
+  - "@(#) : ESTA Onboarding Guide - Package.json Scripts Management"
 title: package.jsonのスクリプト管理
 description: monorepo構成における共通スクリプトとルートスクリプトの使い分け、管理方法について解説します。
+version: 1.0.0
+authors:
+  - 👤 atsushifx（オンボーディングガイド作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 sidebar_position: 8
+tags:
+  - onboarding
+  - scripts
+  - package-json
+  - monorepo
 ---
 
 ## 8 package.jsonのスクリプト管理
@@ -16,7 +33,7 @@ sidebar_position: 8
 > ※ `/shared/common/` 下のスクリプトは対象ディレクトリ構造が異なるため、同期の対象外です。
 > そのため、**手動での設定・更新が必要です。**
 
-各サブパッケージのスクリプト定義が統一され、メンテナンス作業の負担が大幅に減ります。
+各サブパッケージのスクリプト定義が統一され、メンテナンス作業の負担が減ります。
 
 一方、`monorepo`のルート（プロジェクトルート）では、
 **ルート固有のスクリプトや、全体に影響する管理用スクリプト**が定義されています。
@@ -53,7 +70,7 @@ sidebar_position: 8
 
 #### 実行方法
 
-次のコマンドにより、共通スクリプトファイルのスクリプトを、指定したパッケージの`package.json`に同期します:
+次のコマンドにより、共通スクリプトファイルのスクリプトを、指定したパッケージの`package.json`に同期:
 
 ```bash
 bash ./scripts/sync-configs.sh ./packages/<@package-name-space>/<your-package-name> package
@@ -61,7 +78,7 @@ bash ./scripts/sync-configs.sh ./packages/<@package-name-space>/<your-package-na
 
 > 💡 `--dry-run` を末尾に付加することで、dry-runモードで実行できます。
 
-また、`config_type` に `all` を指定すると、`secretlint.config.yaml` など他の共通設定もあわせて同期可能です:
+また、`config_type` に `all` を指定すると、`secretlint.config.yaml` など他の共通設定もあわせて同期可能:
 
 ```bash
 ./scripts/sync-configs.sh ./packages/your-package-name all
@@ -150,12 +167,12 @@ pnpm run sync:configs all
 
 *[表4-1] `<monorepo}`ルートの代表的なスクリプト*<!-- markdownlint-enable -->
 
-**補足**:
+補足:
 
-- `pnpm -r run <script>` は、すべてのサブパッケージに対してスクリプトを一括実行します。
-- 処理の順序が不要なタスク (例：`lint` や `clean`) では `--parallel` オプションをつけて並列実行することで高速化できます。
-- ルートの`lint-all`,`lint-all:types`スクリプトは、Lefthook での実行時に変更されたソースコードのみスキャンします。
-  ソースコード全体をスキャンする`lint`と違い、高速な実行が見込めます。
+- `pnpm -r run <script>` は、すべてのサブパッケージに対してスクリプトを一括実行する。
+- 処理の順序が不要なタスク (例：`lint` や `clean`) では `--parallel` オプションをつけて並列実行することで高速化できる。
+- ルートの`lint-all`,`lint-all:types`スクリプトは、Lefthook での実行時に変更されたソースコードのみスキャンする。
+  ソースコード全体をスキャンする`lint`と違い、高速な実行が見込める。
 
 #### Gitフックとの連携
 

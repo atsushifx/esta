@@ -1,6 +1,6 @@
 ---
 header:
-  - src: AgManagerUtils.md
+  - src: docs/api/AgManagerUtils.md
   - @(#): AgManagerUtils ユーティリティ APIリファレンス
 title: AgManagerUtils
 description: AgLoggerManagerの便利なユーティリティ関数群のAPIリファレンス
@@ -10,39 +10,42 @@ authors:
   - atsushifx
 changes:
   - 2025-08-24: 初版作成
+  - 2025-09-05: フロントマター標準化・見出し階層修正
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-# AgManagerUtils
+## AgManagerUtils
 
-AgLoggerManagerの便利なユーティリティ関数群。
+AgLoggerManager の便利なユーティリティ関数群。
 
 ## 概要
 
-`AgManagerUtils` はAgLoggerManagerとAgLoggerの作成・取得・管理を簡素化するためのユーティリティ関数群です。これらの関数を使用することで、より簡潔にロガーの操作を行うことができます。
+`AgManagerUtils` は AgLoggerManager と AgLogger の作成・取得・管理を簡素化するためのユーティリティ関数群です。これらの関数を使用することで、より簡潔にロガーを操作できます。
 
 ## 変数
 
+<!--textlint-disable ja-technical-writing/no-exclamation-question-mark -->
+
 ### AgManager: AgLoggerManager | undefined
 
-現在アクティブなAgLoggerManagerインスタンスを保持する変数。内部的に管理され、自動的に更新されます。
+現在アクティブな AgLoggerManager インスタンスを保持する変数。内部的に管理され、自動的に更新されます。
 
 ## 関数
 
 ### createManager(options?: AgLoggerOptions): AgLoggerManager
 
-AgLoggerManagerのインスタンスを作成し、グローバルなAgManager変数に設定します。
+AgLoggerManager のインスタンスを作成し、グローバルな AgManager 変数に設定します。
 
-**パラメータ:**
+**パラメータ**:
 
 - `options` (オプション): ロガーマネージャーの設定オプション
 
-**戻り値:** 作成されたAgLoggerManagerインスタンス
+**戻り値**: 作成された AgLoggerManager インスタンス。
 
-**例:**
+例:
 
 ```typescript
 import { AG_LOGLEVEL, ConsoleLogger, createManager, PlainFormatter } from '@agla-utils/ag-logger';
@@ -61,15 +64,15 @@ const manager = createManager({
 
 ### getLogger(): AgLogger
 
-現在アクティブなAgLoggerインスタンスを取得します。AgManagerが未初期化の場合は、既存のAgLoggerManagerから取得を試みます。
+現在アクティブな AgLogger インスタンスを取得します。AgManager が未初期化の場合は、既存の AgLoggerManager から取得を試みます。
 
-**戻り値:** AgLoggerインスタンス
+**戻り値**: AgLogger インスタンス。
 
-**例外:**
+**例外**:
 
 - `AgLoggerError` - ロガーが作成されていない場合
 
-**例:**
+例:
 
 ```typescript
 import { getLogger } from '@agla-utils/ag-logger';
@@ -84,11 +87,13 @@ logger.error('エラーが発生しました');
 
 ### setupManager(): void
 
-AgLoggerManagerのメソッドを拡張して、AgManager変数の自動管理を設定します。このセットアップにより、AgLoggerManagerの作成やリセット時にAgManager変数が自動的に更新されます。
+AgLoggerManager のメソッドを拡張して、AgManager 変数の自動管理を設定します。このセットアップにより、AgLoggerManager の作成やリセット時に AgManager 変数が自動的に更新されます。
 
-**注意:** この関数はモジュール読み込み時に自動的に実行されるため、通常は手動で呼び出す必要はありません。
+注意:
 
-**例:**
+- この関数はモジュール読み込み時に自動的に実行されるため、通常は手動で呼び出す必要はありません。
+
+例:
 
 ```typescript
 import { setupManager } from '@agla-utils/ag-logger';
@@ -194,7 +199,7 @@ try {
   logger.info('ログメッセージ');
 } catch (error) {
   console.error('ロガーの初期化が必要です:', error.message);
-  
+
   // 初期化してから再試行
   import { createManager } from '@agla-utils/ag-logger';
   createManager();
@@ -205,17 +210,19 @@ try {
 
 ## 利点
 
-- **簡潔性**: AgLoggerManagerの直接操作よりも簡潔な記述が可能
-- **一元管理**: グローバルなAgManager変数による統一された管理
-- **利便性**: どこからでも`getLogger()`でロガーにアクセス可能
-- **自動同期**: AgLoggerManagerの操作と自動的に同期される
+- 簡潔性: AgLoggerManager の直接操作よりも簡潔な記述が可能
+- 一元管理: グローバルな AgManager 変数による統一された管理
+- 利便性: どこからでも`getLogger()`でロガーにアクセス可能
+- 自動同期: AgLoggerManager の操作と自動的に同期される
 
 ## 注意事項
 
-- `setupManager()`はモジュール読み込み時に自動実行されるため、手動実行は通常不要です
+<!-- textlint-enable -->
+
+- `setupManager()`はモジュール読み込み時に自動実行されるため、手動実行は通常不要
 - `AgManager`変数は内部管理用のため、直接操作は推奨されません
-- エラー時は適切な例外処理を行ってください
-- マルチインスタンス環境では、最後に作成されたマネージャーが優先されます
+- エラー時は例外処理を行う
+- マルチインスタンス環境では、最後に作成されたマネージャーが優先される
 
 ## 関連項目
 

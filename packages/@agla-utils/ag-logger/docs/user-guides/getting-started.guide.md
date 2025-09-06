@@ -1,15 +1,15 @@
 ---
 header:
-  - src: getting-started.guide.md
+  - src: docs/user-guides/getting-started.guide.md
   - @(#): AgLogger 導入ガイド（軽量版）
 title: AgLogger 導入ガイド（軽量版）
 description: 最小構成での導入と基本設定の要点をまとめたガイド
-version: 1.0.0
-created: 2025-08-25
+version: 0.3.0
+created: 2025-09-05
 authors:
   - atsushifx
 changes:
-  - 2025-08-25: 初版作成
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.

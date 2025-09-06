@@ -1,53 +1,55 @@
 ---
 header:
-  - src: AgFormatFunction.md
-  - "@(#)": フォーマッター関数型 APIリファレンス
+  - src: packages/@agla-utils/ag-logger/docs/api/types/AgFormatFunction.md
+  - @(#): フォーマッター関数型 APIリファレンス
 title: AgFormatFunction
 description: ログメッセージをフォーマットする関数の型定義のAPIリファレンス
 version: 0.3.0
-created: 2025-08-25
+created: 2025-09-05
 authors:
   - atsushifx
 changes:
-  - 2025-08-25: 初版作成
+  - 2025-09-05: 初版作成（パッケージドキュメント標準化）
 copyright:
   - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
   - This software is released under the MIT License.
   - https://opensource.org/licenses/MIT
 ---
 
-## AgFormatFunction
-
-### 概要
+## 概要
 
 **AgFormatFunction**は、ログメッセージをフォーマットする関数の型定義です。`AgLogMessage`オブジェクトを受け取り、フォーマット済みの文字列を返します。タイムスタンプ、ログレベル、メッセージの組み合わせ方を自由に定義でき、プレーンテキスト、JSON、カスタム形式など様々な出力形式に対応できます。
 
-### 型定義
+## 型定義
 
 ```typescript
 export type AgFormatFunction = (logMessage: AgLogMessage) => AgFormattedLogMessage;
 ```
 
-### パラメータ・戻り値
+## パラメータ・戻り値
 
-#### パラメータ
+### パラメータ
 
-**`logMessage: AgLogMessage`** - フォーマット対象のログメッセージオブジェクト
+**`logMessage: AgLogMessage`** - フォーマット対象のログメッセージオブジェクト。
 
 プロパティ:
+
+<!-- textlint-disable ja-technical-writing/sentence-length, ja-technical-writing/max-comma -->
 
 - `logLevel: AgLogLevel` - ログレベル数値 (FATAL=1, ERROR=2, WARN=3, INFO=4, DEBUG=5, TRACE=6, VERBOSE=-99, LOG=99)
 - `timestamp: Date` - ログ出力時のタイムスタンプ
 - `message: string` - メインのログメッセージテキスト
 - `args: readonly unknown[]` - 追加引数配列 (オプション)
 
-#### 戻り値
+<!-- textlint-enable -->
+
+### 戻り値
 
 **`AgFormattedLogMessage`** - フォーマット済みメッセージ (通常は文字列)
 
-### 既存フォーマッター例
+## 既存フォーマッター例
 
-#### PlainFormatter
+### PlainFormatter
 
 プレーンテキスト形式のフォーマッター (`[timestamp] LEVEL message ...args`)
 
@@ -60,13 +62,13 @@ createManager({
 });
 const logger = getLogger();
 
-logger.info('起動しました', { version: '1.0.0' });
-// 出力例: 2025-08-25T10:30:00Z [INFO] 起動しました {"version":"1.0.0"}
+logger.info('起動しました', { version: '0.3.0' });
+// 出力例: 2025-08-25T10:30:00Z [INFO] 起動しました {"version":"0.3.0"}
 ```
 
-#### JsonFormatter
+### JsonFormatter
 
-JSON形式のフォーマッター (構造化ログ出力)
+JSON 形式のフォーマッター (構造化ログ出力)
 
 ```typescript
 import { ConsoleLogger, createManager, getLogger, JsonFormatter } from '@agla-utils/ag-logger';
@@ -81,9 +83,9 @@ logger.debug('ユーザー取得', { userId: 42 });
 // 出力例: {"timestamp":"2025-08-25T10:30:00.123Z","level":"DEBUG","message":"ユーザー取得","args":[{"userId":42}]}
 ```
 
-### カスタムフォーマッター作成例
+## カスタムフォーマッター作成例
 
-#### シンプルなカスタムフォーマッター
+### シンプルなカスタムフォーマッター
 
 ```typescript
 import type { AgFormatFunction } from '@agla-utils/ag-logger';
@@ -98,7 +100,7 @@ const simpleFormatter: AgFormatFunction = (logMessage) => {
 // 出力例: 10:30:00 [INFO] 起動しました
 ```
 
-#### 色付きコンソールフォーマッター
+### 色付きコンソールフォーマッター
 
 ```typescript
 import type { AgFormatFunction } from '@agla-utils/ag-logger';
@@ -125,7 +127,7 @@ const colorFormatter: AgFormatFunction = (logMessage) => {
 // 出力例: 10:30:00 [INFO] 起動しました (シアン色で表示)
 ```
 
-#### 詳細情報付きフォーマッター
+### 詳細情報付きフォーマッター
 
 ```typescript
 import type { AgFormatFunction } from '@agla-utils/ag-logger';
@@ -142,10 +144,10 @@ const detailedFormatter: AgFormatFunction = (logMessage) => {
   return `[${timestamp}] [PID:${pid}] [${level}] ${logMessage.message}${argsString}`;
 };
 
-// 出力例: [2025-08-25T10:30:00.123Z] [PID:1234] [INFO] 起動しました | Args: [{"version":"1.0.0"}]
+// 出力例: [2025-08-25T10:30:00.123Z] [PID:1234] [INFO] 起動しました | Args: [{"version":"0.3.0"}]
 ```
 
-#### 環境別フォーマッター
+### 環境別フォーマッター
 
 ```typescript
 import type { AgFormatFunction } from '@agla-utils/ag-logger';
@@ -161,7 +163,7 @@ const environmentFormatter: AgFormatFunction = (logMessage) => {
 };
 ```
 
-#### ファイル出力用フォーマッター
+### ファイル出力用フォーマッター
 
 ```typescript
 import type { AgFormatFunction } from '@agla-utils/ag-logger';
@@ -180,18 +182,18 @@ const fileFormatter: AgFormatFunction = (logMessage) => {
 };
 ```
 
-### 注意事項
+## 注意事項
 
-#### パフォーマンス
+### パフォーマンス
 
 - フォーマッター関数は頻繁に呼び出されるため、重い処理は避けてください
 - JSON.stringify や複雑な文字列操作は必要最小限に留めてください
-- 同期的な処理のみ実装してください（非同期処理は未対応）
+- 同期的な処理のみ実装してください (非同期処理は未対応)
 
-#### エラーハンドリング
+### エラーハンドリング
 
-- フォーマッター内でエラーが発生すると、ログ出力全体が停止する可能性があります
-- try-catch でエラーをキャッチし、フォールバック処理を実装することを推奨します
+- フォーマッター内でエラーが発生した場合、ログ出力全体が停止する可能性
+- try-catch でエラーをキャッチし、フォールバック処理を実装することを推奨
 
 ```typescript
 const safeFormatter: AgFormatFunction = (logMessage) => {
@@ -205,15 +207,15 @@ const safeFormatter: AgFormatFunction = (logMessage) => {
 };
 ```
 
-#### メモリ使用量
+### メモリ使用量
 
 - 大量のログ出力時は、フォーマッター関数でのメモリ使用量に注意してください
 - 不要なオブジェクト作成や文字列結合を最小限に留めてください
 
-### 関連項目
+## 関連項目
 
 - [`AgLogMessage`](./AgLogMessage.md) - フォーマッター入力となるログメッセージ型
 - [`AgFormattedLogMessage`](./AgFormattedLogMessage.md) - フォーマッター出力型
 - [`AgLoggerOptions`](./AgLoggerOptions.md) - フォーマッター設定を含むオプション型
 - [`PlainFormatter`](../plugins/PlainFormatter.md) - 標準プレーンテキストフォーマッター
-- [`JsonFormatter`](../plugins/JsonFormatter.md) - 標準JSONフォーマッター
+- [`JsonFormatter`](../plugins/JsonFormatter.md) - 標準 JSON フォーマッター

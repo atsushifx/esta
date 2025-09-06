@@ -15,7 +15,11 @@
     "typescript",
     "monorepo"
   ],
-  "packageManager": "pnpm@10.15.0",
+  "packageManager": "pnpm@10.15.1",
+  "engines": {
+    "node": ">=20",
+    "pnpm:": ">=10"
+  },
   "scripts": {
     "build": "pnpm -r run build",
     "build:esm": "pnpm -r run build:esm",
@@ -36,7 +40,8 @@
     "lint:secrets": "secretlint --secretlintrc ./configs/secretlint.config.yaml --secretlintignore .gitignore --maskSecrets **/*",
     "test:develop": "pnpm -r run test:develop",
     "test:ci": "pnpm -r run test:ci",
-    "test:gha": "pnpm exec vitest run --config ./configs/vitest.config.gha.ts",
+    "new:doc": "tsx ./scripts/new-doc.ts",
+    "lint:docs": "tsx ./scripts/check-doc-frontmatter.ts",
     "sync:configs": "bash scripts/sync-configs.sh"
   },
   "devDependencies": {
@@ -47,8 +52,8 @@
     "@secretlint/secretlint-rule-preset-recommend": "^9.3.4",
     "@textlint/types": "^14.8.4",
     "@types/node": "^22.18.0",
-    "@typescript-eslint/eslint-plugin": "^8.41.0",
-    "@typescript-eslint/parser": "^8.41.0",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
     "eslint": "^9.34.0",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",

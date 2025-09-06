@@ -1,7 +1,25 @@
 ---
+header:
+  - src: docs/onboarding/10-writing_tools.md
+  - @(#) : ESTA Onboarding Guide - Writing Support Tools Configuration
 title: ライティング支援ツールの設定
 description: 文章作成用の品質チェックツール`textlint`,`CSpell`などの設定方法
+version: 1.0.0
+authors:
+  - 👤 atsushifx（オンボーディングガイド作成）
+changes:
+  - 2025-09-05: フロントマター標準化対応
+copyright:
+  - Copyright (c) 2025 atsushifx <https://github.com/atsushifx>
+  - This software is released under the MIT License.
+  - https://opensource.org/licenses/MIT
 sidebar_position: 10
+tags:
+  - onboarding
+  - writing
+  - tools
+  - textlint
+  - cspell
 ---
 
 ## 10 ライティング支援ツールの設定
@@ -48,9 +66,9 @@ sidebar_position: 10
 
 *[表3-1] 各ツールの`pnpm`スクリプト*
 
-> **注意**:
-> `pnpm run <script>`コマンドは、プロジェクトルートで実行する必要があります
-> 実行時には、ファイルを指定する必要があります
+> 注意:
+> `pnpm run <script>`コマンドは、プロジェクトルートで実行します
+> 実行時に、ファイルを指定します
 > ファイルの指定に`Glob`が使用できます
 
 ### 10.4 `textlint`と基本の設定
@@ -102,17 +120,17 @@ sidebar_position: 10
 ある文字列が、`/configs/.textlint/allowlist.yml`に設定した文字列、および正規表現文字列に合致した場合は
 エラーになりません (CI やエディタでの表示も含む)。
 
-現在、`allowlist`には以下が設定されています:
+以下が、現在の`allowlist`:
 
 ```yaml
 - "/[0-9]+[つ回個番版画面行列種章年月日割分%文字段台]/"
 ```
 
 これにより、"数+数詞"という表現は空白を入れずに入力できます。
-たとえば、以下のような表現は通常 `ja-space-between-half-and-full-width` ルールで警告されます:
+次の表現は、`ja-space-between-half-and-full-width` ルールで警告される。
 
-- ❌ `1年`
-- ✅ `1 年`
+- `1年` : ×
+- `1 年` : 〇
 
 ですが、`allowlist.yml` により `"1年"` のような数詞表現は例外として扱われます。
 
@@ -149,7 +167,7 @@ sidebar_position: 10
 `markdownlint`は、`/configs/.markdownlint.yaml`のルールに基づいて文法チェックをします。
 ルールの説明は、[Rules](https://github.com/DavidAnson/markdownlint/blob/v0.32.1/doc/Rules.md) を参照してください。
 
-現在の`.markdownlint.yaml`は、次のようになっています:
+以下が現在の`.markdownlint.yaml`:
 
 ```yaml
 default: true
@@ -181,11 +199,11 @@ no-hard-tabs: true
 
 **ポイント解説**:
 
-- `default: true`: 標準的な markdownlint ルールを網羅的に有効化します。これにより多くの基本的な文法チェックを自動で行えます。
-- `whitespace: true`: マークダウンの空白に関するルールを一括で有効にします。文末の不要な空白、行頭のスペースなどを取り除き、見た目の崩れや誤認識を防ぎ、文書の整合性を保ちます。
-- line-length: 120`,`code_block_line_length: 120`:1行当たりの最大文字数を 120文字に制限し、コードブロックにも同じ制限を適用します。
-- `no-hard-tabs: true`: タブ文字の混入を防ぎ、コードや文章の整形の一貫性を保ちます。
-- `emphasis-style`, `strong-style`: マークダウンで協調表現に使う記号をアスタリスク('*')に統一しています。
+- `default: true`: 標準的な markdownlint ルールを網羅的に有効化する。これにより多くの基本的な文法チェックを自動かできる。
+- `whitespace: true`: マークダウンの空白に関するルールを一括で有効すり。文末の不要な空白、行頭のスペースなどを取り除き、見た目の崩れや誤認識を防ぎ、文書の整合性を保つ。
+- line-length: 120`,`code_block_line_length: 120`:1行当たりの最大文字数を 120文字に制限し、コードブロックにも同じ制限を適用する。
+- `no-hard-tabs: true`: タブ文字の混入を防ぎ、コードや文章の整形の一貫性を保つ。
+- `emphasis-style`, `strong-style`: マークダウンで協調表現に使う記号をアスタリスク('*')に統一する。
 
 #### `markdownlint`のエラーの無視
 
@@ -203,7 +221,7 @@ no-hard-tabs: true
 `CSpell`の`Visual Studio Code (VSCode)`拡張機能は、`.vscode/cspell.json`を自動的に読み込みます。
 そのため、基本設定ファイルは`.vscode/cspell.json`として作成しています。
 
-`.vscode/cspell.json`の内容は次の通りです:
+以下が、`.vscode/cspell.json`:
 
 ```json
 {
@@ -237,20 +255,20 @@ no-hard-tabs: true
 
 **ポイント解説**:
 
-- import: `cspell.json`は`import`文で外部の設定を読み込むことができます。
-  ここでは、環境変数`XDG_CONFIG_HOME`下の`cspell.config.json`を読み込んで、ユーザー専用辞書を設定しています。
+- import: `cspell.json`は`import`文で外部の設定を読み込むことができる。
+  ここでは、環境変数`XDG_CONFIG_HOME`下の`cspell.config.json`を読み込んで、ユーザー専用辞書を設定している。
 
-- `dictionaryDefinition`: プロジェクト専用辞書を設定しています。ここで設定した`project-dic`では、本プロジェクトでのみ使用する英単語を追加します。
+- `dictionaryDefinition`: プロジェクト専用辞書を設定している。ここで設定した`project-dic`では、本プロジェクトでのみ使用する英単語を追加する。
 
-- `dictionaries`: 単語チェックに使用する辞書を指定します。
-  拡張辞書: <https://github.com/streetsidesoftware/cspell-dicts> は、`HTML`,`CSS`などの技術用語の単語のスペルチェックに使用されます。
+- `dictionaries`: 単語チェックに使用する辞書を指定する。
+  拡張辞書: <https://github.com/streetsidesoftware/cspell-dicts> は、`HTML`,`CSS`などの技術用語の単語のスペルチェックに使用される。
 
 #### ユーザー辞書の設定
 
 環境変数`XDG_CONFIG_HOME` (通常、`~/.config`) 下の`cspell.config.json`を読み込むことで、ユーザー専用辞書が使用できます。
 ユーザー専用辞書に、自分のハンドルなど専用で使う単語を登録することで、その単語に関してエラーを出さないようにできます。
 
-`cspell.config.json`の内容は、次の通りです:
+以下が、`cspell.config.json`:
 
 ```json
 {
@@ -288,16 +306,16 @@ no-hard-tabs: true
 }
 ```
 
-**ポイント**:
+ポイント:
 
-- `dictionaryDefinitions`: ユーザー専用辞書`user-dic`, `textlint-dic`を設定しています。
-- `dictionaries`: プロジェクトで使用する辞書を設定しています。`cspell.json`で上書きされるため、ここの設定は無視されます。
-- `useGitignore`: `.gitignore`で指定したファイルを cspell の英単語チェックから除外します。
+- `dictionaryDefinitions`: ユーザー専用辞書`user-dic`, `textlint-dic`を設定している。
+- `dictionaries`: プロジェクトで使用する辞書を設定している。`cspell.json`で上書きされるため、ここの設定は無視される。
+- `useGitignore`: `.gitignore`で指定したファイルを cspell の英単語チェックから除外する。
 
 > ※ 補足
 >
-> - `dictionaries` は設定ファイルで明示的に指定すると、それまでの辞書設定を上書きします。複数の設定ファイルを使う場合は、辞書の指定が競合しないよう注意してください。
-> - `useGitignore` を `true` に設定すると、コマンドラインや CI 実行時には `.gitignore` に記載されたファイルがスペルチェック対象から除外されます。ただし、VSCode の CSpell 拡張機能は開いているファイルをリアルタイムにチェックするため、除外ファイルであっても編集画面上はチェックが動作します。
+> - `dictionaries` は設定ファイルで明示的に指定すると、それまでの辞書設定を上書きする。複数の設定ファイルを使う場合は、辞書の指定が競合しないよう注意してください。
+> - `useGitignore` を `true` に設定すると、コマンドラインや CI 実行時には `.gitignore` に記載されたファイルがスペルチェック対象から除外される。ただし、VSCode の CSpell 拡張機能は開いているファイルをリアルタイムにチェックするため、除外ファイルであっても編集画面上はチェックが動作する。
 >   VSCode 上で除外したい場合は、拡張機能の設定やワークスペース設定で別途ファイル除外を設定してください。
 
 ### 10.7 ライティング支援ツールに関するチェックポイント
