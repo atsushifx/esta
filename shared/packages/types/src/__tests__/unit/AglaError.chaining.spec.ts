@@ -1,11 +1,27 @@
 // src: src/__tests__/unit/AglaError.chaining.spec.ts
-// @(#) : AglaError チェーン動作 単体テスト
+// @(#): AglaError chain method unit tests
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
+// Testing framework
 import { describe, expect, it } from 'vitest';
+
+// Test utilities
 import { TestAglaError } from '../helpers/TestAglaError.class.ts';
 
+/**
+ * AglaError chain method unit tests
+ * Tests error chaining functionality including message combination, property preservation, and context merging
+ */
 describe('Given AglaError method chaining', () => {
+  /**
+   * Normal error chaining scenarios with valid Error objects
+   */
   describe('When chaining with cause error', () => {
+    // Message combination: combines original and cause messages with standard format
     it('Then should combine messages and preserve properties', () => {
       const originalError = new TestAglaError('TEST_ERROR', 'Original message');
       const causeError = new Error('Cause message');
@@ -17,6 +33,7 @@ describe('Given AglaError method chaining', () => {
       expect(chainedError).toBeInstanceOf(TestAglaError);
     });
 
+    // Context merging: preserves original context and adds cause information
     it('Then should merge context with cause information', () => {
       const originalContext = { userId: '123', operation: 'test' };
       const originalError = new TestAglaError('TEST_ERROR', 'Original message', { context: originalContext });
@@ -34,6 +51,7 @@ describe('Given AglaError method chaining', () => {
       });
     });
 
+    // Immutability: returns new instance rather than modifying original
     it('Then 正常系：should return new error instance', () => {
       const originalError = new TestAglaError('TEST_ERROR', 'Original message');
       const causeError = new Error('Cause message');
@@ -43,19 +61,25 @@ describe('Given AglaError method chaining', () => {
     });
   });
 
+  /**
+   * Edge case scenarios with invalid or non-Error cause parameters
+   */
   describe('When chaining with invalid or non-Error causes', () => {
+    // Null handling: should throw appropriate error for null cause
     it('Then 異常系：should handle null cause gracefully', () => {
       const originalError = new TestAglaError('TEST_ERROR', 'Original message');
       const nullCause = null as unknown as Error;
       expect(() => originalError.chain(nullCause)).toThrow();
     });
 
+    // Undefined handling: should throw appropriate error for undefined cause
     it('Then 異常系：should handle undefined cause gracefully', () => {
       const originalError = new TestAglaError('TEST_ERROR', 'Original message');
       const undefinedCause = undefined as unknown as Error;
       expect(() => originalError.chain(undefinedCause)).toThrow();
     });
 
+    // String cause: attempts to access message property from non-Error object
     it('Then 正常系：should handle string cause by accessing message property', () => {
       const originalError = new TestAglaError('TEST_ERROR', 'Original message');
       const stringCause = 'string error' as unknown as Error;
@@ -63,6 +87,7 @@ describe('Given AglaError method chaining', () => {
       expect(stringChainedError.message).toBe('Original message (caused by: undefined)');
     });
 
+    // Object cause: extracts message from object with message property
     it('Then エッジケース：should handle object cause by accessing message property', () => {
       const originalError = new TestAglaError('TEST_ERROR', 'Original message');
       const objectCause = { message: 'object error message' } as unknown as Error;

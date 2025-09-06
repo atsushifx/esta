@@ -1,15 +1,30 @@
 // src: src/__tests__/functional/CompleteWorkflows.functional.spec.ts
-// @(#) : 完全ワークフロー（シリアライズ/チェーン）を網羅する機能テスト
+// @(#): Complete workflow functional tests (serialization and chaining)
 //
-// Copyright (c) 2025 atsushifx
-// MIT License
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
+// Testing framework
 import { describe, expect, it } from 'vitest';
+
+// Type definitions
 import { ErrorSeverity } from '../../../types/ErrorSeverity.types.js';
+
+// Test utilities
 import { TestAglaError } from '../helpers/TestAglaError.class.ts';
 
+/**
+ * Complete workflow functional tests
+ * Tests end-to-end scenarios combining error chaining, serialization, and context merging
+ */
 describe('Complete Workflows', () => {
+  /**
+   * Error chaining workflow with context merging and serialization
+   */
   describe('Error chaining workflow', () => {
+    // Complete chaining workflow: tests message combination, property preservation, and serialization
     it('combines messages, preserves errorType, and merges context', () => {
       const originalError = new TestAglaError(
         'WORKFLOW_ERROR',
@@ -53,7 +68,11 @@ describe('Complete Workflows', () => {
     });
   });
 
+  /**
+   * Complex serialization scenarios with nested data structures
+   */
   describe('Complex serialization workflow', () => {
+    // Deep serialization: handles nested objects, arrays, and complex data structures
     it('serializes deeply nested context and preserves fields', () => {
       const complexContext = {
         user: { id: '123', name: 'John Doe', roles: ['admin', 'user'] },

@@ -1,12 +1,30 @@
 // src: tests/integration/SerializationCompatibility.integration.spec.ts
-// @(#) : シリアライゼーション互換性（往復/フォーマット/ストリーミング）統合テスト
+// @(#): Serialization compatibility integration tests (round-trip, formats, streaming)
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
+// Testing framework
 import { describe, expect, it } from 'vitest';
-import { TestAglaError } from '../../src/__tests__/helpers/TestAglaError.class.ts';
+
+// Type definitions
 import { ErrorSeverity } from '../../types/ErrorSeverity.types.js';
 
+// Test utilities
+import { TestAglaError } from '../../src/__tests__/helpers/TestAglaError.class.ts';
+
+/**
+ * Serialization compatibility integration tests
+ * Tests JSON round-trip consistency and format compatibility across serialization scenarios
+ */
 describe('Serialization Compatibility', () => {
+  /**
+   * JSON round-trip serialization tests
+   */
   describe('JSON round-trip', () => {
+    // Round-trip consistency: maintains data integrity through JSON parse/stringify cycle
     it('maintains round-trip consistency', () => {
       const timestamp = new Date('2025-09-01T00:00:00.000Z');
       const error = new TestAglaError('ROUND_TRIP', 'Round trip test', {

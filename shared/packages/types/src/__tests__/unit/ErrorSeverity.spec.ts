@@ -9,15 +9,22 @@
 // Testing framework
 import { describe, expect, it } from 'vitest';
 
-// Type definitions and utilities
+// Type definitions
 import { isValidErrorSeverity } from '../../../types/ErrorSeverity.types.js';
 
 /**
- * Test suite for ErrorSeverity enum constant values.
- * Verifies that enum members have correct string values.
+ * ErrorSeverity validation functions unit tests
+ * Tests isValidErrorSeverity function with various input types and edge cases
+ */
+/**
+ * ErrorSeverity列挙型値の検証テスト
  */
 describe('Given ErrorSeverity enum values', () => {
+  /**
+   * isValidErrorSeverity function validation scenarios
+   */
   describe('When validating with isValidErrorSeverity', () => {
+    // Edge case validation: rejects case variants, whitespace, and numeric strings
     it('Then エッジケース：should handle edge case values', () => {
       // Arrange
       const edgeCaseValues = [
@@ -40,6 +47,7 @@ describe('Given ErrorSeverity enum values', () => {
       });
     });
 
+    // Special value rejection: handles Symbol, BigInt, and special numeric values
     it('Then エッジケース：should handle special JavaScript values', () => {
       // Arrange
       const specialValues = [

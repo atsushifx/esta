@@ -1,16 +1,31 @@
 // src: src/__tests__/functional/ErrorPropagation.functional.spec.ts
-// @(#) : エラー伝播（多段チェーン、関数境界越え）機能テスト
+// @(#): Error propagation functional tests (multi-level chaining and function boundaries)
 //
-// Copyright (c) 2025
-// MIT License
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
+// Testing framework
 import { describe, expect, it } from 'vitest';
+
+// Type definitions
 import type { AglaError } from '../../../types/AglaError.types.js';
 import { ErrorSeverity } from '../../../types/ErrorSeverity.types.js';
+
+// Test utilities
 import { TestAglaError } from '../helpers/TestAglaError.class.ts';
 
+/**
+ * Error propagation functional tests
+ * Tests multi-level error chaining and propagation across function boundaries
+ */
 describe('Error Propagation', () => {
+  /**
+   * Multi-level error chaining scenarios
+   */
   describe('Multi-level chaining', () => {
+    // Multi-level preservation: tests property preservation through multiple chaining levels
     it('preserves base properties across levels and appends causes', () => {
       const timestamp = new Date('2025-08-29T21:42:00Z');
       const base = new TestAglaError('MULTI_LEVEL_ERROR', 'Base level error', {
@@ -36,7 +51,14 @@ describe('Error Propagation', () => {
     });
   });
 
+  /**
+   * Error propagation across different function contexts
+   */
   describe('Propagation across function boundaries', () => {
+    /**
+     * Simulates a service layer error with database failure
+     * @returns AglaError with service context and chained cause
+     */
     const service = (): AglaError => {
       try {
         // Simulate low-level failure
@@ -50,12 +72,17 @@ describe('Error Propagation', () => {
       }
     };
 
+    /**
+     * Simulates a controller layer error that enriches service error
+     * @returns AglaError with additional controller context
+     */
     const controller = (): AglaError => {
       const err = service();
       // enrich at controller level
       return err.chain(new Error('Controller observed failure'));
     };
 
+    // Cross-boundary propagation: maintains error properties while enriching context
     it('keeps severity and accumulates context', () => {
       const propagated = controller();
       expect(propagated.severity).toBe(ErrorSeverity.ERROR);

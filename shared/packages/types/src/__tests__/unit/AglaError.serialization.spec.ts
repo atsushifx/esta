@@ -1,15 +1,33 @@
 // src: src/__tests__/unit/AglaError.serialization.spec.ts
-// @(#) : AglaError JSON/toString シリアライゼーション単体テスト
+// @(#): AglaError serialization (toJSON/toString) unit tests
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
+// Testing framework
 import { describe, expect, it } from 'vitest';
-import { AglaError } from '../../../types/AglaError.types.ts';
-import { ErrorSeverity } from '../../../types/ErrorSeverity.types.ts';
+
+// Type definitions
+import { AglaError } from '../../../types/AglaError.types.js';
+import { ErrorSeverity } from '../../../types/ErrorSeverity.types.js';
+
+// Test utilities
 import { TestAglaError } from '../helpers/TestAglaError.class.ts';
 
 type _TCircularContext = { name: string; self?: _TCircularContext };
 
+/**
+ * AglaError serialization unit tests
+ * Tests toJSON and toString methods for various property combinations and edge cases
+ */
 describe('Given AglaError instance for JSON serialization', () => {
+  /**
+   * Basic toJSON method functionality with minimal properties
+   */
   describe('When calling toJSON with basic properties only', () => {
+    // Basic serialization: includes required errorType and message fields
     it('Then should include errorType and message', () => {
       const errorType = 'TEST_ERROR';
       const message = 'Test message';
@@ -18,6 +36,7 @@ describe('Given AglaError instance for JSON serialization', () => {
       expect(json).toEqual({ errorType, message });
     });
 
+    // Context inclusion: adds context object when provided in constructor
     it('Then 正常系：should include context when present', () => {
       const context = { userId: '123', operation: 'test' };
       const error = new TestAglaError('TEST_ERROR', 'Test message', { context });
@@ -25,6 +44,7 @@ describe('Given AglaError instance for JSON serialization', () => {
       expect(json).toEqual({ errorType: 'TEST_ERROR', message: 'Test message', context });
     });
 
+    // Timestamp formatting: converts Date objects to ISO string format
     it('Then 正常系：should include all properties with correct formatting', () => {
       const timestamp = new Date('2025-08-29T21:42:00Z');
       const error = new TestAglaError('TEST_ERROR', 'Test message', { timestamp });
@@ -33,6 +53,7 @@ describe('Given AglaError instance for JSON serialization', () => {
     });
   });
 
+  // Circular reference handling: should throw when JSON.stringify encounters cycles
   it('Then should handle circular reference edge case', () => {
     const circularContext: _TCircularContext = { name: 'circular' };
     circularContext.self = circularContext;
@@ -41,8 +62,16 @@ describe('Given AglaError instance for JSON serialization', () => {
   });
 });
 
+/**
+ * AglaError toString method tests
+ * Tests string representation format and property combinations
+ */
 describe('Given AglaError string representation', () => {
+  /**
+   * Basic toString method functionality
+   */
   describe('When converting to string', () => {
+    // String format consistency: follows 'errorType: message context' pattern
     it('Then should follow consistent format with context', () => {
       const errorType = 'TEST_ERROR';
       const message = 'Test message';
@@ -54,7 +83,11 @@ describe('Given AglaError string representation', () => {
     });
   });
 
+  /**
+   * Complex property combination scenarios
+   */
   describe('When handling special property combinations', () => {
+    // Severity enumeration: tests all ErrorSeverity values with context
     it('Then エッジケース：should handle all severity levels with context', () => {
       const severities = [ErrorSeverity.FATAL, ErrorSeverity.ERROR, ErrorSeverity.WARNING, ErrorSeverity.INFO];
       const context = { test: 'context' };
@@ -65,6 +98,7 @@ describe('Given AglaError string representation', () => {
       });
     });
 
+    // Complete property set: tests all optional properties together
     it('Then エッジケース：should handle complete property set', () => {
       const timestamp = new Date('2025-12-31T23:59:59.999Z');
       const severity = ErrorSeverity.FATAL;
@@ -78,8 +112,16 @@ describe('Given AglaError string representation', () => {
   });
 });
 
+/**
+ * AglaError interface compatibility tests
+ * Tests type system integration and implementation consistency
+ */
 describe('Given AglaError instance for string representation', () => {
+  /**
+   * Interface method verification and type compatibility
+   */
   describe('When calling toString with basic properties', () => {
+    // Type processing: tests error processing functions with AglaError instances
     it('Then should include errorType in output', () => {
       type ProcessedError = { type: string; serialized: unknown; chained: AglaError };
       const errorProcessor = (error: AglaError): ProcessedError => ({
@@ -95,6 +137,7 @@ describe('Given AglaError instance for string representation', () => {
       });
     });
 
+    // Union type support: handles mixed AglaError and Error arrays
     it('Then 正常系：should support union types with Error class', () => {
       const mixedErrors: (AglaError | Error)[] = [
         new TestAglaError('TEST_TYPE', 'Test message'),
@@ -109,6 +152,7 @@ describe('Given AglaError instance for string representation', () => {
       });
     });
 
+    // Interface consistency: verifies all required methods are available
     it('Then 正常系：should provide consistent interface methods', () => {
       const implementations = [new TestAglaError('TEST', 'msg')];
       implementations.forEach((impl) => {
@@ -119,6 +163,7 @@ describe('Given AglaError instance for string representation', () => {
       });
     });
 
+    // Property consistency: ensures base properties exist across implementations
     it('Then 正常系：should maintain property consistency across implementations', () => {
       const baseProps = ['errorType', 'message', 'name', 'stack'] as const;
       const implementations = [new TestAglaError('TEST_ERROR', 'Test message')];

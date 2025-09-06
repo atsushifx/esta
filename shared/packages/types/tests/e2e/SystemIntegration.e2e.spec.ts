@@ -1,9 +1,19 @@
 // src: tests/e2e/SystemIntegration.e2e.spec.ts
-// @(#) : システム統合E2E（FS→HTTP→集約レポート）
+// @(#): System integration E2E tests (FS→HTTP→aggregated reporting)
+//
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
+// Testing framework
 import { describe, expect, it, vi } from 'vitest';
-import { TestAglaError } from '../../src/__tests__/helpers/TestAglaError.class.ts';
+
+// Type definitions
 import { ErrorSeverity } from '../../types/ErrorSeverity.types.js';
+
+// Test utilities
+import { TestAglaError } from '../../src/__tests__/helpers/TestAglaError.class.ts';
 
 const fs = { readFile: vi.fn() };
 const http = { get: vi.fn() };

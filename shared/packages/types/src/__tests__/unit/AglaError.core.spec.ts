@@ -8,17 +8,20 @@
 import { describe, expect, it } from 'vitest';
 
 // Type definitions
-import type { AglaErrorOptions } from '../../../types/AglaError.types.ts';
-import { ErrorSeverity } from '../../../types/ErrorSeverity.types.ts';
+import type { AglaErrorOptions } from '../../../types/AglaError.types.js';
+import { ErrorSeverity } from '../../../types/ErrorSeverity.types.js';
 
 // Test utilities
-import type { _TAglaErrorContextWithSymbols } from '../helpers/test-types.types.ts';
+import type { _TAglaErrorContextWithSymbols } from '../helpers/test-types.types.js';
 import { TestAglaError } from '../helpers/TestAglaError.class.ts';
 
 /**
  * コンストラクタの基本動作とプロパティ設定の確認
  */
 describe('Given AglaError constructor with valid inputs', () => {
+  /**
+   * 基本パラメータのみでエラーを作成する際のテスト
+   */
   describe('When creating error with basic parameters only', () => {
     it('Then 正常系：should set severity option', () => {
       const error = new TestAglaError('TEST_ERROR', 'Test error message', { severity: ErrorSeverity.ERROR });
@@ -50,6 +53,9 @@ describe('Given AglaError constructor with valid inputs', () => {
     });
   });
 
+  /**
+   * 無効またはエッジケースパラメータでエラーを作成する際のテスト
+   */
   describe('When creating error with invalid or edge case parameters', () => {
     it('Then should handle invalid timestamp gracefully', () => {
       const invalidDate = new Date('invalid-date');
@@ -114,7 +120,13 @@ describe('Given AglaError constructor with valid inputs', () => {
   });
 });
 
+/**
+ * AglaErrorプロパティデフォルト値検証テスト
+ */
 describe('Given AglaError property defaults verification', () => {
+  /**
+   * プロパティデフォルト値確認テスト
+   */
   describe('When checking property defaults', () => {
     it('Then エッジケース：should keep provided option values', () => {
       const code = 'TEST_001';
@@ -129,7 +141,13 @@ describe('Given AglaError property defaults verification', () => {
   });
 });
 
+/**
+ * AglaErrorコンストラクタ最小パラメータ互換性テスト
+ */
 describe('Given AglaError constructor minimal parameter compatibility', () => {
+  /**
+   * レガシーコンテキストパラメータ形式使用時のテスト
+   */
   describe('When using legacy context parameter format', () => {
     it('Then should maintain backward compatibility', () => {
       const context = { userId: '123', operation: 'legacy' };
@@ -142,6 +160,9 @@ describe('Given AglaError constructor minimal parameter compatibility', () => {
   });
 });
 
+/**
+ * 大型または重いコンテキストを持つAglaErrorのテスト
+ */
 describe('Given AglaError with large or heavy contexts', () => {
   it('Then should handle large object context', () => {
     const largeContext = {

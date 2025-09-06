@@ -1,12 +1,19 @@
 // src: src/__tests__/functional/TypeSystemIntegration.functional.spec.ts
-// @(#) : TypeScript統合観点の機能テスト（型安全・ユニオン・コンテキスト）
+// @(#): TypeScript type system integration functional tests
 //
-// Copyright (c) 2025
-// MIT License
+// Copyright (c) 2025 atsushifx <http://github.com/atsushifx>
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
+// Testing framework
 import { describe, expect, it } from 'vitest';
+
+// Type definitions
 import { AglaError } from '../../../types/AglaError.types.js';
 import type { AglaErrorContext, AglaErrorOptions } from '../../../types/AglaError.types.js';
+
+// Test utilities
 import { TestAglaError } from '../helpers/TestAglaError.class.ts';
 
 type ProcessedError = {
@@ -16,8 +23,16 @@ type ProcessedError = {
   chained: AglaError;
 };
 
+/**
+ * TypeScript type system integration functional tests
+ * Tests type safety, union types, and context type compatibility
+ */
 describe('TypeScript Integration', () => {
+  /**
+   * Generic error handler type preservation scenarios
+   */
   describe('Generic handlers preserve types', () => {
+    // Type preservation: maintains type safety in generic processing functions
     it('maintains type safety across implementations', () => {
       const errorProcessor = (error: AglaError): ProcessedError => ({
         type: error.errorType,
@@ -35,7 +50,11 @@ describe('TypeScript Integration', () => {
     });
   });
 
+  /**
+   * Union type compatibility with standard Error class
+   */
   describe('Union with Error works', () => {
+    // Union type handling: supports mixed AglaError and Error arrays
     it('supports (AglaError | Error)[] pattern', () => {
       const mixed: (AglaError | Error)[] = [
         new TestAglaError('TEST_TYPE', 'Test message'),
@@ -51,7 +70,11 @@ describe('TypeScript Integration', () => {
     });
   });
 
+  /**
+   * AglaErrorContext type compatibility and integrity
+   */
   describe('AglaErrorContext replacement integrity', () => {
+    // Context type compatibility: AglaErrorOptions.context matches AglaErrorContext
     it('AglaErrorOptions.context satisfies AglaErrorContext', () => {
       const validContext: AglaErrorContext = {
         userId: 'user123',
@@ -71,6 +94,7 @@ describe('TypeScript Integration', () => {
       expect(options.context?.metadata).toEqual({ source: 'test' });
     });
 
+    // Context getter type safety: returns properly typed context or undefined
     it('AglaError.context getter returns AglaErrorContext | undefined', () => {
       const contextWithData: AglaErrorContext = {
         traceId: 'trace-345',
